@@ -1,0 +1,42 @@
+# 이 저장소에는 코드·도구·문서만 올린다.
+# 씬, 프리팹, 데이터 에셋, 그림, 외부 에셋, Unity가 만드는 폴더는 올리지 않는다(로컬 Unity 프로젝트에만 있다).
+# 그래서 모든 것을 무시한 뒤, 올릴 것만 다시 넣는다(허용 목록).
+/*
+!/.gitignore
+!/README.md
+!/.editorconfig
+
+# 문서. 작업 중 쌓인 백업 zip과 캡처 묶음은 뺀다.
+!/Docs/
+/Docs/ArtUpgrade/
+
+# Python 도구(그림·메시·대본 추출). 내려받은 외부 저장소(ThirdParty)는 뺀다.
+!/Tools/
+/Tools/ThirdParty/
+
+# 쓰는 Unity 패키지 목록
+!/Packages/
+/Packages/*
+!/Packages/manifest.json
+
+# C# 코드: 게임, 에디터 도구, 테스트(어셈블리 정의 포함), 셰이더, 입력 액션
+!/Assets/
+/Assets/*
+!/Assets/MiniPandoras/
+/Assets/MiniPandoras/*
+!/Assets/MiniPandoras/Scripts/
+!/Assets/MiniPandoras/Editor/
+!/Assets/MiniPandoras/Tests/
+!/Assets/MiniPandoras/Settings/
+/Assets/MiniPandoras/Settings/*
+!/Assets/MiniPandoras/Settings/*.inputactions
+!/Assets/MiniPandoras/Art/
+/Assets/MiniPandoras/Art/*
+!/Assets/MiniPandoras/Art/Shaders/
+
+# 에셋이 없는 저장소라 Unity의 .meta는 의미가 없다.
+*.meta
+
+# Python 캐시
+__pycache__/
+*.pyc

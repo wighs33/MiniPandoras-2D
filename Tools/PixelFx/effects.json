@@ -1,0 +1,26 @@
+[
+  {
+    "name": "HolyPillar",
+    "id": "holy/holy-pillar",
+    "options": {},
+    "impact": 0.66
+  },
+  {
+    "name": "PortalOpen",
+    "id": "dimension/rift-open",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "PortalLoop",
+    "id": "dimension/rift-loop",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "PortalClose",
+    "id": "dimension/rift-close",
+    "dir": "fx",
+    "options": {}
+  }
+]

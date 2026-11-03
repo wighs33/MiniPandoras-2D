@@ -1,0 +1,2523 @@
+{
+  "memberStats": [
+    {
+      "id": "hero",
+      "level": 1,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 60,
+      "dp": 10,
+      "atk": 10,
+      "def": 6,
+      "spd": 8,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 1,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 60,
+      "dp": 10,
+      "atk": 10,
+      "def": 6,
+      "spd": 8,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 2,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 76,
+      "dp": 12,
+      "atk": 12,
+      "def": 7,
+      "spd": 9,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 2,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 76,
+      "dp": 12,
+      "atk": 12,
+      "def": 7,
+      "spd": 9,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 3,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 118,
+      "dp": 36,
+      "atk": 16,
+      "def": 10,
+      "spd": 11,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 3,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 118,
+      "dp": 36,
+      "atk": 16,
+      "def": 10,
+      "spd": 11,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 4,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 140,
+      "dp": 44,
+      "atk": 19,
+      "def": 12,
+      "spd": 12,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 4,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 140,
+      "dp": 44,
+      "atk": 19,
+      "def": 12,
+      "spd": 12,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 5,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 165,
+      "dp": 52,
+      "atk": 22,
+      "def": 14,
+      "spd": 13,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 5,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 165,
+      "dp": 52,
+      "atk": 22,
+      "def": 14,
+      "spd": 13,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 6,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 190,
+      "dp": 60,
+      "atk": 25,
+      "def": 16,
+      "spd": 14,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 6,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 190,
+      "dp": 60,
+      "atk": 25,
+      "def": 16,
+      "spd": 14,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 7,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 212,
+      "dp": 66,
+      "atk": 27,
+      "def": 17,
+      "spd": 15,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 7,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 212,
+      "dp": 66,
+      "atk": 27,
+      "def": 17,
+      "spd": 15,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 8,
+      "awakened": false,
+      "sprite": "hero",
+      "hp": 212,
+      "dp": 66,
+      "atk": 27,
+      "def": 17,
+      "spd": 15,
+      "skills": [
+        "mystery"
+      ]
+    },
+    {
+      "id": "hero",
+      "level": 8,
+      "awakened": true,
+      "sprite": "hero",
+      "hp": 212,
+      "dp": 66,
+      "atk": 27,
+      "def": 17,
+      "spd": 15,
+      "skills": [
+        "darkPower"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 1,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 82,
+      "dp": 30,
+      "atk": 12,
+      "def": 7,
+      "spd": 12,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 1,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 82,
+      "dp": 30,
+      "atk": 12,
+      "def": 7,
+      "spd": 12,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 2,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 82,
+      "dp": 30,
+      "atk": 12,
+      "def": 7,
+      "spd": 12,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 2,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 82,
+      "dp": 30,
+      "atk": 12,
+      "def": 7,
+      "spd": 12,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 3,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 100,
+      "dp": 36,
+      "atk": 15,
+      "def": 9,
+      "spd": 13,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 3,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 100,
+      "dp": 36,
+      "atk": 15,
+      "def": 9,
+      "spd": 13,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 4,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 118,
+      "dp": 42,
+      "atk": 18,
+      "def": 11,
+      "spd": 14,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 4,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 118,
+      "dp": 42,
+      "atk": 18,
+      "def": 11,
+      "spd": 14,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 5,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 136,
+      "dp": 48,
+      "atk": 21,
+      "def": 13,
+      "spd": 15,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 5,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 136,
+      "dp": 48,
+      "atk": 21,
+      "def": 13,
+      "spd": 15,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 6,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 154,
+      "dp": 54,
+      "atk": 24,
+      "def": 15,
+      "spd": 16,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 6,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 154,
+      "dp": 54,
+      "atk": 24,
+      "def": 15,
+      "spd": 16,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 7,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 172,
+      "dp": 60,
+      "atk": 27,
+      "def": 17,
+      "spd": 17,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 7,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 172,
+      "dp": 60,
+      "atk": 27,
+      "def": 17,
+      "spd": 17,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 8,
+      "awakened": false,
+      "sprite": "rang",
+      "hp": 190,
+      "dp": 66,
+      "atk": 30,
+      "def": 19,
+      "spd": 18,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "rang",
+      "level": 8,
+      "awakened": true,
+      "sprite": "rang",
+      "hp": 190,
+      "dp": 66,
+      "atk": 30,
+      "def": 19,
+      "spd": 18,
+      "skills": [
+        "bite",
+        "beast"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 1,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 260,
+      "dp": 90,
+      "atk": 30,
+      "def": 16,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 1,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 260,
+      "dp": 90,
+      "atk": 30,
+      "def": 16,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 2,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 260,
+      "dp": 90,
+      "atk": 30,
+      "def": 16,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 2,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 260,
+      "dp": 90,
+      "atk": 30,
+      "def": 16,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 3,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 280,
+      "dp": 96,
+      "atk": 32,
+      "def": 17,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 3,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 280,
+      "dp": 96,
+      "atk": 32,
+      "def": 17,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 4,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 300,
+      "dp": 102,
+      "atk": 34,
+      "def": 18,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 4,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 300,
+      "dp": 102,
+      "atk": 34,
+      "def": 18,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 5,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 320,
+      "dp": 108,
+      "atk": 36,
+      "def": 19,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 5,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 320,
+      "dp": 108,
+      "atk": 36,
+      "def": 19,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 6,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 340,
+      "dp": 114,
+      "atk": 38,
+      "def": 20,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 6,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 340,
+      "dp": 114,
+      "atk": 38,
+      "def": 20,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 7,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 360,
+      "dp": 120,
+      "atk": 40,
+      "def": 21,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 7,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 360,
+      "dp": 120,
+      "atk": 40,
+      "def": 21,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 8,
+      "awakened": false,
+      "sprite": "dielDemon",
+      "hp": 380,
+      "dp": 126,
+      "atk": 42,
+      "def": 22,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "diel",
+      "level": 8,
+      "awakened": true,
+      "sprite": "dielDemon",
+      "hp": 380,
+      "dp": 126,
+      "atk": 42,
+      "def": 22,
+      "spd": 17,
+      "skills": [
+        "claw",
+        "wings"
+      ]
+    },
+    {
+      "id": "dielYoung",
+      "level": 1,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 1,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 2,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 2,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 3,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 3,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 4,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 4,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 5,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 5,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 6,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 6,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 7,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 7,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 8,
+      "awakened": false,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "dielYoung",
+      "level": 8,
+      "awakened": true,
+      "sprite": "dielChild",
+      "hp": 120,
+      "dp": 0,
+      "atk": 15,
+      "def": 8,
+      "spd": 13,
+      "skills": []
+    },
+    {
+      "id": "largo",
+      "level": 1,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 190,
+      "dp": 70,
+      "atk": 23,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 1,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 190,
+      "dp": 70,
+      "atk": 23,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 2,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 190,
+      "dp": 70,
+      "atk": 23,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 2,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 190,
+      "dp": 70,
+      "atk": 23,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 3,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 202,
+      "dp": 70,
+      "atk": 25,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 3,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 202,
+      "dp": 70,
+      "atk": 25,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 4,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 214,
+      "dp": 70,
+      "atk": 27,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 4,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 214,
+      "dp": 70,
+      "atk": 27,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 5,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 226,
+      "dp": 70,
+      "atk": 29,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 5,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 226,
+      "dp": 70,
+      "atk": 29,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 6,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 238,
+      "dp": 70,
+      "atk": 31,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 6,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 238,
+      "dp": 70,
+      "atk": 31,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 7,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 250,
+      "dp": 70,
+      "atk": 33,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 7,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 250,
+      "dp": 70,
+      "atk": 33,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 8,
+      "awakened": false,
+      "sprite": "largo",
+      "hp": 262,
+      "dp": 70,
+      "atk": 35,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "largo",
+      "level": 8,
+      "awakened": true,
+      "sprite": "largo",
+      "hp": 262,
+      "dp": 70,
+      "atk": 35,
+      "def": 14,
+      "spd": 10,
+      "skills": [
+        "sandBind",
+        "sandStorm"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 1,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 1,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 2,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 2,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 3,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 3,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 4,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 4,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 5,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 5,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 6,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 6,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 7,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 7,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 8,
+      "awakened": false,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "buddy",
+      "level": 8,
+      "awakened": true,
+      "sprite": "buddy",
+      "hp": 170,
+      "dp": 60,
+      "atk": 24,
+      "def": 12,
+      "spd": 22,
+      "skills": [
+        "blink"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 1,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 1,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 2,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 2,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 3,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 3,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 4,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 4,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 5,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 5,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 6,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 6,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 7,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 7,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 8,
+      "awakened": false,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "isabel",
+      "level": 8,
+      "awakened": true,
+      "sprite": "isabel",
+      "hp": 180,
+      "dp": 80,
+      "atk": 24,
+      "def": 12,
+      "spd": 16,
+      "skills": [
+        "foxfire"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 1,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 1,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 2,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 2,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 3,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 3,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 4,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 4,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 5,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 5,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 6,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 6,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 7,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 7,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 8,
+      "awakened": false,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "aurora",
+      "level": 8,
+      "awakened": true,
+      "sprite": "aurora",
+      "hp": 150,
+      "dp": 90,
+      "atk": 20,
+      "def": 10,
+      "spd": 14,
+      "skills": [
+        "lightRay"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 1,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 1,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 2,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 2,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 3,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 3,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 4,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 4,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 5,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 5,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 6,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 6,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 7,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 7,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 8,
+      "awakened": false,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "erus",
+      "level": 8,
+      "awakened": true,
+      "sprite": "erus",
+      "hp": 420,
+      "dp": 80,
+      "atk": 32,
+      "def": 22,
+      "spd": 14,
+      "skills": [
+        "mightyBlow"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 1,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 1,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 2,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 2,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 3,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 3,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 4,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 4,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 5,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 5,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 6,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 6,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 7,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 7,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 8,
+      "awakened": false,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    },
+    {
+      "id": "hass",
+      "level": 8,
+      "awakened": true,
+      "sprite": "hass",
+      "hp": 400,
+      "dp": 80,
+      "atk": 29,
+      "def": 18,
+      "spd": 15,
+      "skills": [
+        "rage",
+        "twinBlades"
+      ]
+    }
+  ],
+  "damage": [
+    {
+      "atk": 10,
+      "def": 16,
+      "power": 1,
+      "roll": 0,
+      "result": 1
+    },
+    {
+      "atk": 10,
+      "def": 16,
+      "power": 1,
+      "roll": 0.25,
+      "result": 1
+    },
+    {
+      "atk": 10,
+      "def": 16,
+      "power": 1,
+      "roll": 0.5,
+      "result": 1
+    },
+    {
+      "atk": 10,
+      "def": 16,
+      "power": 1,
+      "roll": 0.75,
+      "result": 1
+    },
+    {
+      "atk": 10,
+      "def": 16,
+      "power": 1,
+      "roll": 0.999,
+      "result": 1
+    },
+    {
+      "atk": 11,
+      "def": 6,
+      "power": 1.25,
+      "roll": 0,
+      "result": 9
+    },
+    {
+      "atk": 11,
+      "def": 6,
+      "power": 1.25,
+      "roll": 0.25,
+      "result": 10
+    },
+    {
+      "atk": 11,
+      "def": 6,
+      "power": 1.25,
+      "roll": 0.5,
+      "result": 10
+    },
+    {
+      "atk": 11,
+      "def": 6,
+      "power": 1.25,
+      "roll": 0.75,
+      "result": 11
+    },
+    {
+      "atk": 11,
+      "def": 6,
+      "power": 1.25,
+      "roll": 0.999,
+      "result": 11
+    },
+    {
+      "atk": 12,
+      "def": 7,
+      "power": 1.45,
+      "roll": 0,
+      "result": 12
+    },
+    {
+      "atk": 12,
+      "def": 7,
+      "power": 1.45,
+      "roll": 0.25,
+      "result": 13
+    },
+    {
+      "atk": 12,
+      "def": 7,
+      "power": 1.45,
+      "roll": 0.5,
+      "result": 14
+    },
+    {
+      "atk": 12,
+      "def": 7,
+      "power": 1.45,
+      "roll": 0.75,
+      "result": 14
+    },
+    {
+      "atk": 12,
+      "def": 7,
+      "power": 1.45,
+      "roll": 0.999,
+      "result": 15
+    },
+    {
+      "atk": 16,
+      "def": 8,
+      "power": 2.3,
+      "roll": 0,
+      "result": 29
+    },
+    {
+      "atk": 16,
+      "def": 8,
+      "power": 2.3,
+      "roll": 0.25,
+      "result": 31
+    },
+    {
+      "atk": 16,
+      "def": 8,
+      "power": 2.3,
+      "roll": 0.5,
+      "result": 32
+    },
+    {
+      "atk": 16,
+      "def": 8,
+      "power": 2.3,
+      "roll": 0.75,
+      "result": 34
+    },
+    {
+      "atk": 16,
+      "def": 8,
+      "power": 2.3,
+      "roll": 0.999,
+      "result": 36
+    },
+    {
+      "atk": 25,
+      "def": 80,
+      "power": 1,
+      "roll": 0,
+      "result": 1
+    },
+    {
+      "atk": 25,
+      "def": 80,
+      "power": 1,
+      "roll": 0.25,
+      "result": 1
+    },
+    {
+      "atk": 25,
+      "def": 80,
+      "power": 1,
+      "roll": 0.5,
+      "result": 1
+    },
+    {
+      "atk": 25,
+      "def": 80,
+      "power": 1,
+      "roll": 0.75,
+      "result": 1
+    },
+    {
+      "atk": 25,
+      "def": 80,
+      "power": 1,
+      "roll": 0.999,
+      "result": 1
+    },
+    {
+      "atk": 46,
+      "def": 10,
+      "power": 2.2,
+      "roll": 0,
+      "result": 86
+    },
+    {
+      "atk": 46,
+      "def": 10,
+      "power": 2.2,
+      "roll": 0.25,
+      "result": 91
+    },
+    {
+      "atk": 46,
+      "def": 10,
+      "power": 2.2,
+      "roll": 0.5,
+      "result": 96
+    },
+    {
+      "atk": 46,
+      "def": 10,
+      "power": 2.2,
+      "roll": 0.75,
+      "result": 100
+    },
+    {
+      "atk": 46,
+      "def": 10,
+      "power": 2.2,
+      "roll": 0.999,
+      "result": 105
+    },
+    {
+      "atk": 30,
+      "def": 17,
+      "power": 0,
+      "roll": 0,
+      "result": 1
+    },
+    {
+      "atk": 30,
+      "def": 17,
+      "power": 0,
+      "roll": 0.25,
+      "result": 1
+    },
+    {
+      "atk": 30,
+      "def": 17,
+      "power": 0,
+      "roll": 0.5,
+      "result": 1
+    },
+    {
+      "atk": 30,
+      "def": 17,
+      "power": 0,
+      "roll": 0.75,
+      "result": 1
+    },
+    {
+      "atk": 30,
+      "def": 17,
+      "power": 0,
+      "roll": 0.999,
+      "result": 1
+    }
+  ]
+}

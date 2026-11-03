@@ -1,0 +1,15 @@
+# C# 서식 규칙. Docs/ARCHITECTURE.md의 코드 규칙과 같다.
+# 확인: dotnet format whitespace MiniPandoras.Editor.csproj --verify-no-changes
+#       dotnet format style MiniPandoras.Editor.csproj --diagnostics IDE0011 --severity warn --verify-no-changes
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+csharp_new_line_before_open_brace = all
+
+# 한 줄에 문장 하나, if·for·foreach에는 늘 중괄호.
+csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = true
+csharp_prefer_braces = true:warning
+dotnet_diagnostic.IDE0011.severity = warning
