@@ -42,9 +42,7 @@
    - `Art/WebGame/Emotes/`: 감정 아이콘 6개(!, ?, …, 화남, 땀, 하트)
    - `Art/WebGame/Panels/`: 설명 그림. 웹게임 개발 도구(`__pandorasDev.explain`)로 띄운 화면을 1536×864로 찍는다
 2. 화자: `python -I Tools/WebGame/export_speakers.py <games/pandoras> Assets/MiniPandoras/Art/WebGame/speakers.json`. 웹게임 `story/cast.ts`(이름, 이름 색, 얼굴)와 `art.ts`(일러스트의 얼굴 칸)를 읽는다. 일러스트 그림(`Art/WebGame/Figures/`)은 웹게임 `public/games/pandoras/art`에서 webp를 png로 바꿔 복사한다.
-3. 전투 표: `node Tools/WebGame/export_battle.mjs <games/pandoras> .`(Node 23.6 이상: TypeScript 타입만 지우고 웹게임 모듈을 그대로 불러온다).
-   - `Art/WebGame/battle.json`: `battle/data.ts`(스킬, 적, 판도라 봉인서, 동료)와 `combat/actions.ts`(스킬이 필드에서 나가는 모양, 판도라마다 스킬 둘, 동료 부르기 기술). 처음 에셋을 만들 때 쓴 표이고, 지금은 `Data/Battle`의 에셋이 정본이라 아무것도 읽지 않는다(2026-11-07)
-   - `Tests/EditMode/Fixtures/battle_formulas.json`: 웹게임 코드가 직접 계산한 피해량과 동료 능력치. 공식 테스트가 대조한다
+3. 전투 공식 기대값: `node Tools/WebGame/export_battle.mjs <games/pandoras> .`(Node 23.6 이상: TypeScript 타입만 지우고 웹게임 모듈을 그대로 불러온다). 웹게임 코드가 직접 계산한 피해량과 동료 능력치를 `Tests/EditMode/Fixtures/battle_formulas.json`에 쓰고, 공식 테스트가 대조한다. 전투 수치 자체는 `Data/Battle`의 에셋이 정본이다
 4. 들여오기: 메뉴 **MiniPandoras/Import Web Game**(`Editor/WebGame/WebGameImporter`, 맵은 `MapImporter`)
    - 맵마다 `Prefabs/Maps/Map_<id>.prefab`
    - 인물마다 `Data/Characters/<id>.asset`(`CharacterSheet`). 끝에 PixelLab으로 만든 주인공 방망이 휘두르기 그림을 더한다(`Editor/Characters/ExtraFrames`, 메뉴 **Import Swing Frames**, `Art/PixelLab/Characters/hero`)

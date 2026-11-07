@@ -9,7 +9,7 @@
 
 사용: python Tools/PixelGen/pandora_book.py <프로젝트 루트>
 """
-import json
+import re
 import sys
 from pathlib import Path
 
@@ -19,7 +19,7 @@ from PIL import Image
 import pixelgen as pg
 from houses import Canvas
 
-# 판도라 문양 빛깔은 웹게임 PANDORA_BOOK(battle.json)에서 읽는다. 문양 이름: star, horns, flame, sand, snake, crystal, wind.
+# 판도라 문양과 빛깔은 판도라 에셋(Data/Battle/Pandoras)에서 읽는다. 문양 이름: star, horns, flame, sand, snake, crystal, wind.
 OFF = ("#6b6672", "#b7b2bd", "#26232c")
 LEATHER = pg.hexes("#24130f", "#2e1913", "#381f17", "#432620")
 GOLD = pg.hexes("#7a5a2a", "#b08a46", "#d6b25e", "#f0d890")
@@ -191,11 +191,31 @@ def white():
     return c.image
 
 
+def asset_color(text, field):
+    """에셋의 색 칸을 #rrggbb로 읽는다."""
+    match = re.search(field + r": \{r: ([\d.]+), g: ([\d.]+), b: ([\d.]+)", text)
+    return "#" + "".join(f"{round(float(value) * 255):02x}" for value in match.groups())
+
+
+def book_pandoras(project):
+    """봉인서에 실린 판도라를 봉인서 순서로 읽는다."""
+    battle = project / "Assets/MiniPandoras/Data/Battle"
+    catalog = (battle / "BattleCatalog.asset").read_text(encoding="utf-8")
+    order = re.search(r"  bookOrder:\n((?:  - \w+\n)+)", catalog.replace("\r\n", "\n")).group(1)
+    entries = []
+    for pandora in re.findall(r"- (\w+)", order):
+        text = (battle / "Pandoras" / f"{pandora}.asset").read_text(encoding="utf-8")
+        glyph = re.search(r"^  glyph: (\w*)", text, re.M).group(1)
+        if glyph:
+            entries.append({"id": pandora, "glyph": glyph, "color": asset_color(text, "  color"),
+                            "light": asset_color(text, "lightColor"), "dark": asset_color(text, "darkColor")})
+    return entries
+
+
 def main(project):
     out = project / "Assets/MiniPandoras/Art/PixelGen/UI/SealBook"
     out.mkdir(parents=True, exist_ok=True)
-    battle = json.loads((project / "Assets/MiniPandoras/Art/WebGame/battle.json").read_text(encoding="utf-8"))
-    pandoras = [p for p in battle["pandoras"] if p.get("glyph")]
+    pandoras = book_pandoras(project)
     for name, image in (("book", book()), ("button", button()), ("close", close()), ("ring", ring()), ("row", row()), ("white", white())):
         pg.save_png(image, out / f"{name}.png")
     for entry in pandoras:
