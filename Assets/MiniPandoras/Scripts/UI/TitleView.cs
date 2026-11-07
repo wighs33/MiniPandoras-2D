@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 타이틀 화면(임시, 2026-11-03 사용자 요청 「테스트하기 쉽게 장으로 바로」). 장 선택만 있고, 웹게임 TitleScene의 장 선택 창처럼
+    /// 타이틀 화면(임시: 테스트하기 쉽게 장으로 바로 들어가는 선택만 있다). 장 선택만 있고, 웹게임 TitleScene의 장 선택 창처럼
     /// 왼쪽 줄에 프롤로그~5장, 오른쪽 줄에 6장~11장을 둔다. 장을 누르면 그 번호를 알린다. 아직 옮기지 않은 장은 흐리게 두고 누를 수 없다.
     /// 표지 그림·이어 하기·조작법이 있는 제대로 된 타이틀은 나중에 이 자리를 바꾼다.
     /// </summary>
@@ -27,7 +27,7 @@ namespace MiniPandoras.UI
         /// <summary>장을 골랐다(장 번호, 0은 프롤로그).</summary>
         public event Action<int> ChapterPicked;
 
-        public bool IsShown => screen.activeSelf;
+        public bool IsOpen => screen.activeSelf;
 
         /// <param name="chapters">장마다 보일 글(「6장  뉴웨이브」)</param>
         /// <param name="playable">이 번호보다 앞선 장만 고를 수 있다</param>
@@ -60,7 +60,7 @@ namespace MiniPandoras.UI
         }
 
         /// <summary>그 장을 고른다(장 버튼이 부른다).</summary>
-        public void Pick(int chapter)
+        internal void Pick(int chapter)
         {
             ChapterPicked?.Invoke(chapter);
         }

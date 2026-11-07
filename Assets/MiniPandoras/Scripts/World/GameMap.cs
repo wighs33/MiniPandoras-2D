@@ -27,6 +27,7 @@ namespace MiniPandoras.World
         [SerializeField] private MapLook[] looks = Array.Empty<MapLook>();
 
         private HashSet<Vector2Int> water;
+        private Portal[] portals;
 
         public string Id => id;
         public string DisplayName => displayName;
@@ -38,6 +39,8 @@ namespace MiniPandoras.World
         /// <summary>지금 보이는 모습 이름. 모습이 없는 맵은 빈 문자열이다.</summary>
         public string ShownLook { get; private set; } = string.Empty;
 
+        public Vector2Int SizeInTiles => sizeInTiles;
+
         /// <summary>맵이 덮는 월드 사각형. 카메라가 이 밖을 비추지 않는다.</summary>
         public Rect Bounds
         {
@@ -48,7 +51,8 @@ namespace MiniPandoras.World
             }
         }
 
-        public Portal[] Portals => GetComponentsInChildren<Portal>(true);
+        /// <summary>이 맵의 포탈. 맵 안의 포탈은 바뀌지 않으므로 처음 물을 때 한 번만 모은다.</summary>
+        public Portal[] Portals => portals ??= GetComponentsInChildren<Portal>(true);
 
         /// <summary>그 지점의 첫 칸에 선 인물의 발 위치.</summary>
         public bool TryGetPoint(string pointName, out Vector2 position)
@@ -115,19 +119,6 @@ namespace MiniPandoras.World
             }
 
             ShownLook = looks.Length > 0 ? looks[shown].Name : string.Empty;
-        }
-
-        public MapGate Gate(string pointName)
-        {
-            foreach (MapGate gate in GetComponentsInChildren<MapGate>(true))
-            {
-                if (gate.Point == pointName)
-                {
-                    return gate;
-                }
-            }
-
-            throw new KeyNotFoundException($"{id}에 성문 {pointName}이 없다");
         }
     }
 

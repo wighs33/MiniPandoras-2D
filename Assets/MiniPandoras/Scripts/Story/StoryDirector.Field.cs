@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MiniPandoras.Characters;
 using MiniPandoras.Combat;
+using MiniPandoras.Dialogue;
 using MiniPandoras.Field;
 using MiniPandoras.Progress;
 using MiniPandoras.UI;
@@ -15,53 +16,8 @@ namespace MiniPandoras.Story
     // 장 코드는 맵에 사람·상자·적을 놓고 Explore로 조작을 넘긴 뒤, 탐험을 끝낸 트리거를 보고 다음 연출로 간다.
     public sealed partial class StoryDirector
     {
-        private const string BookFlag = "book";
-
-        [Tooltip("라르고의 지도처럼 지금 맵을 작게 보여 주는 판(웹게임 showMap)")]
-        [SerializeField] private MapSketchView mapSketch;
-
         private readonly Dictionary<string, Action> mapSetups = new Dictionary<string, Action>();
         private readonly Dictionary<string, string> mapNames = new Dictionary<string, string>();
-
-        // ── 진행 ───────────────────────────────────────────────
-
-        /// <summary>장이 시작될 때(웹게임 runStory): 장 번호를 적어 저장하고, 앞 장이 바꾼 맵 이름을 되돌린다.</summary>
-        public void BeginChapter(int chapter)
-        {
-            session.Checkpoint(chapter);
-            mapNames.Clear();
-            mapTravel.ClearLooks();
-            ResetFadeColor();
-        }
-
-        /// <summary>깃발과 물건을 모두 비운다(웹게임 프롤로그의 state.flags = {}, state.items = {}). 처음부터 하는 판이다.</summary>
-        public void ClearFlagsAndItems()
-        {
-            session.State.ClearFlagsAndItems();
-        }
-
-        public void SetFlag(string flag, bool on = true)
-        {
-            session.State.SetFlag(flag, on);
-        }
-
-        public bool HasFlag(string flag)
-        {
-            return session.State.HasFlag(flag);
-        }
-
-        /// <summary>그 물건을 적어도 그만큼 갖게 한다(웹게임 items.x = Math.max(items.x ?? 0, n)).</summary>
-        public void GiveAtLeast(string item, int count)
-        {
-            GameState state = session.State;
-            state.SetItemCount(item, Mathf.Max(state.ItemCount(item), count));
-        }
-
-        /// <summary>이야기가 판도라를 준다(더스트를 채우고 활성화한다).</summary>
-        public void GrantPandoras(params string[] ids)
-        {
-            PandoraBook.Grant(session.State, combat.Catalog, ids);
-        }
 
         // ── 맵 ────────────────────────────────────────────────
 
@@ -105,10 +61,15 @@ namespace MiniPandoras.Story
             }
         }
 
-        /// <summary>그 맵에 들어설 때 띠에 보일 이름을 바꾼다(웹게임 field.mapNames). 장이 바뀌면 원래 이름으로 돌아간다.</summary>
+        /// <summary>HUD에 보일 그 맵의 이름을 바꾼다(웹게임 field.mapNames). 장이 바뀌면 원래 이름으로 돌아간다.</summary>
         public void RenameMap(string mapId, string name)
         {
             mapNames[mapId] = name;
+            GameMap current = mapTravel.CurrentMap;
+            if (current != null && current.Id == mapId)
+            {
+                ShowPlaceName(current);
+            }
         }
 
         /// <summary>
@@ -137,16 +98,6 @@ namespace MiniPandoras.Story
             exploration.UnlockPoint(point);
         }
 
-        /// <summary>성문을 닫는다(웹게임 setTile "gate"). 닫힌 칸에 부딪히면 글을 띄운다.</summary>
-        public void CloseGate(string point, string bumpText)
-        {
-            mapTravel.CurrentMap.Gate(point).SetClosed(true);
-            foreach (Vector2Int cell in Points(point))
-            {
-                exploration.SetBumpText(cell, bumpText);
-            }
-        }
-
         /// <summary>장면 도중에 밤빛을 바꾼다(웹게임 field.ambient = …). 맵을 옮기면 그 맵의 밤빛으로 돌아간다.</summary>
         public void SetAmbient(Color color, float cover)
         {
@@ -156,8 +107,8 @@ namespace MiniPandoras.Story
         /// <summary>지금 맵의 논리 px 자리(웹게임 좌표)에 빛을 하나 켠다(웹게임 extraLights). 어두운 맵에서만 보인다.</summary>
         public void AddLight(Vector2 pixels, float radius, Color color)
         {
-            Vector2 at = (Vector2)mapTravel.CurrentMap.transform.position + new Vector2(MapCoordinates.Pixels(pixels.x), -MapCoordinates.Pixels(pixels.y));
-            ambientLight.AddLight(mapTravel.CurrentMap.transform, at, radius, color);
+            Vector2 at = (Vector2)MapRoot.position + new Vector2(MapCoordinates.Pixels(pixels.x), -MapCoordinates.Pixels(pixels.y));
+            ambientLight.AddLight(MapRoot, at, radius, color);
         }
 
         /// <summary>장면 도중에 날씨를 바꾼다(웹게임 field.weather = …). 맵을 옮기면 그 맵의 날씨로 돌아간다.</summary>
@@ -171,6 +122,11 @@ namespace MiniPandoras.Story
             captions.ShowHint(text, frames);
         }
 
+        public void ClearHint()
+        {
+            captions.ClearHint();
+        }
+
         // ── 탐험 ───────────────────────────────────────────────
 
         /// <summary>
@@ -179,6 +135,8 @@ namespace MiniPandoras.Story
         /// </summary>
         public IEnumerator Explore(Action<string> finished = null)
         {
+            // 연출로만 비춘 맵(11장 에라드의 탑)은 다녀온 곳이 아니다. 직접 걷는 맵과 옮겨 간 맵만 센다.
+            session.State.MarkVisited(mapTravel.CurrentMap.Id);
             SetPlayerControl(true);
             yield return exploration.Explore(finished);
             TakeControl(true);
@@ -198,7 +156,13 @@ namespace MiniPandoras.Story
         /// <summary>목적지 근처(맨해튼 거리 radius 안)에 닿으면 탐험을 끝내는 발판(웹게임 arriveAt).</summary>
         public void ArriveAt(string id, Vector2Int target, int radius = 1)
         {
-            Trigger(id, TriggerKind.Step, cell => Mathf.Abs(cell.x - target.x) + Mathf.Abs(cell.y - target.y) <= radius, once: true, ends: true);
+            Trigger(id, TriggerKind.Step, cell => IsWithin(cell, target, radius), once: true, ends: true);
+        }
+
+        /// <summary>그 칸이 목적지에서 맨해튼 거리 radius 안이다.</summary>
+        public static bool IsWithin(Vector2Int cell, Vector2Int target, int radius)
+        {
+            return Mathf.Abs(cell.x - target.x) + Mathf.Abs(cell.y - target.y) <= radius;
         }
 
         /// <summary>말을 걸면 대사를 차례로 하는 사람(웹게임 npc).</summary>
@@ -221,28 +185,6 @@ namespace MiniPandoras.Story
             exploration.SetTalk(Actor(id), talk);
         }
 
-        /// <summary>
-        /// 지금 맵을 지도로 보여 주고 목적지 지점을 표시한다(웹게임 showMap). 파란 점과 빨간 점을 알려 주는 해설을 넘기면 닫힌다.
-        /// </summary>
-        public IEnumerator ShowMap(string target, string caption)
-        {
-            Rect bounds = mapTravel.CurrentMap.Bounds;
-            int width = Mathf.RoundToInt(bounds.width);
-            int height = Mathf.RoundToInt(bounds.height);
-            var blocked = new bool[width, height];
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    blocked[x, y] = FootMover.IsBlocked(MapCoordinates.CellFoot(new Vector2Int(x, y)));
-                }
-            }
-
-            mapSketch.Show(blocked, hero.Character.Cell, Point(target), caption);
-            yield return Narrate("파란 점이 지금 있는 곳, 깜빡이는 빨간 점이 목적지다.");
-            mapSketch.Hide();
-        }
-
         /// <summary>그 칸을 보고 말을 걸면 글이 나오는 표지판(웹게임 sign).</summary>
         public void Sign(string point, string text)
         {
@@ -261,11 +203,11 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>
-        /// 주인공이 가까이 오면 일어나는 일(웹게임 onTouch). 일어나면 그 인물은 멈추므로, 다시 움직이게 하려면 <see cref="Resume"/>을 부른다.
+        /// 인물에게 V자 시야를 주고, 주인공이 거기 닿으면 일어나는 일을 건다. 일어나면 그 인물은 멈추므로, 다시 움직이게 하려면 <see cref="Resume"/>을 부른다.
         /// </summary>
-        public void OnTouch(string id, Func<IEnumerator> touch)
+        public void GiveSight(string id, Func<IEnumerator> caught)
         {
-            exploration.SetTouch(Actor(id), touch);
+            exploration.SetSight(Actor(id), caught);
         }
 
         public void Resume(string id)
@@ -284,14 +226,44 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>
-        /// 필드를 돌아다니는 적 무리(웹게임 monster). 가까이 가면 알아채고 덤빈다. 다 쓰러뜨리면 깃발 defeated:id가 서서
-        /// 다시 오지 않고, 봉인서를 얻은 뒤라면 짐승 더스트가 모인다.
+        /// 바닥에 떨어진 물건(웹게임에는 없다). 배경 소품과 구별되게 금빛 테두리가 빛나고 반짝인다.
+        /// 그 칸을 밟으면 주워 가방에 넣고, 바닥에서 사라진다. 이미 가진 물건이면 놓지 않는다.
+        /// 그림은 생성기가 그린 「아이템 id_ground」와, 테두리를 뜰 그림자 없는 모양 「아이템 id_ground_shape」다.
+        /// </summary>
+        /// <param name="picked">주운 뒤 이어 할 일(랑의 한마디처럼)</param>
+        public void Pickup(string item, Vector2Int cell, Func<IEnumerator> picked = null)
+        {
+            if (session.State.Owns(item))
+            {
+                return;
+            }
+
+            string key = PickupKey(item);
+            exploration.AddPickup(key, Image(item + "_ground"), Image(item + "_ground_shape"), cell);
+            Trigger(key, TriggerKind.Step, at => at == cell, () => PickUp(key, item, picked), once: true);
+        }
+
+        /// <summary>
+        /// 바닥에 놓아 둔 물건(<see cref="Pickup"/>)을 플레이어 대신 주워 건넨다(2장에서 방망이를 두고 들판을 떠나면 랑이 챙겨 옴).
+        /// 바닥 그림과 줍는 칸을 치우고 가방에 넣는다. 지금 맵에 놓여 있지 않아도 가방에는 넣는다.
+        /// </summary>
+        public IEnumerator HandOverPickup(string item)
+        {
+            string key = PickupKey(item);
+            exploration.RemoveTrigger(key);
+            yield return PickUp(key, item, null);
+        }
+
+        /// <summary>
+        /// 필드를 돌아다니는 적 무리(웹게임 monster). 가까이 가면 알아채고 덤빈다. 다 쓰러뜨리면 깃발 defeated:id로 남고,
+        /// 봉인서를 얻은 뒤라면 짐승 더스트가 모인다. respawnFrames를 주지 않으면 다시 오지 않는다.
         /// </summary>
         public void Monster(string id, Vector2Int at, IReadOnlyList<string> enemies, BattleHooks hooks = null,
-            IReadOnlyList<Facing> patrol = null, int patrolFramesPerTile = 18, Func<IEnumerator> onAggro = null, Func<IEnumerator> onDefeat = null)
+            IReadOnlyList<Facing> patrol = null, int patrolFramesPerTile = 18, Func<IEnumerator> onAggro = null, Func<IEnumerator> onDefeat = null,
+            int respawnFrames = 0)
         {
-            string flag = "defeated:" + id;
-            if (HasFlag(flag))
+            string flag = DefeatedFlag(id);
+            if (respawnFrames == 0 && HasFlag(flag))
             {
                 return;
             }
@@ -304,9 +276,21 @@ namespace MiniPandoras.Story
                 Hooks = hooks,
                 Patrol = patrol,
                 PatrolFramesPerTile = patrolFramesPerTile,
+                RespawnFrames = respawnFrames,
                 OnAggro = onAggro,
                 OnDefeated = () => MonsterDefeated(flag, enemies.Count, onDefeat),
             });
+        }
+
+        private static string DefeatedFlag(string monsterId)
+        {
+            return "defeated:" + monsterId;
+        }
+
+        /// <summary>그 무리(<see cref="Monster"/>의 id)를 이미 다 쓰러뜨렸다.</summary>
+        public bool HasDefeated(string monsterId)
+        {
+            return HasFlag(DefeatedFlag(monsterId));
         }
 
         /// <summary>맵에 물건을 놓는다(웹게임 field.addObject). 그림 이름은 웹게임 assets.images의 이름이다.</summary>
@@ -318,6 +302,12 @@ namespace MiniPandoras.Story
         public void RemoveObject(string id)
         {
             exploration.RemoveObject(id);
+        }
+
+        /// <summary>맵에 놓은 물건을 칸에 매이지 않은 자리로 옮긴다.</summary>
+        public void MoveObject(string id, Vector2 position)
+        {
+            exploration.MoveObject(id, position);
         }
 
         private IEnumerator SayLines(IReadOnlyList<(string speaker, string text)> lines)
@@ -340,88 +330,30 @@ namespace MiniPandoras.Story
             exploration.SetObjectSprite(key, Image("chestOpen"));
             GameState state = session.State;
             state.SetItemCount(item, state.ItemCount(item) + count);
-            string amount = count > 1 ? $" ×{count}" : string.Empty;
-            yield return Notify($"{Items.NameOf(item)}{amount}을(를) 손에 넣었다!");
+            string what = count > 1 ? $"{Items.NameOf(item)} {count}개를" : NameFill.Attach(Items.NameOf(item), "을");
+            yield return Notify($"{what} 손에 넣었다!");
         }
 
-        private IEnumerator MonsterDefeated(string flag, int count, Func<IEnumerator> onDefeat)
+        /// <summary>튜토리얼: 바닥에 놓아 둔 그 물건 위에 화살표를 띄워 주우러 갈 곳을 알려 준다.</summary>
+        public void PointAtPickup(string item)
         {
-            SetFlag(flag);
-            yield return BeastDust(count);
-            if (onDefeat != null)
-            {
-                yield return onDefeat();
-            }
+            exploration.PointAtPickup(PickupKey(item));
         }
 
-        /// <summary>
-        /// 사냥으로 모으는 더스트(웹게임 beastDust). 봉인서를 얻기 전에는 아무것도 모이지 않고,
-        /// 얻은 뒤로는 한 마리마다 불꽃·뱀 가운데 하나의 더스트가 모인다. 처음 모일 때 랑이 알려 준다.
-        /// </summary>
-        private IEnumerator BeastDust(int count)
+        private static string PickupKey(string item)
         {
+            return "pickup:" + item;
+        }
+
+        private IEnumerator PickUp(string key, string item, Func<IEnumerator> picked)
+        {
+            exploration.RemoveObject(key);
             GameState state = session.State;
-            BattleCatalog catalog = combat.Catalog;
-            if (!state.HasFlag(BookFlag))
+            state.SetItemCount(item, state.ItemCount(item) + 1);
+            yield return Notify($"{NameFill.Attach(Items.NameOf(item), "을")} 손에 넣었다!");
+            if (picked != null)
             {
-                yield break;
-            }
-
-            bool first = true;
-            foreach (string hunted in catalog.HuntPandoras)
-            {
-                first &= state.Dust(hunted) == 0;
-            }
-
-            var gained = new List<string>();
-            var filled = new List<string>();
-            for (int i = 0; i < count; i++)
-            {
-                string target = PandoraBook.HuntTarget(state, catalog, UnityEngine.Random.value);
-                if (target == null)
-                {
-                    break;
-                }
-
-                if (PandoraBook.AddDust(state, target, catalog.BeastDust))
-                {
-                    filled.Add(target);
-                }
-
-                if (!gained.Contains(target))
-                {
-                    gained.Add(target);
-                }
-            }
-
-            if (gained.Count == 0)
-            {
-                yield break;
-            }
-
-            if (first)
-            {
-                yield return Narrate("쓰러진 짐승에게서 빛 가루가 흘러나와 봉인서로 스며들었다.");
-            }
-
-            foreach (string id in gained)
-            {
-                string name = catalog.Pandora(id).PandoraName;
-                if (filled.Contains(id))
-                {
-                    yield return Notify($"{name}의 판도라 더스트가 100% 모였다! 봉인서에서 활성화할 수 있다.");
-                }
-                else
-                {
-                    yield return Notify($"{name}의 판도라 더스트를 얻었다! ({state.Dust(id)}%)");
-                }
-            }
-
-            if (first)
-            {
-                yield return Say("rang", "냐. 봉인서가 반응했다. 쓰러진 녀석의 판도라 더스트가 새겨진 거다.");
-                yield return Say(HeroId, "이렇게 모으는 거였구나⋯⋯");
-                yield return Say("rang", "100%가 되면 봉인서에서 깨울 수 있다. 그때까지는 그냥 가루일 뿐이지.");
+                yield return picked();
             }
         }
 
@@ -431,6 +363,7 @@ namespace MiniPandoras.Story
         /// </summary>
         private void OnMapLoaded(GameMap map)
         {
+            ShowPlaceName(map);
             // 웹게임 field.load는 장면 효과를 모두 지우고 날씨를 그 맵 것으로 되돌린다. 경보도 그 맵의 준비가 다시 켠다.
             Alarm(false);
             weather.Show(map.Weather);
@@ -444,12 +377,18 @@ namespace MiniPandoras.Story
 
         private void OnWarped(GameMap map)
         {
+            session.State.MarkVisited(map.Id);
             RunMapSetup();
         }
 
         private void OnArrived(GameMap map)
         {
-            captions.ShowBanner(mapNames.TryGetValue(map.Id, out string name) ? name : map.DisplayName);
+            ShowPlaceName(map);
+        }
+
+        private void ShowPlaceName(GameMap map)
+        {
+            touch.PlaceName.Show(mapNames.TryGetValue(map.Id, out string name) ? name : map.DisplayName);
         }
 
         private Sprite Image(string name)

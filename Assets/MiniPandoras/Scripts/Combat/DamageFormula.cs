@@ -1,4 +1,5 @@
 using System;
+using MiniPandoras.World;
 
 namespace MiniPandoras.Combat
 {
@@ -14,16 +15,7 @@ namespace MiniPandoras.Combat
             // 웹게임과 같은 값이 나오도록 JavaScript처럼 double로 계산한다.
             double baseDamage = attack * (double)power - defense * 0.55;
             double variance = 0.9 + roll * 0.2;
-            return Math.Max(1, JsRound(baseDamage * variance));
-        }
-
-        /// <summary>
-        /// JavaScript Math.round: .5는 늘 위로 올린다. C#의 Math.Round·Mathf.RoundToInt는 짝수 쪽으로 반올림해서
-        /// 2.5를 2로 만들기 때문에 웹게임과 수치가 달라진다.
-        /// </summary>
-        public static int JsRound(double value)
-        {
-            return (int)Math.Floor(value + 0.5);
+            return Math.Max(1, JsMath.Round(baseDamage * variance));
         }
     }
 }

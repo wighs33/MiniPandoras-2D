@@ -22,17 +22,14 @@ namespace MiniPandoras.Progress
         {
             state.SetChapter(chapter);
             SaveData previous = SaveStore.Read();
-            SaveStore.Write(state.ToSave(previous != null && previous.Cleared));
+            SaveStore.Write(state.ToSave(chapter, previous != null && previous.Cleared));
         }
 
         /// <summary>1부를 끝까지 봤다. 저장된 장은 그대로 두고 표시만 더한다(웹게임 markCleared).</summary>
         public void MarkCleared()
         {
             SaveData previous = SaveStore.Read();
-            int now = state.Chapter;
-            state.SetChapter(previous?.Chapter ?? 0);
-            SaveStore.Write(state.ToSave(true));
-            state.SetChapter(now);
+            SaveStore.Write(state.ToSave(previous?.Chapter ?? 0, true));
         }
     }
 }

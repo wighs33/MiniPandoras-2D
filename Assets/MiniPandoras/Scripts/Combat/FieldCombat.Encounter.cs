@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using MiniPandoras.Characters;
+using MiniPandoras.World;
 using UnityEngine;
 
 namespace MiniPandoras.Combat
@@ -8,7 +9,7 @@ namespace MiniPandoras.Combat
     // 이야기 전투(웹게임 Encounter가 전투 엔진에 맡기는 부분)와 훅 실행.
     public sealed partial class FieldCombat
     {
-        // 예전 턴제 훅의 「판」은 실제 시간으로 이만큼(4초)마다 한 판으로 센다.
+        // 웹게임의 턴제 훅이 말하는 「판」은 실제 시간으로 이만큼(4초)마다 한 판으로 센다.
         private const int RoundFrames = 240;
 
         private EncounterLink encounter;
@@ -17,19 +18,17 @@ namespace MiniPandoras.Combat
 
         public bool InEncounter => encounter != null;
 
-        /// <summary>이야기 전투에 나온 보스(체력 300 이상) 가운데 첫째. 화면 위쪽에 체력을 따로 그린다.</summary>
+        /// <summary>
+        /// 싸우고 있는 보스(<see cref="EnemyFighter.Boss"/>) 가운데 첫째. 화면 위쪽에 체력을 따로 그린다.
+        /// 이야기 전투의 보스는 곧바로, 필드의 보스는 알아챈 뒤에 해당한다.
+        /// </summary>
         public EnemyFighter Boss
         {
             get
             {
-                if (encounter == null)
-                {
-                    return null;
-                }
-
                 foreach (EnemyFighter e in enemies)
                 {
-                    if (e.InEncounter && e.IsAlive && e.Boss)
+                    if ((e.InEncounter || e.Aggro) && e.IsAlive && e.Boss)
                     {
                         return e;
                     }
@@ -41,9 +40,9 @@ namespace MiniPandoras.Combat
         /// <summary>이야기 전투의 적이 모두 쓰러졌다.</summary>
         public bool IsWon { get; private set; }
 
-        public EnemyFighter MakeEnemy(CharacterBody body, string key, string enemyId, bool spawned)
+        public EnemyFighter MakeEnemy(CharacterBody body, string key, string enemyId)
         {
-            return new EnemyFighter(body, key, catalog.Enemy(enemyId), null, true, spawned);
+            return new EnemyFighter(body, key, catalog.Enemy(enemyId), null, true);
         }
 
         /// <summary>그 자리에서 이야기 전투를 시작한다. 플레이어는 체력을 가득 채우고, 적은 곧바로 덤빈다.</summary>
@@ -81,16 +80,7 @@ namespace MiniPandoras.Combat
                 }
 
                 CancelAttack(e);
-                e.Dead = false;
-                e.SetHp(e.MaxHp);
-                e.Body.SetVisible(true);
-                e.Body.Alpha = 1f;
-                e.Body.Shade = null;
-                e.State = EnemyState.Chase;
-                e.Slow = 0;
-                e.Freeze = 0;
-                e.DotTicks = 0;
-                e.Cooldown = 60;
+                e.ResetToStart(false);
             }
 
             FreshPlayer();
@@ -100,6 +90,9 @@ namespace MiniPandoras.Combat
 
         public void EndEncounter()
         {
+            // 공격을 누르고 있으면 끝나는 어둠 속에서도 다시 휘두른다. 몸을 놓기 전에 멈춰 그림이 휘두르는 채로 남지 않게 한다.
+            Settle();
+            bossFellHere |= enemies.Exists(e => e.InEncounter && e.Boss);
             ClearSummons();
             ClearShownCompanions();
             enemies.RemoveAll(e => e.InEncounter);
@@ -116,42 +109,30 @@ namespace MiniPandoras.Combat
             Player = null;
         }
 
-        /// <summary>훅이 이름으로 전투원을 찾는다. 주인공은 "hero"로도 찾는다.</summary>
         /// <summary>훅이 전투원을 흔든다(웹게임 Combatant.shake = n → n×4프레임). 적만 흔들린다.</summary>
         internal void ShakeCombatant(string key, float amount)
         {
             if (Combatant(key) is EnemyFighter enemy)
             {
-                enemy.ShakeFrames = DamageFormula.JsRound(amount * 4f);
+                enemy.ShakeFrames = JsMath.Round(amount * 4f);
             }
         }
 
-        /// <summary>훅이 주인공을 흘려보내기 상태로 둔다(웹게임 phase = n, 10 이하면 n×150프레임).</summary>
-        internal void SetPhase(string key, int value)
-        {
-            if (Combatant(key) is PlayerFighter fighter)
-            {
-                fighter.PhaseFrames = value > 0 && value <= 10 ? value * 150 : value;
-            }
-        }
-
+        /// <summary>훅이 이름으로 전투원을 찾는다. 주인공은 "hero"로도 찾는다.</summary>
         public ICombatant Combatant(string key)
         {
-            PlayerFighter p = Player;
-            if (p != null && (key == p.Key || (key == "hero" && p.IsHero)))
+            if (IsPlayerKey(key))
             {
-                return p;
+                return Player;
             }
 
-            foreach (EnemyFighter e in enemies)
+            EnemyFighter enemy = FindEnemy(key);
+            if (enemy == null)
             {
-                if (e.Key == key && e.InEncounter)
-                {
-                    return e;
-                }
+                throw new KeyNotFoundException("전투원 " + key + "가 없다");
             }
 
-            throw new KeyNotFoundException("전투원 " + key + "가 없다");
+            return enemy;
         }
 
         /// <summary>쓰러진 적을 처음 섰던 자리에서 다시 일으킨다(체력 가득). 쓰러지지 않았으면 그대로다.</summary>
@@ -193,7 +174,7 @@ namespace MiniPandoras.Combat
             messageFrames = frames > 0 ? frames : 60;
             if (frames > 0)
             {
-                yield return new WaitForSeconds(frames / 60f);
+                yield return Frames(frames);
             }
         }
 

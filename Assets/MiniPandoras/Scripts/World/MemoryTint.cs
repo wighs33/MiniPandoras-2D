@@ -5,7 +5,8 @@ using UnityEngine.Rendering.Universal;
 namespace MiniPandoras.World
 {
     /// <summary>
-    /// 회상 장면의 색(웹게임 game.memory): 채도를 빼고 세피아를 얹은 뒤 가장자리를 어둡게 한다. 켜고 끌 때 서서히 바뀐다.
+    /// 회상 장면의 색(웹게임 game.memory): 채도를 빼고 세피아를 얹는다. 켜고 끌 때 서서히 바뀐다.
+    /// 웹게임의 가장자리 그늘은 뺐다.
     /// 웹게임처럼 땅과 인물까지만 물들이고 빛·봉인·알갱이 같은 효과는 그 위에 원래 색으로 그린다. 그래서 이 카메라에만
     /// 후처리를 켜고, 효과는 <see cref="UntintedLayer"/> 층에 두어 후처리 없는 덧그림 카메라(카메라 스택)가 그린다.
     /// 웹게임의 가는 가로줄(주사선)은 옮기지 않았다.
@@ -24,7 +25,6 @@ namespace MiniPandoras.World
         // 세피아 섞기와 곱하기를 색 필터 하나로 합쳤다(세피아 색을 밝기 1로 맞춰 40%만 섞은 값 × 곱하기 값).
         private const float Desaturation = -82f;
         private static readonly Color SepiaFilter = new Color(0.915f, 0.802f, 0.685f);
-        private static readonly Color EdgeShadow = new Color32(12, 8, 4, 255);
 
         private UniversalAdditionalCameraData cameraData;
         private Volume volume;
@@ -51,12 +51,6 @@ namespace MiniPandoras.World
             var color = profile.Add<ColorAdjustments>();
             color.saturation.Override(Desaturation);
             color.colorFilter.Override(SepiaFilter);
-            var vignette = profile.Add<Vignette>();
-            vignette.color.Override(EdgeShadow);
-            vignette.intensity.Override(0.45f);
-            vignette.smoothness.Override(0.6f);
-            // 웹게임 가장자리 그늘은 화면 비율과 상관없이 둥글다.
-            vignette.rounded.Override(true);
 
             volume = gameObject.AddComponent<Volume>();
             volume.isGlobal = true;
@@ -76,7 +70,7 @@ namespace MiniPandoras.World
                 return;
             }
 
-            float next = Mathf.Lerp(volume.weight, target, 1f - Mathf.Pow(1f - EasePerFrame, Time.deltaTime * 60f));
+            float next = Mathf.Lerp(volume.weight, target, FrameTime.Ease(EasePerFrame, Time.deltaTime));
             Apply(Mathf.Abs(next - target) < Invisible ? target : next);
         }
 

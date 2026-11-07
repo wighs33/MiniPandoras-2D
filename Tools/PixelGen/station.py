@@ -1,4 +1,4 @@
-"""뱀열차 정류장 소품(사용자 요청 2026-11-02: 승강장이 승강장 같지 않다).
+"""뱀열차 정류장 소품(승강장이 승강장 같지 않다).
 
   platform(columns, stairs, rng)     돌로 쌓아 올린 승강장(바닥에 까는 그림): 판석 윗면, 선로 쪽 가장자리의 밝은 갓돌과 놋쇠 띠,
                                      앞(남쪽) 옹벽과 그 옹벽을 끊고 내려가는 돌계단
@@ -6,6 +6,9 @@
   station_board(rng)                 역명판: 쇠 기둥 둘에 건 초록 판에 뱀 문장과 「뱀열차 정류장」
   ticket_booth(rng)                  매표소: 판자벽의 작은 오두막, 불 켜진 창구와 차양, 지붕 위 뱀 문장 간판, 벽 등불
   luggage(rng)                       여행 가방 더미: 놋쇠 모서리의 큰 트렁크, 작은 가방, 끈 묶은 자루
+  station_clock(rng), timetable(rng) 종착역(terminus.py)에 세우는 벽시계와 시간표
+  text_mask(text, size)              글자를 점 마스크로 만든다(역명판, cutin_gods.py의 글자도 이것을 쓴다)
+  snake_emblem(c, x0, y0, color, eye) 뱀 문장(역명판·매표소 간판)
 
 세우는 것은 (RGBA 그림, 기준점)을 돌려준다(기준점은 바닥에 닿는 아래 가운데, layout.MapLayout.stand로 세운다).
 바닥에 까는 것은 RGBA 그림만 돌려준다(layout.MapLayout.decal). 모두 점 격자(한 칸 32점)에 그린다.
@@ -25,6 +28,7 @@ STONE = pg.STONE
 PAVING = pg.hexes("#55575f", "#6c6e77", "#787a83", "#82848d", "#979aa2")
 WALL = pg.hexes("#1f1f26", "#2c2d35", "#383a44", "#464854", "#5a5c68")
 SNAKE = pg.hexes("#2c3e2e", "#52694a", "#6e8752", "#869c5e")   # 뱀열차 비늘 색(snake_train.py와 같은 녹색)
+# 역명판 글자는 Windows 맑은 고딕 굵게로 뽑는다(다른 글꼴로 바꾸면 도트 글자 모양이 달라져 이미 쓰는 그림과 어긋난다). 이 도구는 Windows에서만 돈다.
 FONT = "C:/Windows/Fonts/malgunbd.ttf"
 
 

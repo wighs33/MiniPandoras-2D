@@ -1,4 +1,4 @@
-"""맵을 웹게임 배치 없이 새로 짜는 도구(사용자 결정 2026-11-02: 맵은 웹게임 방식을 따를 필요가 없다).
+"""맵을 웹게임 배치 없이 새로 짜는 도구(맵은 웹게임 방식을 따를 필요가 없다).
 
 맵 한 장은 칸 격자에 바닥 종류를 칠하고(길·광장·개울 …), 집·나무·가로등·상자를 칸 자리에 세우고, 이야기가 쓰는 지점과
 포탈을 적어서 만든다. 저장하면 웹게임 맵과 같은 형식의 map.json과 바닥 그림이 생기고, 맵 들여오기(MapImporter)는
@@ -273,11 +273,13 @@ class MapLayout:
 
     def collision(self, look=None):
         """막힌 충돌 칸. look을 주면 그 모습일 때만 막히는 칸도 더한다."""
-        solid = self.solid | self.look_solid[look] if look else self.solid.copy()
+        solid = self.solid.copy()
         for kind in SOLID_KINDS:
             cells = np.kron(self.kinds == kind, np.ones((SUB, SUB), dtype=bool))
             solid |= cells
-        return solid & ~self.open
+        solid &= ~self.open
+        # 모습 안에서 막은 칸은 열어 둔 자리보다 앞선다(끊어진 다리는 그 모습에서만 막힌다).
+        return solid | self.look_solid[look] if look else solid
 
     def check(self):
         """지점 칸이 막혀 있으면 알린다(이야기가 그 칸에 인물을 세운다). 모습이 있으면 모습마다 본다."""
@@ -314,7 +316,7 @@ class MapLayout:
             "warps": self.warps, "uprights": self.uprights, "decals": self.decals, "gates": self.gates,
             "animated": water + self.fires, "glints": glints, "lights": self.lights,
             "background": self.background, "ambient": self.ambient, "weather": self.weather,
-            "looks": [{"name": name, "collision": ["".join("1" if v else "0" for v in row) for row in solid_cells & ~self.open]}
+            "looks": [{"name": name, "collision": ["".join("1" if v else "0" for v in row) for row in solid_cells]}
                       for name, solid_cells in self.look_solid.items()],
         }
         (folder / "map.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")

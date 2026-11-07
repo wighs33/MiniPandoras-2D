@@ -18,7 +18,7 @@ namespace MiniPandoras.Tests
         [TestCase("{name으로} 정했다.", "나래", "나래로 정했다.")]
         [TestCase("{name아}!", "도윤", "도윤아!")]
         [TestCase("{name아}!", "나래", "나래야!")]
-        [TestCase("{name}. ⋯그렇게 불러 줘.", "하늘", "하늘. ⋯그렇게 불러 줘.")]
+        [TestCase("{name}.\n...그렇게 불러 줘.", "하늘", "하늘.\n...그렇게 불러 줘.")]
         public void FillsTheNameWithTheMatchingParticle(string text, string name, string expected)
         {
             Assert.That(NameFill.Fill(text, name), Is.EqualTo(expected));

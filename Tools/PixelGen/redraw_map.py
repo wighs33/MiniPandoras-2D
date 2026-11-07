@@ -31,7 +31,7 @@ import trees
 PROPS = {
     "tree": (props.tree, 4, (70, 88), (35, 87.5)),
     "pine": (props.pine, 4, (56, 96), (28, 95.5)),
-    # 숲을 여러 종류로 꾸미는 나무(사용자 요청 2026-11-03, trees.py). 새로 짠 맵(layout.py)이 심는다.
+    # 숲을 여러 종류로 꾸미는 나무(trees.py). 새로 짠 맵(layout.py)이 심는다.
     "oak": (trees.oak, 3, (84, 96), (42, 95.5)),
     "maple": (trees.maple, 3, (64, 84), (32, 83.5)),
     "birch": (trees.birch, 3, (48, 92), (24, 91.5)),
@@ -44,10 +44,10 @@ PROPS = {
 }
 DRAWERS = {"outdoor": terrain.draw_outdoor, "void": terrain.draw_void}
 BACKDROPS = {"void": backdrop.void}
-# 웹게임 나무 대신 숲 구역을 다시 심는 맵(사용자 요청 2026-11-03)과 그 무리 비율. 정원은 침엽수 없이, 모래땅은 활엽수만.
+# 웹게임 나무 대신 숲 구역을 다시 심는 맵과 그 무리 비율. 정원은 침엽수 없이, 모래땅은 활엽수만.
 GARDEN = (forest.BIRCHES, forest.BIRCHES, forest.BROADLEAF)
 REPLANT = {
-    "airosRoad": None, "caveRoad": None, "forest": None, "outskirts": None, "port": None, "station": None,
+    "airosRoad": None, "caveRoad": None, "forest": None, "port": None, "station": None,
     "fairyGarden": GARDEN, "fairyNight": GARDEN, "hiddenGarden": GARDEN,
     "westSands": (forest.BROADLEAF, forest.BROADLEAF, forest.BROADLEAF),
 }

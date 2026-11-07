@@ -10,13 +10,15 @@ namespace MiniPandoras.Editor.Field
     /// <summary>
     /// 임시 타이틀 화면: 게임 이름과 장 선택 창(왼쪽 줄 프롤로그~5장, 오른쪽 줄 6장~11장, 웹게임 TitleScene과 같은 나눔).
     /// 모든 화면 위에 그린다(이야기가 시작되기 전에만 보인다).
-    /// 게임 메뉴: 오른쪽 위 「메뉴」 버튼과, 누르면 화면을 덮고 뜨는 창(계속하기 · 판도라 봉인서 · 타이틀로). 타이틀보다 아래, 다른 화면보다 위에 그린다.
-    /// 봉인서 버튼은 봉인서를 얻은 뒤에만 보여서, 창은 버튼 수에 맞춰 높이가 바뀐다(세로 배치).
+    /// 게임 메뉴: 오른쪽 위 「메뉴」 버튼과, 누르면 화면을 덮고 뜨는 창(계속하기 · 인벤토리 · 판도라 정착 · 판도라 봉인서 · 타이틀로).
+    /// 타이틀보다 아래, 다른 화면보다 위에 그린다. 정착·봉인서 버튼은 익히거나 얻은 뒤에만 보여서, 창은 버튼 수에 맞춰 높이가 바뀐다(세로 배치).
     /// </summary>
     internal static class TitleUiBuilder
     {
         private const float RowHeight = 15f;
         private const float ColumnWidth = 150f;
+
+        private static readonly Vector2 MenuButtonSize = new Vector2(124f, 16f);
 
         public static TitleView Build()
         {
@@ -60,11 +62,39 @@ namespace MiniPandoras.Editor.Field
             return view;
         }
 
+        /// <summary>
+        /// 대화·연출 건너뛰기 버튼(웹게임 SKIP_RECT). 웹게임 자리(오른쪽 위)에 메뉴 버튼이 있어 그 왼쪽에 둔다. 키보드 안내(Tab)는 없다.
+        /// 대사를 넘기는 판(Story UI)보다 위, 열린 메뉴의 덮개(Menu UI)보다 아래에 그린다.
+        /// </summary>
+        public static SkipButtonView BuildSkipButton()
+        {
+            Canvas canvas = NewCanvas("Skip UI", 25, VirtualScreen);
+            RectTransform rect = Rect(canvas.transform, "Skip", new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-44f, -6f), new Vector2(66f, 14f));
+            Image frame = Window(rect, GoldDim, Panel);
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = ClickArea(rect);
+            TMP_Text arrows = Label(rect, "Arrows", 5f, 0f, 14f, 14f, 7f, Regular, Gold, TextAlignmentOptions.MidlineLeft);
+            arrows.text = "▶▶";
+            TMP_Text label = Label(rect, "Text", 19f, 0f, 44f, 14f, 7f, Bold, Ink, TextAlignmentOptions.MidlineLeft);
+
+            var view = canvas.gameObject.AddComponent<SkipButtonView>();
+            SerializedFields.Set(view, ("root", rect.gameObject), ("button", button), ("fill", rect.Find("Fill").GetComponent<Image>()), ("frame", frame),
+                ("arrows", arrows), ("label", label));
+            return view;
+        }
+
+        /// <summary>메뉴 창 안에 세로로 쌓이는 버튼 하나. 자리는 VerticalLayoutGroup이 정한다.</summary>
+        private static Button MenuButton(Transform window, string name, string caption)
+        {
+            RectTransform rect = Rect(window, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, MenuButtonSize);
+            return WindowButton(rect, caption, 9f);
+        }
+
         public static MenuView BuildMenu()
         {
             Canvas canvas = NewCanvas("Menu UI", 30, VirtualScreen);
             RectTransform open = Rect(canvas.transform, "Open", new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-6f, -6f), new Vector2(34f, 14f));
-            Button openButton = MenuButton(open, "메뉴", 8f);
+            Button openButton = WindowButton(open, "메뉴", 8f);
 
             // 열린 메뉴: 화면을 덮는 판(아래 화면이 눌리지 않게) 가운데에 창 하나.
             RectTransform shade = Stretch(canvas.transform, "Window");
@@ -80,30 +110,25 @@ namespace MiniPandoras.Editor.Field
 
             var layout = window.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.padding = new RectOffset(13, 13, 26, 8);
-            layout.spacing = 4f;
+            // 버튼이 모두 보여도 세로 216을 넘지 않는다.
+            layout.spacing = 2f;
             layout.childAlignment = TextAnchor.UpperCenter;
             layout.childControlWidth = layout.childControlHeight = false;
             layout.childForceExpandWidth = layout.childForceExpandHeight = false;
             window.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            Button resume = MenuButton(Rect(window, "Resume", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(124f, 18f)), "계속하기", 9f);
-            Button loadout = MenuButton(Rect(window, "Loadout", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(124f, 18f)), "판도라 정착", 9f);
-            Button book = MenuButton(Rect(window, "Book", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(124f, 18f)), "판도라 봉인서", 9f);
-            Button title = MenuButton(Rect(window, "Title", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(124f, 18f)), "타이틀로 (장 선택)", 9f);
+            Button resume = MenuButton(window, "Resume", "계속하기");
+            Button inventory = MenuButton(window, "Inventory", "가방");
+            Button missions = MenuButton(window, "Missions", "임무");
+            Button monsterBook = MenuButton(window, "MonsterBook", "몬스터 도감");
+            Button companions = MenuButton(window, "Companions", "동료");
+            Button worldMap = MenuButton(window, "WorldMap", "지도");
+            Button loadout = MenuButton(window, "Loadout", "판도라 정착");
+            Button book = MenuButton(window, "Book", "판도라 봉인서");
+            Button title = MenuButton(window, "Title", "타이틀로 (장 선택)");
 
             var view = canvas.gameObject.AddComponent<MenuView>();
-            SerializedFields.Set(view, ("openButton", openButton), ("window", shade.gameObject), ("resumeButton", resume), ("loadoutButton", loadout), ("bookButton", book), ("titleButton", title));
+            SerializedFields.Set(view, ("openButton", openButton), ("window", shade.gameObject), ("resumeButton", resume), ("inventoryButton", inventory), ("missionButton", missions), ("monsterBookButton", monsterBook), ("companionButton", companions), ("worldMapButton", worldMap), ("loadoutButton", loadout), ("bookButton", book), ("titleButton", title));
             return view;
-        }
-
-        /// <summary>창 모양 버튼 하나: 금빛 테두리 창에 가운데 글자, 누르는 판은 버튼 자리 전체.</summary>
-        private static Button MenuButton(RectTransform rect, string caption, float size)
-        {
-            Window(rect, GoldDim, Panel);
-            var button = rect.gameObject.AddComponent<Button>();
-            button.targetGraphic = ClickArea(rect);
-            TMP_Text text = Text(rect, "Text", caption, Regular, size, Ink, TextAlignmentOptions.Center);
-            Place(text.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            return button;
         }
     }
 }

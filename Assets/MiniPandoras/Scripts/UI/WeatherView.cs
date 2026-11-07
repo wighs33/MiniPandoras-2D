@@ -28,7 +28,7 @@ namespace MiniPandoras.UI
         private float tickClock;
         private int frame;
 
-        public MapWeather Weather => weather;
+        internal MapWeather Weather => weather;
 
         public void Show(MapWeather shown)
         {
@@ -129,7 +129,7 @@ namespace MiniPandoras.UI
                     float x = Mathf.Round(drop.X);
                     float y = Mathf.Round(drop.Y);
                     float lean = 0.3f * drop.Length;
-                    AddQuad(mesh, DropColor,
+                    mesh.AddQuad(DropColor,
                         new Vector2(x, y + 1f), new Vector2(x + 1f, y + 1f),
                         new Vector2(x + 1f + lean, y + 1f - drop.Length), new Vector2(x + lean, y + 1f - drop.Length));
                 }
@@ -142,11 +142,11 @@ namespace MiniPandoras.UI
                     }
 
                     float spread = (10 - splash.Time) / 2f;
-                    AddDot(mesh, SplashColor, Mathf.Round(splash.X - spread), Mathf.Round(splash.Y), 1f, 1f);
-                    AddDot(mesh, SplashColor, Mathf.Round(splash.X + spread), Mathf.Round(splash.Y), 1f, 1f);
+                    mesh.AddRect(SplashColor, Mathf.Round(splash.X - spread), Mathf.Round(splash.Y), 1f, 1f);
+                    mesh.AddRect(SplashColor, Mathf.Round(splash.X + spread), Mathf.Round(splash.Y), 1f, 1f);
                     if (splash.Time > 6)
                     {
-                        AddDot(mesh, SplashColor, Mathf.Round(splash.X), Mathf.Round(splash.Y - 2f), 1f, 1f);
+                        mesh.AddRect(SplashColor, Mathf.Round(splash.X), Mathf.Round(splash.Y - 2f), 1f, 1f);
                     }
                 }
             }
@@ -161,9 +161,9 @@ namespace MiniPandoras.UI
                     halo.a = alpha * 0.3f;
                     float x = Mathf.Round(mote.X);
                     float y = Mathf.Round(mote.Y);
-                    AddDot(mesh, halo, x - 1f, y, 3f, 1f);
-                    AddDot(mesh, halo, x, y - 1f, 1f, 3f);
-                    AddDot(mesh, core, x, y, 1f, 1f);
+                    mesh.AddRect(halo, x - 1f, y, 3f, 1f);
+                    mesh.AddRect(halo, x, y - 1f, 1f, 3f);
+                    mesh.AddRect(core, x, y, 1f, 1f);
                 }
             }
         }
@@ -171,23 +171,6 @@ namespace MiniPandoras.UI
         private Drop NewDrop(float y)
         {
             return new Drop(Random.Range(0f, Width + 60f), y, 4f + Random.value * 3f, 4 + Random.Range(0, 4));
-        }
-
-        /// <summary>왼쪽 위가 (x, y)인 사각형. 화면 좌표는 아래로 +y, 그래픽은 피벗이 왼쪽 위다.</summary>
-        private static void AddDot(VertexHelper mesh, Color color, float x, float y, float width, float height)
-        {
-            AddQuad(mesh, color, new Vector2(x, y), new Vector2(x + width, y), new Vector2(x + width, y + height), new Vector2(x, y + height));
-        }
-
-        private static void AddQuad(VertexHelper mesh, Color color, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
-        {
-            int start = mesh.currentVertCount;
-            mesh.AddVert(new Vector3(a.x, -a.y), color, Vector4.zero);
-            mesh.AddVert(new Vector3(b.x, -b.y), color, Vector4.zero);
-            mesh.AddVert(new Vector3(c.x, -c.y), color, Vector4.zero);
-            mesh.AddVert(new Vector3(d.x, -d.y), color, Vector4.zero);
-            mesh.AddTriangle(start, start + 1, start + 2);
-            mesh.AddTriangle(start, start + 2, start + 3);
         }
 
         private struct Drop

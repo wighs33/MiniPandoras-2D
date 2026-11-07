@@ -8,7 +8,7 @@ import numpy as np
 
 TILE = 32          # 한 칸의 점 수
 SCALE = 2          # 게임 그림은 점 하나 = 2px(한 칸 64px)
-PERIOD = 4         # 끝없이 잇는 무늬(시범 장면)는 4×4칸마다 되풀이한다
+PERIOD = 4         # 풀·흙 무늬 한 장이 덮는 칸 수(가로세로). 이어 붙여도 티 나지 않게 이 주기로 되풀이한다
 
 
 def hexes(*codes):
@@ -123,3 +123,16 @@ def stamp(canvas, sprite, foot_x, foot_y, pivot):
 def upscale(image):
     """점 격자 그림을 게임 그림 크기로(점 하나 = SCALE×SCALE px)."""
     return np.repeat(np.repeat(image, SCALE, axis=0), SCALE, axis=1)
+
+
+def save_png(image, path):
+    """점 격자 RGBA 그림을 게임 그림 크기로 키워 PNG로 쓴다."""
+    from PIL import Image
+    Image.fromarray(upscale(image), "RGBA").save(path)
+
+
+def mix_stops(stops, t):
+    """(위치, "#색") 목록을 위치 t(배열)에서 선형으로 섞어 RGB 배열을 만든다."""
+    colors = [hexes(c)[0].astype(float) for _, c in stops]
+    at = [a for a, _ in stops]
+    return np.stack([np.interp(t, at, [c[k] for c in colors]) for k in range(3)], axis=-1)

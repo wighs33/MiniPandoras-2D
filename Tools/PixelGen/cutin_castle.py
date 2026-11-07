@@ -1,4 +1,4 @@
-"""2장 뱀성을 처음 마주하는 컷인 그림(사용자 요청 2026-11-03: 웹게임 패널 대신 생성기로).
+"""2장 뱀성을 처음 마주하는 컷인 그림(웹게임 패널 대신 생성기로).
 
 두 장면을 그린다. 성 그림은 맵과 같은 castle.py 소품이다(원경은 절반 크기).
   wide.png        원경(가상 384×360, 세로로 길다): 강가에서 올려다본 뱀성. 강과 나무다리, 양 끝이 휘어 오른 절벽 세 단을
@@ -41,6 +41,10 @@ NEAR_HILLS = pg.hexes("#5a7a74", "#4c6b66")
 CLIFF = pg.hexes("#3a3b44", "#4f515c", "#676a75", "#80838e", "#9a9da7", "#b6b9c1")
 LEDGE = pg.GRASS
 EYE_GLOW = np.array([255, 96, 40])
+PARCHMENT = pg.hexes("#7a5a34", "#b08d57", "#d9bd85", "#efdcae")
+RED_MARK = pg.hexes("#b0302a")[0]
+MAP_CENTER = (384, 216)     # 지도 근경의 가운데(점)
+MAP_HALF = (216, 136)       # 지도의 가로·세로 절반(점)
 # 그림 안 자리(가상 px): 원경 주인공 발밑, 원경 돌뱀 머리, 근경 돌뱀 머리
 PARTY_FOOT = (118, 352)
 PARTY_HEIGHT = 64
@@ -48,18 +52,12 @@ HEAD_WIDE = (CX / 2, 0)     # main()이 탑을 놓은 뒤 채운다
 HEAD_CLOSE = (CX / 2, 0)
 
 
-def mix(stops, t):
-    colors = [pg.hexes(c)[0].astype(float) for _, c in stops]
-    at = [a for a, _ in stops]
-    return np.stack([np.interp(t, at, [c[k] for c in colors]) for k in range(3)], axis=-1)
-
-
 def sky(height, horizon, rng):
     """오후 하늘: 위는 짙은 파랑, 지평선은 옅은 금빛. 띠 경계만 디더로 섞는다. 왼쪽 위에 해의 빛무리."""
     yy, xx = np.mgrid[0:height, 0:W]
     t = np.clip((yy + 0.5) / horizon, 0, 1)
     stepped = np.floor(t * 16 + (pg.bayer(height, W) - 0.5) * 0.9) / 16
-    image = mix(SKY_STOPS, stepped)
+    image = pg.mix_stops(SKY_STOPS, stepped)
     glow = np.exp(-np.hypot(xx - 140, (yy - 120) * 1.2) / 160)
     glow = np.floor(glow * 6 + (pg.bayer(height, W) - 0.5) * 0.9) / 6
     image = image * (1 - glow[..., None] * 0.45) + np.array([255, 246, 220]) * glow[..., None] * 0.45
@@ -348,6 +346,55 @@ def party(project):
     return image.resize((image.width * 4, image.height * 4), Image.NEAREST)
 
 
+def fallen_map(rng):
+    """지도 근경: 풀밭에 비스듬히 떨어진 낡은 지도. 돌려주는 값: 그림, 지도 둘레에 차오르는 빛."""
+    yy, xx = np.mgrid[0:CLOSE_H, 0:W]
+    dither = pg.bayer(CLOSE_H, W) - 0.5
+    grass = pg.fractal_noise(CLOSE_H, W, rng)
+    tone = np.clip((grass * 5.5 + dither * 1.1 + 0.6).astype(int), 0, len(pg.GRASS) - 1)
+    canvas = pg.GRASS[tone].astype(float)
+    blades = rng.random((CLOSE_H, W)) > 0.986
+    for lift in range(5):
+        canvas[np.roll(blades, -lift, axis=0)] = pg.GRASS[min(5, 3 + lift // 2)]
+
+    # 지도의 자리: 가운데를 돌린 좌표 (u, v)로 그린다.
+    turn = np.radians(-6)
+    du, dv = xx - MAP_CENTER[0], yy - MAP_CENTER[1]
+    u = du * np.cos(turn) - dv * np.sin(turn)
+    v = du * np.sin(turn) + dv * np.cos(turn)
+    edge = pg.fractal_noise(CLOSE_H, W, rng) * 7
+    sheet = (np.abs(u) < MAP_HALF[0] + edge - 3) & (np.abs(v) < MAP_HALF[1] + edge - 3)
+    shadow = np.roll(np.roll(sheet, 10, axis=0), 8, axis=1) & ~sheet
+    canvas[shadow] = canvas[shadow] * 0.45
+
+    panel = np.clip(((u + MAP_HALF[0]) / (MAP_HALF[0] * 2) * 3).astype(int), 0, 2)
+    paper = pg.fractal_noise(CLOSE_H, W, rng)
+    shade = np.clip((np.array([1.4, 2.3, 1.7])[panel] + paper * 1.6 + dither * 0.8).astype(int), 0, len(PARCHMENT) - 1)
+    canvas[sheet] = PARCHMENT[shade][sheet]
+    folds = (np.abs(np.abs(u) - MAP_HALF[0] / 3) < 1.6) & sheet
+    canvas[folds] = PARCHMENT[0]
+
+    # 지도 안: 뭍의 윤곽, 점선 길, 붉은 표시.
+    land = (pg.fractal_noise(CLOSE_H, W, rng) > 0.5) & (np.abs(u) < MAP_HALF[0] - 26) & (np.abs(v) < MAP_HALF[1] - 26)
+    canvas[land] = canvas[land] * 0.88
+    outline = land & ~(np.roll(land, 3, axis=0) & np.roll(land, -3, axis=0) & np.roll(land, 3, axis=1) & np.roll(land, -3, axis=1))
+    canvas[outline] = PARCHMENT[0]
+    route = [(-130 + 250 * t, 60 - 110 * t + 26 * np.sin(t * 6)) for t in np.linspace(0, 1, 15)]
+    for x, y in route[:-1]:
+        canvas[np.hypot(u - x, v - y) < 4.5] = RED_MARK
+    x, y = route[-1]
+    cross = ((np.abs((u - x) - (v - y)) < 5) | (np.abs((u - x) + (v - y)) < 5)) & (np.abs(u - x) < 20) & (np.abs(v - y) < 20)
+    canvas[cross] = RED_MARK
+
+    glow = np.zeros((CLOSE_H, W, 4), dtype=np.uint8)
+    reach = np.maximum(np.abs(u) - MAP_HALF[0], np.abs(v) - MAP_HALF[1])
+    strength = np.exp(-np.clip(reach, 0, None) / 36) * (reach > -6)
+    stepped = np.floor(strength * 5 + dither * 0.8) / 5
+    glow[..., :3] = np.array([255, 226, 150])
+    glow[..., 3] = (np.clip(stepped, 0, 1) * 170).astype(np.uint8)
+    return canvas.astype(np.uint8), glow
+
+
 def main(project):
     out = project / "Assets/MiniPandoras/Art/PixelGen/CutIns/castle"
     out.mkdir(parents=True, exist_ok=True)
@@ -358,6 +405,9 @@ def main(project):
     Image.fromarray(pg.upscale(close_image), "RGB").save(out / "head.png")
     Image.fromarray(pg.upscale(glow), "RGBA").save(out / "head_glow.png")
     party(project).save(out / "party.png")
+    map_image, map_glow = fallen_map(np.random.default_rng(43))
+    Image.fromarray(pg.upscale(map_image), "RGB").save(out / "fallen_map.png")
+    Image.fromarray(pg.upscale(map_glow), "RGBA").save(out / "fallen_map_glow.png")
     print("원경 돌뱀 머리(가상 px):", tuple(round(v / 2, 1) for v in wide_head))
     print("근경 돌뱀 머리(가상 px):", tuple(round(v / 2, 1) for v in close_head))
     preview = Image.fromarray(pg.upscale(wide_image), "RGB").convert("RGBA")
@@ -367,6 +417,7 @@ def main(project):
     preview.alpha_composite(figure, (PARTY_FOOT[0] * 4 - figure.width // 2, PARTY_FOOT[1] * 4 - figure.height))
     preview.save(project / "Docs/ArtUpgrade/PixelGen/cutin_castle_preview.png")
     Image.fromarray(pg.upscale(close_image), "RGB").save(project / "Docs/ArtUpgrade/PixelGen/cutin_castle_head_preview.png")
+    Image.fromarray(pg.upscale(map_image), "RGB").save(project / "Docs/ArtUpgrade/PixelGen/cutin_fallen_map_preview.png")
     print(out)
 
 

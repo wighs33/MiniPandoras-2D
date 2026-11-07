@@ -11,23 +11,9 @@ namespace MiniPandoras.World
     /// </summary>
     public static class EffectSprites
     {
-        /// <summary>봉인진 그림 가로 = 반지름 × 이 값. 테두리 굵기와 룬 눈금이 잘리지 않게 반지름 둘레에 여백을 둔다.</summary>
-        public const float SealSpan = 2.2f;
-
-        private const int SealSize = 256;
-        // 웹게임 봉인진: 반지름 26px에 선 굵기 1.2px, 룬 눈금 3px.
-        private const float SealLine = 1.2f / 26f;
-        private const float SealRune = 3f / 26f;
-        private const float SealTexel = SealSpan / SealSize;
-
         private static Sprite pixel;
         private static Sprite glow;
-        private static Sprite sealRings;
-        private static Sprite sealRunes;
-        private static Sprite hexagram;
-        private static Sprite ring;
         private static Sprite riftArc;
-        private static Sprite knotArc;
 
         public static Sprite Pixel => Cached(ref pixel, () => Make(1, 1f, FilterMode.Point, at => 1f));
 
@@ -41,23 +27,8 @@ namespace MiniPandoras.World
             return rest * rest;
         }));
 
-        /// <summary>봉인진의 두 겹 원(반지름 1, 0.78).</summary>
-        public static Sprite SealRings => Cached(ref sealRings, () => MakeSeal(at => Mathf.Max(Circle(at, 1f), Circle(at, 0.78f))));
-
-        /// <summary>봉인진의 룬 눈금 12개(반지름 0.89).</summary>
-        public static Sprite SealRunes => Cached(ref sealRunes, () => MakeSeal(Runes));
-
-        /// <summary>봉인진 안쪽 육망성(두 삼각형, 꼭짓점 반지름 0.74).</summary>
-        public static Sprite Hexagram => Cached(ref hexagram, () => MakeSeal(at => Mathf.Max(Triangle(at, 0f), Triangle(at, Mathf.PI / 3f))));
-
-        /// <summary>봉인진과 같은 굵기의 원 테두리 하나(반지름 1). 늘려서 타원으로도 쓴다.</summary>
-        public static Sprite Ring => Cached(ref ring, () => MakeSeal(at => Circle(at, 1f)));
-
         /// <summary>공간 균열의 고리 하나(웹게임 spaceRift: 반지름 18×5px 타원의 1.2π만큼, 선 굵기 1px).</summary>
         public static Sprite RiftArc => Cached(ref riftArc, () => MakeArc(18f, 5f, Mathf.PI * 1.2f));
-
-        /// <summary>비틀린 매듭의 고리 하나(웹게임 riftKnot: 반지름 6×3px 타원의 1.5π만큼, 선 굵기 1px).</summary>
-        public static Sprite KnotArc => Cached(ref knotArc, () => MakeArc(6f, 3f, Mathf.PI * 1.5f));
 
         private static Sprite Cached(ref Sprite slot, Func<Sprite> make)
         {
@@ -67,11 +38,6 @@ namespace MiniPandoras.World
             }
 
             return slot;
-        }
-
-        private static Sprite MakeSeal(Func<Vector2, float> coverage)
-        {
-            return Make(SealSize, SealSpan / 2f, FilterMode.Bilinear, coverage);
         }
 
         /// <summary>
@@ -114,53 +80,11 @@ namespace MiniPandoras.World
             return Keep(texture, Sprite.Create(texture, new Rect(0f, 0f, width, height), new Vector2(0.5f, 0.5f), texelsPerPixel * MapCoordinates.LogicalPixelsPerTile));
         }
 
-        /// <summary>반지름 radius인 원 둘레 위의 덮임.</summary>
-        private static float Circle(Vector2 at, float radius)
-        {
-            return Edge(Mathf.Abs(at.magnitude - radius) - SealLine / 2f);
-        }
-
-        private static float Runes(Vector2 at)
-        {
-            float best = 0f;
-            for (int i = 0; i < 12; i++)
-            {
-                float angle = i / 12f * Mathf.PI * 2f;
-                Vector2 gap = at - new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 0.89f;
-                best = Mathf.Max(best, Edge(Mathf.Max(Mathf.Abs(gap.x), Mathf.Abs(gap.y)) - SealRune / 2f));
-            }
-
-            return best;
-        }
-
-        private static float Triangle(Vector2 at, float turn)
-        {
-            float best = 0f;
-            for (int i = 0; i < 3; i++)
-            {
-                best = Mathf.Max(best, Edge(SegmentDistance(at, Corner(i, turn), Corner(i + 1, turn)) - SealLine / 2f));
-            }
-
-            return best;
-        }
-
-        private static Vector2 Corner(int index, float turn)
-        {
-            float angle = index / 3f * Mathf.PI * 2f + turn;
-            return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 0.74f;
-        }
-
         private static float SegmentDistance(Vector2 point, Vector2 a, Vector2 b)
         {
             Vector2 ab = b - a;
             float t = Mathf.Clamp01(Vector2.Dot(point - a, ab) / ab.sqrMagnitude);
             return Vector2.Distance(point, a + ab * t);
-        }
-
-        /// <summary>모양 바깥까지의 거리를 덮임 0~1로. 텍셀 하나 너비로 부드럽게 끊어 선이 계단지지 않게 한다.</summary>
-        private static float Edge(float outside)
-        {
-            return Mathf.Clamp01(0.5f - outside / SealTexel);
         }
 
         /// <summary>흰 그림. coverage는 가운데가 (0, 0)이고 그림 가장자리가 ±span인 자리를 받는다.</summary>

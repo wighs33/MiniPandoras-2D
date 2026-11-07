@@ -1,4 +1,5 @@
 using MiniPandoras.Dialogue;
+using MiniPandoras.World;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -119,8 +120,7 @@ namespace MiniPandoras.UI
             float brightness = lit ? 1f : 0.5f;
             Color target = visible ? new Color(brightness, brightness, brightness, lit ? 1f : 0.72f) : new Color(brightness, brightness, brightness, 0f);
             // 웹게임은 60fps 한 프레임에 남은 차이의 22%씩 다가간다.
-            float t = 1f - Mathf.Pow(1f - 0.22f, Time.deltaTime * 60f);
-            slot.color = Color.Lerp(slot.color, target, t);
+            slot.color = Color.Lerp(slot.color, target, FrameTime.Ease(0.22f, Time.deltaTime));
         }
     }
 }

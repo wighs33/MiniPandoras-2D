@@ -1,9 +1,10 @@
-"""강을 남북으로 건너는 나무다리(사용자 요청 2026-11-03: 뱀성 앞 다리 품질).
+"""강을 남북으로 건너는 나무다리(뱀성 앞 다리 품질).
 
   deck(columns, rows, rng)   다리 바닥(바닥에 까는 그림): 가로로 놓인 두꺼운 판자(판자마다 결과 밝기가 다르고 틈은 어둡다),
                              양옆 받침 들보와 못, 가운데 밟혀 닳은 자국, 양 끝 물가에 얹은 돌 문턱, 물에 드리운 그림자와 물결
   rail(length, rng)          난간 한 칸(세우는 것): 아래 기둥 하나와 그 기둥에서 북쪽 기둥까지 이어진 들보
   lantern_post(rng)          다리 네 귀퉁이의 굵은 기둥: 쇠 고리에 매단 등불
+  span(m, …, broken, mended) 맵에 다리를 놓는다. broken은 가운데가 끊어진 다리, mended는 그 자리를 새 판자로 고친 다리다
 
 위에서 비스듬히 본 시점이라 남북으로 놓인 난간 들보는 화면에서 세로 띠로 보인다. 난간은 기둥마다 한 칸씩 나눠 세워
 기둥 앞뒤로 인물이 제대로 가려진다. 점 격자(한 칸 32점)에 그린다.
@@ -12,6 +13,7 @@ import numpy as np
 
 import pixelgen as pg
 from houses import IRON, WARM, WOOD, Canvas, outline
+from layout import LOGICAL
 
 T = pg.TILE
 SIDE = 4                # 양옆 받침 들보 너비(점)
@@ -21,6 +23,73 @@ MARGIN = 6              # 바닥 그림 양옆 물 위 여백(그림자와 물�
 POST_HEIGHT = 22        # 난간 기둥이 바닥에서 솟은 높이(점)
 WATER_SHADOW = np.array([8, 18, 32], dtype=np.uint8)
 FOAM = pg.WATER[6]
+NEW_WOOD_GAIN = np.array([1.22, 1.16, 1.0])
+NEW_WOOD_LIFT = np.array([30, 22, 8])
+ROPE = pg.hexes("#7a6238", "#c9b27a")
+TORN_PLANK = 9                  # 끊어진 판자 끝이 들쭉날쭉한 폭(점)
+
+
+def fresh(image):
+    """새로 댄 나무 색: 오래된 판자보다 밝고 노랗다."""
+    out = image.copy()
+    out[..., :3] = np.clip(image[..., :3] * NEW_WOOD_GAIN + NEW_WOOD_LIFT, 0, 255)
+    return out
+
+
+def tear(image, top, bottom, rng):
+    """다리 바닥의 top~bottom 점을 뜯어낸다. 판자 끝이 들쭉날쭉하게 남는다."""
+    width = image.shape[1]
+    upper = top + rng.integers(0, TORN_PLANK, width // TORN_PLANK + 1)
+    lower = bottom - rng.integers(0, TORN_PLANK, width // TORN_PLANK + 1)
+    for x in range(width):
+        image[upper[x // TORN_PLANK]:lower[x // TORN_PLANK], x, 3] = 0
+
+
+def mend(image, top, bottom):
+    """다리 바닥의 top~bottom 점을 새 판자로 바꾸고, 옛 판자와 만나는 곳을 밧줄로 동여맨다."""
+    image[top:bottom] = fresh(image[top:bottom])
+    for seam in (top, bottom - 3):
+        image[seam:seam + 3, MARGIN:-MARGIN, :3] = ROPE[1]
+        image[seam + 1, MARGIN:-MARGIN:3, :3] = ROPE[0]
+
+
+def span(m, x0, x1, first_row, last_row, rng, broken=None, mended=None):
+    """
+    맵 m의 x0~x1 열에 first_row~last_row 행을 남북으로 건너는 다리를 놓는다: 판자 바닥(바닥 그림, 양쪽 뭍에 반 칸씩 얹힌다),
+    양옆 난간(기둥마다 세우는 것), 네 귀퉁이 등불 기둥. 다리 위는 난간 안쪽만 걸어서 지나간다.
+    broken(행 둘)이면 그 구간의 판자와 난간이 없다(막지 않는다: 그 구간을 밟으면 떨어지는 연출을 이야기가 건다).
+    mended(행 둘)이면 그 구간이 새 판자와 새 난간이다.
+    한 맵에 모습별로 두 벌 놓을 때는 m.look 안에서 부른다.
+    """
+    def stand(name, piece, x, ground):
+        image, pivot = piece
+        m.upright(name, image, x * T, ground * T, pivot, ground * LOGICAL)
+
+    m.kinds[first_row:last_row + 1, x0:x1] = "water"
+    top, bottom = first_row - 0.5, last_row + 1.5
+    floor = deck(x1 - x0, bottom - top, rng)
+    if broken:
+        tear(floor, int((broken[0] - top) * T), int((broken[1] - top) * T), rng)
+    if mended:
+        mend(floor, int((mended[0] - top) * T), int((mended[1] - top) * T))
+    m.decal("bridge_deck" + ("_broken" if broken else "_mended" if mended else ""), floor, x0 * T - MARGIN, top * T)
+    m.keep_open(x0 + 0.25, first_row, x1 - 0.25, last_row + 1)
+    posts = np.linspace(top + 0.35, bottom - 0.1, int(round((bottom - top) / 1.25)) + 1)
+    for side, x in ((-1, x0 + 0.12), (1, x1 - 0.12)):
+        corner = lantern_post(rng, side)
+        stand("bridge_lantern_post", corner, x, posts[0])
+        for k in range(1, len(posts)):
+            length = int(round((posts[k] - posts[k - 1]) * T))
+            if broken and posts[k] > broken[0] and posts[k - 1] < broken[1]:
+                continue
+            image, pivot = rail(length, rng, post=k < len(posts) - 1)
+            new = mended and posts[k] > mended[0] and posts[k - 1] < mended[1]
+            stand(("bridge_new_rail_" if new else "bridge_rail_") + str(length) + ("" if k < len(posts) - 1 else "_end"),
+                  (fresh(image) if new else image, pivot), x, posts[k])
+        stand("bridge_lantern_post", corner, x, posts[-1])
+        m.block(x - 0.12, top, x + 0.12, bottom)
+        for y in (posts[0], posts[-1]):
+            m.light((x + side * 0.4) * LOGICAL, y * LOGICAL - 18, 24)
 
 
 def deck(columns, rows, rng):

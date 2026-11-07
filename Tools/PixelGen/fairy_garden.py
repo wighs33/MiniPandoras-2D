@@ -1,9 +1,9 @@
-"""페어리가든(fairyGarden)과 그 밤(fairyNight)을 새로 짠다(사용자 요청 2026-11-03: 10장 맵을 생성기로).
+"""페어리가든(fairyGarden)과 그 밤(fairyNight)을 새로 짠다(10장 맵을 생성기로).
 
 숲속 빈터, 맵 위 끝까지 솟은 거대고목의 밑동 아래 요정 마을. 웹게임 맵(칸 34×24)과 지점·출구 자리가 같다.
   - 거대고목 밑동(fairy_props.giant_trunk): 고목 안 1층 뿌리 홀로 드는 뿌리 아치 문(treeGate). 문 앞으로 뿌리가 기어 나온다.
-    쉼터는 고목 3층의 방이다(tree_floors.py, 사용자 요청 2026-11-03).
-  - 서쪽 사막에서 동쪽 아이로스 가도로 빈터를 가로지르는 흙길, 그 길을 남북으로 끊는 맑은 냇물과 나무다리(연잎·꽃).
+    쉼터는 고목 3층의 방이다(tree_floors.py).
+  - 서쪽 사막에서 동쪽 꽃잎 들판(fairy_wilds.py)으로 빈터를 가로지르는 흙길, 그 길을 남북으로 끊는 맑은 냇물과 나무다리(연잎·꽃).
   - 밑동에서 내려오는 길이 큰길과 만나는 곳에 이끼 돌 고리를 두른 연회 자리(가운데 그루터기 탁자, 연회 지점 넷이 둘레).
   - 요정의 버섯 집 넷(빨강·파랑·보라), 덩굴 기둥 등불, 빛나는 버섯 무리, 키 큰 풀숲과 꽃밭. 둘레는 숲이다.
 밤(fairyNight)은 같은 배치에 밤빛·떠도는 빛 알갱이를 얹고, 등불과 창에 불을 켜고, 탁자에 연회 음식을 차린다.
@@ -135,7 +135,7 @@ def build(night):
     m.point("dielAlone", (31, 21))
     m.warp("west", "westSands", "eastArrive", "left")
     m.warp("treeGate", "treeHall", "enter", "up")
-    m.warp("road", "airosRoad", "start", "right")
+    m.warp("road", "petalMeadow", "westArrive", "right")
     return m
 
 

@@ -1,4 +1,4 @@
-"""판도라 봉인서 창의 그림(사용자 요청 2026-11-03: 웹게임 게임 방식을 가져오되 그림은 생성기로). 웹게임 SealBookView를 따른다.
+"""판도라 봉인서 창의 그림(웹게임 게임 방식을 가져오되 그림은 생성기로). 웹게임 SealBookView를 따른다.
 
 펼친 책 한 권(가죽 표지와 금박 테두리, 두 쪽, 책등 그림자), 판도라마다 빛나는 구슬 위 문양(활성화된 것과 잿빛 두 벌, 큰 것과 작은 것),
 모은 더스트를 두르는 고리, 「활성화」 버튼, 닫기 단추. 글자는 그리지 않는다(창이 글자를 얹는다). 크기는 가상 px의 두 배 점이다.
@@ -191,21 +191,17 @@ def white():
     return c.image
 
 
-def save(image, path):
-    Image.fromarray(pg.upscale(image), "RGBA").save(path)
-
-
 def main(project):
     out = project / "Assets/MiniPandoras/Art/PixelGen/UI/SealBook"
     out.mkdir(parents=True, exist_ok=True)
     battle = json.loads((project / "Assets/MiniPandoras/Art/WebGame/battle.json").read_text(encoding="utf-8"))
     pandoras = [p for p in battle["pandoras"] if p.get("glyph")]
     for name, image in (("book", book()), ("button", button()), ("close", close()), ("ring", ring()), ("row", row()), ("white", white())):
-        save(image, out / f"{name}.png")
+        pg.save_png(image, out / f"{name}.png")
     for entry in pandoras:
         for suffix, radius in (("", 32), ("_s", 14)):
-            save(icon(entry, radius, True), out / f"icon_{entry['id']}{suffix}.png")
-            save(icon(entry, radius, False), out / f"icon_{entry['id']}{suffix}_off.png")
+            pg.save_png(icon(entry, radius, True), out / f"icon_{entry['id']}{suffix}.png")
+            pg.save_png(icon(entry, radius, False), out / f"icon_{entry['id']}{suffix}_off.png")
     # 미리보기: 책 위에 문양을 늘어놓는다.
     preview = Image.open(out / "book.png").convert("RGBA")
     for k, entry in enumerate(pandoras):

@@ -14,14 +14,16 @@ namespace MiniPandoras.Editor.Field
     internal static class UiKit
     {
         public static readonly Vector2 VirtualScreen = new Vector2(384f, 216f);
-        public static readonly Vector2 TouchScreen = new Vector2(1920f, 1080f);
 
         public static readonly Color Panel = new Color32(16, 15, 28, 237);
         public static readonly Color PanelSolid = new Color32(0x12, 0x11, 0x1f, 0xff);
-        public static readonly Color Gold = new Color32(0xc9, 0xa5, 0x4a, 0xff);
-        public static readonly Color GoldDim = new Color32(0x7d, 0x6a, 0x3e, 0xff);
-        public static readonly Color Ink = new Color32(0xf3, 0xef, 0xe2, 0xff);
+        public static readonly Color Gold = MiniPandoras.UI.UiPalette.Gold;
+        public static readonly Color GoldDim = MiniPandoras.UI.UiPalette.GoldDim;
+        public static readonly Color Ink = MiniPandoras.UI.UiPalette.Ink;
         public static readonly Color Night = new Color32(0x07, 0x06, 0x0b, 0xff);
+        /// <summary>설명 글과 빈 칸 안내에 쓰는 흐린 글자색</summary>
+        public static readonly Color Muted = new Color32(0xa7, 0xa2, 0x96, 0xff);
+        private static readonly Color ModalBack = new Color(4f / 255f, 4f / 255f, 12f / 255f, 0.8f);
         /// <summary>웹게임 전투 화면의 반투명 바탕(체력 칸, 동료 칸)</summary>
         public static readonly Color HudBack = new Color(10f / 255f, 9f / 255f, 18f / 255f, 0.72f);
         /// <summary>웹게임 스킬 칸·보스 칸 바탕</summary>
@@ -81,6 +83,15 @@ namespace MiniPandoras.Editor.Field
             rect.sizeDelta = size;
         }
 
+        /// <summary>
+        /// 가상 화면(384×216) 크기의 판을 화면 가운데에 둔다. 웹게임 좌표(왼쪽 위에서 잰 자리)로 놓는 창은 이 판 위에 놓는다.
+        /// 캔버스는 기준 화면이 통째로 들어가게 늘어나서(Expand) 16:9보다 가로가 긴 폰에서는 가로 여백이 생기는데, 화면 전체에 늘인 판에 놓으면 창이 왼쪽으로 쏠린다.
+        /// </summary>
+        public static RectTransform VirtualFrame(Transform parent)
+        {
+            return Rect(parent, "Frame", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, VirtualScreen);
+        }
+
         public static RectTransform Stretch(Transform parent, string name)
         {
             return Rect(parent, name, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
@@ -95,6 +106,30 @@ namespace MiniPandoras.Editor.Field
             Image image = Solid(rect, Color.clear);
             image.raycastTarget = true;
             return image;
+        }
+
+        /// <summary>창 뒤를 덮는 어두운 판. 누름을 받아 아래 화면이 눌리지 않게 한다.</summary>
+        public static Image ModalScreen(RectTransform screen)
+        {
+            Image image = ClickArea(screen);
+            image.color = ModalBack;
+            return image;
+        }
+
+        /// <summary>창 오른쪽 위의 닫기 단추(×). 누르는 판은 단추 자리 전체다.</summary>
+        public static Button CloseButton(Transform parent, float x, float y, Color color)
+        {
+            RectTransform rect = TopLeft(parent, "Close", x, y, 20f, 20f);
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = ClickArea(rect);
+            FillParent(Text(rect, "X", "×", Bold, 11f, color, TextAlignmentOptions.Center).rectTransform);
+            return button;
+        }
+
+        /// <summary>부모를 가득 채운다.</summary>
+        public static void FillParent(RectTransform rect)
+        {
+            Place(rect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         }
 
         public static Image Solid(RectTransform rect, Color color)
@@ -115,6 +150,17 @@ namespace MiniPandoras.Editor.Field
             frame.sprite = windowFrame;
             frame.type = Image.Type.Sliced;
             return frame;
+        }
+
+        /// <summary>창 모양 버튼 하나(메뉴·인벤토리): 테두리 창에 가운데 글자, 누르는 판은 버튼 자리 전체. 테두리 색을 주지 않으면 어두운 금빛이다.</summary>
+        public static Button WindowButton(RectTransform rect, string caption, float size, Color? accent = null)
+        {
+            Window(rect, accent ?? GoldDim, Panel);
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = ClickArea(rect);
+            TMP_Text text = Text(rect, "Text", caption, Regular, size, Ink, TextAlignmentOptions.Center);
+            Place(text.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            return button;
         }
 
         public static TMP_Text Text(Transform parent, string name, string text, TMP_FontAsset font, float size, Color color, TextAlignmentOptions alignment)
@@ -165,7 +211,7 @@ namespace MiniPandoras.Editor.Field
         }
 
         /// <summary>창 그림은 1px = 가상 화면 1칸이 되게(Pixels Per Unit 100 = 캔버스 기준값) 점 그대로 늘린다.</summary>
-        private static Sprite ImportUiSprite(string path, Vector4 border)
+        internal static Sprite ImportUiSprite(string path, Vector4 border)
         {
             var importer = (TextureImporter)AssetImporter.GetAtPath(path);
             importer.textureType = TextureImporterType.Sprite;

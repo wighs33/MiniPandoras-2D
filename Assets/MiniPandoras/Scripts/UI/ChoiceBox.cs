@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using MiniPandoras.Dialogue;
-using MiniPandoras.Input;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,35 +7,32 @@ using UnityEngine.UI;
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 대화창 오른쪽 위에 뜨는 선택지 창(웹게임 renderChoice). 항목을 누르면 고른다.
-    /// 조이스틱 위아래로 커서를 옮기고 행동 버튼으로 골라도 된다.
+    /// 선택지(웹게임 renderChoice). 터치로 고르므로 화면 가운데에 누르기 쉬운 버튼을 세로로 늘어놓고, 누른 항목을 고른다.
+    /// 웹게임은 대화창 오른쪽 위의 작은 창에서 커서로 고르고 고르지 않은 항목을 흐리게 두지만, 터치에서는 흐린 항목이 누를 수 없어 보여 모든 항목을 똑같이 보인다.
+    /// 커서가 없으니 조이스틱·행동 버튼으로는 고르지 않는다(보이지 않는 커서로 골라지지 않게).
     /// </summary>
     public sealed class ChoiceBox : MonoBehaviour
     {
-        private static readonly Color Selected = new Color32(0xf3, 0xef, 0xe2, 0xff);
-        private static readonly Color Unselected = new Color32(0xa7, 0xa2, 0x96, 0xff);
-        private const float RowHeight = 14f;
+        /// <summary>항목 버튼 하나의 높이와 버튼 사이(가상 px). 폰에서 손가락으로 누르기 쉬운 크기다.</summary>
+        public const float RowHeight = 24f;
+        public const float RowGap = 6f;
+        // 글자 양옆 여백을 더한 너비와, 가장 좁은 버튼 너비.
+        private const float RowPadding = 32f;
+        private const float MinRowWidth = 120f;
 
         [SerializeField] private Conversation conversation;
-        [SerializeField] private PlayerInputReader input;
         [SerializeField] private RectTransform window;
         [SerializeField] private Button[] rows;
         [SerializeField] private TMP_Text[] labels;
-        [SerializeField] private RectTransform cursor;
-
-        private int count;
-        private int selected;
-        private bool stickHeld;
 
         private void OnEnable()
         {
             conversation.ChoicesShown += Open;
             conversation.LineClosed += Close;
-            input.ActionPressed += Confirm;
             for (int i = 0; i < rows.Length; i++)
             {
                 int option = i;
-                rows[i].onClick.AddListener(() => Pick(option));
+                rows[i].onClick.AddListener(() => conversation.Pick(option));
             }
         }
 
@@ -44,7 +40,6 @@ namespace MiniPandoras.UI
         {
             conversation.ChoicesShown -= Open;
             conversation.LineClosed -= Close;
-            input.ActionPressed -= Confirm;
             foreach (Button row in rows)
             {
                 row.onClick.RemoveAllListeners();
@@ -58,71 +53,26 @@ namespace MiniPandoras.UI
 
         private void Open(IReadOnlyList<string> options)
         {
-            count = Mathf.Min(options.Count, rows.Length);
+            int count = Mathf.Min(options.Count, rows.Length);
             float widest = 0f;
-            for (int i = 0; i < rows.Length; i++)
+            for (int i = 0; i < count; i++)
             {
-                bool used = i < count;
-                rows[i].gameObject.SetActive(used);
-                if (used)
-                {
-                    labels[i].text = options[i];
-                    widest = Mathf.Max(widest, labels[i].preferredWidth);
-                }
+                labels[i].text = options[i];
+                widest = Mathf.Max(widest, labels[i].preferredWidth);
             }
 
-            window.sizeDelta = new Vector2(widest + 30f, count * RowHeight + 10f);
-            selected = 0;
-            Highlight();
+            float width = Mathf.Max(MinRowWidth, widest + RowPadding);
+            for (int i = 0; i < rows.Length; i++)
+            {
+                rows[i].gameObject.SetActive(i < count);
+                ((RectTransform)rows[i].transform).sizeDelta = new Vector2(width, RowHeight);
+            }
+
+            window.sizeDelta = new Vector2(width, count * RowHeight + (count - 1) * RowGap);
             window.gameObject.SetActive(true);
         }
 
-        private void Update()
-        {
-            if (!window.gameObject.activeSelf)
-            {
-                return;
-            }
-
-            float vertical = input.Move.y;
-            if (Mathf.Abs(vertical) < 0.5f)
-            {
-                stickHeld = false;
-                return;
-            }
-
-            if (!stickHeld)
-            {
-                stickHeld = true;
-                selected = (selected + (vertical > 0f ? count - 1 : 1)) % count;
-                Highlight();
-            }
-        }
-
-        private void Highlight()
-        {
-            for (int i = 0; i < count; i++)
-            {
-                labels[i].color = i == selected ? Selected : Unselected;
-            }
-
-            cursor.anchoredPosition = new Vector2(cursor.anchoredPosition.x, -(6f + selected * RowHeight + 5f));
-        }
-
-        private void Confirm()
-        {
-            if (window.gameObject.activeSelf)
-            {
-                Pick(selected);
-            }
-        }
-
-        private void Pick(int option)
-        {
-            conversation.Pick(option);
-        }
-
-        // 선택은 대화가 끝내므로, 어디서 골랐든 질문 대사가 닫힐 때 같이 닫는다.
+        // 선택은 대화가 끝내므로, 질문 대사가 닫힐 때 같이 닫는다.
         private void Close()
         {
             window.gameObject.SetActive(false);

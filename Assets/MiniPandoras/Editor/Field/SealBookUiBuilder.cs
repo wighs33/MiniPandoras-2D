@@ -32,13 +32,14 @@ namespace MiniPandoras.Editor.Field
             Button outside = screen.gameObject.AddComponent<Button>();
             outside.targetGraphic = shade;
             outside.transition = Selectable.Transition.None;
+            RectTransform frame = VirtualFrame(screen);
 
-            RectTransform page = TopLeft(screen, "Book", 16f, 12f, 352f, 190f);
+            RectTransform page = TopLeft(frame, "Book", 16f, 12f, 352f, 190f);
             Image bookImage = ClickArea(page);
             bookImage.color = Color.white;
             bookImage.sprite = Sprite("book");
 
-            RectTransform closeRect = TopLeft(screen, "Close", 350f, 6f, 22f, 22f);
+            RectTransform closeRect = TopLeft(frame, "Close", 350f, 6f, 22f, 22f);
             Image closeImage = ClickArea(closeRect);
             closeImage.color = Color.white;
             closeImage.sprite = Sprite("close");
@@ -47,61 +48,71 @@ namespace MiniPandoras.Editor.Field
             Place(Text(closeRect, "X", "×", Bold, 11f, new Color32(0xe8, 0xcf, 0x8a, 0xff), TextAlignmentOptions.Center).rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             // ── 왼쪽 쪽: 제목, 활성화한 수, 판도라 줄 ──
-            Label(screen, "Title", 28f, 21f, 158f, 12f, 9f, Bold, Ink, TextAlignmentOptions.Top).text = "판도라 봉인서";
-            TMP_Text count = Label(screen, "Count", 28f, 32f, 158f, 9f, 6.5f, Regular, new Color32(0x8a, 0x6a, 0x3e, 0xff), TextAlignmentOptions.Top);
+            Label(frame, "Title", 28f, 21f, 158f, 12f, 9f, Bold, Ink, TextAlignmentOptions.Top).text = "판도라 봉인서";
+            TMP_Text count = Label(frame, "Count", 28f, 32f, 158f, 9f, 6.5f, Regular, new Color32(0x8a, 0x6a, 0x3e, 0xff), TextAlignmentOptions.Top);
             var rows = new SealBookView.Row[catalog.BookOrder.Count];
             for (int i = 0; i < rows.Length; i++)
             {
-                rows[i] = BuildRow(screen, i);
+                rows[i] = BuildRow(frame, i);
             }
 
             PandoraIcon[] icons = Icons(catalog);
-            // ── 오른쪽 쪽: 큰 문양, 이름과 상태, 활성화 버튼 또는 더스트 막대, 설명, 스킬 둘 ──
-            Image detailIcon = Centered(screen, "Icon", 277f, 42f, 57.5f, Sprite("icon_phase"));
+            // ── 오른쪽 쪽: 문양, 이름과 상태, 활성화 버튼 또는 더스트 막대, 설명, 스킬 넷 ──
+            Image detailIcon = Centered(frame, "Icon", 277f, 34f, 44f, Sprite("icon_phase"));
             var bursts = new Image[2];
             for (int k = 0; k < bursts.Length; k++)
             {
-                bursts[k] = Centered(screen, $"Burst {k}", 277f, 42f, 32f, Sprite("ring"));
+                bursts[k] = Centered(frame, $"Burst {k}", 277f, 34f, 32f, Sprite("ring"));
                 bursts[k].enabled = false;
             }
 
-            TMP_Text detailName = Label(screen, "Name", 200f, 59f, 154f, 16f, 13f, Bold, Ink, TextAlignmentOptions.Top);
-            TMP_Text status = Label(screen, "Status", 200f, 76f, 154f, 10f, 7f, Bold, Muted, TextAlignmentOptions.Top);
-            RectTransform activateRect = TopLeft(screen, "Activate", 247f, 86f, 60f, 13f);
+            TMP_Text detailName = Label(frame, "Name", 200f, 47f, 154f, 14f, 11f, Bold, Ink, TextAlignmentOptions.Top);
+            TMP_Text status = Label(frame, "Status", 200f, 60f, 154f, 9f, 6.5f, Bold, Muted, TextAlignmentOptions.Top);
+            RectTransform activateRect = TopLeft(frame, "Activate", 247f, 69f, 60f, 13f);
             Image activateImage = ClickArea(activateRect);
             activateImage.color = Color.white;
             activateImage.sprite = Sprite("button");
             var activate = activateRect.gameObject.AddComponent<Button>();
             activate.targetGraphic = activateImage;
-            Place(Text(activateRect, "Text", "활성화", Bold, 7.5f, new Color32(0xf4, 0xdc, 0x9a, 0xff), TextAlignmentOptions.Center).rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            RectTransform barRoot = TopLeft(screen, "Detail Bar", 208f, 90f, 138f, 4f);
+            TMP_Text activateLabel = Text(activateRect, "Text", "활성화", Bold, 7.5f, new Color32(0xf4, 0xdc, 0x9a, 0xff), TextAlignmentOptions.Center);
+            FillParent(activateLabel.rectTransform);
+            RectTransform tryRect = TopLeft(frame, "Try", 312f, 28f, 36f, 13f);
+            Image tryImage = ClickArea(tryRect);
+            tryImage.color = Color.white;
+            tryImage.sprite = Sprite("button");
+            var tryButton = tryRect.gameObject.AddComponent<Button>();
+            tryButton.targetGraphic = tryImage;
+            TMP_Text tryLabel = Text(tryRect, "Text", "체험", Bold, 7.5f, new Color32(0xf4, 0xdc, 0x9a, 0xff), TextAlignmentOptions.Center);
+            FillParent(tryLabel.rectTransform);
+            RectTransform barRoot = TopLeft(frame, "Detail Bar", 208f, 73f, 138f, 4f);
             Bar(barRoot, out Image detailBar);
 
-            TMP_Text description = Label(screen, "Description", 208f, 100f, 138f, 30f, 7f, Regular, Ink, TextAlignmentOptions.TopLeft);
-            description.maxVisibleLines = 3;
-            Solid(TopLeft(screen, "Divider", 208f, 131f, 138f, 1f), new Color(120f / 255f, 80f / 255f, 30f / 255f, 0.35f));
-            Label(screen, "Skills", 208f, 135f, 60f, 9f, 6.5f, Bold, new Color32(0x9a, 0x6a, 0x22, 0xff), TextAlignmentOptions.TopLeft).text = "스킬";
-            TMP_Text note = Label(screen, "Note", 238f, 135f, 108f, 9f, 6f, Regular, Muted, TextAlignmentOptions.TopRight);
-            var skillNames = new TMP_Text[2];
-            var skillCosts = new TMP_Text[2];
-            var skillTexts = new TMP_Text[2];
-            for (int k = 0; k < 2; k++)
+            // maxVisibleLines는 씬에 저장되지 않는다. 글 상자 높이로 자른다.
+            TMP_Text description = Label(frame, "Description", 208f, 84f, 138f, 16f, 6.5f, Regular, Ink, TextAlignmentOptions.TopLeft);
+            description.overflowMode = TextOverflowModes.Truncate;
+            Solid(TopLeft(frame, "Divider", 208f, 101f, 138f, 1f), new Color(120f / 255f, 80f / 255f, 30f / 255f, 0.35f));
+            Label(frame, "Skills", 208f, 102f, 60f, 9f, 6.5f, Bold, new Color32(0x9a, 0x6a, 0x22, 0xff), TextAlignmentOptions.TopLeft).text = "스킬";
+            TMP_Text note = Label(frame, "Note", 238f, 102f, 108f, 9f, 6f, Regular, Muted, TextAlignmentOptions.TopRight);
+            var skillNames = new TMP_Text[PandoraDefinition.SkillSlots];
+            var skillCosts = new TMP_Text[PandoraDefinition.SkillSlots];
+            var skillTexts = new TMP_Text[PandoraDefinition.SkillSlots];
+            for (int k = 0; k < skillNames.Length; k++)
             {
-                float top = 145f + k * 27f;
-                skillNames[k] = Label(screen, $"Skill {k}", 208f, top, 110f, 10f, 8f, Bold, Ink, TextAlignmentOptions.TopLeft);
-                skillCosts[k] = Label(screen, $"Cost {k}", 300f, top + 1f, 46f, 9f, 6.5f, Regular, Muted, TextAlignmentOptions.TopRight);
-                // 웹게임처럼 설명은 두 줄까지만 보인다.
-                skillTexts[k] = Label(screen, $"Skill Text {k}", 208f, top + 10f, 138f, 16f, 6.5f, Regular, Ink, TextAlignmentOptions.TopLeft);
-                skillTexts[k].maxVisibleLines = 2;
+                float top = 111f + k * 20f;
+                skillNames[k] = Label(frame, $"Skill {k}", 208f, top, 110f, 9f, 7.5f, Bold, Ink, TextAlignmentOptions.TopLeft);
+                skillCosts[k] = Label(frame, $"Cost {k}", 300f, top, 46f, 9f, 6.5f, Regular, Muted, TextAlignmentOptions.TopRight);
+                // 스킬이 넷이라 자리가 좁다. 설명은 한 줄만 보인다.
+                skillTexts[k] = Label(frame, $"Skill Text {k}", 208f, top + 9f, 138f, 9f, 6f, Regular, Ink, TextAlignmentOptions.TopLeft);
+                skillTexts[k].overflowMode = TextOverflowModes.Truncate;
             }
 
-            Label(screen, "Help", 0f, 204f, 384f, 9f, 6.5f, Regular, new Color32(0xa7, 0xa2, 0x96, 0xff), TextAlignmentOptions.Top).text =
+            Label(frame, "Help", 0f, 204f, 384f, 9f, 6.5f, Regular, UiKit.Muted, TextAlignmentOptions.Top).text =
                 "판도라를 누르면 내용을 보고, 더스트가 다 모이면 「활성화」로 깨운다 · 책 밖을 누르면 닫힌다";
 
             var view = canvas.gameObject.AddComponent<SealBookView>();
             SerializedFields.Set(view, ("screen", screen.gameObject), ("outside", outside), ("closeButton", close), ("activeCount", count),
                 ("rows", rows), ("icons", icons), ("detailIcon", detailIcon), ("burstRings", bursts), ("detailName", detailName), ("status", status),
-                ("activateButton", activate), ("detailBarRoot", barRoot.gameObject), ("detailBar", detailBar), ("description", description),
+                ("activateButton", activate), ("activateLabel", activateLabel), ("tryButton", tryButton), ("detailBarRoot", barRoot.gameObject), ("detailBar", detailBar), ("description", description),
                 ("skillNote", note), ("skillNames", skillNames), ("skillCosts", skillCosts), ("skillTexts", skillTexts));
             return view;
         }
@@ -120,9 +131,9 @@ namespace MiniPandoras.Editor.Field
         }
 
         /// <summary>판도라 한 줄(웹게임 rowRect: x 28, 줄마다 20px): 고른 줄 바탕과 화살표, 작은 문양과 더스트 고리, 이름, 활성화 가능 표시, 더스트 막대, %.</summary>
-        private static SealBookView.Row BuildRow(Transform screen, int index)
+        private static SealBookView.Row BuildRow(Transform frame, int index)
         {
-            RectTransform row = TopLeft(screen, $"Row {index}", 28f, RowTop + index * RowHeight, 158f, RowHeight - 2f);
+            RectTransform row = TopLeft(frame, $"Row {index}", 28f, RowTop + index * RowHeight, 158f, RowHeight - 2f);
             var button = row.gameObject.AddComponent<Button>();
             button.targetGraphic = ClickArea(row);
             button.transition = Selectable.Transition.None;

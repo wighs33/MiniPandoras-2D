@@ -1,4 +1,4 @@
-"""뉴웨이브 아지트 안의 가구와 바닥·벽 장식(사용자 요청 2026-11-02: 길드 내부 그래픽 개선).
+"""뉴웨이브 아지트 안의 가구와 바닥·벽 장식(길드 내부 그래픽 개선).
 
 가구(세우는 것)는 (RGBA 그림, 발밑 기준점)을, 장식(바닥이나 벽면 위에 까는 것)은 RGBA 그림만 돌려준다.
 낡은 아지트(지금)는 천을 덮거나 부서진 가구, 먼지·거미줄·판자로 막은 창이고, 전성기(6장 회상)는 손때 묻은 가구와 길드 장식이다.
@@ -18,6 +18,7 @@ RUG = pg.hexes("#0f2c2c", "#164242", "#1f5a58", "#2c7470", "#c8963a", "#ecc876")
 LEATHER = pg.hexes("#3a1c12", "#5a2c1a", "#7a4026", "#9a5634")
 MATTRESS = pg.hexes("#7a6e58", "#a09276", "#c2b496", "#d8cbb0")
 STAIN = pg.hexes("#6a5a40")[0]
+MAT = pg.hexes("#4a3c28", "#6e5a3a", "#94805a", "#b4a076")
 
 
 def covered(c, mask, rng):
@@ -288,6 +289,61 @@ def runner(columns, rows, rng):
     c.paint(body & ((c.xx // 6 + c.yy // 6) % 2 == 0), CLOTH["red"][0])
     c.paint(body & ~c.rect(3, 3, w - 3, h - 3), BRASS[2])
     return c.image
+
+
+def door_mat(rng, worn=False):
+    """뒷문 앞 신발 깔개(바닥 장식): 거친 짚 깔개에 줄무늬 둘. 낡으면 해지고 먼지가 앉았다."""
+    w, h = 40, 22
+    c = Canvas(w, h)
+    mat = c.rect(1, 1, w - 1, h - 1)
+    c.paint(mat, MAT[2])
+    c.paint(mat & ((c.xx + c.yy * 2) % 4 == 0), MAT[1])
+    c.paint(mat & ((c.xx * 2 + c.yy) % 7 == 0), MAT[3])
+    c.paint(mat & ~c.rect(3, 3, w - 3, h - 3), MAT[0])
+    for x in (9, w - 12):
+        c.paint(c.rect(x, 3, x + 3, h - 3), TEAL[1])
+    if worn:
+        holes = (pg.noise(h, w, 6, rng) > 0.62) | (rng.random((h, w)) < 0.05)
+        c.image[holes & ~c.rect(6, 4, w - 6, h - 4), 3] = 0
+        c.paint(mat & (pg.noise(h, w, 8, rng) > 0.55) & (c.image[..., 3] > 0), DUST[2])
+    return c.image
+
+
+def boots(rng, toppled=False):
+    """벗어 둔 가죽 장화 한 켤레. toppled면 한 짝이 쓰러졌다."""
+    w, h = 26, 22
+    c = Canvas(w, h)
+    ground = h - 2
+
+    def boot(x, base):
+        c.paint(c.rect(x, base - 15, x + 7, base), LEATHER[2])
+        c.paint(c.rect(x, base - 15, x + 2, base), LEATHER[3])
+        c.paint(c.rect(x, base - 5, x + 11, base), LEATHER[1])
+        c.paint(c.rect(x, base - 1, x + 11, base), LEATHER[0])
+        c.paint(c.rect(x, base - 16, x + 7, base - 14), LEATHER[3])
+
+    boot(1, ground)
+    if toppled:
+        c.paint(c.rect(13, ground - 7, 25, ground), LEATHER[2])
+        c.paint(c.rect(13, ground - 7, 25, ground - 5), LEATHER[3])
+        c.paint(c.rect(21, ground - 8, 25, ground), LEATHER[1])
+    else:
+        boot(13, ground)
+    return outline(c.image), (w // 2, ground)
+
+
+def broom(rng):
+    """벽에 기대 세운 빗자루."""
+    w, h = 18, 66
+    c = Canvas(w, h)
+    ground = h - 2
+    c.line(12, 2, 9, ground - 16, WOOD[3], 2)
+    c.line(13, 2, 10, ground - 16, WOOD[4], 1)
+    head = c.polygon([(6, ground - 18), (13, ground - 18), (16, ground), (2, ground)])
+    c.paint(head, MAT[2])
+    c.paint(head & (c.xx % 3 == 0), MAT[1])
+    c.paint(c.rect(6, ground - 19, 13, ground - 15), IRON[2])
+    return outline(c.image), (w // 2, ground)
 
 
 def cushion(rng):

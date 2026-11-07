@@ -1,8 +1,9 @@
-"""7장 루가의 설명 컷인(사용자 요청 2026-11-03: 다음 장들의 그래픽을 생성기로). 웹게임 설명 그림 넷을 생성기로 다시 그린다.
+"""7장 루가의 설명 컷인(다음 장들의 그래픽을 생성기로). 웹게임 설명 그림 넷을 생성기로 다시 그린다.
 
 1장(cutin_gods.py)·6장(cutin_lesson.py)과 같은 도구를 쓰고, 십이장·에라드·거신은 정확한 모습 대신 실루엣이다.
 장면마다 배경 한 장과, 루가가 말하는 동안 서서히 밝아지는 빛 한 장(가상 384×216, 점은 그 두 배).
 대화창이 화면 아래 4분의 1을 덮으므로 알맹이는 점 y 310 위에 둔다.
+그림 위 글자는 이름만 둔다. 설명은 루가가 대사로 한다.
   twelve.png        십이장: 열두 자리로 갈라진 땅을 둘러선 열두 강자(뒷줄 여섯, 앞줄 여섯). 빛: 강자마다 테두리 빛, 땅을 가른 금.
   chaos.png         주인 없는 세상: 쓰러지고 비틀거리는 열두 강자, 갈라진 땅의 불길과 피어오르는 연기. 빛: 불길과 불티.
   erad.png          에라드: 붉게 빛나는 검은 탑 앞에 두 팔을 벌린 페르니와 양옆의 강자들. 빛: 탑 창, 페르니를 감는 재앙의 소용돌이.
@@ -149,7 +150,7 @@ def twelve(rng):
     canvas = night("#151325", "#2a2238", H, rng, "#3a2c56")
     starfield(canvas, rng, 160, 260)
     glow = np.zeros((H, W, 4))
-    title(canvas, "십이장", "신들이 사라진 뒤 세상을 나눠 가진 열두 강자")
+    title(canvas, "십이장")
     back, front = seats()
     for index, x, foot, h in back:
         warlord(canvas, x, foot, h, index, np.random.default_rng(index), 0.8)
@@ -166,7 +167,6 @@ def chaos(rng):
     canvas = night("#2a1014", "#4a1a12", H, rng, "#5a2418")
     starfield(canvas, rng, 50, 160)
     glow = np.zeros((H, W, 4))
-    title(canvas, "주인 없는 세상", "균형이 깨지고, 수백 년 동안 주인 없는 세상이 이어졌다")
     back, front = seats()
     tilts = [0.5, -0.25, 1.35, -0.15, 0.3, -1.3, 0.2, -0.45, 1.4, -0.3, 0.6, -0.2]
     for index, x, foot, h in back:
@@ -204,7 +204,7 @@ def erad(rng):
     starfield(canvas, rng, 70, 200)
     glow = np.zeros((H, W, 4))
     aura(canvas, W / 2, 180, 220, ERAD_RED, 0.22, 1.0)
-    title(canvas, "에라드", "재앙의 판도라를 가진 페르니를 중심으로 모인 강자들")
+    title(canvas, "에라드")
     spire(canvas, glow, W / 2, 302, 70, 108, rng)
     for k, (x, foot, h) in enumerate(((124, 300, 80), (204, 290, 88), (284, 280, 96), (484, 280, 96), (564, 290, 88), (644, 300, 80))):
         index = (k + 3) % 12
@@ -228,7 +228,7 @@ def erad(rng):
             x, y = cx + np.cos(a) * 70, 164 + np.sin(a) * 28
             dot(glow, x - 1, y - 1, color("#ff5a4a") if k != 1 else color("#300808"), 0.75, size=3)
     aura(glow, cx, 164, 60, ERAD_RED, 0.45, 1.2)
-    write(canvas, "페르니 · 재앙의 판도라", 13, cx, foot + 6, color("#ff9a9a"))
+    write(canvas, "페르니", 13, cx, foot + 6, color("#ff9a9a"))
     return canvas, glow
 
 
@@ -243,17 +243,16 @@ def three_powers(rng):
     canvas = night("#13121e", "#22202e", H, rng, "#2c2840")
     starfield(canvas, rng, 120, 300)
     glow = np.zeros((H, W, 4))
-    title(canvas, "세 번째 권력", "신들 → 십이장 → 에라드")
     # 1대: 열 신(두 줄로 작게)
     for i in range(len(GODS)):
         god(canvas, i, 92 + (i % 5) * 24, 128 + (i // 5) * 42, 34, np.random.default_rng(i), 0.85)
-    write(canvas, "1대 · 신들", 15, 140, 182, GOLD)
+    write(canvas, "신들", 15, 140, 182, GOLD)
     arrow(canvas, 222, 278, 132)
     # 2대: 십이장(둥글게 둘러선다)
     for i in range(12):
         a = i / 12 * np.pi * 2 - np.pi / 2
         warlord(canvas, W / 2 + np.cos(a) * 62, 150 + np.sin(a) * 24, 30, i, np.random.default_rng(i), 0.85)
-    write(canvas, "2대 · 십이장", 15, W / 2, 182, color("#c8c0e0"))
+    write(canvas, "십이장", 15, W / 2, 182, color("#c8c0e0"))
     arrow(canvas, 490, 546, 132)
     # 3대: 에라드(지금의 권력이라 붉게 빛난다)
     aura(canvas, 628, 124, 92, ERAD_RED, 0.25)
@@ -262,7 +261,7 @@ def three_powers(rng):
     for i, x in enumerate((580, 604, 652, 676)):
         body, bright = warlord_shape(x, 164, 32, TWELVE[i])
         paint_silhouette(canvas, body, bright, x, 164, 32, color("#b04848"), np.random.default_rng(i), 0.9)
-    write(canvas, "3대 · 에라드", 15, 628, 182, color("#ff9a9a"))
+    write(canvas, "에라드", 15, 628, 182, color("#ff9a9a"))
     # 사슬에 묶여 무릎 꿇은 거신(거신 헤토스의 빛깔): 굽은 큰 등, 앞으로 떨군 머리, 앞으로 낸 무릎, 늘어진 팔.
     # 사슬은 땅에 박은 말뚝에서 두 손목으로 팽팽하다.
     gx, gf, gh = 610, 300, 100
@@ -283,7 +282,6 @@ def three_powers(rng):
             if int(t * 50) % 3 != 2:
                 dot(canvas, x - 1, y - 1, color("#8a8070"), 1.0, size=3)
         paint(canvas, color("#4a4440"), ((np.abs(XX + 0.5 - stake) < 3) & (YY + 0.5 > gf - 10) & (YY + 0.5 < gf + 2)).astype(float))
-    write(canvas, "봉인돼 있던 거신까지", 13, 470, 250, color("#d0b8a0"))
     return canvas, glow
 
 

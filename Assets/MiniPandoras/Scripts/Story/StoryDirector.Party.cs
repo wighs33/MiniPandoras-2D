@@ -25,15 +25,6 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>
-        /// 따라다니던 동료를 맵에서 내린다(웹게임 field.followers = []). 동료를 연출 인물(Spawn)로 따로 세울 때 쓰고,
-        /// <see cref="Regroup"/>이 다시 붙인다.
-        /// </summary>
-        public void DismissFollowers()
-        {
-            RemoveFollowers();
-        }
-
-        /// <summary>
         /// 맵에 따로 서 있던 파티 동료들이 주인공 자리로 걸어온 뒤, 다시 주인공 뒤에 한 줄로 따라붙는다(웹게임 regroup).
         /// </summary>
         public IEnumerator Regroup()
@@ -94,6 +85,11 @@ namespace MiniPandoras.Story
         public CharacterBody DetachFollower(string id)
         {
             CharacterBody follower = followers.Find(body => body.name == id);
+            if (follower == null)
+            {
+                throw new KeyNotFoundException($"따라다니는 동료 중에 {id}가 없다");
+            }
+
             followers.Remove(follower);
             actors[id] = follower;
             follower.SetVisible(true);
@@ -156,9 +152,9 @@ namespace MiniPandoras.Story
             GameState state = session.State;
             Vector2Int behind = -Step(facing);
             Vector2Int cell = hero.Character.Cell;
-            foreach (string member in state.Party)
+            foreach (string member in state.AvailableCompanions(state.Lead))
             {
-                if (member == GameState.Hero || member == state.Lead || (member == "rang" && state.HasFlag("rangHurt")))
+                if (member == GameState.Hero)
                 {
                     continue;
                 }
@@ -189,7 +185,11 @@ namespace MiniPandoras.Story
             SetFollowersVisible(true);
         }
 
-        private void RemoveFollowers()
+        /// <summary>
+        /// 따라다니던 동료를 맵에서 내린다(웹게임 field.followers = []). 동료를 연출 인물(Spawn)로 따로 세울 때 쓰고,
+        /// <see cref="Regroup"/>이 다시 붙인다.
+        /// </summary>
+        public void RemoveFollowers()
         {
             foreach (CharacterBody follower in followers)
             {

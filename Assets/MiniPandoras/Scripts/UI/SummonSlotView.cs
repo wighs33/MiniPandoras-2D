@@ -10,8 +10,7 @@ namespace MiniPandoras.UI
     /// </summary>
     public sealed class SummonSlotView : MonoBehaviour
     {
-        private const float Size = 19f;
-        private static readonly Color Ready = new Color32(0xff, 0xe9, 0xa0, 0xff);
+        private const float Size = 26f;
         private static readonly Color Waiting = new Color32(0xa7, 0xa2, 0x96, 0xff);
 
         [SerializeField] private Image portrait;
@@ -27,7 +26,7 @@ namespace MiniPandoras.UI
             bool waiting = cooldown > 0;
             shade.gameObject.SetActive(waiting);
             outline.enabled = !waiting;
-            number.color = waiting ? Waiting : Ready;
+            number.color = waiting ? Waiting : UiPalette.ReadyGold;
             if (waiting)
             {
                 shade.sizeDelta = new Vector2(shade.sizeDelta.x, Mathf.Ceil(Size * cooldown / fullCooldown));

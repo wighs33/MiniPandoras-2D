@@ -1,4 +1,4 @@
-"""힐리아 서부 모래땅(westSands, 8장)을 새로 짠다(사용자 요청 2026-11-03: 다음 장들의 맵과 소품을 생성기로).
+"""힐리아 서부 모래땅(westSands, 8장)을 새로 짠다(다음 장들의 맵과 소품을 생성기로).
 
 웹게임은 풀밭 마을에 모래를 깐 정도였지만, 라르고가 「여긴 사막이다. 발밑이 전부 내 모래라고」 하는 곳이라 사막 바닷가 마을로 다시 짰다:
 남쪽 바다와 나무 부두(배가 닿는 곳), 젖은 모래와 물거품, 서쪽과 북쪽의 모래 언덕(바람 물결)과 사암 절벽, 마른 땅의 갈라진 흙,
@@ -267,6 +267,10 @@ def build():
     m.point("eastArrive", (34, 9))
     m.point("east", (35, 9))
     m.warp("east", "fairyGarden", "arrive", "right")
+    # 미노가 달아난 북쪽 고갯길은 드래곤 고원으로 이어진다.
+    m.point("north", (25, 0), (26, 0), (27, 0))
+    m.point("northArrive", (26, 1))
+    m.warp("north", "dragonRoad", "southArrive", "up")
     m.paint_ground = lambda: desert(m.kinds.tolist(), m.seed)
     return m
 

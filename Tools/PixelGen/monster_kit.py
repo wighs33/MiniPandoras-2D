@@ -130,11 +130,6 @@ def shade(c, mask, light, palette, dither=0.12):
     c.paint(mask, pg.quantize(light, palette, dither))
 
 
-def vertical_light(c, top, bottom, bias=0.0):
-    """위가 밝고 아래가 어두운 빛(평평한 면의 명암)."""
-    return np.clip(0.85 - (c.yy - top) / max(bottom - top, 1) * 0.6 + bias, 0, 0.999)
-
-
 def eye(c, x, y, r, iris, pupil=None, white=None, glint=True):
     """눈 하나: 흰자(있으면), 홍채, 동공, 왼쪽 위 빛점."""
     if white is not None:

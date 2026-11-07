@@ -1,15 +1,17 @@
-"""뉴웨이브 아지트 안(hideout)을 새로 그린다(사용자 요청 2026-11-02: 디엘이 있는 길드 건물 안부터 그래픽 개선).
+"""뉴웨이브 아지트 안(hideout)을 새로 그린다(디엘이 있는 길드 건물 안부터 그래픽 개선).
 
 방 배치는 웹게임 아지트와 같다: 서쪽 큰 강당(남쪽 문, 북쪽 벽난로), 북쪽 가운데 단장실, 북동쪽 뒷문·위층 계단 방,
 남동쪽 숙소. 바닥과 벽은 room_interior.RoomInterior가 그린다(판자 바닥, 북쪽 벽 안쪽 면, 방 사이 벽 윗면).
 1층이라 2층은 보이지 않는다(계단만 있다). 벽면이 두 칸 높이가 되도록 웹게임보다 한 줄 아래로 내렸다(칸 y + 1).
-3장에서 2층 난간에 걸터앉은 디엘은 맵이 아니라 따로 그린 컷인 화면으로 보여 준다(cutin_railing.py, 사용자 요청 2026-11-02).
+3장에서 2층 난간에 걸터앉은 디엘은 맵이 아니라 따로 그린 컷인 화면으로 보여 준다(cutin_railing.py).
 
 모습 두 벌(layout.py 모습):
   abandoned  기본. 3·5장의 낡은 아지트: 먼지·거미줄·판자로 막은 창·식은 벽난로, 천을 덮거나 부서진 가구,
              강당 동쪽에 디엘이 지내는 자리(침낭과 바닥 등불).
   lively     6장 디엘의 회상 속 전성기의 뉴웨이브: 불 피운 벽난로, 길드 양탄자와 깃발, 안락의자·둥근 탁자,
              단장 책상과 톱니 작업대, 정돈된 침대.
+뒷문(out)은 방문과 달리 돌을 둘러 쌓은 벽에 낸 낮은 쪽문이다: 나무 빗장, 문틈의 바깥 빛, 신발 깔개와 장화, 통.
+2층과 방은 hideout_upstairs.py가 짠다. stairs는 계단 맨 윗줄의 포탈이고, stairsArrive는 2층에서 내려올 때 서는 칸이다.
 
 지점은 웹게임 아지트와 같은 이름이고(칸 y + 1), 3장 연출이 쓰는 자리를 이름 있는 지점으로 더했다.
 
@@ -52,10 +54,21 @@ def paint_rooms():
     for x, row in WINDOWS:
         room.window(x, row)
     room.fireplace(FIREPLACE, ROOMS["hall"][1])
-    room.wall_door(BACK_DOOR, ROOMS["back"][1])
+    room.back_door(BACK_DOOR, ROOMS["back"][1])
     room.stairs(*STAIRS)
     room.entrance(*ENTRANCE)
     return room
+
+
+def back_door_things(m, worn):
+    """뒷문 곁 살림(뒷문처럼 보이게). 낡은 아지트에서는 깔개가 해지고 장화 한 짝이 쓰러져 있다."""
+    rng = np.random.default_rng(73)
+    row = ROOMS["back"][1]
+    m.decal("door_mat_old" if worn else "door_mat", gf.door_mat(rng, worn), BACK_DOOR * T - 4, row * T + 2)
+    m.stand("boots_old" if worn else "boots", gf.boots(rng, toppled=worn), 23.2, row + 0.9, block=(0.6, 0.3))
+    m.thing("barrel", BACK_DOOR + 1, row)
+    if not worn:
+        m.stand("broom", gf.broom(rng), 23.3, row + 0.2)
 
 
 def abandoned(m, room, rng):
@@ -97,6 +110,7 @@ def abandoned(m, room, rng):
         m.stand("stool_office", gf.stool(rng, toppled=True), 19.8, 6.4, block=(0.6, 0.4))
         for kind, x, y in (("crate", 22, 6), ("barrel", 23, 6), ("crate", 28, 6)):
             m.thing(kind, x, y)
+        back_door_things(m, worn=True)
 
         # 숙소: 맨 매트리스 침대 셋과 주저앉은 침대 하나, 빈 옷장, 부서진 탁자.
         for i, x in enumerate((15, 17, 19, 21)):
@@ -144,6 +158,7 @@ def lively(m, room, rng):
         m.stand("bench_back", yard.bench(rng), 25.5, 7, block=(1.8, 0.5))
         for kind, x, y in (("barrel", 28, 6), ("crate", 28, 5)):
             m.thing(kind, x, y)
+        back_door_things(m, worn=False)
 
         # 숙소: 정돈된 침대 넷과 발치 상자, 옷장, 둥근 탁자.
         for i, x in enumerate((15, 17, 19, 21)):
@@ -174,7 +189,8 @@ def build():
     m.point("erus", (17, 2))
     m.point("report", (17, 4))
     m.point("aurora", (26, 3))
-    m.point("stairs", (27, 3))
+    m.point("stairs", STAIRS, (STAIRS[0] + 1, STAIRS[1]))
+    m.point("stairsArrive", (27, 4))
     m.point("hall", (6, 5), (4, 8), (6, 8), (8, 8))
     m.point("bed", (16, 10))
     m.point("enter", (6, 17))
@@ -194,13 +210,14 @@ def build():
     m.point("dielCloser", (6, 13))
     m.warp("entryExit", "hideoutPath", "doorArrive", "down")
     m.warp("out", "forest", "start", "up")
+    m.warp("stairs", "hideoutUpper", "arrive", "up")
     return m
 
 
 def main(project):
     m = build()
     # 이야기가 걷는 길: 남쪽 문에서 강당·단장실·뒷문·숙소까지 두 모습 모두 막히지 않아야 한다.
-    goals = ["hall", "isabel", "erus", "report", "outArrive", "aurora", "bed", "spar", "rangLie"]
+    goals = ["hall", "isabel", "erus", "report", "outArrive", "aurora", "bed", "spar", "rangLie", "stairs", "stairsArrive"]
     for look in m.look_solid:
         for goal in goals:
             for cell in m.points[goal]:

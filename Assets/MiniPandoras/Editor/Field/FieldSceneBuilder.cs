@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using MiniPandoras.App;
@@ -36,16 +37,16 @@ namespace MiniPandoras.Editor.Field
     public static class FieldSceneBuilder
     {
         private const string ScenePath = "Assets/MiniPandoras/Scenes/Field.unity";
-        private const string InputAsset = "Assets/MiniPandoras/Settings/MiniPandorasInput.inputactions";
-        private const string SilhouettePath = "Assets/MiniPandoras/Art/Materials/SpriteSilhouette.mat";
-        private const string AdditivePath = "Assets/MiniPandoras/Art/Materials/SpriteAdditive.mat";
-        private const string UnlitPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
-        private const string VoidBackdropPath = MapImporter.RedrawnRoot + "/Backdrops/void.png";
-        private const string AwakenFloorPath = MapImporter.RedrawnRoot + "/Backdrops/void_floor.png";
+        private const string MapPrefabFolder = "Assets/MiniPandoras/Prefabs/Maps";
+        private const string VoidBackdropPath = ArtPaths.RedrawnRoot + "/Backdrops/void.png";
+        private const string AwakenFloorPath = ArtPaths.RedrawnRoot + "/Backdrops/void_floor.png";
+        private const string DroppedItemsFolder = "Assets/MiniPandoras/Art/PixelGen/Items";
+        private const string PickupSparklePath = "Assets/MiniPandoras/Art/PixelGen/Effects/pickup_sparkle.png";
 
         [MenuItem("MiniPandoras/Build Field Scene")]
         public static void Build()
         {
+            CheckImported();
             UiKit.PrepareArt();
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -57,13 +58,13 @@ namespace MiniPandoras.Editor.Field
             var ambient = light.gameObject.AddComponent<AmbientLight>();
             SerializedFields.Set(ambient, ("globalLight", light));
 
-            Material silhouette = ShaderMaterial(SilhouettePath, "MiniPandoras/Sprite Silhouette");
+            Material silhouette = Materials.Silhouette();
             PlayerInputReader input;
             ParticleBurst particles = BuildParticles("Effects", false, untinted);
             StageEffects stageEffects = BuildStageEffects(untinted);
-            var looks = new CharacterLooks(silhouette, particles);
-            TopDownMover hero = BuildHero(looks, out input);
-            ActorFactory actors = BuildActorFactory(looks);
+            var looks = new CharacterLooks(silhouette, Materials.SoftShadow(), particles);
+            TopDownMover hero = CharacterRigBuilder.BuildHero(looks, out input);
+            ActorFactory actors = CharacterRigBuilder.BuildActorFactory(looks);
             FollowCamera camera = BuildCamera(hero.transform, untinted);
 
             var systems = new GameObject("Systems");
@@ -77,15 +78,28 @@ namespace MiniPandoras.Editor.Field
             var glider = systems.AddComponent<GliderFlight>();
 
             ControlsUiBuilder.TouchControls touch = ControlsUiBuilder.Build();
-            CombatUiBuilder.Build(combat, conversation, actors, touch.SkillSlots, touch.SummonSlots);
+            var battleCatalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>(BattleDataImporter.CatalogPath);
+            CombatUiBuilder.Build(combat, conversation, actors, touch.SkillSlots, touch.PandoraSlots, touch.SummonSlots, battleCatalog);
             CombatUiBuilder.BuildEffectsView(combat);
+            RewardFeedView rewardFeed = CombatUiBuilder.BuildRewardFeed(combat);
             OverlayUiBuilder.Overlays screen = OverlayUiBuilder.Build();
             Sprite awakenFloor = WebGameImporter.ImportSprite(AwakenFloorPath, new Vector2(0.5f, 0.5f), 4096, FilterMode.Bilinear);
             DialogueUiBuilder.SceneUi sceneUi = DialogueUiBuilder.BuildSceneUi(conversation, glider, VoidBackdrop(), awakenFloor);
             DialogueUiBuilder.BuildStoryUi(conversation, input, sceneUi);
             TitleView title = TitleUiBuilder.Build();
             MenuView menu = TitleUiBuilder.BuildMenu();
-            var battleCatalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>(BattleDataImporter.CatalogPath);
+            SkipButtonView skipButton = TitleUiBuilder.BuildSkipButton();
+            InventoryView inventory = InventoryUiBuilder.Build();
+            MissionView missions = MissionUiBuilder.Build();
+            MonsterBookView monsterBook = MonsterBookUiBuilder.Build();
+            CompanionView companions = CompanionUiBuilder.Build();
+            ShopView shop = ShopUiBuilder.Build();
+            SerializedFields.Set(touch.QuickSlots, ("session", session));
+            AtlasFile atlasFile = WorldAtlasImporter.Read();
+            WorldAtlas atlas = WorldAtlasImporter.Save(atlasFile);
+            WorldMapView worldMap = WorldMapUiBuilder.Build(atlasFile);
+            TutorialGuide guide = TutorialUiBuilder.Build();
+            DeathView death = DeathUiBuilder.Build();
             SealBookView sealBook = SealBookUiBuilder.Build(battleCatalog);
             LoadoutView loadout = LoadoutUiBuilder.Build(battleCatalog);
             new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
@@ -93,29 +107,40 @@ namespace MiniPandoras.Editor.Field
             List<Sprite> emotes = WebGameImporter.LoadAll<Sprite>(WebGameImporter.Root + "/Emotes");
             SerializedFields.Set(hero, ("input", input), ("combat", combat));
             var controls = systems.AddComponent<PlayerControls>();
-            SerializedFields.Set(controls, ("input", input), ("hero", hero), ("combat", combat), ("exploration", exploration), ("touch", touch.View));
+            SerializedFields.Set(controls, ("input", input), ("hero", hero), ("combat", combat), ("exploration", exploration), ("touch", touch.View),
+                ("gatePick", ControlsUiBuilder.BuildGatePick(combat, camera.GetComponent<Camera>())));
             SerializedFields.Set(travel,
                 ("maps", MapPrefabs()), ("player", hero), ("combat", combat), ("followCamera", camera), ("fade", screen.Fade),
                 ("ambientLight", ambient), ("backdrop", camera.GetComponentInChildren<MapBackdrop>(true)), ("exploration", exploration), ("loadOnStart", false));
             SerializedFields.Set(exploration,
-                ("mapTravel", travel), ("hero", hero), ("combat", combat), ("conversation", conversation));
+                ("mapTravel", travel), ("hero", hero), ("combat", combat), ("conversation", conversation),
+                ("pickupRim", silhouette), ("pickupGlow", Materials.Additive()), ("pickupSparkle", WebGameImporter.ImportSprite(PickupSparklePath, new Vector2(0.5f, 0.5f), 512, FilterMode.Point)),
+                ("pickupArrow", WebGameImporter.ImportSprite(TutorialUiBuilder.ArrowPath, new Vector2(0.5f, 0.5f), 512, FilterMode.Point)),
+                ("sightMaterial", Materials.Unlit()));
             SerializedFields.Set(combat,
-                ("catalog", AssetDatabase.LoadAssetAtPath<BattleCatalog>(BattleDataImporter.CatalogPath)), ("session", session),
+                ("catalog", battleCatalog), ("session", session),
                 ("hero", hero.GetComponent<CharacterBody>()), ("actors", actors), ("particles", particles), ("followCamera", camera),
                 ("alertIcon", emotes.Find(sprite => sprite.name == "exclaim")));
             SerializedFields.Set(director,
                 ("session", session), ("conversation", conversation), ("mapTravel", travel), ("exploration", exploration), ("hero", hero),
                 ("combat", combat), ("followCamera", camera), ("fade", screen.Fade), ("screenFlash", screen.Flash), ("screenAlarm", screen.Alarm), ("weather", screen.Weather), ("sandStorm", screen.SandStorm), ("ambientLight", ambient),
                 ("awakenView", sceneUi.Awaken), ("glider", glider), ("gliderView", sceneUi.Glider), ("cutInView", sceneUi.CutIn),
-                ("captions", sceneUi.Captions), ("explainPanel", sceneUi.Explain), ("mapSketch", sceneUi.MapSketch),
+                ("captions", sceneUi.Captions), ("explainPanel", sceneUi.Explain), ("rewardFeed", rewardFeed), ("shop", shop),
                 ("particles", particles), ("actorFactory", actors), ("controls", controls),
                 ("memoryTint", camera.GetComponent<MemoryTint>()), ("stageEffects", stageEffects),
                 ("speakers", WebGameImporter.LoadAll<Speaker>(WebGameImporter.SpeakerFolder)),
                 ("emotes", emotes),
                 ("panels", WebGameImporter.LoadAll<Sprite>(WebGameImporter.Root + "/Panels")),
-                ("images", WebGameImporter.LoadAll<Sprite>(WebGameImporter.Root + "/Images")));
+                ("guide", guide), ("menu", menu), ("inventory", inventory), ("worldMap", worldMap), ("touch", touch.View), ("companions", companions), ("sealBook", sealBook), ("death", death),
+                ("images", FieldImages()));
             SerializedFields.Set(runner, ("director", director), ("session", session), ("title", title));
-            SerializedFields.Set(systems.AddComponent<GameMenu>(), ("view", menu), ("book", sealBook), ("loadout", loadout), ("session", session), ("catalog", battleCatalog));
+            var skip = systems.AddComponent<CutsceneSkip>();
+            SerializedFields.Set(skip, ("view", skipButton), ("conversation", conversation), ("controls", controls), ("title", title));
+            var trial = systems.AddComponent<PandoraTrial>();
+            SerializedFields.Set(trial, ("mapTravel", travel), ("combat", combat), ("exploration", exploration), ("weather", screen.Weather),
+                ("bar", ControlsUiBuilder.BuildTrialBar(combat)));
+            SerializedFields.Set(systems.AddComponent<GameMenu>(), ("view", menu), ("inventory", inventory), ("book", sealBook), ("loadout", loadout), ("session", session), ("catalog", battleCatalog),
+                ("skip", skip), ("missions", missions), ("monsterBook", monsterBook), ("companions", companions), ("actors", actors), ("worldMap", worldMap), ("atlas", atlas), ("mapTravel", travel), ("trial", trial));
             SerializedFields.Set(glider, ("input", input));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -123,119 +148,43 @@ namespace MiniPandoras.Editor.Field
             AssetDatabase.SaveAssets();
         }
 
-        private static TopDownMover BuildHero(CharacterLooks looks, out PlayerInputReader input)
+        /// <summary>빌드에 필요한 들여오기가 먼저 끝났는지 본다. 빠진 것이 있으면 무엇을 먼저 돌릴지 알리고 멈춘다.</summary>
+        private static void CheckImported()
         {
-            var hero = new GameObject("Hero") { tag = "Player" };
-            var body = hero.AddComponent<Rigidbody2D>();
-            body.gravityScale = 0f;
-            body.freezeRotation = true;
-            body.interpolation = RigidbodyInterpolation2D.Interpolate;
-            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            // 웹게임 발밑 상자: 발 기준 가로 ±5px, 위로 1~6px.
-            var feet = hero.AddComponent<BoxCollider2D>();
-            feet.size = new Vector2(10f / 16f, 5f / 16f);
-            feet.offset = new Vector2(0f, 3.5f / 16f);
-            feet.sharedMaterial = AssetDatabase.LoadAssetAtPath<PhysicsMaterial2D>("Assets/MiniPandoras/Settings/NoFriction.physicsMaterial2D");
-
-            AddCharacter(hero, "hero", looks);
-            input = hero.AddComponent<PlayerInputReader>();
-            SerializedFields.Set(input,
-                ("move", Action("Player/Move")), ("action", Action("Player/Action")), ("skill1", Action("Player/Skill1")),
-                ("skill2", Action("Player/Skill2")), ("swap", Action("Player/Swap")),
-                ("summons", new[] { Action("Player/Summon1"), Action("Player/Summon2"), Action("Player/Summon3"), Action("Player/Summon4"), Action("Player/Summon5") }));
-            return hero.AddComponent<TopDownMover>();
-        }
-
-        /// <summary>연출 인물·동료·적의 틀(꺼 둔 CharacterBody)과, 그것을 복제해 시트를 끼우는 ActorFactory.</summary>
-        private static ActorFactory BuildActorFactory(CharacterLooks looks)
-        {
-            var templates = new GameObject("Templates");
-            var actor = new GameObject("Actor");
-            actor.transform.SetParent(templates.transform, false);
-            CharacterBody body = AddCharacter(actor, "thug1", looks);
-            actor.SetActive(false);
-            var factory = templates.AddComponent<ActorFactory>();
-            SerializedFields.Set(factory, ("template", body), ("sheets", WebGameImporter.LoadAll<CharacterSheet>(WebGameImporter.SheetFolder)));
-            return factory;
-        }
-
-        private static CharacterBody AddCharacter(GameObject root, string sheetId, CharacterLooks looks)
-        {
-            var visual = new GameObject("Visual").transform;
-            visual.SetParent(root.transform, false);
-
-            var shadow = new GameObject("Shadow").AddComponent<SpriteRenderer>();
-            shadow.transform.SetParent(visual, false);
-            shadow.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(UiKit.UiArt + "/Shadow.png");
-            shadow.color = new Color(1f, 1f, 1f, 0.28f);
-            shadow.sortingOrder = -50;
-            shadow.transform.localScale = new Vector3(20f / 16f, 0.75f, 1f);
-
-            var figure = new GameObject("Sprite").AddComponent<SpriteRenderer>();
-            figure.transform.SetParent(visual, false);
-            figure.spriteSortPoint = SpriteSortPoint.Pivot;
-            var sheet = AssetDatabase.LoadAssetAtPath<CharacterSheet>($"{WebGameImporter.SheetFolder}/{sheetId}.asset");
-            figure.sprite = sheet.FramesFor(Facing.Down)[0];
-
-            var emote = new GameObject("Emote").AddComponent<SpriteRenderer>();
-            emote.transform.SetParent(visual, false);
-            emote.sortingOrder = 50;
-            SerializedFields.Set(emote.gameObject.AddComponent<EmoteBalloon>(), ("figure", figure));
-
-            var character = root.AddComponent<CharacterBody>();
-            SerializedFields.Set(character, ("visual", visual), ("sheet", sheet));
-            // 날개는 몸 그림 바로 뒤에 그린다(같은 정렬 기준점에서 한 단계 아래).
-            var wings = new GameObject("Wings").AddComponent<SpriteRenderer>();
-            wings.transform.SetParent(visual, false);
-            wings.sortingOrder = figure.sortingOrder - 1;
-            wings.enabled = false;
-
-            SerializedFields.Set(figure.gameObject.AddComponent<CharacterAnimator>(),
-                ("body", character), ("shadow", shadow), ("silhouette", looks.Silhouette), ("wings", wings),
-                ("demonWings", looks.DemonWings), ("angelWings", looks.AngelWings), ("particles", looks.Particles));
-            return character;
-        }
-
-        /// <summary>인물마다 똑같이 붙는 그리기 재료: 실루엣 재질, 날개 그림(접은·편), 기운 알갱이.</summary>
-        private sealed class CharacterLooks
-        {
-            public CharacterLooks(Material silhouette, ParticleBurst particles)
+            if (AssetDatabase.LoadAssetAtPath<BattleCatalog>(BattleDataImporter.CatalogPath) == null)
             {
-                Silhouette = silhouette;
-                Particles = particles;
-                DemonWings = WingSprites("demon");
-                AngelWings = WingSprites("angel");
+                throw new InvalidOperationException("전투 목록(BattleCatalog)이 없다. MiniPandoras/Import Web Game을 먼저 돌린다.");
             }
 
-            public Material Silhouette { get; }
-            public ParticleBurst Particles { get; }
-            public Sprite[] DemonWings { get; }
-            public Sprite[] AngelWings { get; }
-
-            private static Sprite[] WingSprites(string kind)
+            if (!HasAssets("t:Prefab", MapPrefabFolder))
             {
-                string folder = WebGameImporter.Root + "/Images/";
-                return new[]
-                {
-                    AssetDatabase.LoadAssetAtPath<Sprite>(folder + kind + "Wings0.png"),
-                    AssetDatabase.LoadAssetAtPath<Sprite>(folder + kind + "Wings1.png"),
-                };
+                throw new InvalidOperationException("맵 프리팹이 없다. MiniPandoras/Import Web Game 또는 Import Maps를 먼저 돌린다.");
+            }
+
+            if (!HasAssets("t:EffectSheet", PixelFxImporter.SheetFolder))
+            {
+                throw new InvalidOperationException("pixelfx 효과가 없다. MiniPandoras/Import PixelFx를 먼저 돌린다.");
             }
         }
 
-        /// <summary>셰이더 하나로 만든 재질(맞을 때 번쩍이는 실루엣, 빛처럼 더해 그리기). 없으면 만든다.</summary>
-        private static Material ShaderMaterial(string path, string shader)
+        private static bool HasAssets(string filter, string folder)
         {
-            var material = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (material != null)
+            return AssetDatabase.IsValidFolder(folder) && AssetDatabase.FindAssets(filter, new[] { folder }).Length > 0;
+        }
+
+        /// <summary>
+        /// 이야기가 맵에 놓는 물건 그림: 웹게임 그림과, 생성기가 그린 바닥에 떨어진 아이템(Tools/PixelGen/inventory.py, 「아이템 id_ground」).
+        /// 떨어진 아이템은 발밑(아래 가운데)이 칸의 발 자리에 오게 둔다.
+        /// </summary>
+        private static List<Sprite> FieldImages()
+        {
+            List<Sprite> images = WebGameImporter.LoadAll<Sprite>(WebGameImporter.Root + "/Images");
+            foreach (string path in Directory.GetFiles(DroppedItemsFolder, "*.png"))
             {
-                return material;
+                images.Add(WebGameImporter.ImportSprite(path.Replace('\\', '/'), new Vector2(0.5f, 0f), 512, FilterMode.Point));
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-            material = new Material(Shader.Find(shader));
-            AssetDatabase.CreateAsset(material, path);
-            return material;
+            return images;
         }
 
         /// <summary>
@@ -272,9 +221,9 @@ namespace MiniPandoras.Editor.Field
             backdropObject.transform.localPosition = new Vector3(0f, 0f, 10f);
             var picture = new GameObject("Picture").AddComponent<SpriteRenderer>();
             picture.transform.SetParent(backdropObject.transform, false);
-            picture.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(UnlitPath);
+            picture.sharedMaterial = Materials.Unlit();
             SerializedFields.Set(backdropObject.AddComponent<MapBackdrop>(),
-                ("view", camera), ("picture", picture), ("voidPicture", VoidBackdrop()), ("additive", ShaderMaterial(AdditivePath, "MiniPandoras/Sprite Additive")));
+                ("view", camera), ("picture", picture), ("voidPicture", VoidBackdrop()), ("additive", Materials.Additive()));
             backdropObject.SetActive(false);
 
             var follow = cameraObject.AddComponent<FollowCamera>();
@@ -294,54 +243,22 @@ namespace MiniPandoras.Editor.Field
             ParticleBurst glow = BuildParticles("Stage Effects", true, untinted);
             var stage = glow.gameObject.AddComponent<StageEffects>();
             SerializedFields.Set(stage,
-                ("additive", ShaderMaterial(AdditivePath, "MiniPandoras/Sprite Additive")), ("unlit", AssetDatabase.LoadAssetAtPath<Material>(UnlitPath)),
+                ("additive", Materials.Additive()), ("unlit", Materials.Unlit()),
                 ("glowParticles", glow), ("lightPillar", PixelFxImporter.Load("HolyPillar")),
                 ("portalOpen", PixelFxImporter.Load("PortalOpen")), ("portalLoop", PixelFxImporter.Load("PortalLoop")), ("portalClose", PixelFxImporter.Load("PortalClose")),
-                ("trainHead", TrainArt("head", 30f)), ("trainBody", TrainArt("body", 0f)),
-                ("trainTongue", new[] { TongueArt(0), TongueArt(1), TongueArt(2), TongueArt(3) }),
-                ("stageImages", new[] { StageArt("warship"), StageArt("sea_dragon") }), ("sandWall", StageArt("sand_wall")),
+                ("sealChainsOpen", PixelFxImporter.Load("SealChainsOpen")), ("sealChainsLoop", PixelFxImporter.Load("SealChainsLoop")),
+                ("knotLoop", PixelFxImporter.Load("KnotLoop")), ("knotUntie", PixelFxImporter.Load("KnotUntie")), ("warpIn", PixelFxImporter.Load("WarpIn")),
+                ("sandGrasp", PixelFxImporter.Load("SandGrasp")), ("sandPillar", PixelFxImporter.Load("SandPillar")),
+                ("trainHead", StageArt.Train("head", 30f)), ("trainBody", StageArt.Train("body", 0f)),
+                ("trainTongue", new[] { StageArt.Tongue(0), StageArt.Tongue(1), StageArt.Tongue(2), StageArt.Tongue(3) }),
+                ("stageImages", new[] { StageArt.Image("warship"), StageArt.Image("warship_plank"), StageArt.Image("sea_dragon") }), ("sandWall", StageArt.Image("sand_wall")),
                 ("narionPerched", new[]
                 {
-                    NarionArt("narion_perch"), NarionArt("narion_perch_1"), NarionArt("narion_perch_2"), NarionArt("narion_perch_3"),
-                    NarionArt("narion_perch_4"), NarionArt("narion_perch_5"), NarionArt("narion_perch_6"),
+                    StageArt.Narion("narion_perch"), StageArt.Narion("narion_perch_1"), StageArt.Narion("narion_perch_2"), StageArt.Narion("narion_perch_3"),
+                    StageArt.Narion("narion_perch_4"), StageArt.Narion("narion_perch_5"), StageArt.Narion("narion_perch_6"),
                 }),
-                ("narionFlying", new[] { NarionArt("narion_fly0"), NarionArt("narion_fly1") }));
+                ("narionFlying", new[] { StageArt.Narion("narion_fly0"), StageArt.Narion("narion_fly1") }));
             return stage;
-        }
-
-        /// <summary>
-        /// 나리온 그림(Tools/PixelGen/narion.py). 기준점은 발이 닿는 줄 가운데(그림 136 논리 px 가운데 아래에서 27).
-        /// 1152px로 넓어 다른 무대 그림보다 큰 최대 크기로 들여온다(줄이면 도트가 뭉개진다).
-        /// </summary>
-        public static Sprite NarionArt(string name)
-        {
-            return WebGameImporter.ImportSprite($"{MapImporter.RedrawnRoot}/Stage/{name}.png", new Vector2(0.5f, 27f / 136f), 2048, FilterMode.Bilinear);
-        }
-
-        /// <summary>맵에 세우는 큰 그림과 모래벽 한 칸(Tools/PixelGen warship.py·sea_dragon.py·sand_wall.py). 기준점은 아래 가운데다.</summary>
-        private static Sprite StageArt(string name)
-        {
-            return WebGameImporter.ImportSprite($"{MapImporter.RedrawnRoot}/Stage/{name}.png", new Vector2(0.5f, 0f), 1024, FilterMode.Bilinear);
-        }
-
-        /// <summary>뱀열차가 날름거리는 혀 한 장. 기준점은 오른쪽 끝 가운데(혀뿌리)다.</summary>
-        private static Sprite TongueArt(int frame)
-        {
-            return WebGameImporter.ImportSprite($"{MapImporter.RedrawnRoot}/SnakeTrain/tongue_{frame}.png", new Vector2(1f, 0.5f), 256, FilterMode.Bilinear);
-        }
-
-        /// <summary>
-        /// 뱀열차 그림(Tools/PixelGen/snake_train.py). 웹게임처럼 그림을 (x − left, y − (높이 − 2))에 그리도록,
-        /// 기준점을 그림 왼쪽에서 left, 아래에서 2 논리 px 위(몸이 땅에 닿는 줄)에 둔다(그림은 논리 px의 네 배다).
-        /// 몸통은 SnakeTrain이 세로 띠로 잘라 쓴다.
-        /// </summary>
-        private static Sprite TrainArt(string name, float left)
-        {
-            string path = $"{MapImporter.RedrawnRoot}/SnakeTrain/{name}.png";
-            AssetDatabase.ImportAsset(path);
-            // 들여온 텍스처는 최대 크기에 맞춰 줄었을 수 있어, 원본 그림 크기로 기준점을 잰다.
-            ((TextureImporter)AssetImporter.GetAtPath(path)).GetSourceTextureWidthAndHeight(out int width, out int height);
-            return WebGameImporter.ImportSprite(path, new Vector2(left * 4f / width, 8f / height), 2048, FilterMode.Bilinear);
         }
 
         /// <summary>
@@ -376,8 +293,8 @@ namespace MiniPandoras.Editor.Field
             fade.color = gradient;
             var renderer = effects.GetComponent<ParticleSystemRenderer>();
             renderer.sharedMaterial = glow
-                ? ShaderMaterial(AdditivePath, "MiniPandoras/Sprite Additive")
-                : AssetDatabase.LoadAssetAtPath<Material>(UnlitPath);
+                ? Materials.Additive()
+                : Materials.Unlit();
             renderer.sortingOrder = glow ? 41 : 40;
             return effects.AddComponent<ParticleBurst>();
         }
@@ -385,7 +302,7 @@ namespace MiniPandoras.Editor.Field
         private static List<GameMap> MapPrefabs()
         {
             var maps = new List<GameMap>();
-            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/MiniPandoras/Prefabs/Maps" }))
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { MapPrefabFolder }))
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
                 if (prefab.TryGetComponent(out GameMap map))
@@ -397,17 +314,5 @@ namespace MiniPandoras.Editor.Field
             return maps;
         }
 
-        private static InputActionReference Action(string name)
-        {
-            foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(InputAsset))
-            {
-                if (asset is InputActionReference reference && reference.name == name)
-                {
-                    return reference;
-                }
-            }
-
-            return null;
-        }
     }
 }

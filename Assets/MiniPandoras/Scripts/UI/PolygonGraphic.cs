@@ -22,7 +22,7 @@ namespace MiniPandoras.UI
             mesh.Clear();
             foreach (Vector2 point in points)
             {
-                mesh.AddVert(new Vector3(point.x, -point.y), color, Vector4.zero);
+                mesh.AddVertex(point, color);
             }
 
             for (int i = 1; i < points.Length - 1; i++)

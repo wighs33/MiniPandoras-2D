@@ -1,5 +1,6 @@
 using MiniPandoras.Dialogue;
 using MiniPandoras.Input;
+using MiniPandoras.World;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,9 +19,10 @@ namespace MiniPandoras.UI
         [SerializeField] private TMP_Text label;
         [SerializeField] private CanvasGroup group;
         [SerializeField] private Button advanceArea;
-        [SerializeField] private float lockSeconds = 20f / 60f;
-        [SerializeField] private float appearSeconds = 10f / 60f;
+        [SerializeField] private float lockSeconds = 20f / FrameTime.FramesPerSecond;
+        [SerializeField] private float appearSeconds = 10f / FrameTime.FramesPerSecond;
 
+        // 메뉴·튜토리얼이 시간을 멈춘 동안에도 나타나고 넘길 수 있게 멈추지 않는 시간으로 잰다.
         private float openedAt;
         private bool open;
 
@@ -49,7 +51,7 @@ namespace MiniPandoras.UI
         {
             label.text = text;
             window.sizeDelta = new Vector2(Mathf.Ceil(label.preferredWidth) + 40f, window.sizeDelta.y);
-            openedAt = Time.time;
+            openedAt = Time.unscaledTime;
             open = true;
             group.alpha = 0f;
             window.gameObject.SetActive(true);
@@ -60,13 +62,13 @@ namespace MiniPandoras.UI
         {
             if (open)
             {
-                group.alpha = Mathf.Clamp01((Time.time - openedAt) / appearSeconds);
+                group.alpha = Mathf.Clamp01((Time.unscaledTime - openedAt) / appearSeconds);
             }
         }
 
         private void Advance()
         {
-            if (open && Time.time - openedAt > lockSeconds)
+            if (open && Time.unscaledTime - openedAt > lockSeconds)
             {
                 conversation.Continue();
             }

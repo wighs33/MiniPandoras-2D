@@ -1,4 +1,4 @@
-"""뱀성(castle)을 새로 짠다(사용자 결정 2026-11-02: 뱀성은 다리를 건너 산 위에 있다, 성 건물은 꼭대기가 뱀 머리인 탑이다).
+"""뱀성(castle)을 새로 짠다(뱀성은 다리를 건너 산 위에 있다, 성 건물은 꼭대기가 뱀 머리인 탑이다).
 
 56×72칸. 아래(남쪽) 풀밭에서 강 위 나무다리(bridges.py: 판자 바닥, 난간, 등불 기둥)를 건너, 양 끝이 휘어 올라간 절벽 세 단을 돌계단으로 지그재그로 올라
 산꼭대기 성문에 닿는다. 성문을 지나면 안뜰(뱀 석상, 화로, 양옆 정원)이고, 맨 위에 크림색 얼룩 뱀이 감아 오른 탑이 있다.
@@ -77,29 +77,11 @@ def mountain(m):
 
 
 def bridge(m, rng):
-    """
-    강을 건너는 나무다리: 판자 바닥(바닥 그림, 양쪽 물가에 반 칸씩 얹힌다), 양옆 난간(기둥마다 한 칸씩 세워 인물 앞뒤가 맞다),
-    네 귀퉁이 등불 기둥. 물 위는 난간 안쪽만 걸어서 지나간다.
-    """
+    """강을 건너는 나무다리(bridges.span). 물 위는 난간 안쪽만 걸어서 지나간다."""
     x0, x1 = BRIDGE_X
-    # 강 폭은 다리 바로 옆 열에서 잰다(다리 칸은 남쪽 길이 덮어 칠했을 수 있다). 다리 밑은 물로 되돌린다.
+    # 강 폭은 다리 바로 옆 열에서 잰다(다리 칸은 남쪽 길이 덮어 칠했을 수 있다).
     rows = np.nonzero((m.kinds[:, [x0 - 1, x1]] == "water").any(axis=1))[0]
-    m.kinds[rows.min():rows.max() + 1, x0:x1] = "water"
-    top, bottom = rows.min() - 0.5, rows.max() + 1.5
-    m.decal("bridge_deck", bridges.deck(x1 - x0, bottom - top, rng), x0 * T - bridges.MARGIN, top * T)
-    m.keep_open(x0 + 0.25, rows.min(), x1 - 0.25, rows.max() + 1)
-    posts = np.linspace(top + 0.35, bottom - 0.1, int(round((bottom - top) / 1.25)) + 1)
-    for side, x in ((-1, x0 + 0.12), (1, x1 - 0.12)):
-        corner = bridges.lantern_post(rng, side)
-        stand(m, "bridge_lantern_post", corner, x, posts[0])
-        for k in range(1, len(posts)):
-            length = int(round((posts[k] - posts[k - 1]) * T))
-            stand(m, f"bridge_rail_{length}" + ("" if k < len(posts) - 1 else "_end"),
-                  bridges.rail(length, rng, post=k < len(posts) - 1), x, posts[k])
-        stand(m, "bridge_lantern_post", corner, x, posts[-1])
-        m.block(x - 0.12, top, x + 0.12, bottom)
-        for y in (posts[0], posts[-1]):
-            m.light((x + side * 0.4) * LOGICAL, y * LOGICAL - 18, 24)
+    bridges.span(m, x0, x1, rows.min(), rows.max(), rng)
 
 
 def fortress(m, rng):

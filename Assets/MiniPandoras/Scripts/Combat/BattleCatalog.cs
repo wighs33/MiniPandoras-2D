@@ -12,6 +12,9 @@ namespace MiniPandoras.Combat
     {
         [SerializeField] private List<SkillDefinition> skills = new List<SkillDefinition>();
         [SerializeField] private List<EnemyDefinition> enemies = new List<EnemyDefinition>();
+        [Tooltip("몬스터 도감에 실리는 몬스터. 필드에 사는 것만 레벨 순서로 들어간다(MonsterImporter)")]
+        [SerializeField] private List<EnemyDefinition> bestiary = new List<EnemyDefinition>();
+        [SerializeField] private List<EnemyDefinition> huntable = new List<EnemyDefinition>();
         [SerializeField] private List<PandoraDefinition> pandoras = new List<PandoraDefinition>();
         [SerializeField] private List<MemberDefinition> members = new List<MemberDefinition>();
         [Tooltip("불러낸 동료를 다시 부를 때까지 프레임(웹게임 SUMMON_COOLDOWN)")]
@@ -22,8 +25,8 @@ namespace MiniPandoras.Combat
         [SerializeField] private List<string> autoEquip = new List<string>();
         [Tooltip("짐승을 쓰러뜨려 더스트를 모으는 판도라(웹게임 HUNT_PANDORAS)")]
         [SerializeField] private List<string> huntPandoras = new List<string>();
-        [Tooltip("짐승 한 마리마다 모이는 더스트 %(웹게임 BEAST_DUST)")]
-        [SerializeField] private int beastDust = 35;
+        [Tooltip("짐승 한 마리마다 모이는 더스트 %. 웹게임 BEAST_DUST는 35다(BattleDataImporter.HuntDustPercent)")]
+        [SerializeField] private int beastDust = 1;
 
         public int SummonCooldown => summonCooldown;
         public IReadOnlyList<string> BookOrder => bookOrder;
@@ -31,6 +34,9 @@ namespace MiniPandoras.Combat
         public IReadOnlyList<string> HuntPandoras => huntPandoras;
         public int BeastDust => beastDust;
         public IReadOnlyList<EnemyDefinition> Enemies => enemies;
+        public IReadOnlyList<EnemyDefinition> Bestiary => bestiary;
+        /// <summary>도감에 실린 몬스터 가운데 지금 맵에 살아서 잡을 수 있는 것.</summary>
+        public IReadOnlyList<EnemyDefinition> Huntable => huntable;
 
         public SkillDefinition Skill(string id)
         {

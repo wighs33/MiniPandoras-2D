@@ -18,11 +18,12 @@ namespace MiniPandoras.Story
     /// 이야기 연출 명령 모음(웹게임 story/script.ts의 Script). 장 코드(Chapter1 …)가 이 명령을 차례로 부른다.
     /// 시간이 드는 명령은 코루틴이라 yield return으로 끝날 때까지 기다리고, 동시에 돌릴 것은 StartCoroutine으로 띄워 둔다.
     /// 시간은 웹게임처럼 60fps 프레임 수, 자리는 칸 좌표(위에서 아래로)로 받는다.
-    /// 명령이 많아 하는 일별로 파일을 나눴다: 대화·화면·인물(이 파일), 파티와 따라오는 동료, 이야기 전투.
+    /// 명령이 많아 하는 일별로 파일을 나눴다: 대화·화면·조작(이 파일), 인물(Actors), 파티와 따라오는 동료(Party), 진행·물건·의뢰(Progress),
+    /// 맵과 탐험(Field), 이야기 전투(Battle), 튜토리얼(Guide), 화면 전체 장면(Scenes), 연출 효과(Stage).
     /// </summary>
     public sealed partial class StoryDirector : MonoBehaviour
     {
-        private const string HeroId = GameState.Hero;
+        public const string HeroId = GameState.Hero;
 
         [SerializeField] private GameSession session;
         [SerializeField] private Conversation conversation;
@@ -39,27 +40,15 @@ namespace MiniPandoras.Story
         [SerializeField] private ScreenCaptions captions;
         [SerializeField] private ExplainPanel explainPanel;
         [SerializeField] private ParticleBurst particles;
+        [SerializeField] private TouchControlsView touch;
         [SerializeField] private ActorFactory actorFactory;
         [Tooltip("조작 상태를 알리는 곳. 화면 조작과 주인공 멈춤은 거기서 정한다")]
         [SerializeField] private PlayerControls controls;
         [SerializeField] private List<Speaker> speakers = new List<Speaker>();
-        [Tooltip("이름: exclaim, question, dots, anger, sweat, heart")]
-        [SerializeField] private List<Sprite> emotes = new List<Sprite>();
         [SerializeField] private List<Sprite> panels = new List<Sprite>();
         [Tooltip("이야기가 맵에 놓는 물건 그림(상자, 보석 …). 이름은 웹게임 assets.images와 같다")]
         [SerializeField] private List<Sprite> images = new List<Sprite>();
 
-        private static readonly Dictionary<string, string> EmoteFiles = new Dictionary<string, string>
-        {
-            { "!", "exclaim" }, { "?", "question" }, { "…", "dots" }, { "anger", "anger" }, { "sweat", "sweat" }, { "heart", "heart" },
-        };
-
-        private static readonly Color[] DustColors = { new Color32(0xc9, 0xb0, 0x8a, 0xff), new Color32(0xa8, 0x90, 0x6a, 0xff), new Color32(0xe0, 0xcc, 0xa8, 0xff) };
-        private static readonly Color[] BlinkColors = { new Color32(0x5f, 0xd0, 0xc0, 0xff), new Color32(0xc8, 0xff, 0xf4, 0xff), Color.white };
-        private static readonly Color[] SmokeColors = { new Color32(0xf0, 0xec, 0xe4, 0xff), new Color32(0xc8, 0xc2, 0xb6, 0xff), new Color32(0x9a, 0x94, 0xa8, 0xff) };
-        private static readonly Color TearColor = new Color32(0x9a, 0xd0, 0xff, 0xff);
-
-        private readonly Dictionary<string, CharacterBody> actors = new Dictionary<string, CharacterBody>();
         private CharacterBody heroBody;
         private string shownPanel;
 
@@ -95,6 +84,12 @@ namespace MiniPandoras.Story
             return conversation.Say(Line(speakerId, text, nameOverride, style));
         }
 
+        /// <summary>일러스트를 세우지 않고 말한다. 눈을 뜨는 장면처럼 화면이 그 인물의 시점일 때 쓴다.</summary>
+        public IEnumerator SayUnseen(string speakerId, string text)
+        {
+            return conversation.Say(Line(speakerId, text, null, LineStyle.Say).WithoutFigure());
+        }
+
         /// <summary>속마음(웹게임 think). 보통은 주인공이고, 기억 속 인물의 속마음이면 그 인물을 준다.</summary>
         public IEnumerator Think(string text, string speakerId = HeroId)
         {
@@ -116,6 +111,12 @@ namespace MiniPandoras.Story
         {
             LineStyle style = speakerId == HeroId ? LineStyle.Thought : LineStyle.Say;
             return conversation.Choose(Line(speakerId, question, null, style), options, chosen);
+        }
+
+        /// <summary>그 인물의 대사가 대화창에 떠 있다.</summary>
+        public bool IsSpeaking(string speakerId)
+        {
+            return conversation.Speaker == speakerId;
         }
 
         public IEnumerator Notify(string text)
@@ -184,13 +185,6 @@ namespace MiniPandoras.Story
             return fade.FadeTo(alpha, frames / 60f);
         }
 
-        /// <summary>그림을 화면 전체에 바로 띄운다(null이면 내린다). 어두워짐 없이 바꾼다(웹게임 overlay.panel = …).</summary>
-        public void ShowPanel(string panelName)
-        {
-            shownPanel = panelName;
-            explainPanel.Show(panelName == null ? null : panels.Find(panel => panel.name == panelName));
-        }
-
         /// <summary>장면 전체를 빨갛게 깜빡인다(웹게임 alarmEffect). 맵을 옮기면 꺼진다.</summary>
         public void Alarm(bool on)
         {
@@ -233,12 +227,7 @@ namespace MiniPandoras.Story
             captions.SetCinema(on);
         }
 
-        public void Banner(string text)
-        {
-            captions.ShowBanner(text);
-        }
-
-        // ── 맵과 인물 ───────────────────────────────────────────
+        // ── 조작 ───────────────────────────────────────────────
 
         /// <summary>조작을 주인공에게 돌려주거나(true) 빼앗는다(false). 화면 조작과 주인공 멈춤은 PlayerControls가 정한다.</summary>
         public void SetPlayerControl(bool playerControls)
@@ -263,280 +252,6 @@ namespace MiniPandoras.Story
         {
             controls.SetMode(ControlMode.Cutscene);
             LineUpBehindHero(snapHero);
-        }
-
-        /// <summary>맵에 인물을 세운다(웹게임 spawn). 같은 id가 있으면 바꾼다. 탐험하는 동안 주인공 길을 막는다.</summary>
-        public CharacterBody Spawn(string id, string sheetId, Vector2Int cell, Facing facing)
-        {
-            Remove(id);
-            CharacterBody actor = actorFactory.Spawn(id, sheetId, mapTravel.CurrentMap.transform, MapCoordinates.CellFoot(cell), facing);
-            actors[id] = actor;
-            exploration.AddResident(actor);
-            return actor;
-        }
-
-        public CharacterBody Spawn(string id, string sheetId, string point, Facing facing)
-        {
-            return Spawn(id, sheetId, PointCell(point), facing);
-        }
-
-        /// <summary>
-        /// 그 id의 인물: 주인공, 연출 인물, 그리고 따라다니는 파티 동료(웹게임 actor는 맵의 모든 인물에서 찾는다).
-        /// 동료는 id 이름으로 세운다(SpawnFollowers).
-        /// </summary>
-        public CharacterBody Actor(string id)
-        {
-            if (id == HeroId)
-            {
-                return hero.Character;
-            }
-
-            if (actors.TryGetValue(id, out CharacterBody actor))
-            {
-                return actor;
-            }
-
-            foreach (CharacterBody follower in followers)
-            {
-                if (follower.name == id)
-                {
-                    return follower;
-                }
-            }
-
-            throw new KeyNotFoundException($"맵에 인물 {id}가 없다");
-        }
-
-        public bool HasActor(string id)
-        {
-            return actors.ContainsKey(id);
-        }
-
-        public void Remove(string id)
-        {
-            if (actors.TryGetValue(id, out CharacterBody actor))
-            {
-                exploration.ForgetResident(actor);
-                Destroy(actor.gameObject);
-                actors.Remove(id);
-                followers.Remove(actor);
-                guests.Remove(id);
-            }
-        }
-
-        public void Face(string id, Facing facing)
-        {
-            Actor(id).Face(facing);
-        }
-
-        /// <summary>다른 인물 쪽을 본다. 가로로 더 멀면 왼쪽·오른쪽, 아니면 위·아래(웹게임 face(id, 다른 id)).</summary>
-        public void FaceToward(string id, string otherId)
-        {
-            Vector2Int gap = Actor(otherId).Cell - Actor(id).Cell;
-            Facing facing = Mathf.Abs(gap.x) >= Mathf.Abs(gap.y)
-                ? (gap.x >= 0 ? Facing.Right : Facing.Left)
-                : (gap.y >= 0 ? Facing.Down : Facing.Up);
-            Actor(id).Face(facing);
-        }
-
-        /// <summary>인물의 그림을 다른 시트로 바꾼다(악마로 깨어난 디엘 등).</summary>
-        public void SetSheet(string id, string sheetId)
-        {
-            Actor(id).SetSheet(actorFactory.Sheet(sheetId));
-        }
-
-        /// <summary>등에 날개를 단다. spread가 0.5를 넘으면 편 날개다(웹게임 wings·wingSpread).</summary>
-        public void SetWings(string id, WingKind wings, float spread)
-        {
-            Actor(id).SetWings(wings, spread);
-        }
-
-        /// <summary>몸에서 기운 알갱이가 피어오른다. None이면 멈춘다(웹게임 aura).</summary>
-        public void SetAura(string id, AuraKind aura)
-        {
-            Actor(id).Aura = aura;
-        }
-
-        /// <summary>그 칸까지 걷는다. 가로로 먼저, verticalFirst면 세로로 먼저 간다(웹게임 walkTo).</summary>
-        public IEnumerator WalkTo(string id, int x, int y, float framesPerTile, Facing? finalFacing = null, bool verticalFirst = false)
-        {
-            CharacterBody actor = Actor(id);
-            return actor.Walk(WalkPath.Between(actor.Cell, new Vector2Int(x, y), verticalFirst), framesPerTile, finalFacing);
-        }
-
-        public IEnumerator Walk(string id, string path, float framesPerTile, Facing? finalFacing = null)
-        {
-            return Actor(id).Walk(WalkPath.Parse(path), framesPerTile, finalFacing);
-        }
-
-        /// <summary>머리 위에 감정 아이콘을 띄우고, 길어도 40프레임만 기다린다(웹게임 emote).</summary>
-        public IEnumerator Emote(string id, string emote, float frames = 60f)
-        {
-            Sprite icon = emotes.Find(sprite => sprite.name == EmoteFiles[emote]);
-            Actor(id).GetComponentInChildren<EmoteBalloon>(true).Show(icon, frames / 60f);
-            yield return Wait(Mathf.Min(frames, 40f));
-        }
-
-        public IEnumerator Jump(string id, float height = 8f, float frames = 18f)
-        {
-            CharacterBody actor = Actor(id);
-            for (float frame = 0f; frame < frames; frame += Time.deltaTime * 60f)
-            {
-                actor.OffsetY = -Mathf.Round(Mathf.Sin(frame / frames * Mathf.PI) * height);
-                yield return null;
-            }
-
-            actor.OffsetY = 0f;
-        }
-
-        public IEnumerator TweenOffset(string id, float toY, float frames)
-        {
-            CharacterBody actor = Actor(id);
-            float fromY = actor.OffsetY;
-            for (float frame = 0f; frame < frames; frame += Time.deltaTime * 60f)
-            {
-                actor.OffsetY = Mathf.Round(Mathf.Lerp(fromY, toY, frame / frames));
-                yield return null;
-            }
-
-            actor.OffsetY = toY;
-        }
-
-        /// <summary>연기와 함께 펑(웹게임 poof). 인물을 치우는 일은 장 코드가 따로 한다.</summary>
-        public IEnumerator Poof(string id)
-        {
-            Vector2 foot = Actor(id).Position;
-            particles.Burst(foot + Vector2.up * 0.5f, 26, SmokeColors, new Vector2(0.3f, 1.4f), new Vector2(18f, 36f), new Vector2(0f, Mathf.PI * 2f));
-            yield return Wait(6f);
-        }
-
-        /// <summary>순간이동(버디의 판도라): 청록빛 알갱이와 함께 사라진다(웹게임 blink). 맵에 없거나 이미 숨었으면 기다리기만 한다.</summary>
-        public IEnumerator Blink(string id)
-        {
-            if (actors.TryGetValue(id, out CharacterBody current) && current.IsVisible)
-            {
-                BlinkSparkle(current);
-                current.SetVisible(false);
-            }
-
-            yield return Wait(8f);
-        }
-
-        /// <summary>순간이동으로 그 칸에 불쑥 나타나 lookAt 쪽을 본다. 맵에 없으면 sheetId(없으면 id) 모습으로 새로 세운다.</summary>
-        public IEnumerator Blink(string id, Vector2Int at, string lookAt, string sheetId = null)
-        {
-            yield return Blink(id);
-            Appear(id, at, sheetId);
-            FaceToward(id, lookAt);
-            yield return Wait(8f);
-        }
-
-        public IEnumerator Blink(string id, Vector2Int at, Facing facing, string sheetId = null)
-        {
-            yield return Blink(id);
-            Appear(id, at, sheetId).Face(facing);
-            yield return Wait(8f);
-        }
-
-        /// <summary>
-        /// 그 인물 바로 뒤(front면 바로 앞) 빈칸(웹게임 spotNear). 막혀 있거나 누가 서 있으면 옆, 그다음 반대쪽을 본다.
-        /// 순간이동으로 불쑥 나타날 자리를 고른다.
-        /// </summary>
-        public Vector2Int SpotNear(string id, bool front = false)
-        {
-            CharacterBody actor = Actor(id);
-            Vector2Int ahead = Step(actor.Facing);
-            var side = new Vector2Int(ahead.y, ahead.x);
-            Vector2Int[] ways = front ? new[] { ahead, side, -side, -ahead } : new[] { -ahead, side, -side, ahead };
-            foreach (Vector2Int way in ways)
-            {
-                Vector2Int cell = actor.Cell + way;
-                if (!FootMover.IsBlocked(MapCoordinates.CellFoot(cell)) && !IsStanding(cell, actor))
-                {
-                    return cell;
-                }
-            }
-
-            return actor.Cell + Vector2Int.right;
-        }
-
-        /// <summary>반짝이는 알갱이 하나가 위로 떠오른다(웹게임 particles.add, vy −0.35, 수명 36).</summary>
-        public void Sparkle(Vector2 at, Color color)
-        {
-            particles.Emit(at, new Vector2(0f, 0.35f), 36f, color);
-        }
-
-        /// <summary>인물 가슴께에서 빛 알갱이가 사방으로 흩어진다(웹게임 particles.burst, 7장 봉인서가 저절로 넘어갈 때).</summary>
-        public void Glitter(string id, IReadOnlyList<Color> colors, int count = 18)
-        {
-            Vector2 at = Actor(id).Position + Vector2.up * MapCoordinates.Pixels(10f);
-            particles.Burst(at, count, colors, new Vector2(0.2f, 0.8f), new Vector2(20f, 40f), new Vector2(0f, Mathf.PI * 2f));
-        }
-
-        /// <summary>지금 맵의 논리 px 자리(웹게임 좌표)에서 빛 알갱이가 사방으로 흩어진다(웹게임 particles.burst, 11장 나리온이 날아오를 때 꽃잎).</summary>
-        public void GlitterAt(Vector2 pixels, IReadOnlyList<Color> colors, int count = 18)
-        {
-            Vector2 at = (Vector2)MapRoot.position + new Vector2(MapCoordinates.Pixels(pixels.x), -MapCoordinates.Pixels(pixels.y));
-            particles.Burst(at, count, colors, new Vector2(0.3f, 1.2f), new Vector2(20f, 40f), new Vector2(0f, Mathf.PI * 2f));
-        }
-
-        /// <summary>발밑에서 위쪽으로 흙먼지가 튄다.</summary>
-        public void Dust(string id, int count = 14)
-        {
-            particles.Burst(Actor(id).Position, count, DustColors, new Vector2(0.3f, 1.2f), new Vector2(16f, 30f), new Vector2(Mathf.PI, Mathf.PI * 2f));
-        }
-
-        /// <summary>눈물이 한 방울씩 여섯 번 떨어진다(웹게임 particles.add, 눈 밑 좌우를 번갈아).</summary>
-        public IEnumerator Tears(string id)
-        {
-            CharacterBody actor = Actor(id);
-            for (int i = 0; i < 6; i++)
-            {
-                Vector2 at = actor.Position + new Vector2(MapCoordinates.Pixels(i % 2 == 1 ? 3f : -2f), MapCoordinates.Pixels(22f));
-                particles.Emit(at, new Vector2(0f, -0.9f), 26f, TearColor, 1f);
-                yield return Wait(6f);
-            }
-        }
-
-        private CharacterBody Appear(string id, Vector2Int at, string sheetId)
-        {
-            CharacterBody actor = actors.TryGetValue(id, out CharacterBody current) ? current : Spawn(id, sheetId ?? id, at, Facing.Down);
-            actor.PlaceAt(at, actor.Facing);
-            actor.SetVisible(true);
-            actor.Flash(12f);
-            BlinkSparkle(actor);
-            return actor;
-        }
-
-        private void BlinkSparkle(CharacterBody actor)
-        {
-            Vector2 at = actor.Position + Vector2.up * MapCoordinates.Pixels(10f);
-            particles.Burst(at, 22, BlinkColors, new Vector2(0.4f, 1.8f), new Vector2(12f, 26f), new Vector2(0f, Mathf.PI * 2f));
-        }
-
-        /// <summary>그 칸에 다른 인물(주인공 포함)이 보이게 서 있는지.</summary>
-        private bool IsStanding(Vector2Int cell, CharacterBody except)
-        {
-            if (hero.Character != except && hero.Character.Cell == cell && hero.Character.IsVisible)
-            {
-                return true;
-            }
-
-            foreach (CharacterBody other in actors.Values)
-            {
-                if (other != except && other.IsVisible && other.Cell == cell)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private Vector2Int PointCell(string point)
-        {
-            mapTravel.CurrentMap.TryGetPoint(point, out Vector2 foot);
-            return new Vector2Int(Mathf.FloorToInt(foot.x), Mathf.FloorToInt(-foot.y));
         }
 
         private DialogueLine Line(string speakerId, string text, string nameOverride, LineStyle style)

@@ -12,6 +12,7 @@ using MiniPandoras.UI;
 using MiniPandoras.World;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -37,6 +38,12 @@ namespace MiniPandoras.Tests
         public GameSession Session { get; private set; }
         public Exploration Exploration { get; private set; }
 
+        /// <summary>대사·알림을 읽자마자 넘길지. 건너뛰기 테스트가 끈다(꺼도 선택지는 첫 것을 고른다).</summary>
+        public bool ReadsLines { get; set; } = true;
+
+        /// <summary>튜토리얼이 가리킨 버튼을 바로 대신 누를지. 튜토리얼을 손으로 따라 누르는 테스트가 끈다.</summary>
+        public bool FollowsGuides { get; set; } = true;
+
         /// <summary>그 장의 저장을 써 두고 필드 장면을 연다. 사용자 저장은 테스트가 TestSaves로 앞뒤에 지킨다.</summary>
         public IEnumerator Open(int chapter, string heroName = "하늘")
         {
@@ -60,6 +67,38 @@ namespace MiniPandoras.Tests
             yield return PickOnTitle(chapter);
         }
 
+        /// <summary>그 장을 열고 그 맵에서 처음 조작이 돌아올 때까지 기다린다(직접 걷는 시험의 시작).</summary>
+        public IEnumerator OpenAndWait(int chapter, string mapId, string what)
+        {
+            yield return Open(chapter);
+            yield return UntilExploring(mapId, what);
+        }
+
+        /// <summary>시험을 마친다: 시간 배속을 되돌리고 사용자 저장을 돌려놓는다.</summary>
+        public static void Close()
+        {
+            Time.timeScale = 1f;
+            TestSaves.Restore();
+        }
+
+        /// <summary>
+        /// 이야기를 돌리지 않고 필드 장면만 연다(맵 걷기, 전투 시험). 힐리아 동부 착지 자리에서 시작한다.
+        /// 끝나면 <see cref="CloseBareField"/>를 부른다.
+        /// </summary>
+        public static IEnumerator OpenBareField()
+        {
+            Application.runInBackground = true;
+            StoryRunner.PlayStory = false;
+            yield return SceneManager.LoadSceneAsync("Field");
+            yield return null;
+        }
+
+        public static IEnumerator CloseBareField()
+        {
+            StoryRunner.PlayStory = true;
+            yield return null;
+        }
+
         /// <summary>
         /// 타이틀의 장 선택에서 그 장을 누르고, 타이틀이 닫혀 그 장이 시작될 때까지 기다린다. 써 둔 저장의 장이면 그 저장으로 이어서 한다.
         /// </summary>
@@ -67,18 +106,33 @@ namespace MiniPandoras.Tests
         {
             var title = Object.FindFirstObjectByType<TitleView>();
             float realEnd = Time.realtimeSinceStartup + 10f;
-            while (!title.IsShown)
+            while (!title.IsOpen)
             {
                 Assert.That(Time.realtimeSinceStartup, Is.LessThan(realEnd), "타이틀이 뜬다");
                 yield return null;
             }
 
             title.Pick(chapter);
-            while (title.IsShown)
+            while (title.IsOpen)
             {
                 Assert.That(Time.realtimeSinceStartup, Is.LessThan(realEnd), "고르면 타이틀이 닫힌다");
                 yield return null;
             }
+        }
+
+        /// <summary>
+        /// 화면에서 그 자리 가운데를 눌렀을 때 맨 앞에서 누름을 받는 버튼(없으면 맨 앞 그림). 버튼이 그 뒤 그림에 가려 눌리지 않는지 본다.
+        /// 막 켠 창은 한 번 그려져야 누름을 받으므로, 켠 뒤 한 프레임 기다린 다음 부른다.
+        /// </summary>
+        public static GameObject PressedAt(RectTransform rect)
+        {
+            Vector2 centre = RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
+            var pointer = new PointerEventData(EventSystem.current) { position = centre };
+            var hits = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointer, hits);
+            Assert.That(hits, Is.Not.Empty, "누른 자리에 무언가 있다");
+            GameObject pressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>(hits[0].gameObject);
+            return pressed != null ? pressed : hits[0].gameObject;
         }
 
         public Vector2Int HeroCell => MapCoordinates.CellOf(Mover.Character.Position);
@@ -97,7 +151,12 @@ namespace MiniPandoras.Tests
         /// </summary>
         public IEnumerator TalkTo(string id)
         {
-            Vector2Int target = Director.Actor(id).Cell;
+            return TalkAt(Director.Actor(id).Cell, id);
+        }
+
+        /// <summary>그 칸의 사람이나 물건 앞에 서서 말을 걸거나 조사한다.</summary>
+        public IEnumerator TalkAt(Vector2Int target, string id)
+        {
             foreach (Facing facing in new[] { Facing.Up, Facing.Left, Facing.Right, Facing.Down })
             {
                 Vector2 step = FacingRules.Step(facing);
@@ -111,6 +170,14 @@ namespace MiniPandoras.Tests
 
             Physics2D.SyncTransforms();
             yield return null;
+            if (Mover.IsFrozen)
+            {
+                // 곁에 서는 순간 몬스터 튜토리얼이 시간을 멈출 수 있다. 끝나면 다시 곁에 선다.
+                yield return Until(() => !Mover.IsFrozen, 60f, $"{id} 곁에서 조작이 돌아온다");
+                yield return TalkAt(Director.HasActor(id) ? Director.Actor(id).Cell : target, id);
+                yield break;
+            }
+
             Assert.That(Exploration.TryTalk(), Is.True, $"{id}에게 말을 건다 ({Describe()})");
             yield return Until(() => !Exploration.IsBusy, 30f, $"{id}와 이야기를 마친다");
         }
@@ -162,17 +229,7 @@ namespace MiniPandoras.Tests
 
         public IEnumerator Until(Func<bool> condition, float gameSeconds, string what)
         {
-            float gameEnd = Time.time + gameSeconds;
-            float realEnd = Time.realtimeSinceStartup + gameSeconds;
-            while (!condition())
-            {
-                if (Time.time > gameEnd || Time.realtimeSinceStartup > realEnd)
-                {
-                    Assert.Fail($"{gameSeconds}초 안에 되지 않았다: {what} ({Describe()})");
-                }
-
-                yield return null;
-            }
+            return Waits.Until(condition, gameSeconds, what, Describe);
         }
 
         public string Describe()
@@ -188,13 +245,44 @@ namespace MiniPandoras.Tests
             {
                 Lines.Add(line.Text);
                 Names.Add(line.Name);
-                conversation.Continue();
+                if (ReadsLines)
+                {
+                    conversation.Continue();
+                }
             };
             conversation.ChoicesShown += options => conversation.Pick(0);
+            Object.FindFirstObjectByType<TutorialGuide>().Pointed += target =>
+            {
+                if (!FollowsGuides)
+                {
+                    return;
+                }
+
+                // 공격·스킬 버튼은 화면 버튼(가상 게임패드)이라 전투에 바로 누른다.
+                if (target.TryGetComponent(out UnityEngine.UI.Button button))
+                {
+                    button.onClick.Invoke();
+                }
+                else if (target == Object.FindFirstObjectByType<TouchControlsView>().ActionButton)
+                {
+                    Combat.PressAttack();
+                }
+                else if (target == Object.FindFirstObjectByType<TouchControlsView>().SummonButton(0))
+                {
+                    Combat.PressSummon(0);
+                }
+                else
+                {
+                    Combat.PressSkill(0);
+                }
+            };
             conversation.Notified += text =>
             {
                 Notices.Add(text);
-                conversation.Continue();
+                if (ReadsLines)
+                {
+                    conversation.Continue();
+                }
             };
         }
     }

@@ -4,6 +4,7 @@ using MiniPandoras.Characters;
 using MiniPandoras.Progress;
 using MiniPandoras.World;
 using UnityEngine;
+using static MiniPandoras.Combat.CombatPalette;
 using static MiniPandoras.World.MapCoordinates;
 
 namespace MiniPandoras.Combat
@@ -14,7 +15,9 @@ namespace MiniPandoras.Combat
     // 싸움이 끝날 때까지 남는다.
     public sealed partial class FieldCombat
     {
-        private const float ScriptedSettleSeconds = 150f / 60f;
+        private const float ScriptedSettleSeconds = 150 * FrameSeconds;
+        // 체력이 얼마가 남았든 체력 1까지 깎는 위력.
+        private const float FinishingPower = 100f;
 
         private readonly Dictionary<string, CharacterBody> shownCompanions = new Dictionary<string, CharacterBody>();
         // 위 가운데 싸움이 끝나면 치울 것(맵에 서 있던 연출 인물은 빌려 쓴 것이라 남긴다)
@@ -23,21 +26,22 @@ namespace MiniPandoras.Combat
 
         /// <summary>
         /// 그 전투원이 그 스킬을 쓴다(웹게임 scriptedSkill). 적이면 기술 동작(돌진 …) 끝에 플레이어를 치고, 플레이어나 동료면 스킬을 모양대로 낸다.
-        /// target을 주면 그 적을 겨냥하고, 없으면 가장 가까운 적이다. lethal이면 쓰러지지 않는 적도 쓰러뜨린다.
+        /// target을 주면 그 적을 겨냥하고, 없으면 가장 가까운 적이다. lethal이면 쓰러지지 않는 적도 쓰러뜨리고, 적이 쓰면 주인공을 체력 1까지 몰아넣는다.
+        /// calledAs를 주면 알림에 스킬 이름 대신 그 말을 쓴다.
         /// 낸 탄·띠·자리가 다 사라질 때까지(길어도 2.5초) 기다린다.
         /// </summary>
-        public IEnumerator ScriptedSkill(string casterKey, string skillId, string targetKey = null, bool lethal = false)
+        public IEnumerator ScriptedSkill(string casterKey, string skillId, string targetKey = null, bool lethal = false, string calledAs = null)
         {
             SkillDefinition skill = catalog.Skill(skillId);
             EnemyFighter enemyCaster = FindEnemy(casterKey);
             if (enemyCaster != null)
             {
-                yield return ScriptedEnemySkill(enemyCaster, skill);
+                yield return ScriptedEnemySkill(enemyCaster, skill, lethal, calledAs ?? skill.DisplayName);
                 yield break;
             }
 
             PlayerFighter p = Player;
-            bool isPlayer = p != null && (casterKey == p.Key || (casterKey == GameState.Hero && p.IsHero));
+            bool isPlayer = IsPlayerKey(casterKey);
             CharacterBody body;
             int attack;
             string name;
@@ -51,7 +55,7 @@ namespace MiniPandoras.Combat
             {
                 body = ShowCompanion(casterKey);
                 yield return FadeIn(body);
-                attack = MemberStats.For(casterKey, session.State.HeroLevel, true).Attack;
+                attack = MemberStats.Current(casterKey, session.State).Attack;
                 name = catalog.Member(casterKey).NameFor(session.State.HeroName);
             }
 
@@ -71,7 +75,7 @@ namespace MiniPandoras.Combat
                     yield return null;
                 }
 
-                yield return new WaitForSeconds(16f / 60f);
+                yield return Frames(16);
             }
             finally
             {
@@ -114,7 +118,7 @@ namespace MiniPandoras.Combat
                     followCamera.Shake(1.5f, 6f);
                 }
 
-                yield return new WaitForSeconds(1f / 60f);
+                yield return OneFrame;
             }
 
             Effects.AddRing(Up(body.Position, 12f), Pixels(26f), 20, palette[0]);
@@ -126,7 +130,7 @@ namespace MiniPandoras.Combat
             PlayerFighter p = Player;
             if (p != null)
             {
-                p.Hp = Mathf.Max(1, DamageFormula.JsRound(p.MaxHp * ratio));
+                p.Hp = Mathf.Max(1, JsMath.Round(p.MaxHp * ratio));
             }
         }
 
@@ -134,7 +138,7 @@ namespace MiniPandoras.Combat
         /// 연출로 쓰는 적 기술(웹게임 scriptedEnemySkill): 20프레임 동안 번쩍이며 기를 모으고(돌진이면 들썩이며), 돌진이면 플레이어 앞까지 달려든 뒤 친다.
         /// 이야기가 정한 한 방이라 플레이어는 체력 1을 남긴다(웹게임은 그때만 쓰러지지 않게 한다).
         /// </summary>
-        private IEnumerator ScriptedEnemySkill(EnemyFighter e, SkillDefinition skill)
+        private IEnumerator ScriptedEnemySkill(EnemyFighter e, SkillDefinition skill, bool lethal, string shownName)
         {
             PlayerFighter p = Player;
             if (p == null)
@@ -142,8 +146,10 @@ namespace MiniPandoras.Combat
                 yield break;
             }
 
+            // 훅이 시작될 때 준비하던 기술의 예고가 바닥에 남지 않게 거둔다.
+            CancelAttack(e);
             AttackPlan plan = PlanFor(skill);
-            StartCoroutine(ShowMessage($"{e.Name}의 {skill.DisplayName}!", 40));
+            StartCoroutine(ShowMessage($"{e.Name}의 {shownName}!", 40));
             CharacterBody body = e.Body;
             body.Face(FacingRules.From(p.Body.Position - body.Position));
             for (int frame = 0; frame < 20; frame++)
@@ -154,7 +160,7 @@ namespace MiniPandoras.Combat
                 }
 
                 body.OffsetX = plan.Kind == AttackKind.Charge ? Mathf.Round(Random.Range(-1f, 1f)) : 0f;
-                yield return new WaitForSeconds(1f / 60f);
+                yield return OneFrame;
             }
 
             body.OffsetX = 0f;
@@ -168,16 +174,17 @@ namespace MiniPandoras.Combat
                 for (int i = 0; i < steps; i++)
                 {
                     MoveBody(body, step, false);
-                    yield return new WaitForSeconds(1f / 60f);
+                    yield return OneFrame;
                 }
 
                 body.SetWalking(false);
             }
 
             p.Invulnerable = 0;
-            p.PhaseFrames = 0;
-            DamagePlayer(body.Position, e.Definition.Attack, plan.Power, 10f, spare: true);
-            yield return new WaitForSeconds(18f / 60f);
+            EndPhase(p);
+            p.Gate = null;
+            HitPlayer(e.Definition, body.Position, lethal ? FinishingPower : plan.Power, 10f, spare: true);
+            yield return Frames(18);
         }
 
         /// <summary>
@@ -217,7 +224,7 @@ namespace MiniPandoras.Combat
             for (int frame = 1; frame <= 8 && body.Alpha < 1f; frame++)
             {
                 body.Alpha = frame / 8f;
-                yield return new WaitForSeconds(1f / 60f);
+                yield return OneFrame;
             }
 
             body.Alpha = 1f;
@@ -231,18 +238,18 @@ namespace MiniPandoras.Combat
                 return enemy.Body;
             }
 
-            PlayerFighter p = Player;
-            if (p != null && (key == p.Key || (key == GameState.Hero && p.IsHero)))
-            {
-                return p.Body;
-            }
-
-            return ShowCompanion(key);
+            return IsPlayerKey(key) ? Player.Body : ShowCompanion(key);
         }
 
         private bool IsShownOnField(string key)
         {
-            return FindEnemy(key) != null || (Player != null && (key == Player.Key || (key == GameState.Hero && Player.IsHero)));
+            return FindEnemy(key) != null || IsPlayerKey(key);
+        }
+
+        /// <summary>지금 조종하는 인물의 키인지. 주인공을 조종하면 "hero"로도 부른다.</summary>
+        private bool IsPlayerKey(string key)
+        {
+            return Player != null && (key == Player.Key || (key == GameState.Hero && Player.IsHero));
         }
 
         private EnemyFighter FindEnemy(string key)

@@ -1,13 +1,14 @@
 using System.Collections;
 using MiniPandoras.Characters;
 using MiniPandoras.Field;
+using MiniPandoras.Progress;
 using MiniPandoras.World;
 using UnityEngine;
 
 namespace MiniPandoras.Story
 {
     /// <summary>
-    /// 11장 「나리온」(1부 마지막 장). 웹게임 story/chapters.ts의 chapter11을 줄마다 옮겼다.
+    /// 11장 「다시 모인 파도」(1부 마지막 장). 웹게임 story/chapters.ts의 chapter11을 줄마다 옮겼다.
     /// 연회가 끝난 밤, 디엘은 이자벨과 오로라를 만나지 않겠다고 한다 → 고목 3층 요정 마을의 쉼터까지 걸어가 묵고, 라르고가 불러 둔 이자벨과 오로라가
     /// 동료가 된다 → 다 같이 한 방에서 잠들고 꿈속에서 여신을 만난다 → 아침에 고목 꼭대기의 나리온 정거장까지 걸어 올라가 나리온을 타고
     /// 아이로스로 떠난다(하늘길 컷인) → 다른 곳에서: 에라드의 탑, 뱀성 옥상의 루나, 밤바다의 카일 일행.
@@ -16,7 +17,7 @@ namespace MiniPandoras.Story
     /// </summary>
     public static class Chapter11
     {
-        private const string NightText = "밤이다. 오늘은 쉼터에서 쉬자.";
+        private const string NightText = "밤이다.\n오늘은 쉼터에서 쉬자.";
         private const string StationText = "나리온 정거장은 고목 꼭대기다.";
         private static readonly string[] Party = { "hero", "rang", "diel", "largo", "isabel", "aurora" };
         // 쉼터의 이불 자리(tree_inn.py). 디엘은 창가에 서 있다가 마지막에 와 앉는다.
@@ -37,10 +38,10 @@ namespace MiniPandoras.Story
         public static IEnumerator Play(StoryDirector s)
         {
             s.SetParty(new[] { "hero", "rang", "diel", "largo" }, 7);
-            s.SetFlag("awakened");
-            s.SetFlag("rangHurt", false);
-            s.SetFlag("swap");
-            s.SetFlag("book");
+            s.SetFlag(StoryFlags.Awakened);
+            s.SetFlag(StoryFlags.RangHurt, false);
+            s.SetFlag(StoryFlags.Swap);
+            s.SetFlag(StoryFlags.Book);
             s.GrantPandoras("phase", "darkPower", "sandStorm");
             yield return s.FadeOut(0f);
             yield return s.ChapterCard(11);
@@ -67,13 +68,13 @@ namespace MiniPandoras.Story
             s.SnapCamera();
             yield return s.FadeIn(40f);
             s.Cinema(true);
-            yield return s.Say("largo", "이자벨이랑 오로라, 이 근처에 있다. 만나 봐.");
-            yield return s.Say("diel", "⋯못 만난다.");
-            yield return s.Say("diel", "에루스를 지키겠다고 약속했다. 그 약속도 못 지킨 놈이, 무슨 얼굴로 그 딸을 만나.");
-            yield return s.Say("largo", "⋯⋯귀찮은 녀석.");
-            yield return s.Think("디엘⋯⋯");
+            yield return s.Say("largo", "이자벨이랑 오로라, 이 근처에 있다.\n만나 봐.");
+            yield return s.Say("diel", "...못 만난다.");
+            yield return s.Say("diel", "에루스를 지키겠다고 약속했다.\n그 약속도 못 지킨 놈이, 무슨 얼굴로 그 딸을 만나.");
+            yield return s.Say("largo", "......귀찮은 녀석.");
+            yield return s.Think("디엘......");
             // 웹게임 「고목 밑동의 쉼터」: 쉼터는 고목 3층 요정 마을의 한 방이다.
-            yield return s.Say("rang", "냐. 오늘 밤은 고목 3층의 쉼터에서 묵는다더군. 가자.");
+            yield return s.Say("rang", "냐. 오늘 밤은 고목 3층의 쉼터에서 묵는다더군.\n가자.");
 
             // 쉼터까지 직접 걸어간다. 디엘과 라르고가 곁으로 와서 다시 따라온다.
             yield return s.Regroup();
@@ -97,6 +98,7 @@ namespace MiniPandoras.Story
             s.RunMapSetup();
             s.Cinema(false);
             s.Hint("고목 3층 요정 마을의 쉼터로 가자", 300f);
+            s.SetGoal("고목 3층 요정 마을의 쉼터로 간다");
             yield return s.Explore();
         }
 
@@ -119,7 +121,7 @@ namespace MiniPandoras.Story
             yield return s.WalkTo("largo", enter.x + 2, enter.y - 1, 12f, Facing.Up);
             yield return rang;
             yield return diel;
-            yield return s.Say("innFairy", "어서 오세요~ 고목의 쉼터예요! 고목을 구해 주신 손님들은 오늘 숙박비 공짜예요!");
+            yield return s.Say("innFairy", "어서 오세요~\n고목의 쉼터예요!\n고목을 구해 주신 손님들은 오늘 숙박비 공짜예요!");
             yield return s.Say("rang", "냐하! 공짜라는 말은 언제 들어도 좋군.");
             // 디엘은 말없이 창가로 걸어간다.
             Vector2Int window = s.Point("window");
@@ -128,31 +130,31 @@ namespace MiniPandoras.Story
             s.Spawn("aurora", "aurora", enter, Facing.Up);
             s.Spawn("isabel", "isabel", enter + Vector2Int.left, Facing.Up);
             s.Face("hero", Facing.Down);
-            yield return s.Shout("aurora", "디엘! 찾았다!");
+            yield return s.Shout("aurora", "디엘!\n찾았다!");
             s.Face("diel", Facing.Down);
             yield return s.Emote("diel", "!");
-            yield return s.Say("diel", "⋯⋯!");
-            yield return s.Say("diel", "⋯라르고. 네가 불렀나.");
+            yield return s.Say("diel", "......!");
+            yield return s.Say("diel", "...라르고.\n네가 불렀나.");
             s.FaceToward("largo", "diel");
-            yield return s.Say("largo", "⋯네가 안 가니까. 귀찮게 굴지 말고 얘기나 해.");
-            yield return s.Say("isabel", "에루스가 남긴 걸 너 혼자 짊어질 생각이었니? 그건 너무 욕심이야.");
-            yield return s.Say("aurora", "아빠가 그랬잖아. 뉴웨이브는 가족이라고. 가족을 두고 가는 게 어딨어!");
-            yield return s.Say("diel", "⋯위험한 길이다.");
-            yield return s.Say("isabel", "알아. 그러니까 가는 거야.");
-            yield return s.Say("diel", "⋯⋯따라와.");
+            yield return s.Say("largo", "...네가 안 가니까.\n귀찮게 굴지 말고 얘기나 해.");
+            yield return s.Say("isabel", "에루스가 남긴 걸 너 혼자 짊어질 생각이었니?\n그건 너무 욕심이야.");
+            yield return s.Say("aurora", "아빠가 그랬잖아.\n뉴웨이브는 가족이라고.\n가족을 두고 가는 게 어디 있어!");
+            yield return s.Say("diel", "...위험한 길이다.");
+            yield return s.Say("isabel", "알아.\n그러니까 가는 거야.");
+            yield return s.Say("diel", "......따라와.");
             s.SetParty(Party, 7);
             yield return s.Notify("이자벨과 오로라가 동료가 되었다!");
             yield return s.Say("rang", "냐하! 갑자기 시끌벅적해졌군.");
-            yield return s.Say("largo", "⋯낮잠은 글렀네.");
+            yield return s.Say("largo", "...낮잠은 글렀네.");
             yield return s.Say("diel", "내일은 아이로스로 간다.");
             yield return s.Say("hero", "아이로스요?");
-            yield return s.Say("diel", "다음 목적지다. 걸어서 가면 며칠은 걸리지.");
+            yield return s.Say("diel", "다음 목적지다.\n걸어서 가면 며칠은 걸리지.");
             s.FaceToward("hero", "keeper");
-            yield return s.Say("innFairy", "걸어서요? 고목 꼭대기에 나리온 정거장이 있는걸요!");
-            yield return s.Say("hero", "나리온⋯⋯?");
-            yield return s.Say("innFairy", "요정들이 기르는 커다란 새예요. 하늘길로 가면 아이로스까지 금방이에요! 첫 출발은 내일 해 뜰 때고요~");
+            yield return s.Say("innFairy", "걸어서요?\n고목 꼭대기에 나리온 정거장이 있는걸요!");
+            yield return s.Say("hero", "나리온......?");
+            yield return s.Say("innFairy", "요정들이 기르는 커다란 새예요.\n하늘길로 가면 아이로스까지 금방이에요!\n첫 출발은 내일 해 뜰 때고요~");
             yield return s.Say("innFairy", "고목을 구해 주신 손님들이니까, 탑승권도 공짜로 드릴게요!");
-            yield return s.Say("largo", "⋯걷는 것보다는 덜 귀찮겠군.");
+            yield return s.Say("largo", "...걷는 것보다는 덜 귀찮겠군.");
             yield return TheNight(s);
         }
 
@@ -186,23 +188,23 @@ namespace MiniPandoras.Story
                 }
             }
 
-            yield return s.Say("aurora", "이불 폭신폭신해! 요정들 솜씨 대단하다!");
-            yield return s.Say("isabel", "디엘, 너도 이리 와. 창가에 혼자 서 있지 말고.");
-            yield return s.Say("diel", "⋯⋯여기가 편하다.");
-            yield return s.Say("aurora", "또 그런다. 옛날이랑 똑같네.");
-            yield return s.Say("diel", "⋯⋯");
+            yield return s.Say("aurora", "이불 폭신폭신해!\n요정들 솜씨 대단하다!");
+            yield return s.Say("isabel", "디엘, 너도 이리 와.\n창가에 혼자 서 있지 말고.");
+            yield return s.Say("diel", "......여기가 편하다.");
+            yield return s.Say("aurora", "또 그런다.\n옛날이랑 똑같네.");
+            yield return s.Say("diel", "......");
             // 디엘이 말없이 자리로 와 앉는다. 이자벨이 작게 웃는다.
             Vector2Int dielBed = s.Point("bedDiel");
             yield return s.WalkTo("diel", dielBed.x, dielBed.y, 14f, Facing.Down);
             s.Actor("diel").SetPose(BodyPose.Kneel);
             yield return s.Say("isabel", "후훗.");
-            yield return s.Say("largo", "⋯난 먼저 잔다. 오늘 하루 종일 나무만 탔어. 깨우면 귀찮아진다.");
+            yield return s.Say("largo", "...난 먼저 잔다.\n오늘 하루 종일 나무만 탔어.\n깨우면 귀찮아진다.");
             s.Actor("largo").SetPose(BodyPose.Lie);
             yield return s.Wait(20f);
-            yield return s.Say("innFairy", "그럼 푹 주무세요~ 해 뜰 때 깨워 드릴게요!");
+            yield return s.Say("innFairy", "그럼 푹 주무세요~\n해 뜰 때 깨워 드릴게요!");
             yield return s.Poof("keeper");
             s.Remove("keeper");
-            yield return s.Think("⋯⋯이렇게 다 같이 한 방에서 자는 거, 처음인가.");
+            yield return s.Think("......이렇게 다 같이 한 방에서 자는 거, 처음인가.");
             // 밤이 깊어 가고, 하나둘 잠이 든다.
             for (int i = 1; i <= 40; i++)
             {
@@ -216,7 +218,7 @@ namespace MiniPandoras.Story
                 yield return s.Wait(20f);
             }
 
-            yield return s.Narrate("밤이 깊어 간다. 하나둘 잠이 들고, 고목의 잎사귀가 스치는 소리만 남았다.");
+            yield return s.Narrate("밤이 깊어 간다.\n하나둘 잠이 들고, 고목의 잎사귀가 스치는 소리만 남았다.");
             s.Actor("hero").SetPose(BodyPose.Lie);
             yield return s.Wait(50f);
             yield return s.FadeOut(80f);
@@ -236,10 +238,10 @@ namespace MiniPandoras.Story
             yield return s.Wait(30f);
             goddess.SetVisible(true);
             s.Glitter("goddess", Petals, 14);
-            yield return s.Say("goddess", "⋯드디어, 여기까지 닿았구나.");
-            yield return s.Say("hero", "당신은⋯ 혹시⋯⋯");
-            yield return s.Say("goddess", "너는 내가 아니야. 그러니 나처럼 할 필요도 없단다.");
-            yield return s.Say("goddess", "다만 하나만 기억해 주렴. 나눈 힘은, 반드시 누군가에게 이어진다는 걸.");
+            yield return s.Say("goddess", "...드디어, 여기까지 닿았구나.");
+            yield return s.Say("hero", "당신은... 혹시......");
+            yield return s.Say("goddess", "너는 내가 아니야.\n그러니 나처럼 할 필요도 없단다.");
+            yield return s.Say("goddess", "다만 하나만 기억해 주렴.\n나눈 힘은, 반드시 누군가에게 이어진다는 걸.");
             s.Face("goddess", Facing.Down);
             s.Flash(Color.white, 1f);
             yield return s.FadeOut(40f, Color.white);
@@ -251,7 +253,7 @@ namespace MiniPandoras.Story
         {
             s.SetParty(Party, 7);
             s.PlaceParty("treeInn", "bed", Facing.Down);
-            s.DismissFollowers();
+            s.RemoveFollowers();
             foreach ((string id, string point) in Beds)
             {
                 if (id != "hero")
@@ -269,11 +271,11 @@ namespace MiniPandoras.Story
             yield return s.Wait(30f);
             s.Actor("hero").SetPose(BodyPose.Stand);
             yield return s.Emote("hero", "!");
-            yield return s.Think("⋯꿈이었나. 창밖이 밝아 온다.");
+            yield return s.Think("...꿈이었나.\n창밖이 밝아 온다.");
             s.Spawn("keeper", "fairy", "enter", Facing.Up);
             yield return s.Walk("keeper", "U2", 10f);
-            yield return s.Say("innFairy", "좋은 아침이에요~ 아이로스행 첫 나리온, 곧 출발해요!");
-            yield return s.Say("largo", "⋯⋯조금만 더.");
+            yield return s.Say("innFairy", "좋은 아침이에요~\n아이로스행 첫 나리온, 곧 출발해요!");
+            yield return s.Say("largo", "......조금만 더.");
             // 다들 일어나 길을 나설 채비를 하고, 문 앞으로 모인다.
             foreach ((string id, _) in Beds)
             {
@@ -289,17 +291,19 @@ namespace MiniPandoras.Story
             s.SetMapSetup("treeInn", () => { });
             GiantTree.Furnish(s, cursed: false,
                 (GiantTree.Rooms, () => s.LockWarp("down", StationText)),
-                // 웹게임처럼 가지 회랑에는 아직 이끼 슬라임이 남아 있다.
-                (GiantTree.Branches, () => GiantTree.SpawnSlimes(s, GiantTree.Branches)),
+                // 웹게임처럼 가지 회랑에는 저주가 걷힌 뒤에도 몬스터가 남아 있다.
+                (GiantTree.Branches, () => Wildlife.Spawn(s, GiantTree.Branches)),
                 (GiantTree.Crown, () => stationReady(Station(s))));
             s.Cinema(false);
             s.Hint("고목 꼭대기의 나리온 정거장으로 올라가자", 360f);
+            s.SetGoal("고목 꼭대기의 나리온 정거장으로 올라간다");
             yield return s.Explore();
         }
 
         /// <summary>꼭대기 승강장: 나리온이 앉아 있고 요정 둘이 양옆을 지킨다. 승강장 앞줄에 닿으면 정거장 장면이 시작된다.</summary>
         private static GiantBird Station(StoryDirector s)
         {
+            s.RenameMap(GiantTree.Crown, "나리온 정거장");
             Vector2Int top = s.Point("top");
             GiantBird nari = s.ShowGiantBird(top);
             // 요정들은 나리온보다 한 줄 앞(아래)에 세워, 새 그림에 가려지지 않고 새 앞에 보이게 한다.
@@ -317,14 +321,13 @@ namespace MiniPandoras.Story
             Vector2Int top = s.Point("top");
             yield return s.WalkTo("hero", top.x, top.y + 1, 12f, Facing.Up);
             yield return s.Pan(top.x, top.y - 3);
-            s.Banner("나리온 정거장");
-            yield return s.Say("stationFairy", "아이로스행 나리온, 곧 출발합니다~ 타실 분은 서둘러 주세요~!");
-            yield return s.Think("꼭 공항 같네⋯⋯");
+            yield return s.Say("stationFairy", "아이로스행 나리온, 곧 출발합니다~\n타실 분은 서둘러 주세요~!");
+            yield return s.Think("꼭 공항 같네......");
             yield return s.Say("aurora", "우와, 가까이서 보니까 엄청 커!");
             yield return s.Narrate("나리온이 맑은 소리로 길게 울었다.");
-            yield return s.Say("rang", "냐⋯ 날 잡아먹진 않겠지.");
-            yield return s.Say("stationFairy", "고목을 구해 주신 분들이시죠? 등 위 꽃안장에 앉아서 깃털을 꼭 잡아 주세요~");
-            yield return s.Say("largo", "⋯떨어지면 귀찮겠군.");
+            yield return s.Say("rang", "냐... 날 잡아먹진 않겠지.");
+            yield return s.Say("stationFairy", "고목을 구해 주신 분들이시죠?\n등 위 꽃안장에 앉아서 깃털을 꼭 잡아 주세요~");
+            yield return s.Say("largo", "...떨어지면 귀찮겠군.");
             yield return s.Say("diel", "꽉 잡아라.");
             // 일행이 나리온의 등에 오르자, 나리온이 날개를 펼치고 고목 꼭대기를 박차 오른다.
             foreach (string id in Riders)
@@ -357,13 +360,13 @@ namespace MiniPandoras.Story
             s.BeginCutIn("skyRide", SkyRideBirdFoot, SkyRideBirdHeight);
             s.StartCoroutine(s.CutInHover(3f));
             yield return s.FadeIn(40f);
-            yield return s.Say("hero", "와아⋯⋯ 높다⋯⋯!");
+            yield return s.Say("hero", "와아...... 높다......!");
             yield return s.Say("aurora", "구름이 손에 닿을 것 같아!");
             yield return s.Say("rang", "냐하! 바람이 좋군.");
-            yield return s.Say("largo", "⋯여기서 낮잠 자면 딱이겠는데.");
+            yield return s.Say("largo", "...여기서 낮잠 자면 딱이겠는데.");
             yield return s.Say("isabel", "떨어지면 아무도 못 깨워 줘, 라르고.");
-            yield return s.Say("diel", "⋯⋯");
-            yield return s.Think("아이로스. 거기엔 또 뭐가 기다리고 있을까.");
+            yield return s.Say("diel", "......");
+            yield return s.Think("아이로스.\n거기엔 또 뭐가 기다리고 있을까.");
             yield return s.Narrate("나리온이 아이로스를 향해 구름 사이를 날아간다.");
             yield return s.FadeOut(60f);
             s.EndCutIn();
@@ -388,15 +391,15 @@ namespace MiniPandoras.Story
             s.CameraOn("perni");
             s.SnapCamera();
             yield return s.FadeIn(40f);
-            yield return s.Say("eradExec", "보고드립니다. 정찰부대의 케이트가 페어리가든에서 뉴웨이브의 잔당과 부딪쳤습니다.");
-            yield return s.Say("eradExec", "디엘 이브라는 놈이 옛 뉴웨이브 놈들을 다시 모으고 있답니다. 이름은⋯ 컨티뉴웨이브.");
+            yield return s.Say("eradExec", "보고드립니다.\n정찰부대의 케이트가 페어리가든에서 뉴웨이브의 잔당과 부딪쳤습니다.");
+            yield return s.Say("eradExec", "디엘 이브라는 놈이 옛 뉴웨이브 놈들을 다시 모으고 있답니다.\n이름은... 에버웨이브.");
             yield return s.Say("perni", "뉴웨이브의 잔당이 다시 모인다고?");
-            yield return s.Say("raco", "하하하. 내가 누누이 얘기했잖아. 디엘은 재능이 있다니까?");
-            yield return s.Say("eradExec", "그날 정리했어야 했어. 정찰부대장의 안일함이 화를 불렀군.");
-            yield return s.Say("perni", "이름 따위는 상관없다. 몇이나 모였지?");
-            yield return s.Say("eradExec", "아직 대여섯입니다. 대단한 수는 아닙니다.");
-            yield return s.Say("perni", "⋯⋯");
-            yield return s.Say("luwan", "⋯⋯디엘.");
+            yield return s.Say("raco", "하하하.\n내가 누누이 얘기했잖아.\n디엘은 재능이 있다니까?");
+            yield return s.Say("eradExec", "그날 정리했어야 했어.\n정찰부대장의 안일함이 화를 불렀군.");
+            yield return s.Say("perni", "이름 따위는 상관없다.\n몇이나 모였지?");
+            yield return s.Say("eradExec", "아직 대여섯입니다.\n대단한 수는 아닙니다.");
+            yield return s.Say("perni", "......");
+            yield return s.Say("luwan", "......디엘.");
             yield return s.FadeOut(30f);
 
             s.LoadMap("castleRoof");
@@ -404,8 +407,8 @@ namespace MiniPandoras.Story
             s.CameraOn("luna");
             s.SnapCamera();
             yield return s.FadeIn(30f);
-            yield return s.Say("luna", "후훗. 보석은 잘 돌려줬나 봐?");
-            yield return s.Say("luna", "⋯아빠 표정, 볼만했겠다.");
+            yield return s.Say("luna", "후훗.\n보석은 잘 돌려줬나 봐?");
+            yield return s.Say("luna", "...아빠 표정, 볼만했겠다.");
             yield return s.FadeOut(30f);
 
             s.LoadMap("shipNight");
@@ -415,8 +418,8 @@ namespace MiniPandoras.Story
             s.CameraOn("kyle");
             s.SnapCamera();
             yield return s.FadeIn(30f);
-            yield return s.Say("kate", "대장~ 이번엔 어디로 가요?");
-            yield return s.Say("kyle", "⋯⋯아이로스.");
+            yield return s.Say("kate", "대장~\n이번엔 어디로 가요?");
+            yield return s.Say("kyle", "......아이로스.");
             yield return s.Say("neo", "명령대로.");
             yield return s.Wait(60f);
             yield return s.FadeOut(80f);

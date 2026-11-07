@@ -37,7 +37,7 @@ namespace MiniPandoras.Tests
         public static void StartAt(int chapter, string heroName)
         {
             SaveStore.Write(new SaveData(chapter, heroName, Array.Empty<Count>(), Array.Empty<Count>(),
-                Array.Empty<string>(), Array.Empty<string>(), false));
+                Array.Empty<string>(), Array.Empty<string>(), null, false));
         }
     }
 }

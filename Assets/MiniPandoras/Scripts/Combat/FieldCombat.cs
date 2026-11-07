@@ -6,35 +6,48 @@ using MiniPandoras.Dialogue;
 using MiniPandoras.Progress;
 using MiniPandoras.World;
 using UnityEngine;
+using static MiniPandoras.Combat.CombatPalette;
 using static MiniPandoras.World.MapCoordinates;
 
 namespace MiniPandoras.Combat
 {
     /// <summary>
     /// 필드에서 바로 싸우는 실시간 전투(웹게임 combat/combat.ts의 FieldCombat). 플레이어 한 명이 필드에 서고,
-    /// 공격·판도라 스킬 둘·판도라 교체·동료 부르기로 싸운다. 이야기 전투도 이 위에서 돌아간다.
+    /// 공격·판도라 스킬 셋·판도라 칸·동료 부르기로 싸운다. 이야기 전투도 이 위에서 돌아간다.
     ///
     /// 웹게임처럼 60fps 한 프레임씩 센다(<see cref="Tick"/>). 거리는 웹게임 px 수치를 <c>Pixels(…)</c>로 바꿔 쓰고,
     /// 위쪽이 +y인 Unity 좌표라 웹게임의 "몸통은 발보다 9px 위(y−9)"는 여기서 +9px이다.
-    /// 파일은 하는 일별로 나눴다: 플레이어(이 파일), 스킬, 적, 날아가는 효과, 이야기 전투. 소리는 아직 옮기지 않았다.
+    /// 파일은 하는 일별로 나눴다: 플레이어(이 파일), 스킬, 적, 보스, 탄·띠·자리·손·덫, 차원 스킬, 연출 스킬, 이야기 전투, 체험. 소리는 아직 옮기지 않았다.
     /// </summary>
     public sealed partial class FieldCombat : MonoBehaviour
     {
         private const float FrameSeconds = 1f / 60f;
+        private static readonly WaitForSeconds OneFrame = new WaitForSeconds(FrameSeconds);
         // 화면이 오래 멈췄다 돌아와도 한 번에 너무 많이 따라잡지 않는다.
         private const int MaxTicksPerUpdate = 4;
         // 기본 공격은 0.5초(30프레임)에 한 번만 나간다. 연타로 적을 계속 밀어내지 못하게 하려는 것.
         private const int AttackDelay = 30;
+        // 휘두른 지 이 프레임째에 몸 앞의 적을 친다.
+        private const int SwingHitFrame = 4;
+        // 모래 판도라 그림(pixelfx 30fps)의 길이를 60fps 프레임으로.
+        private const int SandGraspFxFrames = 68;
+        private const int SandPillarFxFrames = 80;
+        // 웹게임은 8프레임에 휘두르기를 끝내지만, 무기의 휘두른 뒤 그림을 보이도록 12프레임까지 둔다(치는 때와 내미는 때는 같다).
+        private const int SwingEndFrame = 12;
+        // 휘두른 프레임마다 그릴 무기 휘두르기 그림(0~5 = PixelLab 2~7번). 치기 전 세 프레임은 한 장씩 들어 올리고(2~4번),
+        // 치는 프레임에 휘두르기 시작(5번), 그 뒤 세 프레임은 궤적(6번), 끝 네 프레임은 휘두른 뒤(7번)다. 0프레임은 그리지 않는다.
+        private static readonly int[] SwingPictures = { 0, 0, 1, 2, 3, 4, 4, 4, 5, 5, 5, 5 };
         // 다음 공격이 풀리기 직전 이만큼 안에 누른 것은 기억했다가 풀리자마자 친다.
         private const int AttackBuffer = 8;
+        /// <summary>판도라를 바꾼 뒤 다시 바꿀 수 있을 때까지(3초).</summary>
+        public const int PandoraSwapFrames = 180;
         private const int RegenDelay = 200;
-
-        private static readonly Color HintColor = Hex("#d8d2c0");
-        private static readonly Color SoulColor = Hex("#6aa8e8");
-        private static readonly Color HurtColor = Hex("#ff7a6a");
-        private static readonly Color FinisherColor = Hex("#ffe9a0");
-        private static readonly Color PhaseColor = Hex("#cfe8ff");
-        private static readonly Color SwapColor = Hex("#e6d8ff");
+        // 스킬이 겨냥하는 거리.
+        private static readonly float AimRange = Pixels(130f);
+        // 스킬 버튼은 휘두르는 동작이 이만큼 이하로 남았을 때부터 나간다.
+        private const int SwingBusyFrames = 6;
+        // 알갱이가 사방으로 퍼지는 각도 범위.
+        private static readonly Vector2 FullCircle = new Vector2(0f, Mathf.PI * 2f);
 
         [SerializeField] private BattleCatalog catalog;
         [SerializeField] private GameSession session;
@@ -52,6 +65,7 @@ namespace MiniPandoras.Combat
         private Transform mapRoot;
         private Speech talk;
         private bool hasControl;
+        private bool bossFellHere;
         private int builtRevision = -1;
         private float tickClock;
         private int time;
@@ -74,14 +88,39 @@ namespace MiniPandoras.Combat
         /// <summary>함께 싸우다 불러낼 수 있는 동료(파티에서 조종하는 인물을 뺀 나머지).</summary>
         public IReadOnlyList<string> Companions => companions;
 
-        /// <summary>전투 화면(체력·스킬 칸)을 보일지. 이야기 전투 중이거나 필드에 살아 있는 적이 있으면 보인다.</summary>
-        public bool ShowsHud => encounter != null || AnyEnemyAlive();
+        /// <summary>
+        /// 전투 화면(체력·스킬 칸)을 보일지. 이야기 전투 중이거나 필드에 살아 있는 적이 있으면 보인다.
+        /// 보스를 쓰러뜨린 맵에서는 떠날 때까지 그대로 둔다. 보스전이 끝나자마자 버튼이 조사 하나만 남지 않게 하려는 것이다.
+        /// </summary>
+        public bool ShowsHud => encounter != null || AnyEnemyAlive() || (bossFellHere && hasControl);
+
+        /// <summary>
+        /// 지금 조종하는 인물이 기본 공격을 할 수 있는지. 주인공은 무기를 장착해야 친다(웹게임은 맨손으로도 친다).
+        /// 다른 인물(디엘·라르고)로 싸울 때는 늘 친다. 판도라 스킬은 무기와 상관없다.
+        /// </summary>
+        public bool CanAttack => Player != null && (!Player.IsHero || HoldsWeapon(Player));
+
+        /// <summary>지금 공격을 누르면 곧바로 휘두른다: 칠 수 있고, 맞아 휘청이거나 도약 중이 아니고, 앞선 공격의 대기가 끝났다. 튜토리얼이 시간을 멈출 때를 고른다.</summary>
+        public bool CanSwingNow => IsFreeToAct() && CanAttack && HitStop == 0 && !Player.Swing.HasValue
+            && Player.AttackCooldown == 0 && Player.AttackTimer == 0;
 
         /// <summary>필드에서 쓰러졌다. 이야기 쪽이 화면을 어둡게 하고 <see cref="ReviveField"/>로 되살린다.</summary>
         public event Action PlayerDowned;
 
+        /// <summary>주인공이 경험치를 얻었다. 얻은 양을 넘긴다.</summary>
+        public event Action<int> ExperienceGained;
+
+        /// <summary>경험치로 레벨이 올랐다. 새 레벨을 넘긴다.</summary>
+        public event Action<int> LevelGained;
+
         /// <summary>화면 전체를 그 색으로 번쩍인다(웹게임 overlay.flash, 색과 처음 짙기). 화면 쪽이 그린다.</summary>
         public event Action<Color, float> ScreenFlashed;
+
+        /// <summary>그 프레임 수만큼 기다리는 코루틴 신호.</summary>
+        internal static WaitForSeconds Frames(int frames)
+        {
+            return new WaitForSeconds(frames * FrameSeconds);
+        }
 
         /// <summary>훅과 무리가 대사를 할 때 쓴다. 이야기 감독이 처음에 한 번 넘긴다.</summary>
         public void SetTalk(Speech say)
@@ -107,12 +146,15 @@ namespace MiniPandoras.Combat
         /// <summary>맵을 새로 불러오면 그 맵의 적과 효과를 모두 지운다(체력은 그대로 이어진다).</summary>
         public void ResetForMap(GameMap loaded)
         {
+            bossFellHere = false;
             map = loaded;
             mapRoot = loaded.transform;
             enemies.Clear();
             groups.Clear();
             Effects.Clear();
             ClearSummons();
+            // 맵이 바뀌면 전투 밖 훅이 불러낸 동료도 맵과 함께 사라진다.
+            ClearShownCompanions();
             IsDowned = false;
             SetRespawnHere();
         }
@@ -137,12 +179,12 @@ namespace MiniPandoras.Combat
                 return 0f;
             }
 
-            if (p == null || IsDowned)
+            if (p == null)
             {
                 return 1f;
             }
 
-            if (p.Hitstun > 0 || p.Dash.HasValue || p.Knock.HasValue)
+            if (IsDowned || p.Hitstun > 0 || p.Dash.HasValue || p.Knock.HasValue || p.Gate.HasValue)
             {
                 return 0f;
             }
@@ -160,8 +202,14 @@ namespace MiniPandoras.Combat
         public void PressAttack()
         {
             PlayerFighter p = Player;
-            if (!CanAct() || p.Hitstun > 0 || p.Dash.HasValue)
+            if (!IsFreeToAct())
             {
+                return;
+            }
+
+            if (!CanAttack)
+            {
+                Hint(p, "무기를 장착해야 공격할 수 있다");
                 return;
             }
 
@@ -179,54 +227,59 @@ namespace MiniPandoras.Combat
             StartSwing(p);
         }
 
-        public void PressSwap()
+        /// <summary>그 칸의 판도라로 바꾼다(웹게임은 차례로 돌리는 교체다). 바꾸면 세 칸이 함께 3초를 기다린다.</summary>
+        public void PressPandora(int slot)
         {
             PlayerFighter p = Player;
-            if (!CanAct())
+            if (!CanAct() || p.PandoraAt(slot) == null || slot == p.PandoraIndex)
             {
                 return;
             }
 
-            if (p.PandoraCount < 2)
+            if (p.SwapCooldown > 0)
             {
-                Hint(p, p.IsHero ? "정착한 판도라가 하나뿐이다" : null);
+                Hint(p, "아직 판도라를 바꿀 수 없다");
                 return;
             }
 
-            p.PandoraIndex = (p.PandoraIndex + 1) % p.PandoraCount;
-            Effects.AddPopup(Above(p.Body, 30f), "판도라 ― " + p.ActivePandora.PandoraName, SwapColor, 7f);
+            p.PandoraIndex = slot;
+            p.SwapCooldown = PandoraSwapFrames;
+            Effects.AddPopup(Up(p.Body.Position, 30f), "판도라 ― " + p.ActivePandora.PandoraName, SwapColor, 7f);
             p.Body.Flash(8f);
+        }
+
+        /// <summary>지금 그 스킬 칸을 누르면 곧바로 나간다. 튜토리얼이 시간을 멈출 때를 고른다.</summary>
+        public bool CanCastNow(int slot)
+        {
+            return CastBlockOf(slot) == CastBlock.None;
         }
 
         public void PressSkill(int slot)
         {
             PlayerFighter p = Player;
-            if (!CanAct() || p.Hitstun > 0 || p.Dash.HasValue || p.AttackTimer > 6)
+            switch (CastBlockOf(slot))
             {
-                return;
+                case CastBlock.Busy:
+                case CastBlock.NoFieldAction:
+                    return;
+                case CastBlock.NoSkill:
+                    Hint(p, "쓸 수 있는 스킬이 없다");
+                    return;
+                case CastBlock.Locked:
+                    Hint(p, $"판도라 레벨 {LockedUntilLevel(slot)}에 열린다");
+                    return;
+                case CastBlock.Cooldown:
+                    Hint(p, "아직 다시 쓸 수 없다");
+                    return;
+                case CastBlock.NoMana:
+                    Hint(p, "마나가 모자라다", ManaColor);
+                    return;
             }
 
             SkillDefinition skill = p.SkillIn(slot);
-            if (skill == null)
+            if (skill.Shape.Kind == ShapeKind.Warp && NearestEnemy(p.Body.Position, AimRange) == null)
             {
-                Hint(p, "쓸 수 있는 스킬이 없다");
-                return;
-            }
-
-            if (!skill.HasFieldAction)
-            {
-                return;
-            }
-
-            if (p.Cooldowns.Get(skill) > 0)
-            {
-                Hint(p, "아직 다시 쓸 수 없다");
-                return;
-            }
-
-            if (p.Dp < skill.Cost)
-            {
-                Hint(p, "판도라 소울이 모자라다", SoulColor);
+                Hint(p, "근처에 적이 없다");
                 return;
             }
 
@@ -241,8 +294,56 @@ namespace MiniPandoras.Combat
             CastSkill(p, skill);
         }
 
+        /// <summary>그 스킬 칸을 여는 판도라 레벨. 이미 열렸거나 판도라를 들지 않았으면 0.</summary>
+        public int LockedUntilLevel(int slot)
+        {
+            PandoraDefinition pandora = Player != null ? Player.ActivePandora : null;
+            return pandora != null && !InTrial ? PandoraBook.LockedUntil(session.State, pandora.Id, slot) : 0;
+        }
+
+        /// <summary>스킬 칸을 눌렀을 때 나가지 못하는 이유(튜토리얼과 버튼이 같은 판단을 쓴다).</summary>
+        private CastBlock CastBlockOf(int slot)
+        {
+            if (!IsFreeToAct() || Player.AttackTimer > SwingBusyFrames)
+            {
+                return CastBlock.Busy;
+            }
+
+            SkillDefinition skill = Player.SkillIn(slot);
+            if (skill == null)
+            {
+                return CastBlock.NoSkill;
+            }
+
+            if (!skill.HasFieldAction)
+            {
+                return CastBlock.NoFieldAction;
+            }
+
+            if (LockedUntilLevel(slot) > 0)
+            {
+                return CastBlock.Locked;
+            }
+
+            if (Player.Cooldowns.Get(skill) > 0)
+            {
+                return CastBlock.Cooldown;
+            }
+
+            return Player.Dp < skill.Cost ? CastBlock.NoMana : CastBlock.None;
+        }
+
+        /// <summary>조작이 돌아와 있고, 맞아 휘청이거나 도약하는 중이 아니다.</summary>
+        private bool IsFreeToAct()
+        {
+            return CanAct() && Player.Hitstun == 0 && !Player.Dash.HasValue;
+        }
+
+        /// <summary>지금 판도라를 바꿀 수 있다. 튜토리얼이 시간을 멈출 때를 고른다.</summary>
+        public bool CanSwapNow => IsFreeToAct() && Player.PandoraCount > 1 && Player.SwapCooldown == 0;
+
         /// <summary>전투를 멈출 때(연출 시작) 휘두르던 자세를 풀어 둔다. 공격 간격은 그대로 둔다(멈췄다 풀릴 때 연타가 되지 않게).</summary>
-        /// <param name="keepStatus">훅 때문에 잠깐 멈출 때는 무적·흘려보내기·도약·밀려남을 그대로 두어 훅이 끝나면 이어지게 한다.</param>
+        /// <param name="keepStatus">훅 때문에 잠깐 멈출 때는 무적·흘려보내기·도약·차원이동·밀려남을 그대로 두어 훅이 끝나면 이어지게 한다.</param>
         public void Settle(bool keepStatus = false)
         {
             PlayerFighter p = Player;
@@ -251,11 +352,9 @@ namespace MiniPandoras.Combat
                 return;
             }
 
-            p.Swing = null;
+            EndSwing(p);
             p.AttackTimer = 0;
             p.Buffered = false;
-            p.Body.OffsetX = 0f;
-            p.Body.OffsetY = 0f;
             p.Body.SetWalking(false);
             if (keepStatus)
             {
@@ -263,10 +362,12 @@ namespace MiniPandoras.Combat
             }
 
             p.Dash = null;
+            p.Gate = null;
             p.Knock = null;
-            p.PhaseFrames = 0;
+            EndPhase(p);
             p.Invulnerable = 0;
             p.Body.Alpha = 1f;
+            p.Body.OffsetY = 0f;
         }
 
         // ── 매 프레임 ─────────────────────────────────────────────
@@ -287,6 +388,9 @@ namespace MiniPandoras.Combat
                 tickClock = 0f;
             }
         }
+
+        // 전투가 센 틱 수. 시험이 게임 시간이 아니라 전투 시간으로 기다린다(InternalsVisibleTo).
+        internal int Frame => time;
 
         // 할당 검사 테스트가 한 프레임씩 직접 돌려 본다(InternalsVisibleTo).
         internal void Tick()
@@ -343,10 +447,10 @@ namespace MiniPandoras.Combat
 
         private bool CanAct()
         {
-            return hasControl && !IsScriptRunning && !IsDowned && Player != null;
+            return hasControl && !IsScriptRunning && !IsDowned && Player != null && !Player.Gate.HasValue;
         }
 
-        /// <summary>파티 맨 앞·장 레벨·판도라가 바뀌었으면 조종하는 인물의 전투 상태를 다시 짠다.</summary>
+        /// <summary>파티 맨 앞·장 레벨·판도라·장비가 바뀌었으면 조종하는 인물의 전투 상태를 다시 짠다.</summary>
         private void EnsurePlayer()
         {
             GameState state = session.State;
@@ -365,15 +469,19 @@ namespace MiniPandoras.Combat
             Player = BuildPlayer(Lead, state);
             if (savedVitals.TryGetValue(Lead, out Vector2 ratio))
             {
-                Player.Hp = Mathf.Max(1, DamageFormula.JsRound(ratio.x * Player.MaxHp));
-                Player.Dp = DamageFormula.JsRound(ratio.y * Player.MaxDp);
+                Player.Hp = Mathf.Max(1, JsMath.Round(ratio.x * Player.MaxHp));
+                Player.Dp = JsMath.Round(ratio.y * Player.MaxDp);
             }
 
             if (previous != null && previous.Member == Lead)
             {
-                // 싸우는 도중 판도라가 깨어나도(이야기 훅) 지금 들고 있는 칸과 흘려보내기 상태는 그대로 잇는다.
-                Player.PandoraIndex = previous.PandoraIndex;
-                Player.PhaseFrames = previous.PhaseFrames;
+                // 적을 잡아 경험치가 오르거나 물약을 써도 다시 짜므로, 싸우던 상태(쿨다운·휘두르기·무적 …)는 그대로 잇는다.
+                Player.TakeOverFrom(previous);
+            }
+            else if (previous != null)
+            {
+                // 다른 인물로 바뀌면 이어받지 않으므로 휘두르던 그림을 걷기 그림으로 돌려 둔다.
+                EndSwing(previous);
             }
 
             RefreshCompanions();
@@ -382,10 +490,16 @@ namespace MiniPandoras.Combat
         private PlayerFighter BuildPlayer(string lead, GameState state)
         {
             bool isHero = lead == GameState.Hero;
-            MemberStatBlock stats = MemberStats.For(lead, state.HeroLevel, state.HasFlag("awakened"), isHero ? state.HeroPandoras() : null);
+            MemberStatBlock stats = MemberStats.Current(lead, state);
             var pandoras = new List<PandoraDefinition>();
             var ownSkills = new List<SkillDefinition>();
-            foreach (string id in stats.Skills)
+            IReadOnlyList<string> skills = stats.Skills;
+            if (isHero && InTrial)
+            {
+                skills = new[] { trialPandora };
+            }
+
+            foreach (string id in skills)
             {
                 if (isHero)
                 {
@@ -398,7 +512,7 @@ namespace MiniPandoras.Combat
             }
 
             string name = catalog.Member(lead).NameFor(state.HeroName);
-            return new PlayerFighter(hero, lead, name, stats, state.HeroLevel, isHero ? pandoras : null, ownSkills);
+            return new PlayerFighter(hero, lead, name, stats.Stats, state.HeroLevel, isHero ? pandoras : null, ownSkills);
         }
 
         private void SaveVitals(PlayerFighter p)
@@ -423,14 +537,7 @@ namespace MiniPandoras.Combat
                 return;
             }
 
-            GameState state = session.State;
-            foreach (string member in state.Party)
-            {
-                if (member != Lead && !(member == "rang" && state.HasFlag("rangHurt")))
-                {
-                    companions.Add(member);
-                }
-            }
+            companions.AddRange(session.State.SummonTeam());
         }
 
         private void StartSwing(PlayerFighter p)
@@ -444,22 +551,48 @@ namespace MiniPandoras.Combat
             p.Swing = new Swing { Frame = 0, Combo = p.Combo, Direction = FacingRules.Step(p.Body.Facing) };
         }
 
+        /// <summary>휘두르기를 멈춘다: 내민 그림을 되돌리고 걷기 그림으로 돌아간다.</summary>
+        private static void EndSwing(PlayerFighter p)
+        {
+            p.Swing = null;
+            p.Body.OffsetX = 0f;
+            p.Body.OffsetY = 0f;
+            p.Body.SwingFrame = null;
+        }
+
+        /// <summary>주인공이 무기를 장착했는지(무기는 웹게임에 없다). 맨손이면 휘두르는 그림 없이 걷기 그림 그대로 친다.</summary>
+        private bool HoldsWeapon(PlayerFighter p)
+        {
+            return p.IsHero && session.State.Weapon != null;
+        }
+
         /// <summary>휘두른 지 4프레임째: 몸 앞 상자 안의 적을 친다. 세 번째 연격은 더 세고 더 밀어낸다.</summary>
         private void ResolveSwing(PlayerFighter p, Swing swing)
         {
             Vector2 d = swing.Direction;
-            Vector2 center = p.Body.Position + new Vector2(d.x * Pixels(13f), Pixels(9f) + d.y * Pixels(11f));
+            Vector2 center = p.Body.Position + new Vector2(d.x * Pixels(13f), Pixels(PlayerFighter.ChestPixels) + d.y * Pixels(11f));
             float reachX = Pixels(d.x != 0f ? 14f : 13f);
             float reachY = Pixels(d.y != 0f ? 14f : 11f);
             bool finisher = swing.Combo == 3;
-            Effects.AddArc(center, d, Pixels(finisher ? 15f : 12f), finisher ? FinisherColor : Color.white);
+            // 무기 공격은 휘두르기 그림의 궤적과 타격 이펙트가 대신하므로 웹게임의 반달 자국을 남기지 않는다.
+            // 무기 그림이 없는 인물(디엘·라르고)은 그대로 남긴다.
+            if (!HoldsWeapon(p))
+            {
+                Effects.AddArc(center, d, Pixels(finisher ? 15f : 12f), finisher ? FinisherColor : Color.white);
+            }
 
             bool any = false;
             foreach (EnemyFighter e in enemies)
             {
                 if (e.IsAlive && Mathf.Abs(e.Position.x - center.x) <= reachX + e.Radius && Mathf.Abs(e.Chest.y - center.y) <= reachY + e.Radius * 0.8f)
                 {
-                    DamageEnemy(e, p.Attack, finisher ? 1.45f : 1f, finisher ? 10f : 4f, d, default, false);
+                    bool landed = DamageEnemy(e, p.Attack, finisher ? 1.45f : 1f, finisher ? 10f : 4f, d, default, false);
+                    if (landed && HoldsWeapon(p))
+                    {
+                        // 무기 타격 이펙트는 웹게임에 없다. 맞은 적의 친 쪽 몸 앞에서 터진다.
+                        Effects.AddImpact(e.Chest - d * (e.Radius * 0.5f), d, finisher ? 1.4f : 1f);
+                    }
+
                     any = true;
                 }
             }
@@ -478,14 +611,16 @@ namespace MiniPandoras.Combat
 
         private void CastSkill(PlayerFighter p, SkillDefinition skill)
         {
+            // 휘두른 뒤 그림이 남아 있으면 스킬을 쓰는 동안 걷기 그림으로 돌린다.
+            EndSwing(p);
             p.Dp = Mathf.Max(0, p.Dp - skill.Cost);
             p.Cooldowns.Set(skill, skill.Cooldown);
             p.AttackTimer = Mathf.Max(p.AttackTimer, 12);
             p.Calm = 0;
             Vector2 facing = FacingRules.Step(p.Body.Facing);
-            EnemyFighter target = AimTarget(p.Body.Position, facing, Pixels(130f));
-            Execute(new CastSource(p.Body.Position, facing, p.Attack, p), skill, skill.Power, target, false);
-            Effects.AddPopup(Above(p.Body, 28f), skill.DisplayName, skill.AccentColor, 7f);
+            EnemyFighter target = AimTarget(p.Body.Position, facing, AimRange);
+            Execute(new CastSource(p.Body.Position, facing, p.Attack, p), skill, PandoraBook.PowerOf(session.State, p.ActivePandora, skill), target, false);
+            Effects.AddPopup(Up(p.Body.Position, 28f), skill.DisplayName, skill.AccentColor, 7f);
             AfterAction(p);
         }
 
@@ -507,11 +642,12 @@ namespace MiniPandoras.Combat
                 p.ComboWindow -= 1;
             }
 
-            if (p.PhaseFrames > 0)
+            if (p.SwapCooldown > 0)
             {
-                p.PhaseFrames -= 1;
+                p.SwapCooldown -= 1;
             }
 
+            StepPhase(p);
             p.Cooldowns.TickAll();
             if (p.AttackCooldown > 0)
             {
@@ -523,24 +659,26 @@ namespace MiniPandoras.Combat
                 p.AttackTimer -= 1;
             }
 
-            if (p.Buffered && p.AttackCooldown == 0 && p.AttackTimer == 0 && p.Hitstun == 0 && !p.Dash.HasValue)
+            if (p.Buffered && p.AttackCooldown == 0 && p.AttackTimer == 0 && p.Hitstun == 0 && !p.Dash.HasValue && CanAttack)
             {
                 StartSwing(p);
             }
 
             StepSwing(p);
             StepDash(p);
+            StepGate(p);
             if (p.Knock.HasValue)
             {
-                Knockback knock = p.Knock.Value;
-                MoveBody(body, knock.Velocity, true);
-                knock.FramesLeft -= 1;
-                p.Knock = knock.FramesLeft > 0 ? knock : (Knockback?)null;
+                p.Knock = AdvanceKnock(body, p.Knock.Value, true);
             }
 
-            if (p.PhaseFrames > 0)
+            if (p.Gate.HasValue)
             {
-                body.Alpha = 0.5f + (time % 10 < 5 ? 0.1f : 0f);
+                body.Alpha = GateAlpha(p.Gate.Value);
+            }
+            else if (p.PhaseFrames > 0)
+            {
+                body.Alpha = PhaseAlpha;
             }
             else if (p.Invulnerable > 0)
             {
@@ -551,7 +689,7 @@ namespace MiniPandoras.Combat
                 body.Alpha = 1f;
             }
 
-            // 판도라 소울은 18프레임마다 1씩 찬다.
+            // 마나는 18프레임마다 1씩 찬다.
             p.DpTick += 1;
             if (p.DpTick >= 18)
             {
@@ -559,11 +697,17 @@ namespace MiniPandoras.Combat
                 p.Dp = Mathf.Min(p.MaxDp, p.Dp + 1);
             }
 
+            // 체험 중에는 마나를 걱정하지 않고 스킬을 써 본다.
+            if (InTrial)
+            {
+                p.Dp = p.MaxDp;
+            }
+
             // 싸움 밖에서 한동안 맞지 않으면 체력이 조금씩 찬다.
             p.Calm += 1;
             if (p.Calm > RegenDelay && !AnyEnemyAggro() && encounter == null && time % 4 == 0)
             {
-                p.Hp = Mathf.Min(p.MaxHp, p.Hp + Mathf.Max(1, DamageFormula.JsRound(p.MaxHp * 0.01)));
+                p.Hp = Mathf.Min(p.MaxHp, p.Hp + Mathf.Max(1, JsMath.Round(p.MaxHp * 0.01)));
             }
         }
 
@@ -580,17 +724,16 @@ namespace MiniPandoras.Combat
             float lunge = swing.Frame < 6 ? 2f : 0f;
             p.Body.OffsetX = swing.Direction.x * lunge;
             p.Body.OffsetY = -swing.Direction.y * lunge;
+            p.Body.SwingFrame = HoldsWeapon(p) && swing.Frame < SwingEndFrame ? SwingPictures[swing.Frame] : (int?)null;
             p.Swing = swing;
-            if (swing.Frame == 4)
+            if (swing.Frame == SwingHitFrame)
             {
                 ResolveSwing(p, swing);
             }
 
-            if (swing.Frame >= 8)
+            if (swing.Frame >= SwingEndFrame)
             {
-                p.Swing = null;
-                p.Body.OffsetX = 0f;
-                p.Body.OffsetY = 0f;
+                EndSwing(p);
             }
         }
 
@@ -604,6 +747,11 @@ namespace MiniPandoras.Combat
             Dash dash = p.Dash.Value;
             bool moved = MoveBody(p.Body, dash.Velocity, true);
             p.Body.SetWalking(true);
+            if (dash.Slices)
+            {
+                SliceThrough(p, dash);
+            }
+
             if (time % 2 == 0)
             {
                 IReadOnlyList<Color> palette = dash.Skill.Palette;
@@ -612,12 +760,29 @@ namespace MiniPandoras.Combat
 
             dash.FramesLeft -= 1;
             p.Dash = dash;
+            if (dash.Leap)
+            {
+                // 그림만 포물선으로 뜬다. 웹게임 좌표라 위가 음수다.
+                p.Body.OffsetY = -Mathf.Sin((1f - dash.FramesLeft / (float)dash.Frames) * Mathf.PI) * LeapHeight;
+            }
+
             if (dash.FramesLeft > 0 && moved)
             {
                 return;
             }
 
             p.Dash = null;
+            if (dash.Leap)
+            {
+                Land(p, dash);
+                return;
+            }
+
+            if (dash.Slices)
+            {
+                Effects.AddSpriteFx(FxSheet.Shard, Up(p.Body.Position, 9f), ShardFxFrames, 1.6f);
+            }
+
             if (!dash.Strike)
             {
                 return;
@@ -625,29 +790,37 @@ namespace MiniPandoras.Combat
 
             // 뛰어든 끝에서 문다.
             Vector2 facing = FacingRules.Step(p.Body.Facing);
-            Vector2 center = p.Body.Position + new Vector2(facing.x * Pixels(12f), Pixels(9f) + facing.y * Pixels(10f));
+            Vector2 center = p.Body.Position + new Vector2(facing.x * Pixels(12f), Pixels(PlayerFighter.ChestPixels) + facing.y * Pixels(10f));
             Effects.AddArc(center, facing, Pixels(14f), dash.Skill.MainColor);
             foreach (EnemyFighter e in enemies)
             {
                 if (e.IsAlive && Vector2.Distance(e.Chest, center) <= Pixels(16f) + e.Radius)
                 {
-                    DamageEnemy(e, p.Attack, dash.Skill.Power, 6f, facing, dash.Skill.Status, false);
+                    DamageEnemy(e, p.Attack, dash.Power, 6f, facing, dash.Skill.Status, false);
                 }
             }
         }
 
+        /// <summary>적의 공격이 주인공에게 닿았다.</summary>
+        private void HitPlayer(EnemyDefinition enemy, Vector2 from, float power, float knock = 5f, bool spare = false)
+        {
+            DamagePlayer(from, enemy.Attack, power, knock, spare, enemy.FixedDamage);
+        }
+
         /// <param name="spare">이야기가 정한 한 방(연출 기술)이라 체력 1은 남긴다</param>
-        public void DamagePlayer(Vector2 from, int attack, float power, float knock = 5f, bool spare = false)
+        /// <param name="fixedDamage">0이 아니면 공식 대신 이만큼 깎는다</param>
+        public void DamagePlayer(Vector2 from, int attack, float power, float knock = 5f, bool spare = false, int fixedDamage = 0)
         {
             PlayerFighter p = Player;
-            if (p == null || IsDowned)
+            if (p == null || IsDowned || p.Gate.HasValue)
             {
                 return;
             }
 
             if (p.PhaseFrames > 0)
             {
-                Effects.AddPopup(Above(p.Body, 28f), "흘려보냄", PhaseColor, 7f);
+                Effects.AddPopup(Up(p.Body.Position, 28f), "흘려보냄", PhaseColor, 7f);
+                RefundPhase(p);
                 return;
             }
 
@@ -656,7 +829,13 @@ namespace MiniPandoras.Combat
                 return;
             }
 
-            int damage = DamageFormula.Compute(attack, p.Defense, power, UnityEngine.Random.value);
+            if (!spare && p.EvadeChance > 0f && UnityEngine.Random.value < p.EvadeChance)
+            {
+                Effects.AddPopup(Up(p.Body.Position, 28f), "회피", MissColor, 7f);
+                return;
+            }
+
+            int damage = fixedDamage > 0 ? fixedDamage : DamageFormula.Compute(attack, p.Defense, power, UnityEngine.Random.value);
             if (spare || (encounter != null && encounter.NoDeath))
             {
                 damage = Mathf.Min(damage, Mathf.Max(0, p.Hp - 1));
@@ -666,18 +845,25 @@ namespace MiniPandoras.Combat
             p.Invulnerable = 50;
             p.Hitstun = 12;
             p.Calm = 0;
-            p.Swing = null;
+            EndSwing(p);
             p.AttackTimer = 0;
             p.Buffered = false;
             Vector2 away = Direction(p.Body.Position - from);
             p.Knock = new Knockback { Velocity = away * Pixels(knock / 6f), FramesLeft = 6 };
             p.Body.Flash(12f);
             followCamera.Shake(2f, 8f);
-            Effects.AddNumber(Above(p.Body, 28f), damage, HurtColor, 8f);
+            Effects.AddNumber(Up(p.Body.Position, 28f), damage, HurtColor, 8f);
             if (p.Hp <= 0)
             {
                 PlayerDown();
             }
+        }
+
+        /// <summary>싸움 밖의 사고로 쓰러진다(낭떠러지). 체력이 바닥난 것과 같이 사망 화면으로 간다.</summary>
+        public void KnockOutPlayer()
+        {
+            Player.Hp = 0;
+            PlayerDown();
         }
 
         private void PlayerDown()
@@ -689,7 +875,8 @@ namespace MiniPandoras.Combat
 
             IsDowned = true;
             Player.Body.SetWalking(false);
-            Player.Swing = null;
+            EndSwing(Player);
+            Player.Body.SetPose(BodyPose.Lie);
             // 이야기 전투는 이야기 쪽이 같은 싸움을 처음부터 다시 한다.
             if (encounter == null)
             {
@@ -708,6 +895,7 @@ namespace MiniPandoras.Combat
             p.Dash = null;
             p.Invulnerable = 60;
             p.Body.Alpha = 1f;
+            p.Body.SetPose(BodyPose.Stand);
             p.Body.PlaceAt(respawnPosition);
             p.Body.Face(respawnFacing);
             followCamera.SnapToTarget();
@@ -740,7 +928,7 @@ namespace MiniPandoras.Combat
             }
 
             p.HintCooldown = 40;
-            Effects.AddPopup(Above(p.Body, 30f), text, color ?? HintColor, 6.5f);
+            Effects.AddPopup(Up(p.Body.Position, 30f), text, color ?? HintColor, 6.5f);
         }
 
         // ── 도우미 ───────────────────────────────────────────────
@@ -758,6 +946,14 @@ namespace MiniPandoras.Combat
             return moved;
         }
 
+        /// <summary>밀려나는 한 프레임을 움직이고, 아직 밀려나야 하면 남은 밀림을 돌려준다.</summary>
+        private static Knockback? AdvanceKnock(CharacterBody body, Knockback knock, bool isPlayer)
+        {
+            MoveBody(body, knock.Velocity, isPlayer);
+            knock.FramesLeft -= 1;
+            return knock.FramesLeft > 0 ? knock : (Knockback?)null;
+        }
+
         /// <summary>단위 방향. 길이가 0이면 웹게임처럼 아래쪽을 본다.</summary>
         private static Vector2 Direction(Vector2 v)
         {
@@ -771,21 +967,22 @@ namespace MiniPandoras.Combat
             return feet + new Vector2(0f, Pixels(pixels));
         }
 
-        /// <summary>그림 윗변에서 그만큼(논리 px) 더 위. 머리 위 글자 자리다.</summary>
-        private static Vector2 Above(CharacterBody body, float pixels)
-        {
-            return Up(body.Position, pixels);
-        }
-
         private static Vector2 OverHead(EnemyFighter e, float extraPixels = 0f)
         {
             return Up(e.Position, e.Body.Sheet.Size.y + extraPixels);
         }
 
-        private static Color Hex(string hex)
+        private enum CastBlock
         {
-            ColorUtility.TryParseHtmlString(hex, out Color color);
-            return color;
+            None,
+            /// <summary>조작할 수 없거나 휘두르는 중이다. 아무 말 없이 무시한다.</summary>
+            Busy,
+            NoSkill,
+            /// <summary>필드 모양이 없는 스킬. 아무 말 없이 무시한다.</summary>
+            NoFieldAction,
+            Locked,
+            Cooldown,
+            NoMana,
         }
 
         private bool AnyEnemyAlive()
@@ -829,8 +1026,8 @@ namespace MiniPandoras.Combat
             public Vector2 Facing { get; }
             public int Attack { get; }
             public PlayerFighter Player { get; }
-            /// <summary>몸통 높이(발에서 9px 위). 겨냥과 터지는 자리를 이 높이로 잰다.</summary>
-            public Vector2 Chest => Up(Feet, 9f);
+            /// <summary>몸통 높이. 겨냥과 터지는 자리를 이 높이로 잰다.</summary>
+            public Vector2 Chest => Up(Feet, PlayerFighter.ChestPixels);
         }
     }
 }

@@ -12,7 +12,6 @@ namespace MiniPandoras.World
         [SerializeField] private Sprite[] colorFrames;
         [SerializeField] private Sprite[] lightFrames;
         [SerializeField] private float framesPerSecond = 30f;
-        [SerializeField] private bool loop;
         [Tooltip("효과 안에서 빛이 땅에 닿는 때(초). 연출이 이때에 맞춰 번쩍이고 흔든다")]
         [SerializeField] private float impactSeconds;
 
@@ -20,7 +19,6 @@ namespace MiniPandoras.World
         public IReadOnlyList<Sprite> LightFrames => lightFrames;
         public int FrameCount => colorFrames.Length;
         public float FramesPerSecond => framesPerSecond;
-        public bool Loop => loop;
         public float ImpactSeconds => impactSeconds;
         public float DurationSeconds => colorFrames.Length / framesPerSecond;
     }

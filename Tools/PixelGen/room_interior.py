@@ -15,6 +15,7 @@ FLOORBOARD = pg.hexes("#2a1b10", "#45301e", "#563b25", "#66472c", "#755234", "#8
 CAP = pg.hexes("#100a08", "#1e140e", "#2c1e14", "#4a3422")
 GLASS = pg.hexes("#22324a", "#3c5878", "#6a8cae", "#b4cce0")
 SOOT = pg.hexes("#120c0a", "#22180f", "#34261a")
+DAYLIGHT = pg.hexes("#8a7a52", "#d8c88e", "#f4e8b8", "#fffbe6")
 
 
 def face_top(row):
@@ -165,6 +166,64 @@ class RoomInterior:
         for y in (top + 16, bottom - 12):
             c.paint(c.rect(cx - 12, y, cx - 2, y + 3), IRON[2])
         c.paint(c.ellipse(cx + 7, top + 32, 2.5, 2.5), BRASS[3])
+
+    def back_door(self, x, row):
+        """
+        뒷문(방문처럼 생겼다): 거친 돌을 둘러 쌓은 벽에 낸 낮은 나무 쪽문. 판자 폭이 들쭉날쭉하고 Z자 띠장을 댔으며,
+        옆으로 밀어 둔 나무 빗장과 쇠 걸쇠가 있다. 문틈과 문 밑으로 바깥 빛이 새어 들어와 바닥에 깔린다. x는 문이 난 칸 열.
+        """
+        c = self.c
+        cx, bottom = int((x + 0.5) * T), row * T
+        door_w, door_h = 28, 44
+        x0, x1, top = cx - door_w // 2, cx + door_w // 2, bottom - door_h
+
+        # 회벽을 뚫고 다시 쌓은 듯한 거친 돌 테두리
+        rim = c.rect(x0 - 8, top - 8, x1 + 8, bottom)
+        stones = (((c.xx + (c.yy // 7 % 2) * 6) % 13) < 12) & ((c.yy % 7) < 6)
+        c.paint(rim, STONE[1])
+        c.paint(rim & stones, STONE[2])
+        c.paint(rim & stones & ((c.xx * 3 + c.yy * 5) % 17 < 4), STONE[3])
+        c.paint(c.rect(x0 - 3, top - 3, x1 + 3, bottom), WOOD[0])
+
+        # 들쭉날쭉한 판자: 폭이 다르고 밝기도 조금씩 다르다
+        edges = [x0, x0 + 6, x0 + 11, x0 + 18, x0 + 23, x1 - 2]
+        for k, (left, right) in enumerate(zip(edges, edges[1:])):
+            plank = c.rect(left, top, right, bottom)
+            c.paint(plank, WOOD[2 + k % 3])
+            c.paint(c.rect(left, top, left + 1, bottom), WOOD[0])
+            c.paint(plank & ((c.xx * 2 + c.yy) % 11 == 0), WOOD[1])
+        # 띠장 둘과 비스듬한 버팀목
+        for y in (top + 5, bottom - 10):
+            c.paint(c.rect(x0, y, x1 - 2, y + 4), WOOD[3])
+            c.paint(c.rect(x0, y, x1 - 2, y + 1), WOOD[5])
+            c.paint(c.rect(x0, y + 3, x1 - 2, y + 4), WOOD[1])
+        c.line(x0 + 2, bottom - 11, x1 - 5, top + 9, WOOD[1], 3)
+        c.line(x0 + 2, bottom - 12, x1 - 5, top + 8, WOOD[4], 1)
+
+        # 나무 빗장: 쇠 걸쇠 둘에 끼운 굵은 막대를 왼쪽으로 밀어 두었다
+        bar_y = top + 21
+        c.paint(c.rect(x0 - 7, bar_y, x1 - 8, bar_y + 5), WOOD[4])
+        c.paint(c.rect(x0 - 7, bar_y, x1 - 8, bar_y + 1), WOOD[5])
+        c.paint(c.rect(x0 - 7, bar_y + 4, x1 - 8, bar_y + 5), WOOD[1])
+        for bx in (x0 + 2, x0 + 16):
+            c.paint(c.rect(bx, bar_y - 2, bx + 4, bar_y + 7), IRON[2])
+            c.paint(c.rect(bx, bar_y - 2, bx + 1, bar_y + 7), IRON[4])
+        c.paint(c.rect(x1 - 4, bar_y - 2, x1 + 2, bar_y + 7), IRON[1])
+
+        # 쇠 띠 두 줄, 문틈으로 새는 바깥 빛(오른쪽 틈과 문 밑)
+        for y in (top + 6, bottom - 9):
+            c.paint(c.rect(x0, y, x0 + 9, y + 2), IRON[3])
+        gap = c.rect(x1 - 2, top, x1, bottom)
+        c.paint(gap, DAYLIGHT[2])
+        c.paint(gap & ((c.yy % 5) == 0), DAYLIGHT[3])
+        c.paint(c.rect(x0, bottom - 2, x1, bottom), DAYLIGHT[1])
+        c.paint(c.rect(x1 - 2, bottom - 2, x1, bottom), DAYLIGHT[3])
+
+        # 문 밑으로 바닥에 깔린 빛: 문에서 멀어질수록 점이 성기다
+        spill_y = c.yy - bottom
+        spill = (spill_y >= 0) & (spill_y < 14) & (c.xx >= x0 - 2 + spill_y // 2) & (c.xx < x1 + 8 + spill_y // 2)
+        fade = spill & (pg.bayer(*c.image.shape[:2]) > spill_y / 14)
+        c.image[fade, :3] = (c.image[fade, :3] * 0.55 + DAYLIGHT[1] * 0.45).astype(np.uint8)
 
     def stairs(self, x, y):
         """위층으로 오르는 나무 계단(2×2칸, 왼쪽 위 칸 x, y): 벽면을 뚫고 북쪽으로 올라가며 어두워진다. 왼쪽에 난간."""

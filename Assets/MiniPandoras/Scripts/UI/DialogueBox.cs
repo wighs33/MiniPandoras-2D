@@ -15,7 +15,6 @@ namespace MiniPandoras.UI
     /// </summary>
     public sealed class DialogueBox : MonoBehaviour
     {
-        private static readonly Color TextColor = new Color32(0xf3, 0xef, 0xe2, 0xff);
         private static readonly Color ThoughtColor = new Color32(0xa9, 0xc4, 0xe8, 0xff);
 
         [SerializeField] private Conversation conversation;
@@ -84,7 +83,7 @@ namespace MiniPandoras.UI
             ShowPortrait(line);
 
             body.text = line.Text;
-            body.color = line.Style == LineStyle.Thought ? ThoughtColor : TextColor;
+            body.color = line.Style == LineStyle.Thought ? ThoughtColor : UiPalette.Ink;
             body.fontStyle = line.Style == LineStyle.Shout ? FontStyles.Bold : FontStyles.Normal;
             body.pageToDisplay = 1;
             body.maxVisibleCharacters = 0;
@@ -143,7 +142,8 @@ namespace MiniPandoras.UI
                 return;
             }
 
-            shown = Mathf.Min(visibleTotal, shown + speed * Time.deltaTime);
+            // 튜토리얼은 시간을 멈춘 채 말을 건다.
+            shown = Mathf.Min(visibleTotal, shown + speed * Time.unscaledDeltaTime);
             ShowCharacters();
         }
 

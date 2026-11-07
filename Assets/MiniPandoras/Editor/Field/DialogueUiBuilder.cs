@@ -1,5 +1,6 @@
 using MiniPandoras.Characters;
 using MiniPandoras.Dialogue;
+using MiniPandoras.Editor.PixelFx;
 using MiniPandoras.Editor.WebGame;
 using MiniPandoras.Input;
 using MiniPandoras.Minigames;
@@ -18,14 +19,13 @@ namespace MiniPandoras.Editor.Field
     {
         public readonly struct SceneUi
         {
-            public SceneUi(ScreenCaptions captions, ExplainPanel explain, GliderView glider, AwakenView awaken, CutInView cutIn, MapSketchView mapSketch)
+            public SceneUi(ScreenCaptions captions, ExplainPanel explain, GliderView glider, AwakenView awaken, CutInView cutIn)
             {
                 Captions = captions;
                 Explain = explain;
                 Glider = glider;
                 Awaken = awaken;
                 CutIn = cutIn;
-                MapSketch = mapSketch;
             }
 
             public ScreenCaptions Captions { get; }
@@ -33,7 +33,6 @@ namespace MiniPandoras.Editor.Field
             public GliderView Glider { get; }
             public AwakenView Awaken { get; }
             public CutInView CutIn { get; }
-            public MapSketchView MapSketch { get; }
         }
 
         /// <summary>어두워짐 아래에 그리는 것: 눈을 뜨는 장면, 글라이더 화면, 컷인, 위아래 검은 띠, 대화 일러스트, 설명 그림.</summary>
@@ -51,7 +50,8 @@ namespace MiniPandoras.Editor.Field
                 ("rangSheet", AssetDatabase.LoadAssetAtPath<CharacterSheet>(WebGameImporter.SheetFolder + "/rang.asset")),
                 ("skyArt", GliderArt("sky")), ("farArt", GliderArt("far")), ("nearArt", GliderArt("near")),
                 ("cloudArt", new[] { GliderArt("cloud_0"), GliderArt("cloud_1"), GliderArt("cloud_2") }),
-                ("castleArt", GliderArt("castle")), ("townArt", GliderArt("town")));
+                ("castleArt", GliderArt("castle")), ("townArt", GliderArt("town")),
+                ("heartArt", HeartArt("heart_full")), ("emptyHeartArt", HeartArt("heart_empty")));
 
             // 컷인도 필드 대신 그리는 장면이라 검은 띠 아래에 둔다(검은 띠와 대화창이 그 위에 온다).
             CutInView cutIn = BuildCutIn(canvas.transform);
@@ -75,46 +75,12 @@ namespace MiniPandoras.Editor.Field
             var explain = explainRoot.gameObject.AddComponent<ExplainPanel>();
             SerializedFields.Set(explain, ("screen", explainScreen.gameObject), ("picture", picture));
 
-            MapSketchView mapSketch = BuildMapSketch(canvas.transform);
-
             var captions = canvas.gameObject.AddComponent<ScreenCaptions>();
             SerializedFields.Set(captions, ("barTop", barTop), ("barBottom", barBottom));
-            return new SceneUi(captions, explain, glider, awaken, cutIn, mapSketch);
+            return new SceneUi(captions, explain, glider, awaken, cutIn);
         }
 
-        /// <summary>
-        /// 지도 한 장(웹게임 showMap): 위쪽 가운데의 창 안에 맵 칸 그림, 지금 자리(파란 점)와 목적지(빨간 점), 아래에 금빛 설명 한 줄.
-        /// 크기와 자리는 지도를 띄울 때 맵에 맞춘다(MapSketchView).
-        /// </summary>
-        private static MapSketchView BuildMapSketch(Transform canvas)
-        {
-            RectTransform root = Stretch(canvas, "Map Sketch");
-            RectTransform window = Rect(root, "Window", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.one);
-            Window(window, Gold, Panel);
-            var sketch = TopLeft(window, "Sketch", 8f, 8f, 1f, 1f).gameObject.AddComponent<RawImage>();
-            sketch.raycastTarget = false;
-            Image here = Solid(TopLeft(window, "Here", 0f, 0f, 1f, 1f), new Color32(0x4a, 0x8a, 0xe8, 0xff));
-            Image goal = Solid(TopLeft(window, "Goal", 0f, 0f, 1f, 1f), new Color32(0xe8, 0x4a, 0x3a, 0xff));
-            TMP_Text caption = Text(window, "Caption", "", Regular, 7.5f, Gold, TextAlignmentOptions.Top);
-            Place(caption.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(360f, 12f));
-            caption.rectTransform.pivot = new Vector2(0.5f, 1f);
-            var view = root.gameObject.AddComponent<MapSketchView>();
-            SerializedFields.Set(view, ("window", window), ("sketch", sketch), ("here", here.rectTransform), ("goal", goal.rectTransform), ("caption", caption));
-            return view;
-        }
-
-        // 뱀열차 객실 창의 유리 자리(가상 px, Tools/PixelGen/cutin_train.py의 WINDOW와 같다)
-        private static readonly Rect TrainWindow = new Rect(72f, 26f, 240f, 104f);
-        // 호빗 마차 장면은 화면 전체가 창이다(cutin_carriage.py)
-        private static readonly Rect WholeScreen = new Rect(0f, 0f, 384f, 216f);
-
-        /// <summary>
-        /// 컷인: 검은 바탕 가운데 장면 한 장(배경·인물·빛, 함께 확대), 그 위에 화면 전체 속도선. 장면마다 그림이 다르다:
-        /// 3장 2층 난간의 디엘(Tools/PixelGen/cutin_railing.py), 2장 강가에서 올려다본 뱀성과 돌뱀 머리(cutin_castle.py),
-        /// 1장 랑이 설명하는 열 신·인간·축복신 판도라(cutin_gods.py), 6장 라코의 수업(cutin_lesson.py)과 뱀열차 객실 창(cutin_train.py),
-        /// 7장 호빗 마차(cutin_carriage.py)와 루가의 설명(cutin_ruga.py), 11장 나리온을 타고 나는 하늘길과 1부 엔딩(cutin_sky.py, 새는 narion.py).
-        /// 창 뒤 풍경은 배경 뒤에 깔린 겹들이다(배경의 유리 자리가 비어 있다).
-        /// </summary>
+        /// <summary>컷인: 검은 바탕 가운데 장면 한 장, 그 위에 화면 전체 속도선. 장면 목록은 <see cref="CutInShots"/>다.</summary>
         private static CutInView BuildCutIn(Transform canvas)
         {
             RectTransform root = Stretch(canvas, "Cut In");
@@ -130,99 +96,26 @@ namespace MiniPandoras.Editor.Field
 
             Image back = Solid(Stretch(frame, "Back"), Color.white);
             Image figure = Solid(Rect(frame, "Figure", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0.5f, 0f), Vector2.zero, Vector2.one), Color.white);
+            Image over = Solid(Rect(frame, "Over", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0.5f, 0f), Vector2.zero, Vector2.one), Color.white);
             Image glow = Solid(Stretch(frame, "Glow"), Color.clear);
             Image streaks = Solid(Stretch(root, "Streaks"), Color.clear);
-            streaks.sprite = CutInArt("railing", "streaks");
+            streaks.sprite = CutInShots.Streaks();
             var view = root.gameObject.AddComponent<CutInView>();
-            SerializedFields.Set(view, ("frame", frame), ("window", window), ("sceneryLayers", scenery), ("back", back), ("figure", figure), ("glow", glow), ("streaks", streaks),
-                ("shots", new[]
-                {
-                    new CutInView.Shot("railing", CutInArt("railing", "back"), CutInArt("railing", "diel"), null),
-                    new CutInView.Shot("castleWide", CutInArt("castle", "wide"), CutInArt("castle", "party"), null),
-                    new CutInView.Shot("castleHead", CutInArt("castle", "head"), null, CutInArt("castle", "head_glow")),
-                    new CutInView.Shot("creation", CutInArt("gods", "creation"), null, CutInArt("gods", "creation_glow")),
-                    new CutInView.Shot("humans", CutInArt("gods", "humans"), null, CutInArt("gods", "humans_glow")),
-                    new CutInView.Shot("blessing", CutInArt("gods", "blessing"), null, CutInArt("gods", "blessing_glow")),
-                    new CutInView.Shot("tenGods", CutInArt("lesson", "tenGods"), null, CutInArt("lesson", "tenGods_glow")),
-                    new CutInView.Shot("splitPower", CutInArt("lesson", "splitPower"), null, CutInArt("lesson", "splitPower_glow")),
-                    new CutInView.Shot("war", CutInArt("lesson", "war"), null, CutInArt("lesson", "war_glow")),
-                    new CutInView.Shot("dust", CutInArt("lesson", "dust"), null, CutInArt("lesson", "dust_glow")),
-                    new CutInView.Shot("trainWindow", CutInArt("train", "back"), null, CutInArt("train", "glow"), TrainWindow, new[]
-                    {
-                        new CutInView.Scenery(CutInScenery("train", "sky"), 0f),
-                        new CutInView.Scenery(CutInScenery("train", "far"), 16f),
-                        new CutInView.Scenery(CutInScenery("train", "near"), 110f),
-                        new CutInView.Scenery(CutInScenery("train", "close"), 260f),
-                    }),
-                    // 산길을 달리는 호빗 마차: 하늘은 멈추고 먼 산·언덕·길이 점점 빠르게 흐른다. 수레와 일행은 네 장을 넘긴다.
-                    new CutInView.Shot("carriage", CutInArt("carriage", "back"), null, WholeScreen, new[]
-                    {
-                        new CutInView.Scenery(CutInScenery("carriage", "sky"), 0f),
-                        new CutInView.Scenery(CutInScenery("carriage", "far"), 14f),
-                        new CutInView.Scenery(CutInScenery("carriage", "hills"), 70f),
-                        new CutInView.Scenery(CutInScenery("carriage", "road"), 190f),
-                    }, new[] { CutInArt("carriage", "cart_0"), CutInArt("carriage", "cart_1"), CutInArt("carriage", "cart_2"), CutInArt("carriage", "cart_3") }, 8f),
-                    new CutInView.Shot("twelve", CutInArt("ruga", "twelve"), null, CutInArt("ruga", "twelve_glow")),
-                    new CutInView.Shot("chaos", CutInArt("ruga", "chaos"), null, CutInArt("ruga", "chaos_glow")),
-                    new CutInView.Shot("erad", CutInArt("ruga", "erad"), null, CutInArt("ruga", "erad_glow")),
-                    new CutInView.Shot("threePowers", CutInArt("ruga", "threePowers"), null, CutInArt("ruga", "threePowers_glow")),
-                    // 나리온을 타고 구름 위를 난다: 하늘은 멈추고, 멀어지는 숲과 구름 세 줄이 저마다 빠르기로 흐른다(웹게임 skyRidePanel, px/프레임 × 60).
-                    new CutInView.Shot("skyRide", CutInArt("skyRide", "back"), null, WholeScreen, new[]
-                    {
-                        new CutInView.Scenery(CutInScenery("skyRide", "sky"), 0f),
-                        new CutInView.Scenery(CutInScenery("skyRide", "forest"), 21f),
-                        new CutInView.Scenery(CutInScenery("skyRide", "far"), 15f),
-                        new CutInView.Scenery(CutInScenery("skyRide", "near"), 30f),
-                        new CutInView.Scenery(CutInScenery("skyRide", "front"), 84f),
-                    }, NarionFlying(), 60f / 18f),
-                    // 1부 엔딩: 노을 하늘과 구름 바다(웹게임 EndingScene).
-                    new CutInView.Shot("ending", CutInArt("ending", "back"), null, WholeScreen, new[]
-                    {
-                        new CutInView.Scenery(CutInScenery("ending", "sky"), 0f),
-                        new CutInView.Scenery(CutInScenery("ending", "far"), 9f),
-                        new CutInView.Scenery(CutInScenery("ending", "near"), 18f),
-                        new CutInView.Scenery(CutInScenery("ending", "front"), 72f),
-                    }, NarionFlying(), 60f / 18f),
-                }));
+            SerializedFields.Set(view, ("frame", frame), ("window", window), ("sceneryLayers", scenery), ("back", back), ("figure", figure), ("over", over), ("glow", glow), ("streaks", streaks),
+                ("shots", CutInShots.All()));
             root.gameObject.SetActive(false);
             return view;
         }
 
-        /// <summary>
-        /// 컷인 창 뒤 풍경 한 겹. 가로로 이어 붙여 되풀이하므로 가로는 Repeat로 들여온다(RawImage의 uv를 밀어 흐르게 한다).
-        /// </summary>
-        private static Texture2D CutInScenery(string shot, string name)
+        private static Sprite HeartArt(string name)
         {
-            string path = $"{MapImporter.RedrawnRoot}/CutIns/{shot}/{name}.png";
-            var importer = (TextureImporter)AssetImporter.GetAtPath(path);
-            importer.textureType = TextureImporterType.Default;
-            importer.npotScale = TextureImporterNPOTScale.None;
-            importer.mipmapEnabled = false;
-            importer.filterMode = FilterMode.Bilinear;
-            importer.wrapModeU = TextureWrapMode.Repeat;
-            importer.wrapModeV = TextureWrapMode.Clamp;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.alphaIsTransparency = true;
-            importer.maxTextureSize = 4096;
-            importer.SaveAndReimport();
-            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-        }
-
-        /// <summary>나리온 날갯짓 두 장(맵 위 나리온과 같은 그림, FieldSceneBuilder.NarionArt).</summary>
-        private static Sprite[] NarionFlying()
-        {
-            return new[] { FieldSceneBuilder.NarionArt("narion_fly0"), FieldSceneBuilder.NarionArt("narion_fly1") };
-        }
-
-        private static Sprite CutInArt(string shot, string name)
-        {
-            return WebGameImporter.ImportSprite($"{MapImporter.RedrawnRoot}/CutIns/{shot}/{name}.png", new Vector2(0.5f, 0.5f), 4096, FilterMode.Bilinear);
+            return WebGameImporter.ImportSprite($"{ArtPaths.RedrawnRoot}/Glider/{name}.png", new Vector2(0f, 1f), 64, FilterMode.Point);
         }
 
         /// <summary>글라이더 화면의 배경 그림(Tools/PixelGen/glider_backdrop.py가 그린다).</summary>
         private static Sprite GliderArt(string name)
         {
-            return WebGameImporter.ImportSprite($"{MapImporter.RedrawnRoot}/Glider/{name}.png", new Vector2(0f, 1f), 4096, FilterMode.Bilinear);
+            return WebGameImporter.ImportSprite($"{ArtPaths.RedrawnRoot}/Glider/{name}.png", new Vector2(0f, 1f), 4096, FilterMode.Bilinear);
         }
 
         /// <summary>
@@ -251,8 +144,9 @@ namespace MiniPandoras.Editor.Field
             var gods = new Image[personas.Length];
             for (int i = 0; i < personas.Length; i++)
             {
-                glows[i] = Solid(Rect(scene, "Glow " + personas[i], new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.one), Color.clear);
-                gods[i] = Solid(Rect(scene, personas[i], new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.one), Color.clear);
+                // 넓은 폰에서도 가운데에 오도록 화면 위 가운데를 기준으로 둔다(자리는 AwakenView가 정한다).
+                glows[i] = Solid(Rect(scene, "Glow " + personas[i], new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.one), Color.clear);
+                gods[i] = Solid(Rect(scene, personas[i], new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.one), Color.clear);
                 gods[i].sprite = AssetDatabase.LoadAssetAtPath<Speaker>($"{WebGameImporter.SpeakerFolder}/{personas[i]}.asset").Figure;
             }
 
@@ -266,34 +160,25 @@ namespace MiniPandoras.Editor.Field
             return view;
         }
 
-        /// <summary>어두워짐 위에 그리는 글자들: 지명 띠, 안내 띠, 대화창, 선택지, 알림, 이름 입력, 장 제목 카드.</summary>
+        /// <summary>어두워짐 위에 그리는 글자들: 안내 띠, 대화창, 선택지, 알림, 이름 입력, 장 제목 카드.</summary>
         public static void BuildStoryUi(Conversation conversation, PlayerInputReader input, SceneUi sceneUi)
         {
             Canvas canvas = NewCanvas("Story UI", 20, VirtualScreen);
-
-            // 지명 띠: 왼쪽 위 (8, 24), 높이 18, 왼쪽에 금색 2px.
-            RectTransform bannerBox = Rect(canvas.transform, "Banner", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(8f, -24f), new Vector2(100f, 18f));
-            Solid(bannerBox, new Color(8f / 255f, 8f / 255f, 14f / 255f, 0.7f));
-            Solid(Rect(bannerBox, "Bar", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(2f, 0f)), Gold);
-            TMP_Text bannerText = Text(bannerBox, "Text", "", Bold, 10f, new Color32(0xf3, 0xea, 0xd2, 0xff), TextAlignmentOptions.MidlineLeft);
-            Place(bannerText.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(10f, 0f), Vector2.zero);
-            var bannerGroup = bannerBox.gameObject.AddComponent<CanvasGroup>();
-            bannerGroup.blocksRaycasts = false;
 
             // 안내 띠: 위 가운데 (y 6, 높이 14), 글자 7.5. 너비는 글에 맞춘다.
             RectTransform hintBox = Rect(canvas.transform, "Hint", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(100f, 14f));
             Solid(hintBox, new Color(8f / 255f, 8f / 255f, 14f / 255f, 0.72f));
             TMP_Text hintText = Text(hintBox, "Text", "", Regular, 7.5f, new Color32(0xe8, 0xe2, 0xcf, 0xff), TextAlignmentOptions.Center);
-            Place(hintText.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            FillParent(hintText.rectTransform);
             var hintGroup = hintBox.gameObject.AddComponent<CanvasGroup>();
             hintGroup.blocksRaycasts = false;
 
             BuildDialogueBox(canvas.transform, conversation, input);
-            BuildChoiceBox(canvas.transform, conversation, input);
+            BuildChoiceBox(canvas.transform, conversation);
             BuildToast(canvas.transform, conversation, input);
             BuildNameEntry(canvas.transform, conversation);
 
-            // 장 제목 카드: 검은 화면 가운데에 「1장」(금색 8) / 「힐리아 동부」(20) / ✦와 양쪽으로 자라는 선.
+            // 장 제목 카드: 검은 화면 가운데에 「1장」(금색 8) / 「낯선 땅의 첫날」(20) / ✦와 양쪽으로 자라는 선.
             RectTransform card = Stretch(canvas.transform, "Chapter Card");
             Solid(card, Night);
             var cardGroup = card.gameObject.AddComponent<CanvasGroup>();
@@ -303,8 +188,9 @@ namespace MiniPandoras.Editor.Field
             Place(label.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -78f), new Vector2(200f, 12f));
             TMP_Text title = Text(cardText, "Title", "", Bold, 20f, new Color32(0xf3, 0xea, 0xd2, 0xff), TextAlignmentOptions.Center);
             Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -94f), new Vector2(300f, 26f));
-            TMP_Text star = Text(cardText, "Star", "◆", Regular, 7f, Gold, TextAlignmentOptions.Center);
-            Place(star.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -121f), new Vector2(20f, 12f));
+            // ◆와 양쪽 선이 한 줄에 놓이도록, 글자 칸이 아니라 ◆ 그림의 가운데(Midline)를 선 높이(128)에 맞춘다.
+            TMP_Text star = Text(cardText, "Star", "◆", Regular, 7f, Gold, TextAlignmentOptions.Midline);
+            Place(star.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -128f), new Vector2(20f, 12f));
             RectTransform lineLeft = Rect(cardText, "Line Left", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(1f, 0.5f), new Vector2(-8f, -128f), new Vector2(0f, 1f));
             Solid(lineLeft, GoldDim);
             RectTransform lineRight = Rect(cardText, "Line Right", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, 0.5f), new Vector2(8f, -128f), new Vector2(0f, 1f));
@@ -315,7 +201,6 @@ namespace MiniPandoras.Editor.Field
             SerializedFields.Set(sceneUi.Captions,
                 ("input", input), ("card", cardGroup), ("cardText", cardTextGroup), ("cardLabel", label), ("cardTitle", title),
                 ("cardLineLeft", lineLeft), ("cardLineRight", lineRight), ("cardSkipArea", cardSkip),
-                ("banner", bannerGroup), ("bannerBox", bannerBox), ("bannerText", bannerText),
                 ("hint", hintGroup), ("hintBox", hintBox), ("hintText", hintText),
                 ("ending", ending), ("endingLines", endingLines), ("endingPrompt", endingPrompt));
         }
@@ -332,7 +217,7 @@ namespace MiniPandoras.Editor.Field
             (string text, float size, TMP_FontAsset font, Color color, float y)[] rows =
             {
                 ("― 1부 종료 ―", 16f, Bold, new Color32(0xf3, 0xe3, 0xb8, 0xff), 24f),
-                ("컨티뉴웨이브는 다음 동료를 찾아 아이로스로 향했다.", 9f, Regular, new Color32(0xff, 0xf8, 0xe8, 0xff), 54f),
+                ("에버웨이브는 다음 동료를 찾아 아이로스로 향했다.", 9f, Regular, new Color32(0xff, 0xf8, 0xe8, 0xff), 54f),
                 ("판도라즈 2부에서 계속됩니다.", 9f, Regular, Gold, 68f),
                 ("플레이해 주셔서 감사합니다.", 8f, Regular, new Color32(0xcf, 0xc6, 0xb2, 0xff), 82f),
             };
@@ -355,7 +240,7 @@ namespace MiniPandoras.Editor.Field
             TMP_Text shadow = Text(line, "Shadow", caption, font, size, new Color32(0x3a, 0x2a, 0x30, 0xff), TextAlignmentOptions.Center);
             Place(shadow.rectTransform, Vector2.zero, Vector2.one, new Vector2(0f, -1f), Vector2.zero);
             TMP_Text text = Text(line, "Text", caption, font, size, color, TextAlignmentOptions.Center);
-            Place(text.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            FillParent(text.rectTransform);
             var group = line.gameObject.AddComponent<CanvasGroup>();
             group.alpha = 0f;
             group.blocksRaycasts = false;
@@ -382,7 +267,7 @@ namespace MiniPandoras.Editor.Field
             Image accent = Solid(Rect(portrait, "Accent", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(0f, 1f)), Gold);
 
             TMP_Text body = Text(box, "Text", "", Regular, 9f, Ink, TextAlignmentOptions.TopLeft);
-            Place(body.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            FillParent(body.rectTransform);
             body.rectTransform.offsetMin = new Vector2(5f, 3f);
             body.rectTransform.offsetMax = new Vector2(-14f, -5f);
             body.overflowMode = TextOverflowModes.Page;
@@ -400,26 +285,25 @@ namespace MiniPandoras.Editor.Field
                 ("body", body), ("nextArrow", arrow.gameObject));
         }
 
-        private static void BuildChoiceBox(Transform canvas, Conversation conversation, PlayerInputReader input)
+        /// <summary>
+        /// 선택지: 화면 가운데(대화창보다 조금 위)에 메뉴 버튼 모양의 항목 버튼을 세로로 늘어놓는다(웹게임은 대화창 오른쪽 위의 작은 창, 터치에 맞춰 바꿨다).
+        /// 버튼 너비와 감싼 판의 크기는 ChoiceBox가 항목 글에 맞춘다.
+        /// </summary>
+        private static void BuildChoiceBox(Transform canvas, Conversation conversation)
         {
-            // 웹게임: 오른쪽에서 8, 대화창 윗변에서 16 위. 한 줄 14, 위아래 여백 5.
-            RectTransform window = Rect(canvas, "Choices", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-8f, 75f), new Vector2(100f, 38f));
-            Window(window, Gold, Panel);
+            RectTransform window = Rect(canvas, "Choices", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 18f), new Vector2(120f, 54f));
             var rows = new Button[4];
             var labels = new TMP_Text[4];
             for (int i = 0; i < rows.Length; i++)
             {
-                RectTransform row = Rect(window, $"Option {i}", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -(5f + i * 14f)), new Vector2(0f, 14f));
-                rows[i] = row.gameObject.AddComponent<Button>();
-                rows[i].targetGraphic = ClickArea(row);
-                labels[i] = Text(row, "Text", "", Regular, 9f, Ink, TextAlignmentOptions.MidlineLeft);
-                Place(labels[i].rectTransform, Vector2.zero, Vector2.one, new Vector2(18f, 0f), Vector2.zero);
+                RectTransform row = Rect(window, $"Option {i}", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                    new Vector2(0f, -i * (ChoiceBox.RowHeight + ChoiceBox.RowGap)), new Vector2(120f, ChoiceBox.RowHeight));
+                rows[i] = WindowButton(row, "", 10f);
+                labels[i] = row.Find("Text").GetComponent<TMP_Text>();
             }
 
-            TMP_Text cursor = Text(window, "Cursor", "▶", Regular, 6f, Gold, TextAlignmentOptions.Center);
-            Place(cursor.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(10f, -12f), new Vector2(8f, 8f));
             SerializedFields.Set(canvas.gameObject.AddComponent<ChoiceBox>(),
-                ("conversation", conversation), ("input", input), ("window", window), ("rows", rows), ("labels", labels), ("cursor", cursor.rectTransform));
+                ("conversation", conversation), ("window", window), ("rows", rows), ("labels", labels));
         }
 
         private static void BuildToast(Transform canvas, Conversation conversation, PlayerInputReader input)
@@ -447,7 +331,7 @@ namespace MiniPandoras.Editor.Field
             var resources = new TMP_DefaultControls.Resources();
             GameObject fieldObject = TMP_DefaultControls.CreateInputField(resources);
             fieldObject.transform.SetParent(panel, false);
-            var field = fieldObject.GetComponent<TMP_InputField>();
+            TMP_InputField field = WithKoreanBackspaceFix(fieldObject.GetComponent<TMP_InputField>());
             Place((RectTransform)fieldObject.transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -36f), new Vector2(140f, 18f));
             field.characterLimit = 8;
             field.fontAsset = Regular;
@@ -456,13 +340,16 @@ namespace MiniPandoras.Editor.Field
             {
                 text.font = Regular;
                 text.fontSize = 9f;
+                text.alignment = TextAlignmentOptions.Center;
             }
 
             ((TMP_Text)field.placeholder).text = "???";
 
+            // 버튼은 창 아래 끝에서 8 위에 아래 끝을 맞춘다(기준점이 가운데면 버튼 아래 절반이 창 밖으로 나간다).
             GameObject buttonObject = TMP_DefaultControls.CreateButton(resources);
             buttonObject.transform.SetParent(panel, false);
-            Place((RectTransform)buttonObject.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 7f), new Vector2(60f, 16f));
+            Place((RectTransform)buttonObject.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(60f, 16f));
+            ((RectTransform)buttonObject.transform).pivot = new Vector2(0.5f, 0f);
             TMP_Text buttonText = buttonObject.GetComponentInChildren<TMP_Text>();
             buttonText.text = "확인";
             buttonText.font = Bold;
@@ -470,6 +357,23 @@ namespace MiniPandoras.Editor.Field
 
             SerializedFields.Set(canvas.gameObject.AddComponent<NameEntry>(),
                 ("conversation", conversation), ("panel", panel.gameObject), ("field", field), ("confirm", buttonObject.GetComponent<Button>()));
+        }
+
+        /// <summary>기본 입력 칸을 한글 조합 중 지우기 버그를 막은 칸(NameInputField)으로 바꾼다. 칸을 이루는 그림·글 연결은 옮겨 단다.</summary>
+        private static TMP_InputField WithKoreanBackspaceFix(TMP_InputField original)
+        {
+            GameObject host = original.gameObject;
+            RectTransform viewport = original.textViewport;
+            TMP_Text textComponent = original.textComponent;
+            Graphic placeholder = original.placeholder;
+            Graphic background = original.targetGraphic;
+            Object.DestroyImmediate(original);
+            var field = host.AddComponent<NameInputField>();
+            field.textViewport = viewport;
+            field.textComponent = textComponent;
+            field.placeholder = placeholder;
+            field.targetGraphic = background;
+            return field;
         }
     }
 }

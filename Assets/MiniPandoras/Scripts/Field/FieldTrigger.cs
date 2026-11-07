@@ -10,6 +10,8 @@ namespace MiniPandoras.Field
         Step,
         /// <summary>그 칸을 보고 말을 걸면(공격 버튼)</summary>
         Talk,
+        /// <summary>그 칸 너머의 사람에게 말을 걸면(접수대 뒤의 안내원). 행동 버튼에 「조사」 대신 「대화」가 뜬다.</summary>
+        TalkAcross,
     }
 
     /// <summary>

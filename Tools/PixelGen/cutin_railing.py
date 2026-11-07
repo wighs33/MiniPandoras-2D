@@ -1,4 +1,4 @@
-"""3장 컷인 그림: 아지트 1층에서 올려다본 어두운 2층 난간(사용자 요청 2026-11-02).
+"""3장 컷인 그림: 아지트 1층에서 올려다본 어두운 2층 난간.
 
 맵에서는 1층만 보이므로, 2층 난간에 걸터앉은 디엘은 필드 대신 띄우는 컷인 화면(CutInView)으로 보여 준다.
 카메라는 1층 바닥 가까이에서 올려다본다: 위로 모이는 서까래, 2층 벽과 방문, 판자로 막은 2층 창 틈의 달빛,
@@ -6,7 +6,8 @@
 
   back.png      배경(768×432, 가상 화면 384×216의 두 배)
   streaks.png   뛰어내릴 때 겹치는 세로 속도선(반투명)
-  diel.png      디엘 정면 그림을 걸터앉은 모습으로 접어(다리를 짧게) 도트 그대로 네 배 키운 것(UI에서 크게 그려도 흐려지지 않게)
+  diel.png      난간에 앉아 다리를 꼰 디엘을 도트 그대로 네 배 키운 것(UI에서 크게 그려도 흐려지지 않게). 다리를 눌러 앉히면 짧아 보인다.
+                PixelLab이 웹게임 정면 그림을 고쳐 그린 Tools/PixelLab/diel_crossed_legs_raw.png에서 함께 그려진 나무 막대를 지우고, 머리는 웹게임 그림 그대로 되얹는다.
 그림 안 자리(가상 화면 px)는 CutInView를 쓰는 이야기 코드(Chapter3)가 쓴다: 난간 손잡이 윗면 y 103.
 
 사용: python Tools/PixelGen/cutin_railing.py <프로젝트 루트>
@@ -30,8 +31,15 @@ HANDRAIL_Y = 206          # 난간 손잡이 윗면(점). 가상 화면 103px.
 EDGE_Y = 262              # 2층 바닥 앞 들보 위 끝
 UNDER_Y = 292             # 들보 아래, 2층 바닥 밑면이 보이기 시작하는 곳
 LAMP_AT = (318, 168)
-SIT_HIP = 0.64            # 정면 그림에서 엉덩이 높이(위에서부터 비율)
-SIT_LEGS = 0.4            # 앉은 다리는 선 다리 길이의 이만큼으로 보인다
+SIT_HIP = 0.64            # 정면 그림에서 엉덩이 높이(위에서부터 비율). 여기가 난간 손잡이에 닿는다.
+
+# PixelLab 그림에서 고치는 자리(112×168의 좌표).
+SEAT_ROWS = (106, 123)      # 그림에 함께 그려진 나무 막대의 줄. 맵의 난간에 앉으므로 지운다.
+SEAT_LEFT_END = 22          # 이 x보다 왼쪽, 아래 x보다 오른쪽의 막대를 지운다.
+SEAT_RIGHT_START = 90
+HEAD_ROWS = 57              # 웹게임 그림에서 얼굴이 끝나는 줄. 여기까지는 웹게임 그림 그대로 쓴다.
+HEAD_SHIFT = (0, -1)        # PixelLab 그림의 머리는 한 점 위에 있다.
+BODY_CELL = (56, 80)        # 몸통 안의 한 점
 
 
 def glow(image, centre, radius, color, strength):
@@ -150,17 +158,34 @@ def streaks(rng):
     return image
 
 
-def sitting(source):
-    """
-    정면으로 선 그림을 걸터앉은 모습으로: 엉덩이(위에서 64%) 아래 다리를 세로로 접어 짧게 한다.
-    앞을 향해 뻗은 허벅지는 짧아 보이고 정강이만 늘어진다(정면에서 본 앉은 다리).
-    """
-    hip = int(source.height * SIT_HIP)
-    legs = source.crop((0, hip, source.width, source.height))
-    legs = legs.resize((legs.width, int(legs.height * SIT_LEGS)), Image.NEAREST)
-    out = Image.new("RGBA", (source.width, hip + legs.height))
-    out.alpha_composite(source.crop((0, 0, source.width, hip)), (0, 0))
-    out.alpha_composite(legs, (0, hip))
+def connected_to(solid, cell):
+    """cell에서 이어진 칠한 점. 막대를 지우고 남은 부스러기를 떼어 낸다."""
+    reached = np.zeros_like(solid)
+    reached[cell[1], cell[0]] = True
+    while True:
+        grown = (reached | pg.neighbours(reached)) & solid
+        if (grown == reached).all():
+            return reached
+        reached = grown
+
+
+def perched(project):
+    """다리를 꼰 디엘. 막대는 갈색이고 코트는 검어서, 양옆의 갈색 점과 그에 붙은 윤곽만 지운다."""
+    lab = np.array(Image.open(project / "Tools/PixelLab/diel_crossed_legs_raw.png").convert("RGBA"))
+    top, bottom = SEAT_ROWS
+    box = np.zeros(lab.shape[:2], dtype=bool)
+    box[top:bottom, :SEAT_LEFT_END] = True
+    box[top:bottom, SEAT_RIGHT_START:] = True
+    red, blue = lab[..., 0].astype(int), lab[..., 2].astype(int)
+    wood = box & (red > blue + 14) & (red < 150)
+    outline = box & pg.neighbours(wood) & (lab[..., :3].max(axis=2) < 40)
+    lab[wood | outline] = 0
+    lab[~connected_to(lab[..., 3] > 0, BODY_CELL)] = 0
+    out = Image.fromarray(lab, "RGBA")
+    # 얼굴은 다시 그리지 않는다. 몸과 이어지는 목 아래는 PixelLab 그림을 둔다.
+    head = Image.open(project / "Assets/MiniPandoras/Art/WebGame/Characters/diel/down_0.png").convert("RGBA").crop((0, 0, 112, HEAD_ROWS))
+    out.paste(Image.new("RGBA", head.size), HEAD_SHIFT)
+    out.alpha_composite(head.crop((0, -HEAD_SHIFT[1], 112, HEAD_ROWS)))
     return out
 
 
@@ -171,7 +196,7 @@ def main(project):
     Image.fromarray(back(rng), "RGB").save(out / "back.png")
     Image.fromarray(streaks(rng), "RGBA").save(out / "streaks.png")
     source = Image.open(project / "Assets/MiniPandoras/Art/WebGame/Characters/diel/down_0.png").convert("RGBA")
-    seated = sitting(source)
+    seated = perched(project)
     seated.resize((seated.width * 4, seated.height * 4), Image.NEAREST).save(out / "diel.png")
     preview = Image.open(out / "back.png").convert("RGBA")
     scale = 192 / source.height

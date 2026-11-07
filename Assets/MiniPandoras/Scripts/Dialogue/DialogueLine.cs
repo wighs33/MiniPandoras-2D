@@ -60,6 +60,12 @@ namespace MiniPandoras.Dialogue
         public string Text { get; }
         public LineStyle Style { get; }
 
+        /// <summary>같은 대사를 인물 일러스트 없이 띄운다.</summary>
+        public DialogueLine WithoutFigure()
+        {
+            return new DialogueLine(SpeakerId, Name, NameColor, Portrait, null, Text, Style);
+        }
+
         public static DialogueLine Narration(string text)
         {
             return new DialogueLine(null, null, Color.white, null, null, text, LineStyle.Narration);

@@ -24,7 +24,7 @@ namespace MiniPandoras.Combat
     {
         public Func<BattleApi, IEnumerator> OnStart { get; set; }
 
-        /// <summary>실제 시간 4초(240프레임)마다 한 「판」을 센다(예전 턴제 훅을 그대로 쓰려고).</summary>
+        /// <summary>실제 시간 4초(240프레임)마다 한 「판」을 센다(웹게임의 턴제 훅을 그대로 쓰려고).</summary>
         public Func<BattleApi, IEnumerator> OnRoundStart { get; set; }
 
         /// <summary>누가 공격하거나 스킬을 쓴 뒤.</summary>
@@ -69,7 +69,7 @@ namespace MiniPandoras.Combat
 
         public IEnumerator Wait(int frames)
         {
-            yield return new WaitForSeconds(frames / 60f);
+            yield return FieldCombat.Frames(frames);
         }
 
         public void Flash(string key, int frames)
@@ -82,16 +82,10 @@ namespace MiniPandoras.Combat
             combat.ShakeCombatant(key, amount);
         }
 
-        /// <summary>몸이 공격을 흘려보내는 상태로 둔다(웹게임 phase). 작은 값은 판 수로 본다(1판 = 150프레임).</summary>
-        public void Phase(string key, int turns)
-        {
-            combat.SetPhase(key, turns);
-        }
-
         /// <summary>그 전투원이 그 스킬을 쓴다(웹게임 scene.scriptedSkill). 동료면 플레이어 곁에 나타나 쓴다.</summary>
-        public IEnumerator ScriptedSkill(string casterKey, string skillId, string targetKey = null, bool lethal = false)
+        public IEnumerator ScriptedSkill(string casterKey, string skillId, string targetKey = null, bool lethal = false, string calledAs = null)
         {
-            return combat.ScriptedSkill(casterKey, skillId, targetKey, lethal);
+            return combat.ScriptedSkill(casterKey, skillId, targetKey, lethal, calledAs);
         }
 
         /// <summary>사방의 기운이 그 전투원에게 모여든다(웹게임 scene.gather).</summary>
@@ -161,8 +155,14 @@ namespace MiniPandoras.Combat
         public BattleHooks Hooks { get; set; }
         /// <summary>맨 앞 적이 되풀이해 걷는 길. 없으면 모두 어슬렁거린다.</summary>
         public IReadOnlyList<Facing> Patrol { get; set; }
+        public const int DefaultPatrolFrames = 18;
+
         /// <summary>어슬렁거릴 때 한 칸에 걸리는 프레임.</summary>
-        public int PatrolFramesPerTile { get; set; } = 18;
+        public int PatrolFramesPerTile { get; set; } = DefaultPatrolFrames;
+        /// <summary>쓰러진 뒤 제자리에 다시 나타나기까지의 프레임. 0이면 돌아오지 않는다.</summary>
+        public int RespawnFrames { get; set; }
+        /// <summary>훈련장의 허수아비로 세운다.</summary>
+        public bool Dummy { get; set; }
         /// <summary>처음 알아챘을 때(싸움 전 대사 등). 이 동안 전투는 멈춘다.</summary>
         public Func<IEnumerator> OnAggro { get; set; }
         public Func<IEnumerator> OnDefeated { get; set; }
@@ -180,5 +180,7 @@ namespace MiniPandoras.Combat
         public List<EnemyFighter> Enemies { get; } = new List<EnemyFighter>();
         public bool Engaged { get; set; }
         public bool Done { get; set; }
+        /// <summary>쓰러진 뒤 다시 나타날 때까지 남은 프레임.</summary>
+        public int RespawnIn { get; set; }
     }
 }

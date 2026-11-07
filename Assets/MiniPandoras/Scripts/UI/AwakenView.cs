@@ -12,10 +12,11 @@ namespace MiniPandoras.UI
     /// </summary>
     public sealed class AwakenView : MonoBehaviour
     {
-        // 웹게임 화면(384×216) 기준: 인격체 일러스트는 높이 194px, 가운데 x 118·268, 위 끝 16px에서 위아래로 3px 흔들린다.
+        // 웹게임 화면(384×216) 기준: 인격체 일러스트는 높이 194px, 가운데 x 118·268(화면 가운데 192에서 -74·+76), 위 끝 16px에서 위아래로 3px 흔들린다.
+        // 넓은 폰에서도 가운데에 오도록 화면 가운데에서 잰다.
         private const float GodHeight = 194f;
         private const float GodTop = 16f;
-        private static readonly float[] GodCentres = { 118f, 268f };
+        private static readonly float[] GodCentres = { -74f, 76f };
         private static readonly float[] GodPhases = { 0f, 1.7f };
         private static readonly Color GodGlow = new Color32(150, 160, 255, 82);
 
@@ -67,7 +68,7 @@ namespace MiniPandoras.UI
             for (int i = 0; i < gods.Length; i++)
             {
                 float top = GodTop + Mathf.Sin(frame * 0.025f + GodPhases[i]) * 3f;
-                // 그림은 위 가운데를 기준점으로 두고, 빛은 그림 위에서 45% 지점에 둔다(화면 왼쪽 위가 원점).
+                // 그림은 위 가운데를 기준점으로 두고, 빛은 그림 위에서 45% 지점에 둔다(화면 위 가운데가 원점).
                 gods[i].rectTransform.anchoredPosition = new Vector2(GodCentres[i], -top);
                 gods[i].color = new Color(1f, 1f, 1f, godsAppear);
                 glows[i].rectTransform.anchoredPosition = new Vector2(GodCentres[i], -(top + GodHeight * 0.45f));

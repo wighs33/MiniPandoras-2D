@@ -33,30 +33,49 @@ namespace MiniPandoras.Combat
         Blink,
         Area,
         Nova,
+        Volley,
+        Fissure,
+        BlastRing,
+        Grab,
+        Guard,
     }
 
     /// <summary>범위 공격 전에 바닥에 깔리는 빨간 예고. 다 차오르면 그 자리가 터진다.</summary>
     public sealed class Telegraph
     {
         public Vector2 Center { get; set; }
+        /// <summary>돌진 길이면 폭의 절반이다.</summary>
         public float Radius { get; set; }
+        /// <summary>돌진 길이면 Center에서 끝까지. 둥근 예고면 0이다.</summary>
+        public Vector2 Line { get; set; }
         public int Frame { get; set; }
         public int Duration { get; set; }
         /// <summary>몸 둘레 공격이면 적을 따라다닌다.</summary>
         public EnemyFighter Follow { get; set; }
+        /// <summary>예고가 차면 저절로 터지는 땅이면 그 공격을 쓴 적. 아니면 null.</summary>
+        public EnemyFighter Owner { get; set; }
+        public float Power { get; set; }
+        /// <summary>터질 때 돌 대신 가시가 솟는다.</summary>
+        public BlastLook Look { get; set; }
     }
 
     /// <summary>적이 준비하는 공격 하나. 적마다 하나를 만들어 두고 다시 쓴다.</summary>
     public sealed class EnemyAttack
     {
         public AttackKind Kind { get; set; }
-        public SkillDefinition Skill { get; set; }
+
+        /// <summary>기술을 내기까지 숨 고르는 프레임.</summary>
+        public int WindupFrames { get; set; }
         public float Power { get; set; }
         public float Radius { get; set; }
         public Vector2 Direction { get; set; }
         public Vector2 Target { get; set; }
         public bool Hit { get; set; }
         public Telegraph Telegraph { get; set; }
+        /// <summary>보스 기술의 돌 수, 터지는 곳 수.</summary>
+        public int Count { get; set; }
+        /// <summary>터지는 땅에서 돌 대신 가시가 솟는다.</summary>
+        public BlastLook Look { get; set; }
     }
 
     /// <summary>
@@ -64,23 +83,24 @@ namespace MiniPandoras.Combat
     /// </summary>
     public sealed class EnemyFighter : ICombatant
     {
-        // 필드에서는 적 체력을 조금 줄여 싸움이 늘어지지 않게 한다(정해진 9999 같은 값은 그대로).
+        // 필드에서는 적 체력을 조금 줄여 싸움이 늘어지지 않게 한다(이벤트용 체력은 그대로).
         private const float FieldHpScale = 0.75f;
+        private const int BossHp = 300;
+        private const int SuperArmorHp = 400;
 
         private int hp;
 
-        public EnemyFighter(CharacterBody body, string key, EnemyDefinition definition, MonsterGroup group, bool inEncounter, bool spawned)
+        public EnemyFighter(CharacterBody body, string key, EnemyDefinition definition, MonsterGroup group, bool inEncounter)
         {
             Body = body;
             Key = key;
             Definition = definition;
             Group = group;
             InEncounter = inEncounter;
-            Spawned = spawned;
-            MaxHp = definition.Hp >= 9000 ? definition.Hp : Mathf.Max(10, DamageFormula.JsRound(definition.Hp * FieldHpScale));
+            MaxHp = definition.Hp >= EnemyDefinition.EventHp ? definition.Hp : Mathf.Max(10, JsMath.Round(definition.Hp * FieldHpScale));
             hp = MaxHp;
-            Boss = definition.Hp >= 300;
-            SuperArmor = definition.Hp >= 400;
+            Boss = definition.Hp >= BossHp;
+            SuperArmor = definition.Hp >= SuperArmorHp;
             Vector2 sheetSize = body.Sheet.Size;
             Radius = MapCoordinates.Pixels(Mathf.Clamp(sheetSize.x * 0.3f, 7f, 22f));
             Reach = Radius + MapCoordinates.Pixels(12f);
@@ -96,12 +116,13 @@ namespace MiniPandoras.Combat
         public MonsterGroup Group { get; }
         /// <summary>이야기 전투에 나온 적. 제자리로 돌아가지 않고, 끝나면 치운다.</summary>
         public bool InEncounter { get; }
-        /// <summary>전투가 새로 세운 인물이라 끝나면 지운다(원래 서 있던 인물이면 그대로 둔다).</summary>
-        public bool Spawned { get; }
         public string Name => Definition.DisplayName;
         public int MaxHp { get; }
         public int Hp => hp;
+        /// <summary>체력이 큰 적. 체력 막대를 따로 그리고 쓰러뜨리면 맵이 보스전을 치른 것으로 센다. 보스 기술(<see cref="BossPatterns"/>)을 쓰는 적은 이 가운데 일부다.</summary>
         public bool Boss { get; }
+        /// <summary>체력 숫자를 보여도 되는지. 이벤트용 체력(9999 같은 한 방)은 숫자를 감춘다.</summary>
+        public bool ShowsHpNumbers => Definition.Hp < EnemyDefinition.EventHp;
         /// <summary>맞아도 휘청이지 않고 덜 밀린다.</summary>
         public bool SuperArmor { get; }
         public float Radius { get; }
@@ -112,6 +133,16 @@ namespace MiniPandoras.Combat
 
         /// <summary>쓰러져도 체력 1이 남는다(이벤트로 끝나는 싸움).</summary>
         public bool NoDeath { get; set; }
+        /// <summary>훈련장의 허수아비. 덤비지 않고 쓰러지지 않으며, 밀리거나 끌려가도 곧 제자리로 돌아온다.</summary>
+        public bool IsDummy { get; set; }
+        /// <summary>보스가 다음에 쓸 기술의 차례.</summary>
+        public int PatternIndex { get; set; }
+        /// <summary>보스가 체력이 절반 아래로 내려가 분노했다.</summary>
+        public bool Enraged { get; set; }
+        /// <summary>이어서 돌진할 횟수.</summary>
+        public int ChargesLeft { get; set; }
+        /// <summary>돌진했으니 일반 공격을 한 번 해야 다시 돌진한다.</summary>
+        public bool StrikeOwed { get; set; }
         public bool Aggro { get; set; }
         public IReadOnlyList<Facing> Patrol { get; set; }
         public EnemyState State { get; set; } = EnemyState.Idle;
@@ -122,6 +153,9 @@ namespace MiniPandoras.Combat
         public Knockback? Knock { get; set; }
         public int Slow { get; set; }
         public int Freeze { get; set; }
+
+        /// <summary>방패를 세우고 있는 남은 프레임. 그동안 공격을 막는다.</summary>
+        public int GuardFrames { get; set; }
         public float Dot { get; set; }
         public int DotTicks { get; set; }
         public int DotTimer { get; set; }
@@ -161,12 +195,61 @@ namespace MiniPandoras.Combat
                 Dead = false;
                 DeathFrame = 0;
                 Body.SetVisible(true);
-                Body.Alpha = 1f;
+                ClearBattleState();
                 Body.PlaceAt(Start);
                 State = EnemyState.Chase;
                 Cooldown = 40;
-                HasAttack = false;
             }
+        }
+
+        /// <summary>
+        /// 싸움 전의 모습으로 되돌린다(체력 가득, 상태이상·분노 해제). 공격 예고는 효과 목록이 있는 쪽이 먼저 거둔다.
+        /// 제자리로 돌아가는 적(<paramref name="backHome"/>)은 알아채기 전으로, 이야기 전투를 다시 하는 적은 곧바로 덤비는 상태로 돌아간다.
+        /// </summary>
+        public void ResetToStart(bool backHome)
+        {
+            hp = MaxHp;
+            ClearBattleState();
+            if (backHome)
+            {
+                Aggro = false;
+                State = EnemyState.Idle;
+                Knock = null;
+                Stepping = false;
+                Body.PlaceAt(MapCoordinates.CellFoot(HomeCell));
+                if (Group != null)
+                {
+                    Group.Engaged = false;
+                }
+
+                return;
+            }
+
+            Dead = false;
+            Body.SetVisible(true);
+            State = EnemyState.Chase;
+            Cooldown = 60;
+        }
+
+        /// <summary>상태이상, 보스의 분노와 기술 차례, 방패, 공격 준비를 지우고 그림을 원래대로 둔다.</summary>
+        private void ClearBattleState()
+        {
+            Slow = 0;
+            Freeze = 0;
+            DotTicks = 0;
+            GuardFrames = 0;
+            HasAttack = false;
+            StrikeOwed = false;
+            ChargesLeft = 0;
+            PatternIndex = 0;
+            if (Enraged)
+            {
+                Enraged = false;
+                Body.Aura = AuraKind.None;
+            }
+
+            Body.Shade = null;
+            Body.Alpha = 1f;
         }
     }
 }

@@ -22,5 +22,198 @@
     "id": "dimension/rift-close",
     "dir": "fx",
     "options": {}
+  },
+  {
+    "name": "SummonPoof",
+    "id": "spawn/poof",
+    "options": {}
+  },
+  {
+    "name": "DemonPoof",
+    "id": "spawn/poof",
+    "options": {
+      "palette": [
+        "#0c0614",
+        "#1e0f34",
+        "#3b1a66",
+        "#6f2cc0",
+        "#b488f0",
+        "#f6eaff"
+      ],
+      "stars": [
+        "#c35cff",
+        "#e6a6ff",
+        "#ffffff"
+      ]
+    }
+  },
+  {
+    "name": "DemonClaw",
+    "id": "melee/claw-swipe",
+    "options": {
+      "palette": [
+        "#06040b",
+        "#150c26",
+        "#2a1150",
+        "#461a84",
+        "#6f2cc0",
+        "#9d5cec",
+        "#cfa6ff",
+        "#f6eaff"
+      ],
+      "sparks": [
+        "#f6eaff",
+        "#cfa6ff",
+        "#9d5cec",
+        "#6f2cc0"
+      ]
+    }
+  },
+  {
+    "name": "BeastStomp",
+    "id": "impacts/heavy-landing",
+    "options": {}
+  },
+  {
+    "name": "DemonWingsUnfurl",
+    "id": "demon/wings-unfurl",
+    "dir": "fx",
+    "colorOnly": true,
+    "options": {}
+  },
+  {
+    "name": "DemonWingsField",
+    "id": "demon/wings-field",
+    "dir": "fx",
+    "colorOnly": true,
+    "pixelsPerUnit": 64,
+    "options": {}
+  },
+  {
+    "name": "AngelWingsField",
+    "id": "angel/wings-field",
+    "dir": "fx",
+    "colorOnly": true,
+    "pixelsPerUnit": 64,
+    "options": {}
+  },
+  {
+    "name": "AngelWingsUnfurl",
+    "id": "angel/wings-unfurl",
+    "dir": "fx",
+    "colorOnly": true,
+    "pixelsPerUnit": 32,
+    "options": {}
+  },
+  {
+    "name": "SealChainsOpen",
+    "id": "seal/chains-open",
+    "dir": "fx",
+    "pixelsPerUnit": 32,
+    "options": {}
+  },
+  {
+    "name": "SealChainsLoop",
+    "id": "seal/chains-loop",
+    "dir": "fx",
+    "pixelsPerUnit": 32,
+    "options": {}
+  },
+  {
+    "name": "SandGrasp",
+    "id": "sand/grasp",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "SandPillar",
+    "id": "sand/pillar",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "SandWave",
+    "id": "sand/wave",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "Quicksand",
+    "id": "sand/quicksand",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "KnotLoop",
+    "id": "dimension/knot-loop",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "KnotUntie",
+    "id": "dimension/knot-untie",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "WarpIn",
+    "id": "dimension/warp-in",
+    "dir": "fx",
+    "options": {},
+    "impact": 0.45
+  },
+  {
+    "name": "HolyShield",
+    "id": "holy/shield",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "HolySmite",
+    "id": "holy/smite",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "Sanctuary",
+    "id": "holy/sanctuary",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "KnightAscend",
+    "id": "holy/ascend",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "TwinSlash",
+    "id": "berserk/twin-slash",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "TigerDash",
+    "id": "berserk/tiger-dash",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "SpinRise",
+    "id": "berserk/spin-rise",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "BerserkAwaken",
+    "id": "berserk/awaken",
+    "dir": "fx",
+    "options": {}
+  },
+  {
+    "name": "LevelUp",
+    "id": "levelup/level-up",
+    "dir": "fx",
+    "options": {}
   }
 ]

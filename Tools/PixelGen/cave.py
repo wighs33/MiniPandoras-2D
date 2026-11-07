@@ -1,4 +1,4 @@
-"""호빗 소굴(hobbitCave, 7장)을 새로 짠다(사용자 요청 2026-11-03: 다음 장들의 맵과 소품을 생성기로).
+"""호빗 소굴(hobbitCave, 7장)을 새로 짠다(다음 장들의 맵과 소품을 생성기로).
 
 산속 바위 동굴 하나가 호빗 사기꾼들의 소굴이다. 웹게임은 네모난 돌 타일 방이지만 자연 동굴로 다시 짰다:
 울퉁불퉁한 바위(위에서 본 바위 윗면, 바닥 북쪽 가장자리에는 드러난 벽면), 다져진 흙바닥과 납작한 돌·자갈·물웅덩이,
@@ -397,11 +397,12 @@ def build():
 
     # ── 7장 지점(웹게임 칸): 거대 호빗, 호빗 넷, 덮치는 자리, 루가가 서는 자리, 입구 ──
     m.point("giant", (13, 3))
+    m.point("chest", (13, 2))
     m.point("hobbit", (8, 5), (18, 5), (7, 9), (19, 9))
     m.point("arrive", (13, 9))
     m.point("ruga", (13, 14))
     m.point("entrance", (13, 17))
-    m.warp("entrance", "caveRoad", "enter", "down")
+    m.warp("entrance", "hobbitTrail", "mouthArrive", "down")
     # 입구 굴길 아래 끝은 맵 밖으로 이어진다.
     m.keep_open(12, 17, 15, 18)
     return m

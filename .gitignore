@@ -13,6 +13,9 @@
 # Python 도구(그림·메시·대본 추출). 내려받은 외부 저장소(ThirdParty)는 뺀다.
 !/Tools/
 /Tools/ThirdParty/
+# 생성기가 읽는 원본 그림도 그림이라 올리지 않는다.
+/Tools/**/*.png
+/Tools/PixelLab/raw/
 
 # 쓰는 Unity 패키지 목록
 !/Packages/

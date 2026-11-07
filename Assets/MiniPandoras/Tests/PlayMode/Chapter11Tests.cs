@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 11장 「나리온」(1부 마지막 장)을 저장에서 이어 엔딩까지 돌린다. 연회가 끝난 밤, 요정 마을 밖 길은 잠겨 있고 고목으로 들어가 1층 홀·2층 장터를 지나
+    /// 11장 「다시 모인 파도」(1부 마지막 장)을 저장에서 이어 엔딩까지 돌린다. 연회가 끝난 밤, 요정 마을 밖 길은 잠겨 있고 고목으로 들어가 1층 홀·2층 장터를 지나
     /// 3층 요정 마을의 쉼터로(밤에는 3층 위로 오르지 않는다) → 이자벨과 오로라가 동료가 되어 여섯이 됨 → 쉼터의 밤과 꿈속 여신 → 아침에는 아래층으로
     /// 내려가지 않고 꼭대기 정거장까지 오름 → 여섯이 차례로 나리온 등에 오르면 날아오름 → 하늘길 컷인 → 에라드의 탑·뱀성 옥상·밤바다 →
     /// 1부 엔딩: 시작하면 클리어가 저장되고, 글귀가 다 뜨기 전에는 눌러도 넘어가지 않으며, 다 뜬 뒤 누르면 타이틀로 돌아가 「1부 클리어」가 뜬다.
@@ -33,8 +33,7 @@ namespace MiniPandoras.Tests
         [UnityTearDown]
         public IEnumerator Restore()
         {
-            Time.timeScale = 1f;
-            TestSaves.Restore();
+            StoryDriver.Close();
             yield return null;
         }
 
@@ -43,8 +42,8 @@ namespace MiniPandoras.Tests
         {
             // 밤의 페어리가든: 디엘은 이자벨과 오로라를 만나지 않겠다고 한다. 쉼터로 가는 길만 열려 있다.
             yield return story.UntilExploring("fairyNight", "연회가 끝난 밤");
-            Assert.That(story.Lines, Has.Member("에루스를 지키겠다고 약속했다. 그 약속도 못 지킨 놈이, 무슨 얼굴로 그 딸을 만나."));
-            Assert.That(story.Exploration.IsLocked("road"), Is.True, "밤에는 아이로스 가도로 나가지 않는다");
+            Assert.That(story.Exploration.IsLocked("road"), Is.True, "밤에는 꽃잎 들판으로 나가지 않는다");
+            Assert.That(story.Lines, Has.Member("에루스를 지키겠다고 약속했다.\n그 약속도 못 지킨 놈이, 무슨 얼굴로 그 딸을 만나."));
             yield return story.StandOn(story.Director.Point("treeGate"));
             yield return Walk("up", "treeHall", "treeMarket", "treeRooms");
             Assert.That(story.Exploration.IsLocked("up"), Is.True, "밤에는 쉼터가 있는 3층보다 위로 오르지 않는다");
@@ -54,7 +53,7 @@ namespace MiniPandoras.Tests
             yield return story.UntilExploring("treeInn", "쉼터의 아침");
             Assert.That(story.Notices, Has.Member("이자벨과 오로라가 동료가 되었다!"));
             Assert.That(story.Session.State.Party, Is.EqualTo(new[] { "hero", "rang", "diel", "largo", "isabel", "aurora" }));
-            Assert.That(story.Lines, Has.Member("다만 하나만 기억해 주렴. 나눈 힘은, 반드시 누군가에게 이어진다는 걸."));
+            Assert.That(story.Lines, Has.Member("다만 하나만 기억해 주렴.\n나눈 힘은, 반드시 누군가에게 이어진다는 걸."));
             yield return story.StandOn(story.Director.Point("exit"));
             yield return story.UntilExploring("treeRooms", "쉼터에서 3층 요정 마을로");
             Assert.That(story.Exploration.IsLocked("down"), Is.True, "아침에는 아래층으로 내려가지 않는다");
@@ -74,8 +73,8 @@ namespace MiniPandoras.Tests
 
             // 다른 곳에서(에라드의 탑, 뱀성 옥상, 밤바다)를 지나 1부 엔딩.
             yield return story.Until(() => IsShowing(cutIn, "ending"), 120f, "1부 엔딩");
-            Assert.That(story.Lines, Has.Member("⋯⋯디엘."));
-            Assert.That(story.Lines, Has.Member("⋯아빠 표정, 볼만했겠다."));
+            Assert.That(story.Lines, Has.Member("......디엘."));
+            Assert.That(story.Lines, Has.Member("...아빠 표정, 볼만했겠다."));
             Assert.That(story.Lines, Has.Member("명령대로."));
             Assert.That(SaveStore.Read().Cleared, Is.True, "엔딩이 시작되면 1부 클리어가 저장된다");
 
@@ -91,7 +90,7 @@ namespace MiniPandoras.Tests
 
             float realEnd = Time.realtimeSinceStartup + 30f;
             TitleView title = null;
-            while (title == null || !title.IsShown)
+            while (title == null || !title.IsOpen)
             {
                 Assert.That(Time.realtimeSinceStartup, Is.LessThan(realEnd), "엔딩을 넘기면 타이틀로 돌아간다");
                 yield return null;

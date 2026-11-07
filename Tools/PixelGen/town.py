@@ -1,11 +1,11 @@
-"""힐리아 마을(town)을 새로 짠다(사용자 결정 2026-11-02: 일자 마을이 아니라 커도 된다, 집은 따로 디자인한 소품으로).
+"""힐리아 마을(town)을 새로 짠다(일자 마을이 아니라 커도 된다, 집은 따로 디자인한 소품으로).
 
 마을은 64×46칸이다. 서쪽 어귀에서 흙길이 들어와 돌길이 되고, 가운데 광장(분수, 북쪽에 모험가 길드)을 지나
 개울 다리를 건너 동쪽 출구로 나간다. 다리 건너에서 흙길이 북쪽 숲(마을 끝 숲길)으로 갈라진다.
 광장 서쪽은 앞뒤 두 줄 주택가, 길 남쪽은 농가와 텃밭이다.
 
-지점 이름은 웹게임 마을과 같다(arrive, east, forest, forestArrive, npc). 3장 인물 자리는 지점으로 옮겼다
-(townWoman, elder, kid, guard 세 칸).
+지점 이름은 웹게임 마을과 같다(arrive, east, forest, forestArrive, npc). guildDoor·guildArrive는 모험가 길드 문이다. 3장 인물 자리는 지점으로 옮겼다
+(townWoman, elder, kid, guard 칸들). 순찰병의 자리와 길은 GUARD_ROUTES와 함께 고치고, town_guards.py로 지나갈 틈을 확인한다.
 
 사용: python Tools/PixelGen/town.py <프로젝트 루트>
   Assets/MiniPandoras/Art/PixelGen/Maps/town/…       맵 데이터와 그림(layout.py)
@@ -23,6 +23,16 @@ from layout import MapLayout
 
 DESIGNS = {design.name: design for design in houses.CATALOG}
 
+# 3장 순찰병: (자리, 길). 길은 Chapter3.cs의 GuardRoutes와 같아야 한다.
+GUARDS = (
+    ((10, 21), "D7 U7"),
+    ((26, 21), "R8 D6 L8 U6"),
+    ((16, 34), "R20 L20"),
+    ((44, 21), "D13 U13"),
+    ((53, 23), "R3 L3"),
+    ((56, 11), "R1 D1 L1 U1"),
+)
+
 
 def design(base, **changes):
     """견본 집(houses.CATALOG)을 바탕으로 이름·색 등을 바꾼 설계."""
@@ -30,8 +40,8 @@ def design(base, **changes):
 
 
 def build():
-    town = MapLayout("town", "힐리아 마을", 64, 46, theme="town", music="town", weather="rain",
-                     ambient={"color": "#0e1430", "alpha": 0.55}, seed=41)
+    # 맵은 맑은 낮이다. 비와 밤은 쫓기는 장면에서 이야기가 켠다(Chapter3.RainyNightOverTheTown).
+    town = MapLayout("town", "힐리아 마을", 64, 46, theme="town", music="town", seed=41)
 
     # ── 바닥: 길, 광장, 개울, 다리 ──
     town.line("path", [(-1, 25), (9, 25)], 3)
@@ -110,20 +120,30 @@ def build():
     # ── 이야기 지점과 포탈 ──
     town.point("arrive", (2, 25))
     town.point("east", (63, 21), (63, 22), (63, 23))
+    town.point("eastArrive", (61, 22))
+    town.point("west", (0, 24), (0, 25), (0, 26))
     town.point("forest", (54, 0), (55, 0))
     town.point("forestArrive", (55, 3))
     town.point("npc", (27, 28))
     town.point("townWoman", (19, 23))
     town.point("elder", (33, 28))
     town.point("kid", (12, 23))
-    town.point("guard", (16, 23), (34, 22), (55, 20))
-    town.warp("forest", "hideoutPath", "westArrive", "right")
+    town.point("guard", *(cell for cell, _ in GUARDS))
+    town.point("guildDoor", (29, 18), (30, 18))
+    town.point("guildArrive", (30, 19))
+    town.warp("forest", "hideoutPath", "westArrive", "up")
     town.warp("east", "outskirts", "enter", "right")
+    town.warp("west", "cliffBridge", "eastArrive", "left")
+    town.warp("guildDoor", "adventurersGuild", "enter", "up")
     return town
 
 
 def main(project):
-    print(build().publish(project))
+    town = build()
+    for start, route in GUARDS:
+        if not town.route_is_clear(start, route):
+            print(f"순찰 길 {route}({start})이 막힌 칸을 지난다")
+    print(town.publish(project))
 
 
 if __name__ == "__main__":

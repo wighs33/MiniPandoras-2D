@@ -84,7 +84,7 @@ namespace MiniPandoras.World
         {
             // 웹게임은 60fps 고정이라 프레임당 비율로 적혀 있다. 프레임이 달라도 같은 빠르기로 따라가게 바꾼다.
             float perFrame = panPoint.HasValue ? panPerFrame : followPerFrame;
-            float t = 1f - Mathf.Pow(1f - perFrame, Time.deltaTime * 60f);
+            float t = FrameTime.Ease(perFrame, Time.deltaTime);
             Vector3 goal = Clamp(Goal());
             smoothed = Vector3.Lerp(smoothed, goal, t);
             if ((goal - smoothed).sqrMagnitude < SnapDistance * SnapDistance)

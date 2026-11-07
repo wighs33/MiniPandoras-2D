@@ -30,17 +30,27 @@ namespace MiniPandoras.Dialogue
 
         public bool IsShowingLine { get; private set; }
 
+        /// <summary>지금 떠 있는 대사를 말하는 인물 id. 대사가 없거나 해설이면 null.</summary>
+        public string Speaker { get; private set; }
+
+        /// <summary>
+        /// 대화·연출 건너뛰기 중(웹게임 overlay.skipping): 대사와 알림을 플레이어가 넘기기를 기다리지 않고 곧바로 넘긴다.
+        /// 선택지와 이름 입력은 그대로 기다린다.
+        /// </summary>
+        public bool Skipping { get; set; }
+
+        /// <summary>선택지나 이름 입력처럼 플레이어가 직접 답해야 하는 것을 기다리는 중. 이때는 건너뛰기가 멈춘다.</summary>
+        public bool AwaitsPlayer { get; private set; }
+
         public IEnumerator Say(DialogueLine line)
         {
             IsShowingLine = true;
+            Speaker = line.SpeakerId;
             waitingForReader = true;
             LineShown?.Invoke(line);
-            while (waitingForReader)
-            {
-                yield return null;
-            }
-
+            yield return WaitForReader();
             IsShowingLine = false;
+            Speaker = null;
             LineClosed?.Invoke();
         }
 
@@ -48,6 +58,8 @@ namespace MiniPandoras.Dialogue
         public IEnumerator Choose(DialogueLine question, IReadOnlyList<string> options, Action<int> chosen)
         {
             IsShowingLine = true;
+            Speaker = question.SpeakerId;
+            AwaitsPlayer = true;
             pickedOption = -1;
             LineShown?.Invoke(question);
             ChoicesShown?.Invoke(options);
@@ -56,7 +68,9 @@ namespace MiniPandoras.Dialogue
                 yield return null;
             }
 
+            AwaitsPlayer = false;
             IsShowingLine = false;
+            Speaker = null;
             LineClosed?.Invoke();
             chosen(pickedOption);
         }
@@ -64,12 +78,14 @@ namespace MiniPandoras.Dialogue
         public IEnumerator AskName(string initial, Action<string> named)
         {
             submittedName = null;
+            AwaitsPlayer = true;
             NameRequested?.Invoke(initial);
             while (submittedName == null)
             {
                 yield return null;
             }
 
+            AwaitsPlayer = false;
             named(submittedName);
         }
 
@@ -78,11 +94,7 @@ namespace MiniPandoras.Dialogue
         {
             waitingForReader = true;
             Notified?.Invoke(text);
-            while (waitingForReader)
-            {
-                yield return null;
-            }
-
+            yield return WaitForReader();
             NoticeClosed?.Invoke();
         }
 
@@ -96,6 +108,21 @@ namespace MiniPandoras.Dialogue
         public void Continue()
         {
             waitingForReader = false;
+        }
+
+        /// <summary>플레이어가 넘길 때까지, 건너뛰는 중이면 한 프레임만 기다린다.</summary>
+        private IEnumerator WaitForReader()
+        {
+            while (waitingForReader && !Skipping)
+            {
+                yield return null;
+            }
+
+            // 건너뛰어도 대사마다 한 프레임은 쉰다. 대사만 되풀이하는 연출이 한 프레임 안에서 끝없이 돌지 않게.
+            if (Skipping)
+            {
+                yield return null;
+            }
         }
 
         public void Pick(int option)

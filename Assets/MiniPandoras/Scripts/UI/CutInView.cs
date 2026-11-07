@@ -1,4 +1,5 @@
 using System;
+using MiniPandoras.World;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,9 +7,6 @@ namespace MiniPandoras.UI
 {
     /// <summary>
     /// 컷인: 필드 대신 다른 화면에서 한 장면을 크게 보여 주는 짧은 연출(영상 대신). 장면(Shot)마다 배경 한 장과, 있으면 인물과 빛을 둔다.
-    /// 3장 2층 난간의 디엘(Tools/PixelGen/cutin_railing.py), 2장 강가에서 올려다본 뱀성과 돌뱀 머리(cutin_castle.py),
-    /// 1장 랑이 설명하는 열 신·인간·축복신 판도라(cutin_gods.py), 6장 라코의 수업(cutin_lesson.py)과 뱀열차 객실 창(cutin_train.py),
-    /// 7장 호빗 마차(cutin_carriage.py)와 루가의 설명(cutin_ruga.py).
     /// 배경·인물·빛은 한 장(가로는 가상 화면 너비 384px, 세로는 그림 비율대로, 왼쪽 위가 원점, 아래로 +y)에 놓여 함께 확대되고,
     /// 넓은 화면에서는 둘레가 검다. 화면보다 세로로 긴 장면은 카메라를 올리고 내려 비춘다.
     /// 창이 있는 장면은 배경의 유리 자리를 비워 두고, 그 뒤에서 풍경 몇 겹이 저마다 빠르기로 옆으로 흐른다(열차 창 밖).
@@ -52,6 +50,17 @@ namespace MiniPandoras.UI
             [Tooltip("인물이 움직이면 넘길 그림들(첫 장이 figure다)")]
             [SerializeField] private Sprite[] figureFrames;
             [SerializeField] private float figureFramesPerSecond;
+            [Tooltip("인물 위에 겹쳐 이야기가 부를 때 한 번 재생하는 효과(pixelfx). 첫 장으로 기다렸다가 끝 장에 머문다")]
+            [SerializeField] private EffectSheet over;
+            [Tooltip("효과를 인물 뒤에 그린다(옆모습의 날개)")]
+            [SerializeField] private bool overBehindFigure;
+
+            public Shot(string name, Sprite back, Sprite figure, Sprite glow, EffectSheet over, bool overBehindFigure = false)
+                : this(name, back, figure, glow)
+            {
+                this.over = over;
+                this.overBehindFigure = overBehindFigure;
+            }
 
             public Shot(string name, Sprite back, Sprite figure, Sprite glow, Rect window = default, Scenery[] scenery = null)
                 : this(name, back, glow, window, scenery, figure == null ? Array.Empty<Sprite>() : new[] { figure }, 0f)
@@ -68,6 +77,8 @@ namespace MiniPandoras.UI
                 this.scenery = scenery ?? Array.Empty<Scenery>();
                 this.figureFrames = figureFrames;
                 this.figureFramesPerSecond = figureFramesPerSecond;
+                over = null;
+                overBehindFigure = false;
             }
 
             public string Name => name;
@@ -78,6 +89,8 @@ namespace MiniPandoras.UI
             public Scenery[] SceneryLayers => scenery ?? Array.Empty<Scenery>();
             public Sprite[] FigureFrames => figureFrames ?? Array.Empty<Sprite>();
             public float FigureFramesPerSecond => figureFramesPerSecond;
+            public EffectSheet Over => over;
+            public bool OverBehindFigure => overBehindFigure;
         }
 
         [Tooltip("함께 확대되는 한 장(배경·인물·빛). 기준점이 왼쪽 위다")]
@@ -88,9 +101,13 @@ namespace MiniPandoras.UI
         [SerializeField] private RawImage[] sceneryLayers = Array.Empty<RawImage>();
         [SerializeField] private Image back;
         [SerializeField] private Image figure;
+        [Tooltip("인물에 겹치는 효과. 효과의 원점이 인물 발밑에 온다. 크기는 효과 시트의 pixelsPerUnit을 따른다(16이면 점 하나가 가상 1px)")]
+        [SerializeField] private Image over;
         [SerializeField] private Image glow;
         [SerializeField] private Image streaks;
         [SerializeField] private Shot[] shots = Array.Empty<Shot>();
+
+        private const float OverPixelsPerUnit = 16f;
 
         private Vector2 foot;
         private float streakAlpha;
@@ -99,6 +116,9 @@ namespace MiniPandoras.UI
         private Sprite[] figureFrames = Array.Empty<Sprite>();
         private float figureFramesPerSecond;
         private float figureClock;
+        private EffectSheet overEffect;
+        private float overClock;
+        private bool overPlaying;
 
         /// <summary>지금 띄운 장면 이름.</summary>
         public string ShotName { get; private set; }
@@ -130,10 +150,26 @@ namespace MiniPandoras.UI
             figureFrames = shot.FigureFrames;
             figureFramesPerSecond = shot.FigureFramesPerSecond;
             figureClock = 0f;
+            overEffect = shot.Over;
+            overClock = 0f;
+            overPlaying = false;
+            over.enabled = overEffect != null;
+            if (over.enabled)
+            {
+                ShowOverFrame(0);
+                PutOverBehindFigure(shot.OverBehindFigure);
+            }
+
             glow.enabled = shot.Glow != null;
             glow.sprite = shot.Glow;
             SetGlow(0f);
             ShowScenery(shot, art.width / Size.x);
+        }
+
+        /// <summary>인물 위에 겹친 효과를 재생한다. 끝 장에 머문다.</summary>
+        public void PlayOver()
+        {
+            overPlaying = true;
         }
 
         public void Hide()
@@ -150,6 +186,7 @@ namespace MiniPandoras.UI
             frame.localScale = new Vector3(zoom, zoom, 1f);
             frame.anchoredPosition = new Vector2(-viewCenter.x * zoom, viewCenter.y * zoom);
             figure.rectTransform.anchoredPosition = new Vector2(foot.x, -(foot.y + drop));
+            over.rectTransform.anchoredPosition = figure.rectTransform.anchoredPosition;
             streakAlpha = streakStrength;
         }
 
@@ -157,6 +194,25 @@ namespace MiniPandoras.UI
         public void SetGlow(float strength)
         {
             glow.color = new Color(1f, 1f, 1f, strength);
+        }
+
+        private void ShowOverFrame(int index)
+        {
+            Sprite frameSprite = overEffect.ColorFrames[index];
+            over.sprite = frameSprite;
+            over.rectTransform.sizeDelta = frameSprite.rect.size * (OverPixelsPerUnit / frameSprite.pixelsPerUnit);
+            over.rectTransform.pivot = frameSprite.pivot / frameSprite.rect.size;
+        }
+
+        private void PutOverBehindFigure(bool behind)
+        {
+            int overIndex = over.transform.GetSiblingIndex();
+            int figureIndex = figure.transform.GetSiblingIndex();
+            if (overIndex < figureIndex != behind)
+            {
+                over.transform.SetSiblingIndex(figureIndex);
+                figure.transform.SetSiblingIndex(overIndex);
+            }
         }
 
         private void Awake()
@@ -199,6 +255,12 @@ namespace MiniPandoras.UI
             {
                 figureClock += Time.deltaTime;
                 figure.sprite = figureFrames[Mathf.FloorToInt(figureClock * figureFramesPerSecond) % figureFrames.Length];
+            }
+
+            if (overPlaying)
+            {
+                overClock += Time.deltaTime;
+                ShowOverFrame(Mathf.Min(overEffect.FrameCount - 1, Mathf.FloorToInt(overClock * overEffect.FramesPerSecond)));
             }
 
             for (int i = 0; i < sceneryLayers.Length; i++)

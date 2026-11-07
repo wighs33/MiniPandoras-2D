@@ -1,4 +1,4 @@
-"""뉴웨이브 호(ship): 6장 디엘의 기억과 9장 라르고의 기억 속 뉴웨이브 길드의 배를 새로 짠다(사용자 요청 2026-11-03: 다음 장의 맵과 그래픽).
+"""뉴웨이브 호(ship): 6장 디엘의 기억과 9장 라르고의 기억 속 뉴웨이브 길드의 배를 새로 짠다(다음 장의 맵과 그래픽).
 
 웹게임 배는 네모난 갑판에 방을 얹은 모양이라, 바다 위를 동쪽으로 나아가는 두 돛대 배로 다시 그렸다. 46×22칸.
   - 바다: 물결 줄무늬와 반짝임, 배 둘레 물거품, 이물에서 갈라지는 물결, 고물 뒤로 남는 물보라.
@@ -31,7 +31,8 @@ from room_interior import CAP as CAP_TONES, FACE, RoomInterior, face_decal, floo
 from station import text_mask
 
 T = pg.TILE
-WIDTH, HEIGHT = 46, 22
+# 동쪽 바다는 9장에서 뉴웨이브 호만 한 에라드 군함이 들어오는 자리라 넓다.
+WIDTH, HEIGHT = 82, 22
 MID = 11                    # 배 가운데 줄(칸 경계)
 HALF = 8                    # 갑판 반폭(칸): 북쪽 끝 MID - HALF, 남쪽 끝 MID + HALF
 STERN, BOW_START, BOW_TIP = 1.6, 26.0, 39.0
@@ -137,7 +138,7 @@ def sea(rng, hull):
 
 # ── 뱃전과 갑판 ────────────────────────────────────────
 
-def hull_and_deck(c, rng):
+def hull_and_deck(c, rng, name="뉴웨이브 호"):
     """뱃전 윗면, 북쪽 안쪽 면, 남쪽 바깥 뱃전, 갑판 판자, 이물대와 이물 장식을 그린다."""
     w, h = c.size
     north, south, inside = deck_edges(w)
@@ -164,12 +165,13 @@ def hull_and_deck(c, rng):
         c.paint(c.ellipse(px, py, 5, 4.5), BRASS[3])
         c.paint(c.ellipse(px, py, 3.5, 3), pg.hexes("#24384a")[0])
         c.paint(c.ellipse(px - 1, py - 1, 1.2, 1), pg.hexes("#8ab4c8")[0])
-    name = text_mask("뉴웨이브 호", 12, 80)
-    nh, nw = name.shape
-    left, top = int(4.4 * T), int(south[int(4.4 * T)] + CAP + 30)
-    region = c.image[top:top + nh, left:left + nw]
-    region[name, :3] = CREAM[2]
-    region[name, 3] = 255
+    if name:
+        letters = text_mask(name, 12, 80)
+        nh, nw = letters.shape
+        left, top = int(4.4 * T), int(south[int(4.4 * T)] + CAP + 30)
+        region = c.image[top:top + nh, left:left + nw]
+        region[letters, :3] = CREAM[2]
+        region[letters, 3] = 255
 
     # 뱃전 윗면: 짙은 테 안의 밝은 나무, 일정한 간격으로 버팀 기둥 머리
     c.paint(cap_ring, WOOD[4])

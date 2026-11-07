@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 체력·판도라 소울 막대 하나(웹게임 drawBar). 채운 길이를 가상 화면 1px 단위로 반올림해 점이 번지지 않게 한다.
+    /// 체력·마나 막대 하나(웹게임 drawBar). 채운 길이를 가상 화면 1px 단위로 반올림해 점이 번지지 않게 한다.
     /// </summary>
     public sealed class BarView : MonoBehaviour
     {

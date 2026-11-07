@@ -18,6 +18,9 @@ namespace MiniPandoras.Story
         /// <summary>쓰러지지 않는 싸움에서도 쓰러져야 하는 적(병사·부하).</summary>
         public IReadOnlyList<string> EnemiesThatFall { get; set; }
 
+        /// <summary>체력이 바닥나도 1에서 버티는 적. 플레이어는 보통 싸움처럼 쓰러지고, 훅이 이어질 이야기를 정한다.</summary>
+        public IReadOnlyList<string> EnemiesThatStand { get; set; }
+
         public BattleHooks Hooks { get; set; }
     }
 }

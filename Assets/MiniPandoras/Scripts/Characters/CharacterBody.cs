@@ -13,6 +13,7 @@ namespace MiniPandoras.Characters
         Lie,
         Squash,
         Kneel,
+        LieInBed,
     }
 
     /// <summary>등에 펼치는 날개(웹게임 Actor.wings).</summary>
@@ -30,6 +31,7 @@ namespace MiniPandoras.Characters
         Dark,
         Gold,
         Light,
+        Rage,
     }
 
     /// <summary>
@@ -77,6 +79,18 @@ namespace MiniPandoras.Characters
         /// <summary>그림을 한 가지 색의 실루엣으로 칠할지(웹게임 shade, 얼어붙음 등). null이면 그림 그대로다.</summary>
         public Color? Shade { get; set; }
 
+        /// <summary>
+        /// 무기를 휘두르는 그림의 몇째 장인지(0 들어 올림, 1 치기, 2 휘두른 뒤). null이면 걷기 그림이다.
+        /// 전투가 휘두르는 동안 정하고, 시트에 휘두르기 그림이 없으면 걷기 그림을 그대로 쓴다.
+        /// </summary>
+        public int? SwingFrame { get; set; }
+
+        /// <summary>지금 쓰는 기술의 그림 이름(시트의 moves). 없으면 null이다.</summary>
+        public string Move { get; set; }
+
+        /// <summary>기술 그림을 어디까지 넘겼는지(0~1).</summary>
+        public float MoveProgress { get; set; }
+
         /// <summary>하얗게 번쩍이는 중인지. 웹게임처럼 4프레임 가운데 앞 2프레임만 하얗다.</summary>
         public bool IsFlashLit => flashFrames > 0f && Mathf.CeilToInt(flashFrames) % 4 < 2;
 
@@ -84,7 +98,7 @@ namespace MiniPandoras.Characters
         public Vector2 Position => body != null ? body.position : (Vector2)transform.position;
 
         /// <summary>발이 서 있는 칸(웹게임 좌표).</summary>
-        public Vector2Int Cell => new Vector2Int(Mathf.FloorToInt(Position.x), Mathf.FloorToInt(-Position.y));
+        public Vector2Int Cell => MapCoordinates.TileAt(Position);
 
         /// <summary>그림을 발 위치에서 좌우로 옮긴 정도(웹게임 offsetX, 논리 px). 맞고 흔들리거나 휘두를 때 쓴다.</summary>
         public float OffsetX

@@ -10,6 +10,15 @@ namespace MiniPandoras.Combat
         Self,
     }
 
+    /// <summary>스킬을 어떤 그림으로 그릴지. 그림이 있는 판도라만 값이 있고, 나머지는 도형과 입자로 그린다.</summary>
+    public enum SkillLook
+    {
+        Plain,
+        Demon,
+        Flame,
+        Sand,
+    }
+
     /// <summary>
     /// 스킬 하나. 이름·위력·소모는 웹게임 battle/data.ts의 SKILLS, 필드에서 나가는 모양은 combat/actions.ts의 ACTIONS다.
     /// 에디터의 WebGameImporter가 battle.json에서 만든다.
@@ -20,7 +29,10 @@ namespace MiniPandoras.Combat
         [SerializeField] private string id;
         [SerializeField] private string displayName;
         [SerializeField, TextArea] private string description;
-        [Tooltip("판도라 소울(DP) 소모")]
+        [Tooltip("스킬 버튼의 아이콘. 없으면 색 구슬과 이름으로 보인다")]
+        [SerializeField] private Sprite icon;
+        [SerializeField] private SkillLook look;
+        [Tooltip("마나(DP) 소모")]
         [SerializeField] private int cost;
         [SerializeField] private SkillTarget target;
         [SerializeField] private float power;
@@ -38,6 +50,8 @@ namespace MiniPandoras.Combat
         public string Id => id;
         public string DisplayName => displayName;
         public string Description => description;
+        public Sprite Icon => icon;
+        public SkillLook Look => look;
         public int Cost => cost;
         public SkillTarget Target => target;
         public float Power => power;

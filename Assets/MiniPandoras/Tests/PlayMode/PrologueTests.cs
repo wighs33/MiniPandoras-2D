@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 프롤로그 「차원공간」을 처음부터 끝까지 본다. 조작 없는 장이라 대사만 넘긴다.
+    /// 0장 「여신의 환생」을 처음부터 끝까지 본다. 조작 없는 장이라 대사만 넘긴다.
     /// 눈을 뜨는 장면 → 허공에 뜬 돌섬과 차원공간 배경 → 떠 있는 두 인격체 → 차원문 → 주인공이 사라지고 1장으로 넘어간다.
     /// </summary>
     public sealed class PrologueTests
@@ -27,8 +27,7 @@ namespace MiniPandoras.Tests
         [UnityTearDown]
         public IEnumerator Restore()
         {
-            Time.timeScale = 1f;
-            TestSaves.Restore();
+            StoryDriver.Close();
             yield return null;
         }
 
@@ -57,10 +56,13 @@ namespace MiniPandoras.Tests
             Assert.That(backdropShown, Is.True, "돌섬 밖으로 차원공간 배경이 보인다");
             Assert.That(godsFloated, Is.True, "두 인격체는 그림자 없이 떠 있다");
             Assert.That(sawPortal, Is.True, "차원문이 열린다");
-            Assert.That(story.Lines, Has.Member("하하! 드디어 일어났군, 애송이!"));
-            Assert.That(story.Lines, Has.Member("당신입니다."));
+            Assert.That(story.Lines[0], Is.EqualTo("으으.... 추워..."), "눈을 뜨기 전 검은 화면의 첫 대사");
+            Assert.That(story.Lines, Has.Member("..뭐라 했냐?"));
+            Assert.That(story.Lines[1], Is.EqualTo("???"), "눈을 뜬 뒤의 대사");
+            Assert.That(story.Lines[2], Is.EqualTo("오오...!\n드디어 일어났군!"));
+            Assert.That(story.Lines, Has.Member("바로 당신입니다."));
             Assert.That(story.Lines, Has.Member("에라디온 구하고 와라!"));
-            Assert.That(story.Lines, Has.Member("⋯⋯\n생각보다 낮잖아?"));
+            Assert.That(story.Lines, Has.Member("......\n생각보다 낮잖아?"));
             Assert.That(story.Mover.Character.IsVisible, Is.False, "주인공은 차원문으로 떨어져 사라졌다");
             Assert.That(GameObject.Find("Portal"), Is.Null, "차원문은 닫혔다");
         }

@@ -1,8 +1,8 @@
-"""몬스터 도감 두 벌: 1레벨부터 20레벨까지 한 종씩(사용자 요청 2026-11-03 「세계관에 맞는 판타지 몬스터, 개·늑대·멧돼지 같은 건 진부」,
-이어서 「귀여운 것과 안 귀여운 것을 섞어, 포켓몬·팰월드처럼 처음부터 특이하게 생긴 생물로, 지형 컨셉에 맞게」).
+"""몬스터 도감 두 벌: 1레벨부터 20레벨까지 한 종씩(세계관에 맞는 판타지 몬스터로, 개·늑대·멧돼지 같은 흔한 동물은 진부해서 쓰지 않는다.
+귀여운 것과 안 귀여운 것을 섞어, 처음부터 특이하게 생긴 생물을 지형 컨셉에 맞게 둔다).
 
 에라디온의 몬스터는 동물이 아니다. 죽은 신들의 힘과 원념이 흩어진 소울더스트가 사람이 아닌 것(털뭉치·볏단·돌·버섯·천·덤불·토기·
-조형물·갑주·거품·뿌리·수정·책·깃털·얼음·연·시계·공간·석상·왕관)에 깃들어 생긴다(Docs/STORY.md 4장 「소울더스트와 판도라의 탄생」).
+조형물·갑주·거품·뿌리·수정·책·깃털·얼음·연·시계·공간·석상·왕관)에 깃들어 생긴다(웹게임 세계관 4장 「소울더스트와 판도라의 탄생」).
 레벨이 오를수록 더 큰 힘에서 나온다:
    1~5   주인 없는 더스트와 사람의 원념(monsters_dust.py)
    6~10  땅·바다에 스민 십이장의 더스트와 옛 싸움의 흔적(monsters_land.py)
@@ -10,7 +10,7 @@
   16~20  십이장 번개·시간, 태초의 신 차원·거인·재앙의 잔재(monsters_divine.py)
 생물 도감(CREATURES)은 우리 맵 지형마다 사는 생물이다(creatures_<지형>.py). 귀여운 것과 사나운 것이 섞여 있다. 메이플스토리 몬스터처럼
 한 마리마다 분명한 컨셉을 하나씩 갖고, 얼굴은 주황버섯·슬라임처럼 작은 눈과 가는 ω 입(또는 입 없음)이다. 초롱초롱한 빛점 눈은 쓰지 않는다
-(사용자 지적: 프로젝트와 안 맞는다). 사나운 것은 그 색으로 빛나는 작은 눈과 이빨을 둔다(creature_kit.small_face).
+(프로젝트와 안 맞는다). 사나운 것은 그 색으로 빛나는 작은 눈과 이빨을 둔다(creature_kit.small_face).
 몬스터마다 웹게임 인물과 같은 시트(아래·옆·위 세 장씩, sheet.json)를 그린다.
 
   Assets/MiniPandoras/Art/PixelGen/Monsters/<id>/down_0.png … up_2.png, sheet.json
@@ -34,6 +34,7 @@ import creatures_meadow as meadow
 import creatures_stone as stone
 import creatures_void as void
 import creatures_water as water
+import monsters_boss as boss
 import monsters_dust as dust
 import monsters_land as land
 import monsters_divine as divine
@@ -101,6 +102,11 @@ CREATURES = [
     Monster(20, "starWhale", "별고래", (42, 30), (6, 8, 20), void.star_whale, "사나움", "차원공간의 가장자리", 2),
 ]
 
+# 던전 보스. 도감 밖이라 미리보기에 넣지 않는다.
+BOSSES = [
+    Monster(30, "leviathan", "레비아탄", (96, 84), (4, 12, 20), boss.leviathan, "바다(아쿠아)의 더스트", "힐리아 동부와 서부 사이의 바다"),
+]
+
 BACKDROP = (58, 72, 62, 255)
 FONT = "Assets/ThirdParty/Pretendard/Pretendard-Bold.otf"
 
@@ -140,7 +146,7 @@ def walk_preview(roster, sheets):
 def main(project, only):
     out = project / "Assets/MiniPandoras/Art/PixelGen/Monsters"
     sheets = {}
-    for monster in ROSTER + CREATURES:
+    for monster in ROSTER + CREATURES + BOSSES:
         if only and monster.id not in only:
             continue
         sheets[monster.id] = save_sheet(out / monster.id, monster.id, monster.size, monster.draw, np.array(monster.outline, dtype=np.uint8),

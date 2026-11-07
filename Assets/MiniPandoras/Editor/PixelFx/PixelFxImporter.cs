@@ -13,13 +13,12 @@ namespace MiniPandoras.Editor.PixelFx
     /// <summary>
     /// Tools/PixelFx/export_pixelfx.mjs가 뽑은 효과(Art/PixelFx/이름/color.png·light.png·effect.json)를 들여온다.
     /// 두 시트를 같은 격자로 잘라 프레임 스프라이트를 만들고, 효과마다 <see cref="EffectSheet"/>(Data/Effects/이름.asset)를 만든다.
-    /// pixelfx는 논리 1px로 그리므로 한 칸 = 16px이다(인물 그림은 4배 고운 64px이라 효과의 점이 더 굵다, 웹게임과 같다).
+    /// pixelfx는 논리 1px로 그리므로 한 칸 = 16px이다(인물 그림은 4배 고운 64px이라 효과의 점이 더 굵다, 웹게임과 같다). 인물에 붙는 그림은 effect.json의 pixelsPerUnit으로 64px을 고른다.
     /// </summary>
     public static class PixelFxImporter
     {
         public const string Root = "Assets/MiniPandoras/Art/PixelFx";
         public const string SheetFolder = "Assets/MiniPandoras/Data/Effects";
-        private const float PixelsPerUnit = 16f;
 
         [MenuItem("MiniPandoras/Import PixelFx")]
         public static void ImportAll()
@@ -38,7 +37,13 @@ namespace MiniPandoras.Editor.PixelFx
 
         public static EffectSheet Load(string name)
         {
-            return AssetDatabase.LoadAssetAtPath<EffectSheet>($"{SheetFolder}/{name}.asset");
+            var sheet = AssetDatabase.LoadAssetAtPath<EffectSheet>($"{SheetFolder}/{name}.asset");
+            if (sheet == null)
+            {
+                throw new FileNotFoundException($"효과 {name}이 없다. MiniPandoras/Import PixelFx를 먼저 돌린다.");
+            }
+
+            return sheet;
         }
 
         private static void Import(string folder)
@@ -46,7 +51,8 @@ namespace MiniPandoras.Editor.PixelFx
             string name = Path.GetFileName(folder);
             var info = WebGameImporter.ReadJson<EffectInfo>(folder + "/effect.json");
             Sprite[] color = SliceFrames(folder + "/color.png", name + "_color", info);
-            Sprite[] light = SliceFrames(folder + "/light.png", name + "_light", info);
+            // 빛을 그리지 않는 그림은 빛 시트가 없다.
+            Sprite[] light = File.Exists(folder + "/light.png") ? SliceFrames(folder + "/light.png", name + "_light", info) : Array.Empty<Sprite>();
 
             string path = $"{SheetFolder}/{name}.asset";
             var sheet = AssetDatabase.LoadAssetAtPath<EffectSheet>(path);
@@ -61,7 +67,6 @@ namespace MiniPandoras.Editor.PixelFx
             Fill(serialized.FindProperty("colorFrames"), color);
             Fill(serialized.FindProperty("lightFrames"), light);
             serialized.FindProperty("framesPerSecond").floatValue = info.fps;
-            serialized.FindProperty("loop").boolValue = info.loop;
             serialized.FindProperty("impactSeconds").floatValue = info.impact;
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -72,7 +77,7 @@ namespace MiniPandoras.Editor.PixelFx
             var importer = (TextureImporter)AssetImporter.GetAtPath(path);
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Multiple;
-            importer.spritePixelsPerUnit = PixelsPerUnit;
+            importer.spritePixelsPerUnit = info.pixelsPerUnit;
             importer.mipmapEnabled = false;
             importer.filterMode = FilterMode.Point;
             importer.wrapMode = TextureWrapMode.Clamp;
@@ -138,6 +143,7 @@ namespace MiniPandoras.Editor.PixelFx
             public int frames;
             public int columns;
             public float impact;
+            public float pixelsPerUnit = 16f;
         }
     }
 }

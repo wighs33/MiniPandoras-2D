@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MiniPandoras.UI
 {
-    /// <summary>판도라 하나의 문양(Tools/PixelGen/pandora_book.py): 큰 것과 작은 것, 활성화했을 때와 잿빛. 봉인서와 정착 창이 함께 쓴다.</summary>
+    /// <summary>판도라 하나의 문양: 큰 것과 작은 것, 활성화했을 때와 잿빛. 봉인서와 정착 창이 함께 쓴다.</summary>
     [Serializable]
     public struct PandoraIcon
     {

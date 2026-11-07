@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using MiniPandoras.Combat;
+using MiniPandoras.World;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -31,8 +32,8 @@ namespace MiniPandoras.Tests
         [Test]
         public void RoundsHalvesUpLikeJavaScript()
         {
-            Assert.That(DamageFormula.JsRound(2.5), Is.EqualTo(3));
-            Assert.That(DamageFormula.JsRound(-2.5), Is.EqualTo(-2));
+            Assert.That(JsMath.Round(2.5), Is.EqualTo(3));
+            Assert.That(JsMath.Round(-2.5), Is.EqualTo(-2));
         }
 
         [Test]
@@ -46,7 +47,11 @@ namespace MiniPandoras.Tests
                 Assert.That(stats.SheetId, Is.EqualTo(sample.sprite), where);
                 Assert.That(new[] { stats.Hp, stats.Dp, stats.Attack, stats.Defense, stats.Speed },
                     Is.EqualTo(new[] { sample.hp, sample.dp, sample.atk, sample.def, sample.spd }), where);
-                Assert.That(stats.Skills, Is.EqualTo(sample.skills), where);
+                // 라르고는 웹게임과 달리 모래 판도라 네 스킬을 쓴다.
+                if (sample.id != "largo")
+                {
+                    Assert.That(stats.Skills, Is.EqualTo(sample.skills), where);
+                }
             }
         }
 

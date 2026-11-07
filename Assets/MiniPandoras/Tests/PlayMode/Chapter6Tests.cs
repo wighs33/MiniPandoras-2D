@@ -11,8 +11,8 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 6장 「뉴웨이브」를 저장에서 이어 끝까지 돌린다. 뱀열차 객실 → 소년 디엘의 기억(뉴웨이브 호, 라코의 수업, 엿들은 회의) →
-    /// 선착장에서 라르고의 지도 → 전성기의 아지트 → 비틀린 숲 → 공터의 케이트. 그다음 7장이 뱀열차 종착역에서 이어진다.
+    /// 6장 「뉴웨이브 호의 소년」를 저장에서 이어 끝까지 돌린다. 뱀열차 객실 → 소년 디엘의 기억(뉴웨이브 호, 라코의 수업, 엿들은 회의) →
+    /// 서쪽 부두에서 혼자 아지트로 → 전성기의 아지트 → 비틀린 숲 → 공터의 케이트. 그다음 7장이 뱀열차 종착역에서 이어진다.
     /// </summary>
     public sealed class Chapter6Tests
     {
@@ -29,8 +29,7 @@ namespace MiniPandoras.Tests
         [UnityTearDown]
         public IEnumerator Restore()
         {
-            Time.timeScale = 1f;
-            TestSaves.Restore();
+            StoryDriver.Close();
             yield return null;
         }
 
@@ -74,12 +73,15 @@ namespace MiniPandoras.Tests
             // 단장실 앞에서 회의를 엿듣는다.
             yield return story.StandOn(story.Director.Point("eavesdrop"));
             yield return story.UntilExploring("port", "선착장 걷기");
-            Assert.That(story.Lines, Has.Member("그리고 하나 더. 에라드 정찰부대가 이 근처 해역까지 왔다는 소문이 있습니다. 대장은⋯ 카일 이브."));
-            Assert.That(story.Notices, Has.Member("라르고의 지도를 받았다."));
-            Assert.That(story.Lines, Has.Member("파란 점이 지금 있는 곳, 깜빡이는 빨간 점이 목적지다."));
-            Assert.That(Object.FindFirstObjectByType<MapSketchView>(FindObjectsInactive.Include).gameObject.activeSelf, Is.False, "지도는 해설을 넘기면 닫힌다");
+            Assert.That(story.Lines, Has.Member("그리고 하나 더.\n에라드 정찰부대가 이 근처 해역까지 왔다는 소문이 있습니다.\n대장은... 카일 이브."));
+            Assert.That(story.Lines, Has.Member("낮잠이겠지.\n...디엘, 넌 먼저 아지트로 가 있어라.\n가는 길은 알지?"));
+            Assert.That(story.Lines, Has.No.Member("파란 점이 지금 있는 곳, 깜빡이는 빨간 점이 목적지다."), "디엘이 아는 길이라 지도를 보여 주지 않는다");
 
-            // 북쪽 숲길 → 아지트. 기억 속 길드는 낡기 전의 활기찬 모습이다.
+            // 북쪽으로 외곽 들판을 지나 숲길 → 아지트. 기억 속 길드는 낡기 전의 활기찬 모습이다.
+            yield return story.StandOn(story.Director.Point("north"));
+            yield return story.UntilExploring("outskirts", "기억 속 외곽 들판");
+            Assert.That(story.Exploration.IsLocked("west"), Is.True, "기억 속에서는 마을로 새지 않는다");
+            Assert.That(story.Exploration.IsLocked("east"), Is.True, "기억 속에서는 정류장으로 새지 않는다");
             yield return story.StandOn(story.Director.Point("north"));
             yield return story.UntilExploring("hideoutPath", "아지트 가는 숲길");
             Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("lively"), "기억 속 숲길의 길드 집은 활기찬 모습이다");
@@ -90,12 +92,36 @@ namespace MiniPandoras.Tests
 
             yield return story.StandOn(story.Director.Point("isabel") + new Vector2Int(1, 1));
             yield return story.UntilExploring("hideout", "이자벨을 만난 뒤");
-            yield return story.StandOn(story.Director.Point("stairs") + new Vector2Int(-1, 1));
-            yield return story.UntilExploring("hideout", "오로라를 만난 뒤");
-            Assert.That(story.Lines, Has.Member("난 오로라! 오로라 마틴. 에루스 마틴의 딸이야. 잘 지내자, 디엘!"));
-            yield return story.StandOn(story.Director.Point("bed"));
+            Assert.That(story.Lines, Has.Member("2층에 네 또래 아이가 있어.\n심심할 텐데 올라가서 같이 놀렴."));
+            yield return story.StandOn(story.Director.Point("stairs"));
+            yield return story.UntilExploring("hideoutUpper", "2층에서 오로라를 만난 뒤");
+            Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("lively"), "기억 속 2층은 활기찬 모습이다");
+            Assert.That(story.Lines, Has.Member("난 오로라! 오로라 마틴.\n에루스 마틴의 딸이야.\n잘 지내자, 디엘!"));
+
+            // 잠들기 전에는 계단으로 1층과 2층을 오가고, 방에서도 나올 수 있다.
+            yield return story.StandOn(story.Director.Point("down"));
+            yield return story.UntilExploring("hideout", "계단으로 1층에 내려간다");
+            Assert.That(story.Director.Actor("isabel").Pose, Is.EqualTo(BodyPose.Kneel), "이자벨은 그대로 앉아 있다");
+            yield return story.StandOn(story.Director.Point("stairs"));
+            yield return story.UntilExploring("hideoutUpper", "계단으로 2층에 다시 오른다");
+            Assert.That(story.Director.HasActor("aurora"), Is.True, "오로라는 복도에 남아 있다");
+            yield return story.StandOn(story.Director.Point("roomDoor"));
+            yield return story.UntilExploring("hideoutRoom", "2층 끝방");
+            yield return story.StandOn(story.Director.Point("door"));
+            yield return story.UntilExploring("hideoutUpper", "방에서 복도로 나온다");
+            yield return story.StandOn(story.Director.Point("roomDoor"));
+            yield return story.UntilExploring("hideoutRoom", "방으로 돌아간다");
+            yield return story.StandOn(story.Director.Point("bed") + new Vector2Int(0, 2));
             yield return story.UntilExploring("hideout", "다음 날 아침");
             Assert.That(story.Lines, Has.Member("디엘은 오랜만에 깊이 잠들었다."));
+
+            // 아침에도 2층에 다녀올 수 있고, 돌아오면 강당의 사람들이 그대로 있다.
+            yield return story.StandOn(story.Director.Point("stairs"));
+            yield return story.UntilExploring("hideoutUpper", "아침에 2층에 오른다");
+            Assert.That(story.Director.HasActor("aurora"), Is.False, "아침에는 다들 강당에 있다");
+            yield return story.StandOn(story.Director.Point("down"));
+            yield return story.UntilExploring("hideout", "강당으로 내려온다");
+            Assert.That(story.Director.HasActor("erus"), Is.True, "단장이 강당에 있다");
 
             // 강당에서 수색 조를 나누고, 라르고·루완과 뒷문으로 나간다.
             yield return story.StandOn(story.Director.Point("hall", 1));
@@ -104,6 +130,7 @@ namespace MiniPandoras.Tests
             yield return story.UntilExploring("forest", "아지트 뒤 숲");
             Assert.That(story.Director.HasActor("largo") && story.Director.HasActor("luwan"), Is.True, "라르고와 루완이 따라온다");
             Assert.That(GameObject.Find("RiftKnot"), Is.Not.Null, "숲에 비틀린 매듭이 있다");
+            Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("twisted"), "매듭이 둘이면 땅이 어긋나 있다");
 
             // 매듭이 남아 있으면 북쪽 길목에서 처음 자리로 돌아온다. 매듭 둘을 풀면 공터로 갈 수 있다.
             yield return story.StandOn(new Vector2Int(22, 6));
@@ -111,26 +138,24 @@ namespace MiniPandoras.Tests
             Assert.That(story.HeroCell, Is.EqualTo(story.Director.Point("loop")), "접힌 길은 처음 자리로 돌아온다");
             yield return story.StandOn(new Vector2Int(3, 10));
             yield return story.UntilExploring("forest", "첫 매듭");
+            Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("loosened"), "매듭을 풀면 어긋남이 줄어든다");
             yield return story.StandOn(new Vector2Int(26, 9));
             yield return story.UntilExploring("forest", "둘째 매듭");
-            Assert.That(story.Lines, Has.Member("⋯풀렸네. 이제 북쪽으로 가 보자."));
+            Assert.That(story.Lines, Has.Member("...풀렸네.\n이제 북쪽으로 가 보자."));
             Assert.That(GameObject.Find("RiftKnot"), Is.Null, "매듭을 다 풀면 사라진다");
+            Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("normal"), "매듭을 다 풀면 땅이 제자리로 돌아온다");
 
-            // 공터의 케이트와 싸우고(세 판을 버틴다), 라르고의 모래바람 뒤 루완이 사라진다.
+            // 공터의 케이트에게 붙잡힐 뻔하지만 싸우지 않는다. 라르고의 모래바람 뒤 루완이 사라진다.
             bool sandBlew = false;
             yield return story.StandOn(new Vector2Int(21, 4));
             var sandStorm = Object.FindFirstObjectByType<SandStormView>();
             yield return story.Until(() =>
             {
-                if (story.Combat.InEncounter)
-                {
-                    story.Combat.PressAttack();
-                }
-
+                Assert.That(story.Combat.InEncounter, Is.False, "케이트와 싸우지 않는다");
                 sandBlew |= sandStorm.IsBlowing;
                 return story.Runner.Chapter > 6;
-            }, 120f, "케이트와의 싸움과 6장 끝");
-            Assert.That(story.Lines, Has.Member("에라드 정찰부대, 케이트. 이 누나랑 같이 가줘야겠는걸~"));
+            }, 120f, "공터의 케이트와 6장 끝");
+            Assert.That(story.Lines, Has.Member("에라드 정찰부대, 케이트.\n이 누나랑 같이 가 줘야겠는걸~"));
             Assert.That(sandBlew, Is.True, "라르고의 모래바람이 분다");
             Assert.That(story.Lines, Has.Member("루완 형!!"));
 

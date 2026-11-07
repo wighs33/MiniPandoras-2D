@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 10장 「페어리가든」을 저장에서 이어 끝까지 돌린다. 사막에서 모래 늑대 셋을 잡아야 동쪽 길이 열림 → 요정 마을에서 버디를 만나야 고목 문이 열림 →
+    /// 10장 「깨어난 축복」을 저장에서 이어 끝까지 돌린다. 사막에서 모래 늑대 셋을 잡아야 동쪽 길이 열림 → 요정 마을에서 버디를 만나야 고목 문이 열림 →
     /// 고목을 층층이 올라(1층 뿌리 홀, 2층 장터, 3층 요정 마을, 4층 서고, 층마다 요정들) 5층 가지 회랑에서 케이트 → 판도라의 정원 싸움 뒤 판도라 정착을 익힘(메뉴의 정착 창에서 목록의 판도라를 눌러 집고 자리를 눌러 놓으면, 닫을 때 그대로 정착) →
     /// 빛의 문으로 고목 꼭대기, 케이트전 → 1층까지 내려가 뿌리 계단 아래 아피아를 구하면 뿌리가 맑아짐 → 요정 마을로 걸어 돌아가 밤의 연회.
     /// 연회가 끝나면 11장이 이어져 밤의 페어리가든에서 쉼터로 걸어간다.
@@ -38,8 +38,7 @@ namespace MiniPandoras.Tests
         [UnityTearDown]
         public IEnumerator Restore()
         {
-            Time.timeScale = 1f;
-            TestSaves.Restore();
+            StoryDriver.Close();
             yield return null;
         }
 
@@ -64,7 +63,8 @@ namespace MiniPandoras.Tests
             Assert.That(story.Exploration.IsLocked("treeGate"), Is.True, "버디를 만나기 전에는 고목 문이 잠겨 있다");
             yield return story.StandOn(story.Director.Point("buddy") + new Vector2Int(0, 2));
             yield return story.UntilExploring("fairyGarden", "버디를 만난 뒤");
-            Assert.That(story.Lines, Has.Member("그것도 말 못 해. 하지만 네 적은 아니야. 그건 약속할게."));
+            Assert.That(story.Lines, Has.Member("뉴웨이브의 뜻을 이어 갈 길드를 세웠다.\n이름은 에버웨이브다."), "버디가 모르는 이름이라 어떤 길드인지 먼저 말한다");
+            Assert.That(story.Lines, Has.Member("그것도 말 못 해.\n하지만 네 적은 아니야.\n그건 약속할게."));
             yield return story.StandOn(story.Director.Point("treeGate"));
 
             // 거대고목을 층층이 올라 5층 가지 회랑에서 케이트 → 판도라의 정원.
@@ -88,7 +88,7 @@ namespace MiniPandoras.Tests
                 story.Fight();
                 return IsExploring("treeCrown");
             }, 120f, "꼭대기 케이트전 뒤 고목을 내려간다");
-            Assert.That(story.Lines, Has.Member("아야야⋯ 오늘은 여기까지! 대장한테 혼나겠네~"));
+            Assert.That(story.Lines, Has.Member("아야야... 오늘은 여기까지!\n대장한테 혼나겠네~"));
 
             // 1층까지 내려가 뿌리 계단으로. 아피아를 구하면 저주가 걷혀 뿌리가 맑아진다.
             yield return Walk("down", "treeCrown", "giantTree", "treeLibrary", "treeRooms", "treeMarket", "treeHall");
@@ -99,7 +99,7 @@ namespace MiniPandoras.Tests
                 story.Fight();
                 return IsExploring("treeRoots");
             }, 120f, "아피아를 구한다");
-            Assert.That(story.Lines, Has.Member("⋯고마워요. 이제 강물이 다시 맑아질 거예요."));
+            Assert.That(story.Lines, Has.Member("...고마워요.\n이제 강물이 다시 맑아질 거예요."));
             Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("clean"), "저주가 걷히면 뿌리가 맑아진다");
             yield return story.StandOn(story.Director.Point("up"));
             yield return story.UntilExploring("treeHall", "뿌리에서 고목 1층으로");
@@ -109,6 +109,8 @@ namespace MiniPandoras.Tests
             yield return story.Until(() => story.Runner.Chapter > 10, 60f, "연회와 10장 끝");
             Assert.That(story.Lines, Has.Member("고목을 구한 영웅들에게 건배!"));
             yield return story.UntilExploring("fairyNight", "11장 첫머리 밤의 페어리가든");
+            Assert.That(story.Notices, Has.Member("의뢰 완료: 고목의 뿌리 (+500 Gold)"), "촌장의 부탁을 끝내면 골드를 받는다");
+            Assert.That(story.Session.State.Gold, Is.EqualTo(500));
             Assert.That(story.Runner.Chapter, Is.EqualTo(11));
         }
 
@@ -163,16 +165,16 @@ namespace MiniPandoras.Tests
             Assert.That(GameObject.Find("Menu UI/Window/Box/Loadout"), Is.Not.Null, "정착을 익히면 메뉴에 「판도라 정착」이 보인다");
             GameObject.Find("Menu UI/Window/Box/Loadout").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             yield return null;
-            Assert.That(loadout.IsShown, Is.True, "정착 창이 열린다");
+            Assert.That(loadout.IsOpen, Is.True, "정착 창이 열린다");
 
             string[] expected = story.Session.State.Equipped.Concat(new string[3]).Take(3).ToArray();
             string first = story.Session.State.Pandoras.First();
             PandoraBook.Place(expected, first, -1, 2);
-            Tap(loadout, "Loadout UI/Screen/Row 0");
-            Tap(loadout, "Loadout UI/Screen/Slot 2");
-            loadout.transform.Find("Close").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            Tap(loadout, "Loadout UI/Screen/Frame/Row 0");
+            Tap(loadout, "Loadout UI/Screen/Frame/Slot 2");
+            loadout.transform.Find("Frame/Close").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             yield return null;
-            Assert.That(loadout.IsShown, Is.False);
+            Assert.That(loadout.IsOpen, Is.False);
             Assert.That(menu.IsOpen, Is.False, "정착 창을 닫으면 메뉴도 닫힌다");
             Assert.That(story.Session.State.Equipped, Is.EqualTo(expected.Where(id => id != null).ToArray()), "고른 배치가 정착이 된다");
         }

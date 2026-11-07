@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using MiniPandoras.Combat;
+using MiniPandoras.World;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,7 +9,7 @@ using UnityEngine.UI;
 
 namespace MiniPandoras.UI
 {
-    /// <summary>정착 창 목록 한 줄에 보일 판도라: 이름과 스킬 둘의 이름.</summary>
+    /// <summary>정착 창 목록 한 줄에 보일 판도라: 이름과 스킬 셋의 이름.</summary>
     public readonly struct LoadoutEntry
     {
         public LoadoutEntry(string id, string name, string skills)
@@ -32,8 +34,8 @@ namespace MiniPandoras.UI
     public sealed class LoadoutView : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IPointerUpHandler
     {
         // 웹게임은 프레임마다 룬 띠를 0.002 라디안, 별을 sin(0.06 t)로 움직이고 알림을 110프레임 띄운다(60fps).
-        private const float RuneDegreesPerSecond = 0.002f * 60f * Mathf.Rad2Deg;
-        private const float NoticeSeconds = 110f / 60f;
+        private const float RuneDegreesPerSecond = 0.002f * FrameTime.FramesPerSecond * Mathf.Rad2Deg;
+        private const float NoticeSeconds = 110f / FrameTime.FramesPerSecond;
         private const string IdleHint = "끌어서 마법진에 놓기 · 눌러서 집기 · ×로 닫기";
         private const string HeldHint = "자리를 눌러 놓기 · 다른 곳을 누르면 내려놓기";
 
@@ -107,7 +109,7 @@ namespace MiniPandoras.UI
         [SerializeField] private TMP_Text hint;
 
         private readonly List<LoadoutEntry> entries = new List<LoadoutEntry>();
-        private readonly string[] placed = new string[3];
+        private readonly string[] placed = new string[PandoraBook.MaxEquipped];
         private string heldId;
         // 집은 판도라가 있던 자리(목록에서 집었으면 −1)
         private int heldFrom = -1;
@@ -122,7 +124,7 @@ namespace MiniPandoras.UI
         public event Action<int> ReleaseRequested;
         public event Action Closed;
 
-        public bool IsShown => screen.activeSelf;
+        public bool IsOpen => screen.activeSelf;
 
         /// <summary>활성화된 판도라 목록과 세 자리(빈자리는 null)를 보인다. 집고 있던 것은 놓는다.</summary>
         public void Show(IReadOnlyList<LoadoutEntry> available, IReadOnlyList<string> slotIds)
@@ -145,12 +147,6 @@ namespace MiniPandoras.UI
             notice.text = text;
             notice.gameObject.SetActive(true);
             noticeLeft = NoticeSeconds;
-        }
-
-        public void Hide()
-        {
-            Drop();
-            screen.SetActive(false);
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -255,16 +251,16 @@ namespace MiniPandoras.UI
 
         private void Update()
         {
-            if (!IsShown)
+            if (!IsOpen)
             {
                 return;
             }
 
             clock += Time.unscaledDeltaTime;
             runes.localRotation = Quaternion.Euler(0f, 0f, -clock * RuneDegreesPerSecond);
-            float size = 1f + Mathf.Sin(clock * 60f * 0.06f) * 0.16f;
+            float size = 1f + Mathf.Sin(FrameTime.Frames(clock) * 0.06f) * 0.16f;
             star.localScale = new Vector3(size, size, 1f);
-            float pulse = 0.5f + Mathf.Sin(clock * 60f * 0.15f) * 0.3f;
+            float pulse = 0.5f + Mathf.Sin(FrameTime.Frames(clock) * 0.15f) * 0.3f;
             for (int i = 0; i < slots.Length; i++)
             {
                 bool lit = dragging ? hoverSlot == i : heldId != null && heldFrom == i;
@@ -272,9 +268,13 @@ namespace MiniPandoras.UI
                 slots[i].Glow.color = new Color(1f, 1f, 1f, pulse);
             }
 
-            if (noticeLeft > 0f && (noticeLeft -= Time.unscaledDeltaTime) <= 0f)
+            if (noticeLeft > 0f)
             {
-                notice.gameObject.SetActive(false);
+                noticeLeft -= Time.unscaledDeltaTime;
+                if (noticeLeft <= 0f)
+                {
+                    notice.gameObject.SetActive(false);
+                }
             }
         }
 
@@ -297,7 +297,11 @@ namespace MiniPandoras.UI
 
         private void Close()
         {
-            Hide();
+            Drop();
+            // 알림 시간은 창이 열린 동안만 흐르므로, 닫을 때 지워야 다시 열었을 때 옛 알림이 남지 않는다.
+            noticeLeft = 0f;
+            notice.gameObject.SetActive(false);
+            screen.SetActive(false);
             Closed?.Invoke();
         }
 

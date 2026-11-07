@@ -18,7 +18,7 @@ namespace MiniPandoras.Tests
 {
     /// <summary>
     /// 필드 장면을 열고 타이틀에서 1장을 고르면 1장 연출이 처음부터 끝까지 흐르고, 끝나면 조작이 돌아오는지 본다.
-    /// 중간의 불량배 싸움에서는 플레이어 대신 공격과 스킬을 눌러 본다.
+    /// 불량배와는 싸우지 않고, 판도라를 써 보려다 아무 일도 일어나지 않는 연출로 흐른다.
     /// </summary>
     public sealed class Chapter1Tests
     {
@@ -29,10 +29,7 @@ namespace MiniPandoras.Tests
         private Conversation conversation;
         private OnScreenStick stick;
         private bool stickShownInCutscenes;
-        private bool stickShownInBattle;
-        private bool thugsWereHit;
-        private bool heroWasHit;
-        private bool triedPandora;
+        private bool foughtInChapter1;
 
         [UnitySetUp]
         public IEnumerator LoadField()
@@ -54,8 +51,7 @@ namespace MiniPandoras.Tests
         [UnityTearDown]
         public IEnumerator RestoreTime()
         {
-            Time.timeScale = 1f;
-            TestSaves.Restore();
+            StoryDriver.Close();
             yield return null;
         }
 
@@ -76,12 +72,9 @@ namespace MiniPandoras.Tests
             while (runner.Chapter <= 1 || mover.IsFrozen)
             {
                 Assert.That(Time.realtimeSinceStartup, Is.LessThan(realEnd), "1장이 2분 안에 끝나지 않았다");
-                if (combat.InEncounter)
+                if (runner.Chapter <= 1)
                 {
-                    Fight(combat);
-                }
-                else
-                {
+                    foughtInChapter1 |= combat.InEncounter;
                     stickShownInCutscenes |= stick.isActiveAndEnabled;
                 }
 
@@ -93,50 +86,24 @@ namespace MiniPandoras.Tests
                 yield return null;
             }
 
-            Assert.That(shownLines, Has.Member("아야야⋯⋯ 여, 여기가 에라디온⋯⋯?"));
+            Assert.That(shownLines, Has.Member("아야야...... 여, 여기가 에라디온......?"));
             Assert.That(shownLines, Has.Member("어딜 도망가!"), "첫 선택지에서 「도망친다」를 골랐다");
-            Assert.That(shownLines, Has.Member("하늘이라. 좋다."), "{name이라}에 받침 없는 이름의 조사가 붙었다");
+            Assert.That(shownLines, Has.Member("하늘이라.\n좋은 이름이군."), "{name이라}에 받침 없는 이름의 조사가 붙었다");
             Assert.That(notices, Is.EqualTo(new[] { "랑이 동료가 되었다!" }));
             Assert.That(shots, Is.EqualTo(new[] { "creation", "humans", "blessing" }), "랑의 설명은 열 신 → 인간 → 축복신 판도라 컷인으로 흐른다");
             Assert.That(cutIn.gameObject.activeSelf, Is.False, "설명이 끝나면 컷인이 닫힌다");
             Assert.That(director.HeroName, Is.EqualTo(TypedName));
             Assert.That(GameObject.Find("Story UI").transform.Find("Choices").gameObject.activeSelf, Is.False, "고른 뒤에는 선택지 창이 닫힌다");
 
-            Assert.That(thugsWereHit, Is.True, "공격이 불량배에게 맞았다");
-            Assert.That(heroWasHit, Is.True, "불량배의 공격이 주인공에게 맞았다");
-            Assert.That(shownLines, Has.Member("뭐야, 그게 끝이야?"), "아직 깨어나지 않은 판도라를 쓰면 연출이 대신한다");
-            Assert.That(stickShownInBattle, Is.True, "싸우는 동안에는 조이스틱이 보인다");
-            Assert.That(stickShownInCutscenes, Is.False, "연출 동안에는 조이스틱을 숨긴다");
+            Assert.That(foughtInChapter1, Is.False, "1장에서는 불량배와 싸우지 않는다");
+            Assert.That(shownLines, Has.Member("...하지만 아무 일도 일어나지 않았다."), "판도라를 써 보려 하지만 깨어나지 않는다");
+            Assert.That(shownLines, Has.Member("뭐야, 그게 끝이야?"));
+            Assert.That(shownLines, Has.Member("판도라는 무슨.\n허세만 늘어서는."), "얻어맞고 쓰러진 뒤 이야기가 이어진다");
+            Assert.That(stickShownInCutscenes, Is.False, "1장은 모두 연출이라 조이스틱을 숨긴다");
             Assert.That(stick.isActiveAndEnabled, Is.True, "연출이 끝나면 조이스틱이 돌아온다");
             Assert.That(Object.FindFirstObjectByType<GameSession>().State.Party, Is.EqualTo(new[] { "hero", "rang" }), "랑이 파티에 들었다");
             Assert.That(travel.CurrentMap.Id, Is.EqualTo("hillia"));
             Assert.That(Object.FindFirstObjectByType<TopDownMover>().IsFrozen, Is.False);
-        }
-
-        /// <summary>싸우는 동안 플레이어 대신 공격을 연타하고, 한 번은 스킬을 눌러 본다.</summary>
-        private void Fight(FieldCombat combat)
-        {
-            stickShownInBattle |= stick.isActiveAndEnabled;
-            PlayerFighter player = combat.Player;
-            heroWasHit |= player != null && player.Hp < player.MaxHp;
-            foreach (EnemyFighter enemy in combat.Enemies)
-            {
-                thugsWereHit |= enemy.InEncounter && enemy.Hp < enemy.MaxHp;
-            }
-
-            // 한 번 맞힌 뒤에는 판도라 스킬을 써 본다. 휘두르는 중에는 스킬이 나가지 않으므로 동작이 끝나길 기다린다.
-            if (thugsWereHit && !triedPandora)
-            {
-                triedPandora = combat.IsScriptRunning;
-                if (player.AttackTimer <= 6)
-                {
-                    combat.PressSkill(0);
-                }
-
-                return;
-            }
-
-            combat.PressAttack();
         }
 
         private void AnswerConversation(Scene scene, LoadSceneMode mode)

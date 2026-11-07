@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MiniPandoras.Characters;
 using MiniPandoras.World;
 using UnityEngine;
+using static MiniPandoras.Combat.CombatPalette;
 using static MiniPandoras.World.MapCoordinates;
 
 namespace MiniPandoras.Combat
@@ -12,42 +13,34 @@ namespace MiniPandoras.Combat
     {
         private static readonly float AggroRange = Pixels(78f);
         private static readonly float PatrolAggroRange = Pixels(58f);
+        // 다시 나타난 무리가 곧바로 덤비지 않도록 알아채는 거리보다 한 칸 더 떨어져 있어야 한다.
+        private static readonly float RespawnClearance = AggroRange + 1f;
         // 이만큼 넘게 끌려 나오면 제자리로 돌아간다.
         private static readonly float Leash = Pixels(220f);
+        private const int ChargeFrames = 24;
         private static readonly float ChargeSpeed = Pixels(3.2f);
-        private static readonly Color[] TeleportColors = { Hex("#5fd0c0"), Hex("#c8fff4"), Hex("#ffffff") };
-        private static readonly Color[] BlastColors = { Hex("#ff8a6a"), Hex("#ffd0a0"), Hex("#ffffff") };
-        private static readonly Color FreezeShade = Hex("#a8dcff");
-        private static readonly Color BurnColor = Hex("#ffb05a");
-        private static readonly Color EnemySkillColor = Hex("#ffcf7a");
-        private static readonly Color EnemySwingColor = Hex("#ff9a8a");
+        private static readonly float ChargeHitMargin = Pixels(9f);
+        private static readonly float ChargePathStep = Pixels(4f);
+        // 돌진 기술의 효과 이름이다. 돌진하는 동안 보이는 그림 이름도 같다.
+        private const string ChargeFx = "charge";
         private static readonly Facing[] WanderDirections = { Facing.Down, Facing.Up, Facing.Left, Facing.Right };
         // 웹게임 AREA_FX·WIDE_FX·MELEE_FX: 적의 기술 효과로 공격 방식을 고른다.
         private static readonly HashSet<string> AreaFx = new HashSet<string> { "fire", "ice", "light", "sand", "dark" };
         private static readonly HashSet<string> WideFx = new HashSet<string> { "fireWave", "windWave", "lightWave", "waterWave", "steelWave", "sandWave", "darkWide" };
         private static readonly HashSet<string> MeleeFx = new HashSet<string> { "punch", "kick", "bite", "thrust", "bash", "slash", "claw" };
 
+        // 무리를 세울 때 첫 적 둘레에서 빈 칸을 찾는 순서(가까운 칸부터).
+        private static readonly Vector2Int[] SpotRing =
+        {
+            new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(-1, 0), new Vector2Int(0, -1),
+            new Vector2Int(1, 1), new Vector2Int(-1, 1), new Vector2Int(1, -1), new Vector2Int(-1, -1),
+            new Vector2Int(2, 0), new Vector2Int(0, 2), new Vector2Int(-2, 0),
+        };
+
         private readonly List<EnemyFighter> enemies = new List<EnemyFighter>();
         private readonly List<MonsterGroup> groups = new List<MonsterGroup>();
 
         public IReadOnlyList<EnemyFighter> Enemies => enemies;
-
-        /// <summary>맵에 아직 쓰러지지 않은 적이 있는지. 싸움 밖에서는 이때만 공격 버튼이 휘두른다.</summary>
-        public bool HasLivingEnemies
-        {
-            get
-            {
-                foreach (EnemyFighter enemy in enemies)
-                {
-                    if (!enemy.Dead)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-        }
 
         /// <summary>필드에 적 무리를 세운다(웹게임 spawnGroup). 다가가면 함께 덤비고, 모두 쓰러지면 OnDefeated가 돈다.</summary>
         public MonsterGroup SpawnGroup(GroupOptions options)
@@ -59,7 +52,9 @@ namespace MiniPandoras.Combat
                 EnemyDefinition definition = catalog.Enemy(options.Enemies[i]);
                 string key = options.Id + "#" + i;
                 CharacterBody body = actors.Spawn(key, definition.SheetId, mapRoot, CellFoot(spots[i]), Facing.Left);
-                var enemy = new EnemyFighter(body, key, definition, group, false, true);
+                var enemy = new EnemyFighter(body, key, definition, group, false);
+                enemy.IsDummy = options.Dummy;
+                enemy.NoDeath = options.Dummy;
                 if (options.Patrol != null && i == 0)
                 {
                     enemy.Patrol = options.Patrol;
@@ -76,13 +71,7 @@ namespace MiniPandoras.Combat
         private List<Vector2Int> FreeSpotsAround(Vector2Int at, int count)
         {
             var spots = new List<Vector2Int> { at };
-            Vector2Int[] ring =
-            {
-                new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(-1, 0), new Vector2Int(0, -1),
-                new Vector2Int(1, 1), new Vector2Int(-1, 1), new Vector2Int(1, -1), new Vector2Int(-1, -1),
-                new Vector2Int(2, 0), new Vector2Int(0, 2), new Vector2Int(-2, 0),
-            };
-            foreach (Vector2Int offset in ring)
+            foreach (Vector2Int offset in SpotRing)
             {
                 if (spots.Count >= count)
                 {
@@ -105,7 +94,7 @@ namespace MiniPandoras.Combat
 
         private void SetAggro(EnemyFighter e)
         {
-            if (e.Aggro || e.Dead)
+            if (e.Aggro || e.Dead || e.IsDummy)
             {
                 return;
             }
@@ -129,7 +118,7 @@ namespace MiniPandoras.Combat
                 SetAggro(other);
             }
 
-            e.Body.GetComponentInChildren<EmoteBalloon>(true).Show(alertIcon, 40f / 60f);
+            e.Body.GetComponentInChildren<EmoteBalloon>(true).Show(alertIcon, 40 * FrameSeconds);
             if (group.Options.OnAggro != null || group.Options.Hooks?.OnStart != null)
             {
                 StartCoroutine(RunHook(GroupNoticed(group)));
@@ -151,45 +140,126 @@ namespace MiniPandoras.Combat
 
         private void StepGroups()
         {
-            foreach (MonsterGroup group in groups)
+            // 뒤에서부터 돈다. 다시 세운 무리는 목록 끝에 붙어 이번 프레임에는 보지 않는다.
+            for (int i = groups.Count - 1; i >= 0; i--)
             {
-                if (group.Done || !group.Enemies.TrueForAll(e => e.Dead))
+                MonsterGroup group = groups[i];
+                if (group.Done)
                 {
-                    continue;
+                    StepRespawn(group);
                 }
+                else if (group.Enemies.TrueForAll(e => e.Dead))
+                {
+                    group.Done = true;
+                    group.RespawnIn = group.Options.RespawnFrames;
+                    bossFellHere |= HasBoss(group);
+                    if (group.Options.OnDefeated != null)
+                    {
+                        StartCoroutine(AfterGroupDefeated(group));
+                    }
+                }
+            }
+        }
 
-                group.Done = true;
-                if (group.Options.OnDefeated != null)
+        private static bool HasBoss(MonsterGroup group)
+        {
+            foreach (EnemyFighter enemy in group.Enemies)
+            {
+                if (enemy.Boss)
                 {
-                    StartCoroutine(AfterGroupDefeated(group));
+                    return true;
                 }
+            }
+
+            return false;
+        }
+
+        /// <summary>쓰러진 무리를 기다렸다가 제자리에 다시 세운다. 맵을 나가면 무리 목록과 함께 사라진다.</summary>
+        private void StepRespawn(MonsterGroup group)
+        {
+            GroupOptions options = group.Options;
+            if (options.RespawnFrames == 0)
+            {
+                return;
+            }
+
+            group.RespawnIn -= 1;
+            if (group.RespawnIn > 0 || Vector2.Distance(Player.Body.Position, CellFoot(options.At)) <= RespawnClearance)
+            {
+                return;
+            }
+
+            groups.Remove(group);
+            foreach (EnemyFighter dead in group.Enemies)
+            {
+                enemies.Remove(dead);
+                Destroy(dead.Body.gameObject);
+            }
+
+            foreach (EnemyFighter enemy in SpawnGroup(options).Enemies)
+            {
+                Puff(enemy);
             }
         }
 
         private IEnumerator AfterGroupDefeated(MonsterGroup group)
         {
             // 마지막 적이 사라지는 것을 잠깐 보여 준다.
-            yield return new WaitForSeconds(24f / 60f);
+            yield return Frames(24);
             yield return RunHook(group.Options.OnDefeated());
+        }
+
+        /// <summary>보스는 기술을 쓰는 동안 그 기술 그림을 보인다. 그림이 없는 기술은 걷기 그림 그대로다.</summary>
+        private void ShowMovePicture(EnemyFighter e)
+        {
+            CharacterBody body = e.Body;
+            if (e.State == EnemyState.Charge)
+            {
+                body.Move = ChargeFx;
+                body.MoveProgress = time % ChargeFrames / (float)ChargeFrames;
+                body.Face(e.Attack.Direction.x < 0f ? Facing.Left : Facing.Right);
+            }
+            else if (e.State == EnemyState.Windup && e.HasAttack)
+            {
+                body.Move = PictureOf(e.Attack.Kind);
+                body.MoveProgress = 1f - e.Timer / (float)Mathf.Max(1, e.Attack.WindupFrames);
+            }
+            else
+            {
+                body.Move = null;
+            }
+        }
+
+        private static string PictureOf(AttackKind kind)
+        {
+            switch (kind)
+            {
+                case AttackKind.Nova:
+                    return "slam";
+                case AttackKind.Volley:
+                    return "throw";
+                case AttackKind.BlastRing:
+                    return "stomp";
+                default:
+                    return null;
+            }
         }
 
         private void StepEnemy(EnemyFighter e, PlayerFighter p)
         {
-            CharacterBody body = e.Body;
+            ShowMovePicture(e);
+            if (e.GuardFrames > 0)
+            {
+                e.GuardFrames -= 1;
+            }
+
             if (e.Dead)
             {
-                // 쓰러진 적은 깜빡이다 30프레임 뒤 사라진다.
-                e.DeathFrame += 1;
-                body.Alpha = e.DeathFrame % 4 < 2 ? 0.25f : 0.85f;
-                body.SetWalking(false);
-                if (e.DeathFrame >= 30)
-                {
-                    body.SetVisible(false);
-                }
-
+                StepDeath(e);
                 return;
             }
 
+            CharacterBody body = e.Body;
             if (!body.IsVisible)
             {
                 return;
@@ -203,10 +273,7 @@ namespace MiniPandoras.Combat
 
             if (e.Knock.HasValue)
             {
-                Knockback knock = e.Knock.Value;
-                MoveBody(body, knock.Velocity, false);
-                knock.FramesLeft -= 1;
-                e.Knock = knock.FramesLeft > 0 ? knock : (Knockback?)null;
+                e.Knock = AdvanceKnock(body, e.Knock.Value, false);
             }
 
             if (e.Freeze > 0)
@@ -214,6 +281,12 @@ namespace MiniPandoras.Combat
                 e.Freeze -= 1;
                 body.Shade = e.Freeze > 0 ? FreezeShade : (Color?)null;
                 body.SetWalking(false);
+                return;
+            }
+
+            if (e.IsDummy)
+            {
+                StepDummy(e);
                 return;
             }
 
@@ -252,6 +325,7 @@ namespace MiniPandoras.Combat
                     StepReturn(e);
                     break;
                 case EnemyState.Stun:
+                case EnemyState.Recover:
                     body.SetWalking(false);
                     if (--e.Timer <= 0)
                     {
@@ -261,21 +335,7 @@ namespace MiniPandoras.Combat
                     break;
                 case EnemyState.Chase:
                 case EnemyState.Idle:
-                    e.State = EnemyState.Chase;
-                    body.Face(FacingRules.From(p.Body.Position - e.Position));
-                    if (distance > e.Reach)
-                    {
-                        MoveToward(e, p.Body.Position, e.Speed);
-                    }
-                    else
-                    {
-                        body.SetWalking(false);
-                        if (e.Cooldown <= 0)
-                        {
-                            StartAttack(e, p);
-                        }
-                    }
-
+                    StepChase(e, p, distance);
                     break;
                 case EnemyState.Windup:
                     StepWindup(e, p);
@@ -286,14 +346,48 @@ namespace MiniPandoras.Combat
                 case EnemyState.BlinkOut:
                     StepBlinkOut(e, p);
                     break;
-                case EnemyState.Recover:
-                    body.SetWalking(false);
-                    if (--e.Timer <= 0)
-                    {
-                        e.State = EnemyState.Chase;
-                    }
+            }
+        }
 
-                    break;
+        /// <summary>쓰러진 적은 깜빡이다 30프레임 뒤 사라진다.</summary>
+        private static void StepDeath(EnemyFighter e)
+        {
+            CharacterBody body = e.Body;
+            e.DeathFrame += 1;
+            body.Alpha = e.DeathFrame % 4 < 2 ? 0.25f : 0.85f;
+            body.SetWalking(false);
+            if (e.DeathFrame >= 30)
+            {
+                body.SetVisible(false);
+            }
+        }
+
+        /// <summary>멀면 다가가거나 먼 거리 기술을 쓰고, 닿을 거리면 공격을 시작한다.</summary>
+        private void StepChase(EnemyFighter e, PlayerFighter p, float distance)
+        {
+            CharacterBody body = e.Body;
+            e.State = EnemyState.Chase;
+            body.Face(FacingRules.From(p.Body.Position - e.Position));
+            if (distance > e.Reach)
+            {
+                SkillDefinition rush = ChargeFromAfar(e, distance);
+                if (rush != null)
+                {
+                    body.SetWalking(false);
+                    StartAttack(e, p, rush);
+                }
+                else if (!TryBossMoveFromAfar(e, p, distance))
+                {
+                    MoveToward(e, p.Body.Position, e.Speed);
+                }
+
+                return;
+            }
+
+            body.SetWalking(false);
+            if (e.Cooldown <= 0)
+            {
+                StartAttack(e, p);
             }
         }
 
@@ -337,7 +431,7 @@ namespace MiniPandoras.Combat
         {
             e.DotTimer = 30;
             e.DotTicks -= 1;
-            int damage = Mathf.Min(40, Mathf.Max(1, DamageFormula.JsRound(e.MaxHp * e.Dot)));
+            int damage = Mathf.Min(40, Mathf.Max(1, JsMath.Round(e.MaxHp * e.Dot)));
             int dealt = e.NoDeath ? Mathf.Min(damage, e.Hp - 1) : damage;
             e.SetHp(Mathf.Max(0, e.Hp - dealt));
             Effects.AddNumber(OverHead(e), dealt, BurnColor, 6.5f);
@@ -391,7 +485,8 @@ namespace MiniPandoras.Combat
 
         private bool TryStartStep(EnemyFighter e, Facing direction)
         {
-            Vector2 to = CellFoot(CellOf(e.Position) + new Vector2Int((int)FacingRules.Step(direction).x, -(int)FacingRules.Step(direction).y));
+            Vector2 step = FacingRules.Step(direction);
+            Vector2 to = CellFoot(CellOf(e.Position) + new Vector2Int((int)step.x, -(int)step.y));
             if (FootMover.IsBlocked(to))
             {
                 return false;
@@ -407,7 +502,7 @@ namespace MiniPandoras.Combat
 
         private void AdvanceStep(EnemyFighter e)
         {
-            int frames = e.Group != null ? e.Group.Options.PatrolFramesPerTile : 18;
+            int frames = e.Group != null ? e.Group.Options.PatrolFramesPerTile : GroupOptions.DefaultPatrolFrames;
             e.StepFrame += 1;
             float t = Mathf.Min(1f, e.StepFrame / (float)frames);
             e.Body.PlaceAt(Vector2.Lerp(e.StepFrom, e.StepTo, t));
@@ -475,14 +570,19 @@ namespace MiniPandoras.Combat
             EnemyAttack attack = e.Attack;
             bool moved = MoveBody(e.Body, attack.Direction * ChargeSpeed, false);
             e.Body.SetWalking(true);
-            if (!attack.Hit && Vector2.Distance(p.Body.Position, e.Position) < e.Radius + Pixels(9f))
+            if (!attack.Hit && Vector2.Distance(p.Body.Position, e.Position) < e.Radius + ChargeHitMargin)
             {
                 attack.Hit = true;
-                DamagePlayer(e.Position, e.Definition.Attack, attack.Power, 10f);
+                HitPlayer(e.Definition, e.Position, attack.Power, 10f);
             }
 
             if (--e.Timer <= 0 || !moved)
             {
+                if ((!moved && TryStunOnWall(e)) || (moved && TryChargeAgain(e, p)))
+                {
+                    return;
+                }
+
                 e.State = EnemyState.Recover;
                 e.Timer = 34;
                 e.HasAttack = false;
@@ -493,7 +593,9 @@ namespace MiniPandoras.Combat
             }
         }
 
-        /// <summary>사라졌다가 플레이어 등 뒤(막혔으면 앞)에 나타나 바로 내리친다.</summary>
+        /// <summary>
+        /// 사라졌다가 플레이어 등 뒤(막혔으면 앞)에 나타나 바로 내리친다. 나타난 뒤의 공격은 일반 근접 공격으로 처리한다.
+        /// </summary>
         private void StepBlinkOut(EnemyFighter e, PlayerFighter p)
         {
             CharacterBody body = e.Body;
@@ -544,14 +646,58 @@ namespace MiniPandoras.Combat
             }
         }
 
+        /// <summary>
+        /// 멀리서도 쓰는 돌진 기술(웹게임에 없다, 경비대장). 쓸 수 없으면 null.
+        /// 돌진에 밀려난 플레이어에게 바로 다시 돌진하지 않고, 걸어가 일반 공격을 한 번 한 뒤에 돌진한다.
+        /// </summary>
+        private static SkillDefinition ChargeFromAfar(EnemyFighter e, float distance)
+        {
+            if (e.Cooldown > 0 || e.StrikeOwed || distance > Pixels(e.Definition.ChargeRange))
+            {
+                return null;
+            }
+
+            IReadOnlyList<SkillDefinition> skills = e.Definition.Skills;
+            for (int i = 0; i < skills.Count; i++)
+            {
+                if (skills[i].Fx == ChargeFx)
+                {
+                    return skills[i];
+                }
+            }
+
+            return null;
+        }
+
         private void StartAttack(EnemyFighter e, PlayerFighter p)
         {
+            float distance = Vector2.Distance(p.Body.Position, e.Position);
+            if (BossPatterns.TryGet(e.Definition, out BossPattern pattern) && TryStartBossMove(e, p, pattern, distance))
+            {
+                return;
+            }
+
+            SkillDefinition skill = ChargeFromAfar(e, distance);
             IReadOnlyList<SkillDefinition> skills = e.Definition.Skills;
-            SkillDefinition skill = skills.Count > 0 && Random.value < e.Definition.SkillRate ? skills[Random.Range(0, skills.Count)] : null;
-            AttackPlan plan = PlanFor(skill);
+            if (skill == null && skills.Count > 0 && Random.value < e.Definition.SkillRate)
+            {
+                skill = skills[Random.Range(0, skills.Count)];
+            }
+
+            StartAttack(e, p, skill);
+        }
+
+        private void StartAttack(EnemyFighter e, PlayerFighter p, SkillDefinition skill)
+        {
+            e.StrikeOwed = skill != null && skill.Fx == ChargeFx;
+            BeginAttack(e, p, PlanFor(skill), skill != null ? skill.DisplayName : null);
+        }
+
+        private void BeginAttack(EnemyFighter e, PlayerFighter p, AttackPlan plan, string name)
+        {
             EnemyAttack attack = e.Attack;
             attack.Kind = plan.Kind;
-            attack.Skill = skill;
+            attack.WindupFrames = plan.Windup;
             attack.Power = plan.Power;
             attack.Radius = Pixels(plan.Radius);
             attack.Direction = Direction(p.Body.Position - e.Position);
@@ -572,6 +718,17 @@ namespace MiniPandoras.Combat
                 attack.Telegraph = telegraph;
             }
 
+            if (plan.Kind == AttackKind.Charge)
+            {
+                attack.Telegraph = LayChargePath(e, plan.Windup);
+            }
+
+            if (plan.Kind == AttackKind.Grab)
+            {
+                SkillShape hand = catalog.Skill(DarkHandSkill).Shape;
+                attack.Telegraph = LayPath(e, plan.Windup, Pixels(hand.Radius) + HeroGrabRadius, Pixels(hand.Range));
+            }
+
             if (plan.Kind == AttackKind.Blink)
             {
                 e.State = EnemyState.BlinkOut;
@@ -583,12 +740,46 @@ namespace MiniPandoras.Combat
                 e.Timer = plan.Windup;
             }
 
-            if (skill != null)
+            if (name != null)
             {
-                Effects.AddPopup(OverHead(e, 6f), skill.DisplayName, EnemySkillColor, 6.5f);
+                Effects.AddPopup(OverHead(e, 6f), name, EnemySkillColor, 6.5f);
             }
 
             e.Cooldown = Mathf.Clamp(110 - e.Definition.Speed * 3, 40, 100) + Random.Range(0, 30);
+            if (e.Enraged)
+            {
+                e.Cooldown = Mathf.RoundToInt(e.Cooldown * EnragedCooldown);
+            }
+        }
+
+        /// <summary>
+        /// 돌진이 지나갈 길을 바닥에 깐다(웹게임에 없다). 길은 벽 앞에서 끝나고,
+        /// 깐 뒤로는 방향을 바꾸지 않으니 비켜서면 맞지 않는다.
+        /// </summary>
+        private Telegraph LayChargePath(EnemyFighter e, int windup)
+        {
+            float halfWidth = e.Radius + ChargeHitMargin;
+            return LayPath(e, windup, halfWidth, ChargeSpeed * ChargeFrames + halfWidth);
+        }
+
+        /// <summary>몸에서 앞으로 뻗는 줄 예고. 벽 앞에서 끝난다.</summary>
+        private Telegraph LayPath(EnemyFighter e, int windup, float halfWidth, float end)
+        {
+            Vector2 direction = e.Attack.Direction;
+            float length = 0f;
+            while (length < end && !FootMover.IsSolidAt(e.Position + direction * (length + ChargePathStep)))
+            {
+                length += ChargePathStep;
+            }
+
+            Telegraph telegraph = Effects.NewTelegraph();
+            telegraph.Center = e.Position;
+            telegraph.Radius = halfWidth;
+            telegraph.Line = direction * length;
+            telegraph.Frame = 0;
+            telegraph.Duration = windup;
+            telegraph.Follow = e;
+            return telegraph;
         }
 
         private void ExecuteAttack(EnemyFighter e, PlayerFighter p)
@@ -606,13 +797,13 @@ namespace MiniPandoras.Combat
                 {
                     Vector2 n = Direction(p.Body.Position - e.Position);
                     // 한 걸음 내지르듯 그림을 6프레임 동안 내민다.
-                    e.Body.OffsetX = DamageFormula.JsRound(n.x * 3f);
-                    e.Body.OffsetY = DamageFormula.JsRound(-n.y * 2f);
+                    e.Body.OffsetX = JsMath.Round(n.x * 3f);
+                    e.Body.OffsetY = JsMath.Round(-n.y * 2f);
                     e.LungeFrames = 6;
                     Effects.AddArc(new Vector2(e.Position.x + n.x * (e.Radius + Pixels(6f)), e.Chest.y + n.y * Pixels(6f)), n, Pixels(11f), EnemySwingColor);
                     if (Vector2.Distance(p.Body.Position, e.Position) <= e.Reach + Pixels(9f))
                     {
-                        DamagePlayer(e.Position, e.Definition.Attack, attack.Power);
+                        HitPlayer(e.Definition, e.Position, attack.Power);
                     }
 
                     e.State = EnemyState.Recover;
@@ -621,9 +812,10 @@ namespace MiniPandoras.Combat
                     break;
                 }
                 case AttackKind.Charge:
-                    attack.Direction = Direction(p.Body.Position - e.Position);
+                    Effects.RemoveTelegraph(attack.Telegraph);
+                    attack.Telegraph = null;
                     e.State = EnemyState.Charge;
-                    e.Timer = 24;
+                    e.Timer = ChargeFrames;
                     break;
                 case AttackKind.Area:
                 case AttackKind.Nova:
@@ -635,7 +827,7 @@ namespace MiniPandoras.Combat
                     particles.Burst(Up(center, 6f), 22, BlastColors, new Vector2(0.5f, 2f), new Vector2(12f, 24f), FullCircle);
                     if (Vector2.Distance(p.Body.Position, center) <= attack.Radius + Pixels(4f))
                     {
-                        DamagePlayer(center, e.Definition.Attack, attack.Power, 7f);
+                        HitPlayer(e.Definition, center, attack.Power, 7f);
                     }
 
                     e.State = EnemyState.Recover;
@@ -643,10 +835,19 @@ namespace MiniPandoras.Combat
                     e.HasAttack = false;
                     break;
                 }
-                case AttackKind.Blink:
+                case AttackKind.Guard:
+                    RaiseShield(e);
+                    break;
+                case AttackKind.Grab:
+                    Effects.RemoveTelegraph(attack.Telegraph);
+                    attack.Telegraph = null;
+                    ReachForHero(e, attack);
                     e.State = EnemyState.Recover;
-                    e.Timer = 20;
+                    e.Timer = e.Enraged ? EnragedRecoverFrames : RecoverFrames;
                     e.HasAttack = false;
+                    break;
+                default:
+                    FireBlasts(e, p);
                     break;
             }
 
@@ -657,21 +858,7 @@ namespace MiniPandoras.Combat
         private void ResetEnemy(EnemyFighter e)
         {
             CancelAttack(e);
-            e.Aggro = false;
-            e.State = EnemyState.Idle;
-            e.SetHp(e.MaxHp);
-            e.Slow = 0;
-            e.Freeze = 0;
-            e.DotTicks = 0;
-            e.Knock = null;
-            e.Stepping = false;
-            e.Body.Shade = null;
-            e.Body.Alpha = 1f;
-            e.Body.PlaceAt(CellFoot(e.HomeCell));
-            if (e.Group != null)
-            {
-                e.Group.Engaged = false;
-            }
+            e.ResetToStart(true);
         }
 
         /// <summary>적끼리 겹치지 않게, 플레이어와도 붙어 서지 않게 밀어 낸다.</summary>
@@ -711,7 +898,7 @@ namespace MiniPandoras.Combat
 
                 float personal = a.Radius + Pixels(5f);
                 float fromPlayer = Vector2.Distance(a.Position, p.Body.Position);
-                if (fromPlayer < personal && fromPlayer > 0.0001f)
+                if (!p.PassesThroughEnemies && !a.IsDummy && fromPlayer < personal && fromPlayer > 0.0001f)
                 {
                     Vector2 n = (a.Position - p.Body.Position) / fromPlayer;
                     MoveBody(a.Body, n * (personal - fromPlayer), false);
@@ -734,8 +921,8 @@ namespace MiniPandoras.Combat
 
             switch (skill.Fx)
             {
-                case "charge":
-                    return new AttackPlan(AttackKind.Charge, skill.Power, 30, 12f);
+                case ChargeFx:
+                    return ChargePlan(skill.Power);
                 case "blink":
                     return new AttackPlan(AttackKind.Blink, skill.Power, 14, 22f);
             }
@@ -756,6 +943,11 @@ namespace MiniPandoras.Combat
             }
 
             return new AttackPlan(AttackKind.Melee, skill.Power > 0f ? skill.Power : 1f, 22, 0f);
+        }
+
+        private static AttackPlan ChargePlan(float power)
+        {
+            return new AttackPlan(AttackKind.Charge, power, 30, 12f);
         }
 
         private readonly struct AttackPlan

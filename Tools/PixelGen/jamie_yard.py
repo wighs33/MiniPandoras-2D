@@ -1,4 +1,4 @@
-"""디엘의 어린 시절 집 마당(jamieYard, 4장 회상)을 새로 짠다(사용자 요청 2026-11-02: 회상 속 집 그래픽 개선).
+"""디엘의 어린 시절 집 마당(jamieYard, 4장 회상)을 새로 짠다(회상 속 집 그래픽 개선).
 
 숲속 빈터에 엄마와 아이가 사는 초가 오두막(houses.py 설계)이 서 있다. 집 앞 마당은 4장에서 병사들이 집을 에워싸고,
 엄마와 카일이 마주 서고, 아이가 장작더미 뒤에 숨는 곳이라 가운데를 비운다. 둘레에 서쪽 텃밭, 동쪽 빨랫줄,
@@ -79,7 +79,7 @@ def build():
     m.point("door", (door_x, HOUSE_GROUND - 1))
     m.point("jamie", (11, 8))
     m.point("kyle", (14, 9))
-    m.point("hide", (17, 10))
+    m.point("hide", (17, 9), blocked=True)     # 장작더미 바로 뒤
     m.point("neo", (3, 13))
     m.point("troops", *STAGE[4:])
     m.point("view", (12, 8))

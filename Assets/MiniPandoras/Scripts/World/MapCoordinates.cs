@@ -18,10 +18,24 @@ namespace MiniPandoras.World
             return new Vector2(cell.x + 0.5f, -(cell.y + 15f / LogicalPixelsPerTile));
         }
 
-        /// <summary>발 위치가 들어 있는 칸(웹게임 x = floor(px/16), y = floor((py−4)/16)).</summary>
+        /// <summary>발 위치가 들어 있는 칸. 발은 칸 아래쪽에 서므로 웹게임처럼 4px 위를 기준으로 센다(x = floor(px/16), y = floor((py−4)/16)). 보정 없는 칸은 <see cref="TileAt"/>이다.</summary>
         public static Vector2Int CellOf(Vector2 feet)
         {
             return new Vector2Int(Mathf.FloorToInt(feet.x), Mathf.FloorToInt(-feet.y - 4f / LogicalPixelsPerTile));
+        }
+
+        /// <summary>
+        /// 위치가 놓인 타일. CellOf와 달리 웹게임의 발 보정(4px)을 넣지 않는다. 물건·막힌 칸처럼 타일 자체를 묻는 곳에 쓴다.
+        /// </summary>
+        public static Vector2Int TileAt(Vector2 position)
+        {
+            return new Vector2Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(-position.y));
+        }
+
+        /// <summary>칸의 발 위치를 맵 왼쪽 위 기준 논리 px로(웹게임 x×16+8, y×16+15). lift만큼 위로 올린다.</summary>
+        public static Vector2 LogicalCellFoot(Vector2Int cell, float lift = 0f)
+        {
+            return new Vector2(cell.x * LogicalPixelsPerTile + 8f, cell.y * LogicalPixelsPerTile + 15f - lift);
         }
 
         /// <summary>웹게임 논리 px 길이를 월드 길이(칸)로 바꾼다. 전투 수치처럼 웹게임이 px로 적은 값을 옮길 때 쓴다.</summary>

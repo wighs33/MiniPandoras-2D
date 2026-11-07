@@ -1,12 +1,12 @@
-"""거대고목의 5층 가지 회랑(giantTree)과 꼭대기 잎 덮개(treeCrown)를 새로 짠다(사용자 요청 2026-11-03: 10장 맵을 생성기로,
-「뱀성처럼 여러 층으로」. 1~4층 안쪽 방은 tree_floors.py).
+"""거대고목의 등반로(giantTree)와 꼭대기 잎 덮개(treeCrown)를 새로 짠다(10장 맵. 뱀성처럼 여러 층이다.
+1~4층 안쪽 방은 tree_floors.py).
 
-  5층 가지 회랑(giantTree): 줄기 밖으로 나와 하늘 아래 가지를 타고 오르는 층. 위에서 비스듬히 본 거대한 줄기의 앞면(세로 껍질 골,
-     이끼, 선반 버섯, 빛나는 옹이 구멍, 요정 창)을 굵은 가지 위 나무 길(n)·밧줄 판자 다리(N)·사다리(^)로 감아 오른다.
-     가지 가장자리에는 잎 덩이가 붙어 있다(b, 막힘). 바깥은 높이가 느껴지게 노을 하늘과 구름, 아래쪽은 안개 낀 먼 숲 우듬지다.
-     맨 아래 사다리가 4층 서고로(down), 맨 위 사다리가 꼭대기로(up) 이어진다. 길·지점은 웹게임 giantTree의 가운데 토막과 같다.
-  꼭대기 잎 덮개(treeCrown): 잎 덩이로 둘러싼 넓은 이끼 덮개(촌장·케이트, 11장 나리온 정거장), 꽃과 빛나는 버섯,
-     가운데 남쪽의 사다리 구멍(down)으로 가지 회랑에 내려간다.
+  등반로(giantTree, 나무 기둥을 보여 주지 않고 거대한 나무의 등산 경로처럼, 뱀성처럼 단면으로 보인다):
+     줄기를 세로로 보여 주지 않고, 뱀성 앞 산처럼 양 끝이 휘어 오르는 나무껍질 절벽 세 단을 지그재그로 오른다.
+     단 위는 이끼 낀 넓은 턱이고, 단마다 뿌리 계단이 있다. 오른쪽 가지 끝 전망대에 케이트가 나타나고, 왼쪽 가지 끝에 등불이 있다.
+     가장자리는 잎 덩이가 막고 그 너머는 노을 하늘과 구름이다. 맨 아래 사다리가 서고로(down), 맨 위 사다리가 꼭대기로(up) 이어진다.
+  꼭대기 잎 덮개(treeCrown): 잎 덩이로 둘러싼 넓은 이끼 덮개(촌장·케이트, 11장 나리온 정거장), 꽃과 빛나는 버섯.
+     가운데 남쪽의 사다리 구멍(down)으로 등반로에 내려간다.
 
 사용: python Tools/PixelGen/giant_tree.py <프로젝트 루트>
   Assets/MiniPandoras/Art/PixelGen/Maps/giantTree/…, treeCrown/…   맵 데이터와 그림(layout.py)
@@ -24,29 +24,28 @@ from houses import Canvas, WOOD
 from layout import LOGICAL, MapLayout
 
 T = pg.TILE
-# 5층 가지 회랑 칸(웹게임 giantTree 6~24줄): u 꼭대기로 오르는 사다리, d 4층으로 내려가는 사다리.
-ROWS = [
-    "obbbbbbbbbbbubbbbbbbbbbo",
-    "ooooobbb####^###oooooooo",
-    "ooobbnnnNNNNN###oooooooo",
-    "ooobbnno########oooooooo",
-    "ooobbnmb########bbbbbooo",
-    "ooobbnno########nnKnbooo",
-    "ooobbnnb########oooooooo",
-    "ooobbnno########oooobooo",
-    "ooooonnnNNNNNNNNnnWnbooo",
-    "oooobbbb########bbnnbooo",
-    "oooooooo########oonnbooo",
-    "oooooooo########oonmbooo",
-    "oooooooo########oonnbooo",
-    "oooooooo########oonnbooo",
-    "oooooooo####NNNNnnnnbooo",
-    "oooooooo####^###bbbbbooo",
-    "oooooo######^#####oooooo",
-    "oooooo######^#####oooooo",
-    "oooooo######d#####oooooo",
-]
-HEIGHT, WIDTH = len(ROWS), len(ROWS[0])
+WIDTH, HEIGHT = 44, 46
+CENTER = WIDTH / 2
+TERRACES = ((12.5, 27), (24.0, 15), (35.0, 29))     # 단 절벽의 윗줄(가운데 기준)과 계단 가운데 칸, 위 단부터
+WALL_HEIGHT = 3.2                                    # 절벽 높이(칸)
+WALL_LIFT = 4.0                                      # 절벽 양 끝이 휘어 오르는 칸 수
+STAIR_HALF = 1.6
+LADDER_X = 22
+CANOPY_ROWS = 3.5                                    # 맨 위 잎 천장
+# 오르는 길: 아래에서 위로, 단마다 한 번씩 꺾인다. 뒤의 둘은 양옆 가지로 나가는 샛길이다.
+TRAILS = (
+    [(22, 44), (24, 42), (28, 40), (29, 38)],
+    [(29, 34), (24, 31), (16, 29), (15, 27)],
+    [(15, 23), (21, 20), (26, 18), (27, 16)],
+    [(27, 12), (24, 9), (22, 6), (22, CANOPY_ROWS)],
+    [(26, 18), (33, 19), (37, 18)],
+    [(18, 30), (8, 31), (5, 30)],
+)
+LOOKOUT = (37, 16, 4.2)                              # 오른쪽 가지 끝 전망대(가운데 칸, 반지름)
+LEFT_END = (5, 29, 3.4)                              # 왼쪽 가지 끝
+ARMS = (([(30, 21), (36, 18)], 2.4), ([(12, 32), (5, 30)], 2.4))
+LANTERNS = ((26.6, 41.0), (31.4, 33.8), (12.6, 28.2), (17.4, 23.0), (24.6, 17.0), (29.4, 12.0), (37.0, 13.2), (5.0, 27.0))
+GLOW_PATCHES = ((9, 33), (33, 30), (12, 20), (31, 21), (17, 8), (30, 8))
 CROWN_W, CROWN_H = 24, 14
 CROWN_CENTER, CROWN_RADII = (12.0, 6.6), (10.6, 5.6)
 SKY = pg.hexes("#1c1838", "#2c2450", "#4a3266", "#6e3e70", "#9a4e6a", "#c86a5e", "#e8925a", "#f6b870")
@@ -56,10 +55,6 @@ LEAF = pg.LEAF
 PLANK = pg.hexes("#3a2616", "#5a3c24", "#7a5434", "#966c46", "#b08458")
 ROPE = pg.hexes("#5a4628", "#8a7044", "#b89a64")
 CURSE = pg.hexes("#120a1e", "#2a1240", "#5a2a8a")
-
-
-def cells_of(chars):
-    return np.array([[ch in chars for ch in row] for row in ROWS])
 
 
 def tile_field(height, width):
@@ -86,22 +81,68 @@ def sky(rng, h, w, haze=True):
     return image
 
 
-def bark(rng, mask):
-    """줄기 앞면: fairy_props의 껍질 결에 이끼, 빛나는 옹이 구멍, 선반 버섯, 요정 창."""
+def terrace_top(x, base):
+    """단 절벽의 윗줄. 뱀성 앞 산처럼 양 끝이 휘어 오른다."""
+    return base - WALL_LIFT * ((x - CENTER) / CENTER) ** 2
+
+
+def bark_wall(rng, mask):
+    """단 절벽: 세로 결의 나무껍질에 이끼, 위 끝의 밝은 턱, 아래로 갈수록 짙은 그늘, 선반 버섯과 빛나는 옹이 구멍, 요정 창."""
     h, w = mask.shape
     c = Canvas(w, h)
     cols = np.nonzero(mask.any(axis=0))[0]
     fp.bark_texture(c, mask, rng, cols.min(), cols.max())
-    fp.moss_patches(c, mask, rng, amount=0.64)
-    for x, y, r in ((9.3, 4.5, 4), (14.2, 11.2, 5), (10.6, 16.6, 4), (13.8, 3.2, 3.5)):
-        hole = c.ellipse(x * T, y * T, r + 2, r * 1.4 + 2) & mask
-        c.paint(hole, pg.hexes("#2a1e14")[0])
-        c.paint(c.ellipse(x * T, y * T + 1, r, r * 1.4) & mask, fp.GLOW[1])
-        c.paint(c.ellipse(x * T - 1, y * T, r * 0.5, r * 0.8) & mask, fp.GLOW[3])
-    for x, y, wd in ((8.6, 6.6, 16), (15.2, 5.4, 18), (9.0, 12.8, 20), (15.0, 16.4, 16), (11.0, 10.0, 14)):
-        fp.shelf_fungus(c, x * T, y * T, wd)
-    for x, y in ((14.0, 2.0), (10.0, 9.2), (15.0, 13.0)):
-        fp.fairy_window(c, x * T, y * T, 5, rng)
+    fp.moss_patches(c, mask, rng, amount=0.7)
+    for base, stair in TERRACES:
+        for x in range(4, WIDTH - 3, 5):
+            if abs(x - stair) < 4:
+                continue
+            y = (terrace_top(x, base) + WALL_HEIGHT * rng.uniform(0.35, 0.7)) * T
+            kind = rng.integers(0, 4)
+            if kind == 0:
+                fp.shelf_fungus(c, x * T, y, 16)
+            elif kind == 1:
+                r = 4
+                hole = c.ellipse(x * T, y, r + 2, r * 1.4 + 2) & mask
+                c.paint(hole, pg.hexes("#2a1e14")[0])
+                c.paint(c.ellipse(x * T, y + 1, r, r * 1.4) & mask, fp.GLOW[1])
+                c.paint(c.ellipse(x * T - 1, y, r * 0.5, r * 0.8) & mask, fp.GLOW[3])
+            elif kind == 2:
+                fp.fairy_window(c, x * T, y, 5, rng)
+    image = c.image
+    lip = mask & ~np.roll(mask, 2, axis=0)
+    image[lip, :3] = fp.BARK[5]
+    foot = mask & ~np.roll(mask, -7, axis=0)
+    image[foot, :3] = (image[foot, :3] * 0.62).astype(np.uint8)
+    return image
+
+
+def mossy_ledge(rng, mask):
+    """단 위의 턱: 짙은 이끼에 나무껍질이 드문드문 드러난다."""
+    h, w = mask.shape
+    image = terrain.grass(h, w, rng)
+    image = (image * np.array([0.82, 0.92, 0.74])).astype(np.uint8)
+    patches = pg.fractal_noise(h, w, rng, ((40, 0.7), (14, 0.3))) > 0.68
+    grain = pg.noise(h, w, 6, rng)
+    level = 0.5 + 0.12 * np.sin(np.arange(w)[None, :] / 3.0 + grain * 4)
+    shown = pg.quantize(np.clip(level, 0, 0.999), fp.BARK[1:5], dither=0.1)
+    image[patches] = shown[patches]
+    litter = rng.random((h, w))
+    image[(litter > 0.992) & ~patches] = pg.FLOWERS[0]
+    return image
+
+
+def root_stairs(mask):
+    """절벽을 끊고 오르는 뿌리 계단: 층층이 박은 두꺼운 판자, 양옆을 감싼 뿌리."""
+    h, w = mask.shape
+    c = Canvas(w, h)
+    step = np.mod(c.yy, 9)
+    c.paint(mask, PLANK[2])
+    c.paint(mask & (step < 2), PLANK[4])
+    c.paint(mask & (step >= 7), PLANK[0])
+    roots = mask & ~(np.roll(mask, 7, axis=1) & np.roll(mask, -7, axis=1))
+    c.paint(roots, fp.BARK[2])
+    c.paint(roots & (mask & ~(np.roll(mask, 3, axis=1) & np.roll(mask, -3, axis=1))), fp.BARK[4])
     return c.image
 
 
@@ -117,24 +158,6 @@ def branch_paths(rng, walk):
     c.paint(walk & ~np.roll(walk, -1, axis=0), fp.BARK[0])
     moss = walk & (pg.fractal_noise(h, w, rng, ((10, 0.7), (4, 0.3))) > 0.7) & ~below
     c.paint(moss, fp.MOSS[2])
-    return c.image
-
-
-def bridges(rng, deck):
-    """줄기 앞을 가로지르는 판자 다리: 걷는 방향을 가로지른 판자, 남북 가장자리 밧줄과 기둥, 줄기에 드리운 그림자."""
-    h, w = deck.shape
-    c = Canvas(w, h)
-    shadow = np.roll(deck, 7, axis=0) & ~deck
-    c.paint(shadow, fp.BARK[0])
-    plank = np.floor(c.xx / 7)
-    level = 0.5 + ((plank * 37) % 5) / 14 - 0.12 * (np.mod(c.xx, 7) < 1)
-    c.paint(deck, pg.quantize(np.clip(level, 0, 0.999), PLANK, dither=0.06))
-    edge_n = deck & ~np.roll(deck, 2, axis=0)
-    edge_s = deck & ~np.roll(deck, -2, axis=0)
-    c.paint(edge_n | edge_s, ROPE[1])
-    c.paint((edge_n | edge_s) & (np.mod(c.xx, 6) < 2), ROPE[2])
-    posts = deck & (np.mod(c.xx, 32) < 3) & (edge_n | edge_s)
-    c.paint(posts, PLANK[0])
     return c.image
 
 
@@ -191,50 +214,77 @@ def ladder_hole(c, x, y):
 
 
 def branches():
-    m = MapLayout("giantTree", "거대고목 5층 · 가지 회랑", WIDTH, HEIGHT, theme="cave", music="field", background="dusk", seed=221)
+    m = MapLayout("giantTree", "거대고목 등반로", WIDTH, HEIGHT, theme="cave", music="field", background="dusk", seed=221)
     rng = np.random.default_rng(222)
     h, w = HEIGHT * T, WIDTH * T
     wobble = pg.fractal_noise(h, w, rng, ((12, 0.7), (5, 0.3))) - 0.5
-    trunk_cells = cells_of("#^Nud")
-    trunk_cells[0] = False
-    walk_cells = cells_of("nmKW")
-    bridge_cells = cells_of("N")
-    ladder_cells = cells_of("^ud")
-    leaf_cells = cells_of("b")
+
+    # ── 칸 나누기: 나무 몸체, 절벽, 계단, 사다리, 잎 ──
+    half_width = 9 + m.cy * 0.28 + 1.2 * np.sin(m.cy * 0.4)
+    body = (np.abs(m.cx - CENTER) < half_width) & (m.cy >= CANOPY_ROWS)
+    for points, reach in ARMS:
+        body |= m.near_line(points, reach)
+    for cx, cy, radius in (LOOKOUT, LEFT_END):
+        body |= np.hypot(m.cx - cx, m.cy - cy) <= radius
+    walls = np.zeros_like(body)
+    stairs = np.zeros_like(body)
+    for base, stair in TERRACES:
+        top = terrace_top(m.cx, base)
+        band = (m.cy >= top) & (m.cy < top + WALL_HEIGHT)
+        gap = np.abs(m.cx + 0.0 - stair) < STAIR_HALF
+        walls |= band & ~gap
+        stairs |= (m.cy >= top - 1) & (m.cy < top + WALL_HEIGHT + 1) & gap
+    walls &= body
+    ladders_at = np.zeros_like(body)
+    ladders_at[:int(CANOPY_ROWS) + 1, LADDER_X] = True
+    ladders_at[-2:, LADDER_X] = True
+    ring = body.copy()
+    for _ in range(2):
+        ring = ring | pg.neighbours(ring)
+    leaf_cells = (ring & ~body) | (m.cy < CANOPY_ROWS)
+    leaf_cells &= ~ladders_at
+    trails = np.zeros_like(body)
+    for trail in TRAILS:
+        trails |= m.near_line(trail, 1.1)
+    trails &= body & ~walls
 
     def paint():
         image = sky(np.random.default_rng(223), h, w)
-        trunk = terrain.region(trunk_cells, wobble, 0.3)
-        # 줄기는 맵 아래 끝 밖으로 이어진다(아래 끝 줄은 흔들지 않는다).
-        trunk[-T:] |= terrain.cell_field(trunk_cells)[-T:] > 0.5
-        layers = [(trunk, bark(np.random.default_rng(225), trunk))]
-        walk = terrain.region(walk_cells, wobble, 0.4)
-        layers.append((walk, branch_paths(np.random.default_rng(226), walk)))
-        leaves = terrain.region(leaf_cells, wobble, 0.9) & ~walk
-        layers.insert(0, (leaves, foliage(np.random.default_rng(227), leaves)))
-        deck = terrain.cell_field(bridge_cells) > 0.5
-        layers.append((deck | np.roll(deck, 7, axis=0) & trunk, bridges(np.random.default_rng(228), deck)))
-        rungs = terrain.cell_field(ladder_cells) > 0.5
-        layers.append((rungs, ladders(np.random.default_rng(229), rungs)))
-        for mask, layer in layers:
-            shown = mask & (layer[..., 3] > 0)
-            image[shown] = layer[shown, :3]
+        ledge = terrain.region(body, wobble, 0.3)
+        layers = [(terrain.region(leaf_cells, wobble, 0.9), None, foliage),
+                  (ledge, None, mossy_ledge),
+                  (terrain.region(trails, wobble, 0.4), None, branch_paths)]
+        for k, (mask, _, draw) in enumerate(layers):
+            drawn = draw(np.random.default_rng(226 + k), mask)
+            shown = mask & (drawn[..., 3] > 0) if drawn.shape[2] == 4 else mask
+            image[shown] = drawn[shown, :3]
+        wall = terrain.region(walls, wobble, 0.22)
+        under = np.roll(wall, 9, axis=0) & ~wall & ledge
+        image[under] = (image[under] * 0.72).astype(np.uint8)
+        drawn = bark_wall(np.random.default_rng(230), wall)
+        shown = wall & (drawn[..., 3] > 0)
+        image[shown] = drawn[shown, :3]
+        steps = terrain.cell_field(stairs) > 0.5
+        drawn = root_stairs(steps)
+        image[steps] = drawn[steps, :3]
+        rungs = terrain.cell_field(ladders_at) > 0.5
+        drawn = ladders(np.random.default_rng(231), rungs)
+        shown = rungs & (drawn[..., 3] > 0)
+        image[shown] = drawn[shown, :3]
         return image
 
-    marks = {"K": "kate", "W": "warpSpot", "u": "up", "d": "down"}
-    slimes = []
-    for y, row in enumerate(ROWS):
-        for x, ch in enumerate(row):
-            if ch in marks:
-                m.point(marks[ch], (x, y))
-            if ch == "m":
-                slimes.append((x, y))
-    m.point("slime", *slimes)
     m.paint_ground = paint
-    m.block_where(~(walk_cells | bridge_cells | ladder_cells))
-    for i, (x, y) in enumerate(((4.6, 3.0), (20.6, 6.0), (20.6, 15.0), (11.4, 1.0))):
-        m.stand(f"lantern_{i}", fp.fairy_lantern(np.random.default_rng(250 + i)), x, y)
-        m.light((x + 0.3) * LOGICAL, y * LOGICAL - 26, 30, "#7ff0dc")
+    walkable = (body & ~walls & ~leaf_cells) | stairs | ladders_at
+    m.block_where(~walkable)
+    for i, (x, ground) in enumerate(LANTERNS):
+        m.stand(f"lantern_{i}", fp.fairy_lantern(np.random.default_rng(250 + i)), x, ground)
+        m.light((x + 0.3) * LOGICAL, ground * LOGICAL - 26, 30, "#7ff0dc")
+    for i, (x, ground) in enumerate(GLOW_PATCHES):
+        m.stand(f"glow_patch_{i}", fp.glow_shrooms(np.random.default_rng(260 + i)), x, ground)
+    m.point("up", (LADDER_X, 0))
+    m.point("down", (LADDER_X, HEIGHT - 1))
+    m.point("warpSpot", (37, 19))
+    m.point("kate", (37, 16))
     m.warp("up", "treeCrown", "down", "up")
     m.warp("down", "treeLibrary", "up", "down")
     return m

@@ -17,30 +17,22 @@ namespace MiniPandoras.Tests
     public sealed class MapTravelTests
     {
         private Gamepad pad;
-        private InputSettings.BackgroundBehavior backgroundBehavior;
+        private TestInput devices;
 
         [UnitySetUp]
         public IEnumerator LoadField()
         {
-            Application.runInBackground = true;
-            InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
-            // 에디터가 포커스를 잃으면 입력 시스템이 게임패드를 꺼서 흉내 낸 스틱이 들어가지 않는다. 테스트 동안만 포커스와 상관없이 받는다.
-            backgroundBehavior = InputSystem.settings.backgroundBehavior;
-            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
-            pad = InputSystem.AddDevice<Gamepad>();
+            devices = TestInput.Start();
+            pad = devices.Pad;
             // 맵만 걸어 본다. 1장 연출은 Chapter1Tests가 본다.
-            StoryRunner.PlayStory = false;
-            yield return SceneManager.LoadSceneAsync("Field");
-            yield return null;
+            yield return StoryDriver.OpenBareField();
         }
 
         [UnityTearDown]
         public IEnumerator RemovePad()
         {
-            InputSystem.RemoveDevice(pad);
-            InputSystem.settings.backgroundBehavior = backgroundBehavior;
-            StoryRunner.PlayStory = true;
-            yield return null;
+            devices.Stop();
+            yield return StoryDriver.CloseBareField();
         }
 
         [UnityTest]
@@ -76,13 +68,13 @@ namespace MiniPandoras.Tests
         {
             var hero = UnityEngine.Object.FindFirstObjectByType<TopDownMover>();
 
-            // 착지 자리 아래쪽은 숲이다. 계속 내려가도 숲 앞에서 멈춘다.
-            yield return HoldFor(Vector2.down, 2.5f);
-            float stoppedAt = hero.transform.position.y;
-            yield return HoldFor(Vector2.down, 0.5f);
+            // 착지 자리 오른쪽 끝은 숲이다. 계속 걸어도 숲 앞에서 멈춘다.
+            yield return HoldFor(Vector2.right, 4f);
+            float stoppedAt = hero.transform.position.x;
+            yield return HoldFor(Vector2.right, 0.5f);
 
-            Assert.That(hero.transform.position.y, Is.EqualTo(stoppedAt).Within(0.01f));
-            Assert.That(stoppedAt, Is.GreaterThan(-40f), "맵 아래 끝(-40)까지 가지 않았다");
+            Assert.That(hero.transform.position.x, Is.EqualTo(stoppedAt).Within(0.01f));
+            Assert.That(stoppedAt, Is.LessThan(30f), "숲을 뚫고 지나가지 않았다");
         }
 
         [UnityTest]
@@ -90,8 +82,8 @@ namespace MiniPandoras.Tests
         {
             var travel = UnityEngine.Object.FindFirstObjectByType<MapTravel>();
             // 아지트 숲길의 왼쪽 꽃 상자 자리(전성기 모습에만 있다)와 문 왼쪽 통 자리(낡은 모습에만 있다). 칸 좌표의 가운데쯤이다.
-            var flowerBox = new Vector2(13.5f, -12.8f);
-            var barrel = new Vector2(10.5f, -12.5f);
+            var flowerBox = new Vector2(28.5f, -16.8f);
+            var barrel = new Vector2(25.5f, -16.5f);
 
             travel.LoadNow("hideoutPath", "doorArrive", Facing.Down);
             yield return null;

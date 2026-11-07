@@ -14,12 +14,25 @@ namespace MiniPandoras.Characters
         private SpriteRenderer spriteRenderer;
         private float hideAt;
 
+        public bool IsShown => spriteRenderer.enabled;
+
         public void Show(Sprite icon, float seconds)
         {
             transform.localPosition = new Vector3(0f, figure.sprite.bounds.max.y + GapUnits, 0f);
             spriteRenderer.sprite = icon;
             spriteRenderer.enabled = true;
             hideAt = Time.time + seconds;
+        }
+
+        /// <summary>내릴 때까지 계속 띄운다.</summary>
+        public void Hold(Sprite icon)
+        {
+            Show(icon, float.PositiveInfinity);
+        }
+
+        public void Hide()
+        {
+            spriteRenderer.enabled = false;
         }
 
         private void Awake()

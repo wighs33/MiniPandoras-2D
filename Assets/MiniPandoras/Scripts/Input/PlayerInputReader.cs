@@ -15,12 +15,15 @@ namespace MiniPandoras.Input
         [SerializeField] private InputActionReference move;
         [FormerlySerializedAs("attack")]
         [SerializeField] private InputActionReference action;
-        [SerializeField] private InputActionReference skill1;
-        [SerializeField] private InputActionReference skill2;
-        [SerializeField] private InputActionReference swap;
-        [Tooltip("동료 부르기 칸 순서대로(웹게임 숫자 1~5)")]
+        [Tooltip("판도라 스킬 칸 순서대로")]
+        [SerializeField] private InputActionReference[] skills = Array.Empty<InputActionReference>();
+        [Tooltip("판도라 칸 순서대로")]
+        [SerializeField] private InputActionReference[] pandoras = Array.Empty<InputActionReference>();
+        [Tooltip("동료 부르기 칸 순서대로")]
         [SerializeField] private InputActionReference[] summons = Array.Empty<InputActionReference>();
 
+        private Action<InputAction.CallbackContext>[] skillHandlers = Array.Empty<Action<InputAction.CallbackContext>>();
+        private Action<InputAction.CallbackContext>[] pandoraHandlers = Array.Empty<Action<InputAction.CallbackContext>>();
         private Action<InputAction.CallbackContext>[] summonHandlers = Array.Empty<Action<InputAction.CallbackContext>>();
 
         /// <summary>조이스틱 방향. 길이는 0~1.</summary>
@@ -29,40 +32,51 @@ namespace MiniPandoras.Input
         /// <summary>행동 버튼(웹게임 확인 Space·Z). 대사를 넘기고, 필드에서는 말 걸기·조사·공격이 된다.</summary>
         public event Action ActionPressed;
 
-        /// <summary>판도라 스킬 칸(0 = 첫째, 1 = 둘째. 웹게임 Q·E).</summary>
+        /// <summary>판도라 스킬 칸(0부터. 앞의 둘은 웹게임 Q·E).</summary>
         public event Action<int> SkillPressed;
 
-        /// <summary>들고 싸우는 판도라 바꾸기(웹게임 Shift).</summary>
-        public event Action SwapPressed;
+        /// <summary>판도라 칸(0부터). 그 칸의 판도라로 바꾼다. 웹게임의 Shift 교체를 대신한다.</summary>
+        public event Action<int> PandoraPressed;
 
-        /// <summary>동료 부르기 칸(0부터. 웹게임 숫자 1~5).</summary>
+        /// <summary>동료 부르기 칸(0부터).</summary>
         public event Action<int> SummonPressed;
 
         private void OnEnable()
         {
             move.action.Enable();
             Listen(action, OnAction);
-            Listen(skill1, OnFirstSkill);
-            Listen(skill2, OnSecondSkill);
-            Listen(swap, OnSwap);
-            summonHandlers = new Action<InputAction.CallbackContext>[summons.Length];
-            for (int i = 0; i < summons.Length; i++)
-            {
-                int slot = i;
-                summonHandlers[i] = context => SummonPressed?.Invoke(slot);
-                Listen(summons[i], summonHandlers[i]);
-            }
+            skillHandlers = ListenToSlots(skills, slot => SkillPressed?.Invoke(slot));
+            pandoraHandlers = ListenToSlots(pandoras, slot => PandoraPressed?.Invoke(slot));
+            summonHandlers = ListenToSlots(summons, slot => SummonPressed?.Invoke(slot));
         }
 
         private void OnDisable()
         {
             action.action.performed -= OnAction;
-            skill1.action.performed -= OnFirstSkill;
-            skill2.action.performed -= OnSecondSkill;
-            swap.action.performed -= OnSwap;
-            for (int i = 0; i < summons.Length; i++)
+            StopListening(skills, skillHandlers);
+            StopListening(pandoras, pandoraHandlers);
+            StopListening(summons, summonHandlers);
+        }
+
+        /// <summary>칸마다 누르면 그 칸 번호를 알리게 한다. 돌려준 처리기는 끊을 때 쓴다.</summary>
+        private static Action<InputAction.CallbackContext>[] ListenToSlots(InputActionReference[] slots, Action<int> pressed)
+        {
+            var handlers = new Action<InputAction.CallbackContext>[slots.Length];
+            for (int i = 0; i < slots.Length; i++)
             {
-                summons[i].action.performed -= summonHandlers[i];
+                int slot = i;
+                handlers[i] = context => pressed(slot);
+                Listen(slots[i], handlers[i]);
+            }
+
+            return handlers;
+        }
+
+        private static void StopListening(InputActionReference[] slots, Action<InputAction.CallbackContext>[] handlers)
+        {
+            for (int i = 0; i < slots.Length; i++)
+            {
+                slots[i].action.performed -= handlers[i];
             }
         }
 
@@ -75,21 +89,6 @@ namespace MiniPandoras.Input
         private void OnAction(InputAction.CallbackContext context)
         {
             ActionPressed?.Invoke();
-        }
-
-        private void OnFirstSkill(InputAction.CallbackContext context)
-        {
-            SkillPressed?.Invoke(0);
-        }
-
-        private void OnSecondSkill(InputAction.CallbackContext context)
-        {
-            SkillPressed?.Invoke(1);
-        }
-
-        private void OnSwap(InputAction.CallbackContext context)
-        {
-            SwapPressed?.Invoke();
         }
     }
 }

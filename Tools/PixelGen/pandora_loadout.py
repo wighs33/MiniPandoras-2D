@@ -1,4 +1,4 @@
-"""판도라 정착 창의 그림(사용자 요청 2026-11-03: 웹게임 게임 방식을 가져오되 그림은 생성기로). 웹게임 LoadoutView를 따른다.
+"""판도라 정착 창의 그림(웹게임 게임 방식을 가져오되 그림은 생성기로). 웹게임 LoadoutView를 따른다.
 
 남색 창(금테 두 줄, 둥근 귀), 왼쪽 마법진(세 겹 원, 동서남북 장식, 세 자리를 잇는 삼각형, 초승달과 삼각 문양, 은은한 푸른 빛),
 마법진의 두 바깥 원 사이를 도는 룬 띠(눈금과 점을 번갈아, 창이 천천히 돌린다), 가운데 네 갈래 별, 판도라를 놓는 자리 원,
@@ -160,17 +160,13 @@ def badge():
     return c.image
 
 
-def save(image, path):
-    Image.fromarray(pg.upscale(image), "RGBA").save(path)
-
-
 def main(project):
     out = project / "Assets/MiniPandoras/Art/PixelGen/UI/Loadout"
     out.mkdir(parents=True, exist_ok=True)
     parts = {"panel": panel(), "circle": circle(), "runes": runes(), "star": star(), "slot": slot(), "slot_glow": slot_glow(),
              "row": row(False), "row_focus": row(True), "badge": badge()}
     for name, image in parts.items():
-        save(image, out / f"{name}.png")
+        pg.save_png(image, out / f"{name}.png")
     # 미리보기: 창에 마법진과 자리 셋, 줄 넷을 얹는다(창 가상 좌표 그대로, 점 하나 = 2px).
     scale = D * pg.SCALE
     preview = Image.open(out / "panel.png").convert("RGBA")

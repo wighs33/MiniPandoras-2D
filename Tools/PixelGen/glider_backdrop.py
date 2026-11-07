@@ -1,4 +1,4 @@
-"""글라이더 탈출 화면의 배경(사용자 요청 2026-11-02: 배경 그래픽 향상).
+"""글라이더 탈출 화면의 배경(배경 그래픽 향상).
 
 글라이더 화면은 가상 화면 384×216에 그린다. 배경 층은 맵과 같은 도트 밀도(가상 1px = 2점)로 그린다.
   sky.png      노을 하늘(디더링한 띠, 희미한 별, 해와 햇무리)                  1024×576, 넓은 화면·높은 화면까지 덮는다
@@ -32,19 +32,13 @@ LAMP = pg.hexes("#ffcf7a")[0]
 EYE = pg.hexes("#ff5a2a")[0]
 
 
-def mix(stops, t):
-    colors = [pg.hexes(c)[0].astype(float) for _, c in stops]
-    at = [a for a, _ in stops]
-    return np.stack([np.interp(t, at, [c[k] for c in colors]) for k in range(3)], axis=-1)
-
-
 def sky(rng):
     """노을 하늘: 위에서 아래로 띠를 나눠 칠하고 띠 경계만 디더로 섞는다. 위쪽에 희미한 별, 아래 오른쪽에 해와 햇무리."""
     yy, xx = np.mgrid[0:SKY_H, 0:SKY_W]
     t = (yy + 0.5) / H
     bands = 14
     stepped = np.floor(t * bands + (pg.bayer(SKY_H, SKY_W) - 0.5) * 0.9) / bands
-    image = mix(SKY_STOPS, np.clip(stepped, 0, 1))
+    image = pg.mix_stops(SKY_STOPS, np.clip(stepped, 0, 1))
     distance = np.hypot(xx - SUN[0], (yy - SUN[1]) * 1.25)
     glow = np.exp(-distance / 90)
     steps = 6

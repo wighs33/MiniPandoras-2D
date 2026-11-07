@@ -1,4 +1,4 @@
-"""집을 따로 디자인하는 소품 생성기(사용자 요청 2026-11-02: 맵 칸 모양을 따르지 말고, 좋은 도트 집을 다양하게).
+"""집을 따로 디자인하는 소품 생성기(맵 칸 모양을 따르지 말고, 좋은 도트 집을 다양하게).
 
 집 한 채는 설계(Design)로 정한다: 너비, 층수, 지붕 모양(옆으로 긴 박공·앞이 세모인 맞배·둘을 합친 십자·사막의 평지붕), 지붕·벽 재료,
 문·창·장식. 위에서 비스듬히 본 시점이라 앞벽이 보이고 지붕은 위에서 내려다본 면이 보인다. 빛은 왼쪽 위에서 온다.
@@ -82,7 +82,7 @@ class Design:
     gears: bool = False           # 뉴웨이브 길드 장식: 벽의 톱니바퀴, 톱니 둥근 창, 구리 관, 쇠 굴뚝, 바람개비
     worn: bool = False            # 버려진 모습: 어둡고 금 간 창, 판자로 막은 창, 지붕 구멍과 이끼, 녹, 불 꺼진 등
     balcony: bool = False
-    plot: str = "dirt"            # 집터: dirt(다진 흙 마당, 디딤돌, 꽃밭) · cobble(돌을 깐 앞뜰) · sand(모래 마당)
+    plot: str = "dirt"            # 집터: dirt(다진 흙 마당, 디딤돌, 꽃밭) · cobble(돌을 깐 앞뜰) · sand(모래 마당) · paved(돌바닥에 그대로 이어지는 앞뜰)
     ladder: bool = False          # 평지붕에 걸친 사다리
     cloth: str = "red"            # 천 문(curtain)과 지붕에 넌 깔개의 색(CLOTH 열쇠)
     seed: int = 1
@@ -1062,7 +1062,7 @@ def build(design):
 # ── 집터 ───────────────────────────────────────────────
 
 PLOT_SIDE = 14        # 처마 끝 밖으로 집터가 더 나간 점 수
-PLOT_FRONT = {"dirt": 40, "cobble": 60, "sand": 36}   # 벽 앞 마당 깊이(점)
+PLOT_FRONT = {"dirt": 40, "cobble": 60, "sand": 36, "paved": 20}   # 벽 앞 마당 깊이(점)
 
 
 def plot(design):
@@ -1145,8 +1145,8 @@ def plot(design):
     image[area, 3] = 255
     # 가장자리: 안쪽 한 줄은 어둡게, 바깥 한 줄은 짙은 풀(맵 흙길 경계와 같다), 풀잎이 조금 넘어온다
     edge = area & pg.neighbours(~area)
-    if design.plot == "sand":
-        # 모래 마당은 둘레 모래땅과 그대로 이어져 테두리를 두르지 않는다.
+    if design.plot in ("sand", "paved"):
+        # 모래 마당과 돌바닥 앞뜰은 둘레 바닥과 그대로 이어져 테두리를 두르지 않는다.
         return image, (x0 + wall_w // 2, ground)
     image[edge, :3] = pg.STONE[1] if design.plot == "cobble" else pg.DIRT[1]
     rim = ~area & pg.neighbours(area)

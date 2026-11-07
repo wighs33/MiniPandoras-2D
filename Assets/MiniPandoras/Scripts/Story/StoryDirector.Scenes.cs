@@ -66,24 +66,38 @@ namespace MiniPandoras.Story
 
         /// <summary>
         /// 글라이더로 뱀성을 빠져나간다(웹게임 GliderScene). 앞서 덮인 화면이 걷히며 시작하고, 떨어지며 다시 덮인 화면에서 끝난다.
-        /// 조이스틱을 위아래로 움직여 뒤에서 날아오는 화살을 피한다.
+        /// 조이스틱으로 움직여 뒤에서 날아오는 화살을 피한다. 화살을 다 맞으면 사망 화면을 거쳐 처음부터 다시 난다.
         /// </summary>
         public IEnumerator FlyGlider()
         {
-            gliderView.Show(true);
             controls.SetMode(ControlMode.Glider);
-            // 웹게임 안내의 방향키를 조이스틱으로 바꿨다.
-            Hint("조이스틱을 위아래로 움직여 화살을 피하세요", 300f);
             glider.RangShielded += OnRangShielded;
             glider.CoverStarted += OnGliderCover;
-            Coroutine flight = StartCoroutine(glider.Fly());
-            yield return FadeIn(24f);
-            yield return flight;
+            do
+            {
+                yield return TakeOff();
+            }
+            while (glider.Crashed);
+
             glider.RangShielded -= OnRangShielded;
             glider.CoverStarted -= OnGliderCover;
             controls.SetMode(ControlMode.Cutscene);
             captions.ClearHint();
             gliderView.Show(false);
+        }
+
+        private IEnumerator TakeOff()
+        {
+            gliderView.Show(true);
+            // 웹게임 안내의 방향키를 조이스틱으로 바꿨다.
+            Hint("조이스틱으로 움직여 화살을 피하세요", 300f);
+            Coroutine flight = StartCoroutine(glider.Fly());
+            yield return FadeIn(24f);
+            yield return flight;
+            if (glider.Crashed)
+            {
+                yield return DeathScreen();
+            }
         }
 
         /// <summary>
@@ -99,6 +113,12 @@ namespace MiniPandoras.Story
             cutInDrop = 0f;
             cutInGlow = 0f;
             cutInView.SetFrame(cutInZoom, cutInCenter, cutInDrop, 0f);
+        }
+
+        /// <summary>컷인의 인물 위에 겹친 효과를 튼다(3장 디엘의 날개가 펼쳐진다).</summary>
+        public void CutInPlayOver()
+        {
+            cutInView.PlayOver();
         }
 
         /// <summary>컷인 카메라를 그 자리로 부드럽게 당긴다(줌인). 대사를 하는 동안 따로 돌려 둘 수 있다.</summary>
@@ -117,6 +137,21 @@ namespace MiniPandoras.Story
 
             cutInZoom = zoom;
             cutInCenter = center;
+            cutInView.SetFrame(cutInZoom, cutInCenter, cutInDrop, 0f);
+        }
+
+        /// <summary>컷인 속 인물이 그 높이(가상 px)에서 제 자리까지 점점 느려지며 내려온다(4장 카일의 강림).</summary>
+        public IEnumerator CutInDescend(float height, float frames)
+        {
+            for (float frame = 0f; frame < frames; frame += Time.deltaTime * 60f)
+            {
+                float left = 1f - frame / frames;
+                cutInDrop = -height * left * left;
+                cutInView.SetFrame(cutInZoom, cutInCenter, cutInDrop, 0f);
+                yield return null;
+            }
+
+            cutInDrop = 0f;
             cutInView.SetFrame(cutInZoom, cutInCenter, cutInDrop, 0f);
         }
 
@@ -172,7 +207,7 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>
-        /// 1부 엔딩(웹게임 EndingScene): 컨티뉴웨이브 일행을 태운 나리온이 노을 진 구름 위를 날아 아이로스로 향하고, 카메라가 천천히 멀어진다.
+        /// 1부 엔딩(웹게임 EndingScene): 에버웨이브 일행을 태운 나리온이 노을 진 구름 위를 날아 아이로스로 향하고, 카메라가 천천히 멀어진다.
         /// 글귀가 차례로 떠오르고, 다 뜬 뒤 화면을 누르면 어두워지며 끝난다. 어두운 화면에서 시작한다.
         /// </summary>
         public IEnumerator Ending()

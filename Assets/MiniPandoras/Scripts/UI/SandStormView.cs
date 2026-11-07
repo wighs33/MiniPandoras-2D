@@ -51,7 +51,7 @@ namespace MiniPandoras.UI
 
             float progress = frame / frames;
             float alpha = progress < 0.2f ? progress / 0.2f : progress > 0.75f ? (1f - progress) / 0.25f : 1f;
-            AddRect(mesh, Faded(Haze, alpha), 0f, 0f, Width, Height);
+            mesh.AddRect(Faded(Haze, alpha), 0f, 0f, Width, Height);
             // 웹게임은 1프레임마다 줄기를 6~9px씩 옮긴다. 줄기마다 빠르기(i % 4)와 높이(i × 37)가 다르다.
             int tick = Mathf.FloorToInt(frame);
             Color streak = Faded(Streak, alpha);
@@ -59,25 +59,13 @@ namespace MiniPandoras.UI
             {
                 float x = (i * 53 + tick * (6 + i % 4)) % (Width + 40f) - 20f;
                 float y = i * 37 % Height;
-                AddRect(mesh, streak, Mathf.Round(x), y, 10 + i % 5 * 3, 1f);
+                mesh.AddRect(streak, Mathf.Round(x), y, 10 + i % 5 * 3, 1f);
             }
         }
 
         private static Color Faded(Color color, float alpha)
         {
             return new Color(color.r, color.g, color.b, color.a * alpha);
-        }
-
-        /// <summary>왼쪽 위가 (x, y)인 사각형. 화면 좌표는 아래로 +y, 그래픽은 피벗이 왼쪽 위다.</summary>
-        private static void AddRect(VertexHelper mesh, Color color, float x, float y, float width, float height)
-        {
-            int start = mesh.currentVertCount;
-            mesh.AddVert(new Vector3(x, -y), color, Vector4.zero);
-            mesh.AddVert(new Vector3(x + width, -y), color, Vector4.zero);
-            mesh.AddVert(new Vector3(x + width, -(y + height)), color, Vector4.zero);
-            mesh.AddVert(new Vector3(x, -(y + height)), color, Vector4.zero);
-            mesh.AddTriangle(start, start + 1, start + 2);
-            mesh.AddTriangle(start, start + 2, start + 3);
         }
     }
 }

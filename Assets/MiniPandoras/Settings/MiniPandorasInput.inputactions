@@ -43,9 +43,45 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Swap",
+                    "name": "Skill3",
+                    "type": "Button",
+                    "id": "94ea92da-751a-4de2-a775-71cdb52d154c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Skill4",
+                    "type": "Button",
+                    "id": "98b48b2d-8f38-4de8-8367-e70f2dc0052d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pandora1",
                     "type": "Button",
                     "id": "fc5bfef9-f88f-485f-a4f0-4fa33db5ea04",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pandora2",
+                    "type": "Button",
+                    "id": "b59cd2dd-2aee-45f8-9e2a-84e307b385f1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pandora3",
+                    "type": "Button",
+                    "id": "9ffd2cd0-fa46-417f-9bc9-5441da34b800",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -73,24 +109,6 @@
                     "name": "Summon3",
                     "type": "Button",
                     "id": "b05bcf8f-5321-4c7f-973f-8ffb9c6d0868",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Summon4",
-                    "type": "Button",
-                    "id": "8241d6d9-7ed9-429e-b3fc-66e795b41b4e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Summon5",
-                    "type": "Button",
-                    "id": "fe545483-d8fe-4ab9-890e-74fa2923a2bc",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -325,18 +343,62 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap",
+                    "action": "Pandora1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "c66bcfb9-9fbc-486e-80ab-0cd8296588bc",
-                    "path": "<Keyboard>/leftShift",
+                    "path": "<Keyboard>/c",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Swap",
+                    "action": "Pandora1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "512b58b7-617f-43d2-a37c-cb0a0c82e641",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pandora2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5c230785-a3be-43cf-8fb3-003f14d1190f",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pandora2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f165ba22-1d0e-41e4-b4e4-90fc1eb555e6",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pandora3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cdd5cdc6-d4d1-44a3-b8a6-5eeef2f8e403",
+                    "path": "<Keyboard>/b",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pandora3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -408,45 +470,45 @@
                 },
                 {
                     "name": "",
-                    "id": "b7b0fb23-9fe1-4c1d-822a-7a5f523de385",
-                    "path": "<Gamepad>/dpad/left",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Summon4",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2f6696c8-258c-4519-967d-06ea80b29771",
-                    "path": "<Keyboard>/4",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Summon4",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f5e78336-1704-4f95-be1f-2cc8c73fdbaf",
+                    "id": "bc5a7924-7dbc-487c-9003-5dda1d52f625",
                     "path": "<Gamepad>/leftShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Summon5",
+                    "action": "Skill3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "7d5a720d-bb36-4b10-ac74-201e7acd9db5",
-                    "path": "<Keyboard>/5",
+                    "id": "5e80703e-5607-497e-862f-dc1088393bb7",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Summon5",
+                    "action": "Skill3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f513084a-e869-4eed-af29-6e8b7031cbe9",
+                    "path": "<Gamepad>/dpad/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Skill4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "79d9e073-a9b4-438d-9b2a-4af30e6ec36a",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Skill4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

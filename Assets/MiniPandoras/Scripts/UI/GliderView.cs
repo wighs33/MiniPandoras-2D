@@ -10,9 +10,9 @@ namespace MiniPandoras.UI
 {
     /// <summary>
     /// 글라이더 탈출 화면(웹게임 GliderScene.render): 노을 하늘, 구름, 먼 산맥과 가까운 숲, 멀어지는 뱀탑, 다가오는 마을,
-    /// 화살과 「!」 알림, 글라이더(랑을 안은 주인공), 탈출 막대, 외침. 놀이 상태는 <see cref="GliderFlight"/>가 가지고, 여기서는 읽어서 그린다.
+    /// 화살과 「!」 알림, 글라이더(랑을 안은 주인공), 탈출 막대, 하트 체력, 외침. 놀이 상태는 <see cref="GliderFlight"/>가 가지고, 여기서는 읽어서 그린다.
     /// 좌표는 가상 화면(384×216) px이고 아래로 +y다. 그림 조각은 처음에 한 번 만들어 두고 자리만 옮긴다.
-    /// 배경은 웹게임의 단색 도형 대신 생성기가 그린 도트 그림(Tools/PixelGen/glider_backdrop.py)이다.
+    /// 배경은 웹게임의 단색 도형 대신 생성기가 그린 도트 그림이다.
     /// </summary>
     public sealed class GliderView : MonoBehaviour
     {
@@ -36,6 +36,11 @@ namespace MiniPandoras.UI
         /// <summary>안긴 랑은 품에 들어가게 주인공보다 조금 더 작게 그린다.</summary>
         private const float HeldRangScale = 0.5f;
 
+        /// <summary>하트는 탈출 막대 바로 오른쪽에 늘어선다.</summary>
+        private const float HeartsLeft = 178f;
+        private const float HeartsTop = 6f;
+        private const float HeartGap = 15f;
+
         private static readonly Color Ink = new Color32(0xff, 0xf2, 0xd8, 0xff);
         private static readonly Color ArrowWood = new Color32(0x5a, 0x3a, 0x22, 0xff);
         private static readonly Color ArrowHead = new Color32(0xd8, 0xd4, 0xc8, 0xff);
@@ -53,7 +58,9 @@ namespace MiniPandoras.UI
         [SerializeField] private TMP_FontAsset boldFont;
         [SerializeField] private CharacterSheet heroSheet;
         [SerializeField] private CharacterSheet rangSheet;
-        [SerializeField] private Color gold = new Color32(0xc9, 0xa5, 0x4a, 0xff);
+        [SerializeField] private Color gold = UiPalette.Gold;
+        [SerializeField] private Sprite heartArt;
+        [SerializeField] private Sprite emptyHeartArt;
 
         [Header("배경 그림")]
         [SerializeField] private Sprite skyArt;
@@ -65,6 +72,7 @@ namespace MiniPandoras.UI
 
         private readonly List<Particle> particles = new List<Particle>();
         private RectTransform root;
+        private RectTransform sky;
         private Image[] clouds;
         private RectTransform farStrip;
         private RectTransform nearStrip;
@@ -78,11 +86,14 @@ namespace MiniPandoras.UI
         private Image[] particleDots;
         private GameObject hud;
         private RectTransform progressFill;
-        private TMP_Text hits;
+        private Image[] hearts;
         private TMP_Text shout;
         private Sprite pixel;
         private float shakeFrames;
         private int lastFrame = -1;
+
+        /// <summary>끝까지 버텨 마지막 장면에 들어왔다. 화살에 떨어질 때는 하늘과 체력이 그 자리에 그대로 남는다.</summary>
+        private bool InFinale => flight.Phase == GliderPhase.Volley || flight.Phase == GliderPhase.Fall;
 
         public void Show(bool shown)
         {
@@ -94,7 +105,7 @@ namespace MiniPandoras.UI
         private void Awake()
         {
             root = (RectTransform)transform;
-            pixel = Pixel();
+            pixel = EffectSprites.Pixel;
             BuildSky();
             BuildLand();
             BuildArrows();
@@ -136,7 +147,7 @@ namespace MiniPandoras.UI
         /// <summary>노을 하늘. 해와 햇무리도 하늘 그림에 들어 있다.</summary>
         private void BuildSky()
         {
-            Art(root, "Sky", skyArt, 0f, 0f);
+            sky = Art(root, "Sky", skyArt, 0f, 0f).rectTransform;
         }
 
         /// <summary>
@@ -225,13 +236,17 @@ namespace MiniPandoras.UI
             Label(hud.transform, "Label", "탈출까지", font, 7.5f, Ink, TextAlignmentOptions.TopLeft).rectTransform.anchoredPosition = new Vector2(12f, -8f);
             Box(hud.transform, "Bar Back", 50f, 11f, 120f, 4f, new Color(0f, 0f, 0f, 0.45f));
             progressFill = Box(hud.transform, "Bar Fill", 50f, 11f, 120f, 4f, gold).rectTransform;
-            hits = Label(hud.transform, "Hits", string.Empty, font, 7.5f, Ink, TextAlignmentOptions.TopRight);
-            hits.rectTransform.pivot = new Vector2(1f, 1f);
-            hits.rectTransform.anchoredPosition = new Vector2(GliderFlight.ViewWidth - 12f, -8f);
+            hearts = new Image[GliderFlight.MaxHearts];
+            for (int i = 0; i < hearts.Length; i++)
+            {
+                hearts[i] = Art(hud.transform, "Heart", heartArt, HeartsLeft + i * HeartGap, HeartsTop);
+            }
+
             shout = Label(root, "Shout", string.Empty, boldFont, 9f, new Color32(0xff, 0xf6, 0xe0, 0xff), TextAlignmentOptions.Top);
+            shout.rectTransform.anchorMin = shout.rectTransform.anchorMax = new Vector2(0.5f, 1f);
             shout.rectTransform.pivot = new Vector2(0.5f, 1f);
             shout.rectTransform.sizeDelta = new Vector2(GliderFlight.ViewWidth, 14f);
-            shout.rectTransform.anchoredPosition = new Vector2(GliderFlight.ViewWidth / 2f, -(GliderFlight.ViewHeight - 22f));
+            shout.rectTransform.anchoredPosition = new Vector2(0f, -(GliderFlight.ViewHeight - 22f));
             shout.outlineWidth = 0.2f;
             shout.outlineColor = new Color32(0x2a, 0x10, 0x20, 0xff);
         }
@@ -240,6 +255,8 @@ namespace MiniPandoras.UI
 
         private void DrawSky()
         {
+            // 하늘 그림보다 넓은 화면에서는 오른쪽이 비지 않게 늘린다.
+            sky.sizeDelta = new Vector2(Mathf.Max(skyArt.rect.width * ArtScale, GliderFlight.VisibleWidth), sky.sizeDelta.y);
             IReadOnlyList<GliderFlight.Cloud> state = flight.Clouds;
             for (int i = 0; i < clouds.Length; i++)
             {
@@ -256,8 +273,8 @@ namespace MiniPandoras.UI
             float castleX = Mathf.Round(flight.CastleX);
             castle.gameObject.SetActive(castleX >= -120f);
             castle.anchoredPosition = new Vector2(castleX, 0f);
-            float approach = flight.Phase == GliderPhase.Play ? flight.Progress : 1f;
-            town.anchoredPosition = new Vector2(Mathf.Round(GliderFlight.ViewWidth + 40f - approach * 160f), 0f);
+            float approach = InFinale ? 1f : flight.Progress;
+            town.anchoredPosition = new Vector2(Mathf.Round(GliderFlight.VisibleWidth + 40f - approach * 160f), 0f);
         }
 
         private void DrawArrows()
@@ -309,12 +326,14 @@ namespace MiniPandoras.UI
 
         private void DrawHud()
         {
-            bool playing = flight.Phase == GliderPhase.Play;
-            hud.SetActive(playing);
-            if (playing)
+            hud.SetActive(!InFinale);
+            if (!InFinale)
             {
                 progressFill.sizeDelta = new Vector2(120f * flight.Progress, 4f);
-                hits.SetText("맞은 화살 {0}", flight.Hits);
+                for (int i = 0; i < hearts.Length; i++)
+                {
+                    hearts[i].sprite = i < flight.Hearts ? heartArt : emptyHeartArt;
+                }
             }
 
             bool shouting = flight.Shout != null && flight.ShoutTime > 0;
@@ -476,14 +495,6 @@ namespace MiniPandoras.UI
             label.raycastTarget = false;
             label.textWrappingMode = TextWrappingModes.NoWrap;
             return label;
-        }
-
-        private static Sprite Pixel()
-        {
-            var texture = new Texture2D(1, 1) { filterMode = FilterMode.Point };
-            texture.SetPixel(0, 0, Color.white);
-            texture.Apply();
-            return Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f), 1f);
         }
 
         private readonly struct ArrowParts

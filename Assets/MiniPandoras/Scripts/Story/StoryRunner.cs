@@ -15,10 +15,7 @@ namespace MiniPandoras.Story
     /// </summary>
     public sealed class StoryRunner : MonoBehaviour
     {
-        /// <summary>저장이 없을 때 시작하는 장(0 = 프롤로그).</summary>
-        public const int FirstChapter = 0;
-
-        // 장 번호 = FirstChapter + 순서. 웹게임 CHAPTERS와 같은 번호다.
+        // 장 번호 = 배열 순서(0 = 프롤로그). 웹게임 CHAPTERS와 같은 번호다.
         private static readonly Func<StoryDirector, IEnumerator>[] Chapters =
         {
             Prologue.Play,
@@ -39,19 +36,26 @@ namespace MiniPandoras.Story
         [SerializeField] private GameSession session;
         [SerializeField] private TitleView title;
 
+        private int pickedChapter;
+
         /// <summary>
         /// 장면을 열 때 이야기를 돌릴지. 맵만 걸어 보는 테스트가 장면을 열기 전에 끈다(끄면 타이틀 없이 착지 자리에서 그냥 걷는다).
         /// </summary>
         public static bool PlayStory { get; set; } = true;
 
+        /// <summary>장면을 다시 열 때 타이틀을 거치지 않고 저장된 장을 바로 이어 한다(사망 화면의 「게임 불러오기」). 한 번 쓰면 꺼진다.</summary>
+        public static bool ContinuesSave { get; set; }
+
         /// <summary>옮긴 장의 수(프롤로그 포함). 이보다 앞선 장만 타이틀에서 고를 수 있다.</summary>
-        public static int PlayableChapters => FirstChapter + Chapters.Length;
+        public static int PlayableChapters => Chapters.Length;
 
         /// <summary>지금 도는 장. 엔딩 중이면 마지막 장 다음 번호다.</summary>
         public int Chapter { get; private set; }
 
         private IEnumerator Start()
         {
+            bool continues = ContinuesSave;
+            ContinuesSave = false;
             if (!PlayStory)
             {
                 director.PlaceParty("hillia", "landing", Facing.Down);
@@ -61,13 +65,18 @@ namespace MiniPandoras.Story
 
             director.SetPlayerControl(false);
             SaveData save = SaveStore.Read();
-            int from = -1;
-            yield return ChooseChapter(save, picked => from = picked);
+            int from = continues && save != null ? save.Chapter : -1;
+            if (from < 0)
+            {
+                yield return ChooseChapter(save);
+                from = pickedChapter;
+            }
+
             yield return BeginFrom(from, save);
             for (Chapter = from; Chapter < PlayableChapters; Chapter++)
             {
                 director.BeginChapter(Chapter);
-                yield return Chapters[Chapter - FirstChapter](director);
+                yield return Chapters[Chapter](director);
             }
 
             // 1부 끝(웹게임 runStory 뒤): 클리어 표시를 남기고 엔딩을 본 뒤 타이틀로 돌아간다.
@@ -77,20 +86,19 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>타이틀에서 장을 고를 때까지 기다린다(웹게임 TitleScene.choose). 지난번에 들어갔던 장은 금빛으로 보인다.</summary>
-        private IEnumerator ChooseChapter(SaveData save, Action<int> chosen)
+        private IEnumerator ChooseChapter(SaveData save)
         {
-            int picked = -1;
-            Action<int> pick = chapter => picked = chapter;
+            pickedChapter = -1;
+            Action<int> pick = chapter => pickedChapter = chapter;
             title.ChapterPicked += pick;
             title.Show(ChapterTitles.Lines, PlayableChapters, save != null ? save.Chapter : -1, save != null && save.Cleared);
-            while (picked < 0)
+            while (pickedChapter < 0)
             {
                 yield return null;
             }
 
             title.ChapterPicked -= pick;
             title.Hide();
-            chosen(picked);
         }
 
         /// <summary>

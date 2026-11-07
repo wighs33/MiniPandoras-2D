@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using MiniPandoras.Characters;
 using MiniPandoras.Combat;
+using MiniPandoras.UI;
 using MiniPandoras.World;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MiniPandoras.Story
 {
@@ -20,6 +22,11 @@ namespace MiniPandoras.Story
             { "apiaCursed", new[] { "apia" } },
         };
 
+        private const float FallFrames = 50f;
+        private const float FallPixels = 120f;
+
+        [SerializeField] private DeathView death;
+
         /// <summary>
         /// 그 자리에서 싸운다. 싸우는 동안은 플레이어가 조종하고, 끝나면 화면이 어두워진 채로 인물들을 싸우기 전 자리로 되돌린다.
         /// keepDark면 어두운 채로 끝내 다음 연출을 준비할 수 있다.
@@ -28,14 +35,7 @@ namespace MiniPandoras.Story
         {
             IReadOnlyList<string> party = config.Party ?? session.State.Party;
             string lead = party.Count > 0 ? party[0] : HeroId;
-            var companions = new List<string>();
-            foreach (string member in party)
-            {
-                if (member != lead && !(member == "rang" && session.State.HasFlag("rangHurt")))
-                {
-                    companions.Add(member);
-                }
-            }
+            List<string> summonTeam = session.State.AvailableCompanions(party, lead);
 
             CharacterBody player = hero.Character;
             List<ActorSnapshot> before = Snapshot();
@@ -50,7 +50,7 @@ namespace MiniPandoras.Story
             var api = new BattleApi(combat, Talk);
             // 웹게임 runEncounter처럼 싸움이 시작되면 대화창 위 일러스트를 내린다.
             conversation.ClearFigures();
-            combat.BeginEncounter(new EncounterLink(lead, companions, config.NoDeath, config.Hooks, api), fighters);
+            combat.BeginEncounter(new EncounterLink(lead, summonTeam, config.NoDeath, config.Hooks, api), fighters);
             SetPlayerControl(true);
             List<ActorSnapshot> start = Snapshot();
 
@@ -85,14 +85,14 @@ namespace MiniPandoras.Story
 
                 if (combat.IsDowned)
                 {
-                    // 쓰러지면 같은 싸움을 처음부터 다시 한다.
+                    // 사망 화면에서 고른다. 이 싸움의 마지막 체크포인트는 싸움의 처음이다.
                     yield return Wait(40f);
-                    yield return FadeOut(30f);
+                    yield return DeathScreen();
                     Restore(start);
                     combat.RestartEncounter();
                     followCamera.SnapToTarget();
                     yield return FadeIn(20f);
-                    yield return combat.RunHook(Narrate("정신을 가다듬고⋯ 다시 한번!"));
+                    yield return combat.RunHook(Narrate("정신을 가다듬고... 다시 한번!"));
                 }
             }
 
@@ -127,8 +127,7 @@ namespace MiniPandoras.Story
             if (lead != HeroId)
             {
                 // 싸우는 모습은 능력치 표의 그림이다(웹게임 memberStats().sprite. 디엘은 악마 모습).
-                MemberStatBlock stats = MemberStats.For(lead, session.State.HeroLevel, session.State.HasFlag("awakened"));
-                player.SetSheet(actorFactory.Sheet(stats.SheetId));
+                player.SetSheet(actorFactory.Sheet(MemberStats.Current(lead, session.State).SheetId));
             }
 
             if (lead == session.State.Lead || !actors.TryGetValue(lead, out CharacterBody leader) || !leader.IsVisible)
@@ -169,9 +168,10 @@ namespace MiniPandoras.Story
                 actor.Shade = null;
                 actor.SetPose(BodyPose.Stand);
                 actor.Face(FacingRules.From(player.Position - actor.Position));
-                EnemyFighter fighter = combat.MakeEnemy(actor, "e" + i, id, isNew);
+                EnemyFighter fighter = combat.MakeEnemy(actor, "e" + i, id);
                 bool falls = config.EnemiesThatFall != null && ContainsId(config.EnemiesThatFall, id);
-                fighter.NoDeath = config.NoDeath && !falls;
+                bool stands = config.EnemiesThatStand != null && ContainsId(config.EnemiesThatStand, id);
+                fighter.NoDeath = stands || (config.NoDeath && !falls);
                 fighters.Add(fighter);
             }
 
@@ -337,21 +337,58 @@ namespace MiniPandoras.Story
             }
         }
 
-        // ── 필드에서 쓰러졌을 때 ────────────────────────────────
+        // ── 쓰러졌을 때 ─────────────────────────────────────────
+
+        /// <summary>
+        /// 사망 화면을 보이고 고를 때까지 기다린다. 마지막 체크포인트를 고르면 화면을 검게 덮은 채 돌아오고, 부른 쪽이 그 자리를 되살린 뒤 밝힌다.
+        /// 나머지는 장면을 다시 열어 이야기·맵·전투를 모두 처음 상태로 돌린다(게임 메뉴의 타이틀로와 같다).
+        /// </summary>
+        private IEnumerator DeathScreen()
+        {
+            yield return death.Ask();
+            if (death.Chosen == DeathChoice.Checkpoint)
+            {
+                yield return FadeOut(0f);
+                death.Hide();
+                yield break;
+            }
+
+            StoryRunner.ContinuesSave = death.Chosen == DeathChoice.LoadGame;
+            SceneManager.LoadScene(gameObject.scene.name);
+            // 장면이 닫히면서 이 코루틴도 사라진다. 그때까지 부른 쪽이 되살리지 않게 붙들어 둔다.
+            yield return new WaitUntil(() => false);
+        }
+
+        /// <summary>낭떠러지로 떨어진다: 몸이 아래로 사라진 뒤 사망 화면이 뜨고, 고른 대로 이어진다.</summary>
+        public IEnumerator FallToDeath()
+        {
+            CharacterBody body = hero.Character;
+            for (float frame = 0f; frame < FallFrames; frame += Time.deltaTime * 60f)
+            {
+                float progress = frame / FallFrames;
+                body.OffsetY = FallPixels * progress * progress;
+                body.Alpha = 1f - progress;
+                yield return null;
+            }
+
+            body.OffsetY = 0f;
+            combat.KnockOutPlayer();
+            yield return new WaitUntil(() => !combat.IsDowned);
+        }
 
         private void OnPlayerDowned()
         {
             StartCoroutine(ReviveInField());
         }
 
-        /// <summary>그 맵에 들어온 자리에서 다시 일어선다(웹게임 playerDown → reviveField).</summary>
+        /// <summary>사망 화면에서 마지막 체크포인트를 고르면 그 맵에 들어온 자리에서 다시 일어선다(웹게임 playerDown → reviveField).</summary>
         private IEnumerator ReviveInField()
         {
             yield return Wait(30f);
-            yield return FadeOut(30f);
+            yield return DeathScreen();
             combat.ReviveField();
             yield return FadeIn(24f);
-            yield return combat.RunHook(Narrate("정신을 가다듬고⋯ 다시 한번!"));
+            yield return combat.RunHook(Narrate("정신을 가다듬고... 다시 한번!"));
             combat.FinishRevive();
         }
     }
