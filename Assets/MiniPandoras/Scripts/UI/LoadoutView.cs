@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -36,8 +37,8 @@ namespace MiniPandoras.UI
         // 웹게임은 프레임마다 룬 띠를 0.002 라디안, 별을 sin(0.06 t)로 움직이고 알림을 110프레임 띄운다(60fps).
         private const float RuneDegreesPerSecond = 0.002f * FrameTime.FramesPerSecond * Mathf.Rad2Deg;
         private const float NoticeSeconds = 110f / FrameTime.FramesPerSecond;
-        private const string IdleHint = "끌어서 마법진에 놓기 · 눌러서 집기 · ×로 닫기";
-        private const string HeldHint = "자리를 눌러 놓기 · 다른 곳을 누르면 내려놓기";
+        private static string IdleHint => T("loadoutView.idleHint");
+        private static string HeldHint => T("loadoutView.heldHint");
 
         /// <summary>마법진의 자리 하나.</summary>
         [Serializable]

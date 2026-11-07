@@ -21,7 +21,6 @@ namespace MiniPandoras.Combat
 
     /// <summary>
     /// 스킬 하나. 이름·위력·소모는 웹게임 battle/data.ts의 SKILLS, 필드에서 나가는 모양은 combat/actions.ts의 ACTIONS다.
-    /// 에디터의 WebGameImporter가 battle.json에서 만든다.
     /// </summary>
     [CreateAssetMenu(menuName = "MiniPandoras/Skill")]
     public sealed class SkillDefinition : ScriptableObject

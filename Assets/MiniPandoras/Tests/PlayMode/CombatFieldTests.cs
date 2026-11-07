@@ -49,10 +49,10 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator FieldMonstersNoticeTheHeroFightAndFall()
         {
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             ArmHero();
             bool defeated = false;
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions
             {
                 Id = "test",
                 Enemies = new[] { "thug1" },
@@ -73,9 +73,9 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator KillingAMonsterGivesExperienceAndShowsItOnTheRight()
         {
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             ArmHero();
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(1, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(1, 0) });
             EnemyFighter thug = group.Enemies[0];
             hero.Face(Facing.Right);
             GameState state = UnityEngine.Object.FindFirstObjectByType<GameSession>().State;
@@ -92,7 +92,7 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator QuickSlotPotionHealsAndUsesOneUp()
         {
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             GameState state = UnityEngine.Object.FindFirstObjectByType<GameSession>().State;
             state.OpenQuickSlots();
             state.SetItemCount(Items.Potion, 2);
@@ -106,16 +106,16 @@ namespace MiniPandoras.Tests
                 slot += 1;
             }
 
-            combat.PressQuickSlot(slot);
+            combat.PlayerSkills.PressQuickSlot(slot);
             Assert.That(state.ItemCount(Items.Potion), Is.EqualTo(2), "체력이 가득하면 쓰지 않는다");
 
             player.Hp = 10;
-            combat.PressQuickSlot(slot);
+            combat.PlayerSkills.PressQuickSlot(slot);
             Assert.That(player.Hp, Is.EqualTo(70), "회복약은 체력을 60 채운다");
             Assert.That(state.ItemCount(Items.Potion), Is.EqualTo(1));
 
             player.Hp = 10;
-            combat.PressQuickSlot(slot);
+            combat.PlayerSkills.PressQuickSlot(slot);
             Assert.That(state.Equipment.Holds(Items.Potion), Is.False, "다 쓰면 칸이 빈다");
         }
 
@@ -123,8 +123,8 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator BareHandsCannotAttackButTheBatBurstsInFrontOfTheEnemy()
         {
-            director.SetParty(new[] { "hero" }, 7);
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(2, 0) });
+            director.Party.SetParty(new[] { "hero" }, 7);
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(2, 0) });
             EnemyFighter thug = group.Enemies[0];
             hero.Face(Facing.Right);
             yield return Waits.Until(() => combat.Player != null, 1f, "전투가 주인공 능력치를 짠다");
@@ -147,9 +147,9 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator PickingAPandoraSwapsToItAndAllSlotsWaitThreeSeconds()
         {
-            director.SetParty(new[] { "hero" }, 7);
-            director.GrantPandoras("phase", "darkPower");
-            combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(8, 0) });
+            director.Party.SetParty(new[] { "hero" }, 7);
+            director.Progress.GrantPandoras("phase", "darkPower");
+            combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(8, 0) });
             var touch = UnityEngine.Object.FindFirstObjectByType<TouchControlsView>();
             yield return Waits.Until(() => touch.Shown.Pandoras, 3f, "판도라가 둘 이상이면 교체 버튼이 보인다");
             Assert.That(touch.Shown.PickingPandora, Is.False, "처음에는 스킬 칸이 보인다");
@@ -169,7 +169,7 @@ namespace MiniPandoras.Tests
 
             combat.PressPandora(1);
             Assert.That(player.ActivePandora.Id, Is.EqualTo(second), "누른 칸의 판도라로 바뀐다");
-            Assert.That(player.SwapCooldown, Is.EqualTo(FieldCombat.PandoraSwapFrames), "바꾸면 3초를 기다린다");
+            Assert.That(player.SwapCooldown, Is.EqualTo(GameBalance.Current.PandoraSwapFrames), "바꾸면 3초를 기다린다");
 
             combat.PressPandora(0);
             Assert.That(player.ActivePandora.Id, Is.EqualTo(second), "기다리는 동안은 바꿀 수 없다");
@@ -178,7 +178,7 @@ namespace MiniPandoras.Tests
             Assert.That(player.ActivePandora.Id, Is.EqualTo(second), "빈 칸을 눌러도 그대로다");
 
             // 기다림은 전투 틱(60/s)으로 센다. 화면이 느리면 게임 시간보다 전투가 더디게 흐른다. 판도라가 다시 짜일 수 있어 매번 combat.Player를 읽는다.
-            yield return Waits.CombatTicksUntil(combat, () => combat.Player.SwapCooldown == 0, FieldCombat.PandoraSwapFrames + 60, "3초가 지나면 다시 바꿀 수 있다");
+            yield return Waits.CombatTicksUntil(combat, () => combat.Player.SwapCooldown == 0, GameBalance.Current.PandoraSwapFrames + 60, "3초가 지나면 다시 바꿀 수 있다");
             combat.PressPandora(0);
             Assert.That(combat.Player.ActivePandora.Id, Is.EqualTo(first));
         }
@@ -187,38 +187,38 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator WildGroupComesBackOnceTheHeroIsAway()
         {
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             ArmHero();
             Vector2Int home = hero.Cell + new Vector2Int(3, 0);
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = home, RespawnFrames = 30 });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = home, RespawnFrames = 30 });
             EnemyFighter thug = group.Enemies[0];
             hero.Face(Facing.Right);
             yield return Waits.Until(() => { combat.PressAttack(); return thug.Dead; }, 20f, "공격으로 쓰러뜨린다");
 
             yield return Waits.CombatTicks(combat, 90);
-            Assert.That(combat.Enemies.Any(e => !e.Dead), Is.False, "주인공이 곁에 있는 동안은 나타나지 않는다");
+            Assert.That(combat.EnemyAi.Enemies.Any(e => !e.Dead), Is.False, "주인공이 곁에 있는 동안은 나타나지 않는다");
 
             hero.PlaceAt(MapCoordinates.CellFoot(home - new Vector2Int(9, 0)));
-            yield return Waits.Until(() => combat.Enemies.Any(e => !e.Dead), 3f, "멀어지면 제자리에 돌아온다");
-            Assert.That(combat.Enemies.Count, Is.EqualTo(1), "쓰러진 몸은 남지 않는다");
-            Assert.That(combat.Enemies[0].Group.Done, Is.False);
-            Assert.That(combat.Enemies[0].Body.Cell, Is.EqualTo(home));
+            yield return Waits.Until(() => combat.EnemyAi.Enemies.Any(e => !e.Dead), 3f, "멀어지면 제자리에 돌아온다");
+            Assert.That(combat.EnemyAi.Enemies.Count, Is.EqualTo(1), "쓰러진 몸은 남지 않는다");
+            Assert.That(combat.EnemyAi.Enemies[0].Group.Done, Is.False);
+            Assert.That(combat.EnemyAi.Enemies[0].Body.Cell, Is.EqualTo(home));
         }
 
 
         [UnityTest]
         public IEnumerator CalledCompanionsComeWithTheirOwnEffects([Values("rang", "diel")] string member)
         {
-            director.SetParty(new[] { "hero", member }, 7);
+            director.Party.SetParty(new[] { "hero", member }, 7);
             yield return null;
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(2, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(2, 0) });
             EnemyFighter thug = group.Enemies[0];
             yield return Waits.Until(() => thug.Aggro, 5f, "적이 알아챈다");
             FxSheet poof = member == "rang" ? FxSheet.SummonPoof : FxSheet.DemonPoof;
             FxSheet strike = member == "rang" ? FxSheet.BeastStomp : FxSheet.DemonClaw;
             int hp = thug.Hp;
 
-            combat.PressSummon(0);
+            combat.PlayerSkills.PressSummon(0);
             Assert.That(combat.Effects.SpriteFxs.Any(fx => fx.Sheet == poof), Is.True, "연기와 함께 나타난다");
             yield return Waits.Until(() => combat.Effects.SpriteFxs.Any(fx => fx.Sheet == strike), 2f, "일격의 그림이 터진다");
             yield return null;
@@ -230,15 +230,15 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator LevelingUpPlaysTheEffectThatFollowsTheHero()
         {
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             GameState state = UnityEngine.Object.FindFirstObjectByType<GameSession>().State;
             ArmHero();
             int level = state.HeroLevel;
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(2, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(2, 0) });
             EnemyFighter thug = group.Enemies[0];
             hero.Face(Facing.Right);
             yield return Waits.Until(() => combat.Player != null, 3f, "전투 준비");
-            state.AddExperience(GameState.ExperiencePerLevel - state.ExperienceInLevel - thug.Definition.Experience);
+            state.AddExperience(GameBalance.Current.ExperiencePerLevel - state.ExperienceInLevel - thug.Definition.Experience);
             Assert.That(state.HeroLevel, Is.EqualTo(level));
 
             yield return Waits.Until(() => { hero.PlaceAt(thug.Position + new Vector2(-1f, 0f)); combat.PressAttack(); return state.HeroLevel > level; }, 20f, "쓰러뜨려 레벨이 오른다");
@@ -250,11 +250,11 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator HassComesBerserkAndStrikesThreeTimes()
         {
-            director.SetParty(new[] { "hero", "hass" }, 7);
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "mino" }, At = hero.Cell + new Vector2Int(3, 0) });
+            director.Party.SetParty(new[] { "hero", "hass" }, 7);
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "mino" }, At = hero.Cell + new Vector2Int(3, 0) });
             EnemyFighter target = group.Enemies[0];
             yield return Waits.Until(() => combat.Player != null && combat.ShowsHud, 3f, "전투 화면이 뜬다");
-            combat.PressSummon(0);
+            combat.PlayerSkills.PressSummon(0);
             CharacterBody helper = FindActor("summon:hass");
             Assert.That(helper.Aura, Is.EqualTo(AuraKind.Rage), "광폭화한 기운을 두른다");
             int hp = target.Hp;
@@ -271,15 +271,15 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator SummonedRangStompsTheNearestEnemy()
         {
-            director.SetParty(new[] { "hero", "rang" }, 2);
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(3, 0) });
+            director.Party.SetParty(new[] { "hero", "rang" }, 2);
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(3, 0) });
             EnemyFighter thug = group.Enemies[0];
             // 전투는 60fps 단위로만 돌아서, 프레임이 짧으면 한 프레임 뒤에도 파티가 아직 반영되지 않았을 수 있다.
             yield return Waits.Until(() => combat.Companions.Count > 0, 1f, "파티가 전투에 반영된다");
             Assert.That(combat.Companions, Is.EqualTo(new[] { "rang" }));
 
-            combat.PressSummon(0);
-            Assert.That(combat.SummonCooldown("rang"), Is.GreaterThan(0), "부르면 다시 부를 때까지 기다린다");
+            combat.PlayerSkills.PressSummon(0);
+            Assert.That(combat.PlayerSkills.SummonCooldown("rang"), Is.GreaterThan(0), "부르면 다시 부를 때까지 기다린다");
             yield return Waits.Until(() => thug.Hp < thug.MaxHp, 2f, "나타난 랑이 거수 짓밟기로 적을 친다");
             yield return Waits.Until(() => GameObject.Find("summon:rang") == null, 3f, "한 번 쓰고 돌아간다");
         }
@@ -288,8 +288,8 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator FollowerHidesWhileWalkingAndLinesUpForCutscenes()
         {
-            director.SetParty(new[] { "hero", "rang" }, 1);
-            director.PlaceParty("hillia", "landing", Facing.Down);
+            director.Party.SetParty(new[] { "hero", "rang" }, 1);
+            director.Party.PlaceParty("hillia", "landing", Facing.Down);
             director.SetPlayerControl(true);
             yield return null;
             CharacterBody rang = FindActor("rang");
@@ -300,7 +300,7 @@ namespace MiniPandoras.Tests
             Assert.That(rang.IsVisible, Is.True, "연출이 시작되면 다시 선다");
             Assert.That(rang.Cell, Is.EqualTo(hero.Cell + new Vector2Int(0, -1)), "아래를 보는 주인공의 바로 뒤(위 칸)에 선다");
 
-            yield return director.Walk("hero", "D2", 6f);
+            yield return director.Actors.Walk("hero", "D2", 6f);
             // 동료의 마지막 한 걸음이 끝나길 잠깐 기다린다.
             yield return new WaitForSeconds(0.2f);
             Assert.That(rang.Cell, Is.EqualTo(hero.Cell + new Vector2Int(0, -1)), "연출 걸음에서도 한 칸 뒤를 따라온다");
@@ -312,9 +312,9 @@ namespace MiniPandoras.Tests
         {
             // 치명타·빗나감이 난수라 앞 테스트에 따라 효과가 겹치는 정도가 달라진다. 늘 같은 싸움을 재도록 씨앗을 고정한다.
             UnityEngine.Random.InitState(20261102);
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             ArmHero();
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(1, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(1, 0) });
             EnemyFighter thug = group.Enemies[0];
             // 측정 중에 쓰러지면 무리 끝 연출(코루틴)이 돌아 할당이 생기므로 체력 1에서 버티게 한다.
             thug.NoDeath = true;

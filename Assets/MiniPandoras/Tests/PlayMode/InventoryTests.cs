@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using MiniPandoras.Characters;
 using MiniPandoras.Combat;
 using MiniPandoras.Progress;
@@ -8,6 +9,7 @@ using MiniPandoras.World;
 using NUnit.Framework;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -152,7 +154,7 @@ namespace MiniPandoras.Tests
 
             // 한 마리뿐인 무리(hillia-2) 곁으로 가면 몬스터가 덤벼들고, 칠 거리에 오면 공격 버튼을 가리킨다.
             EnemyFighter target = null;
-            foreach (EnemyFighter e in story.Combat.Enemies)
+            foreach (EnemyFighter e in story.Combat.EnemyAi.Enemies)
             {
                 if (e.Group != null && e.Group.Options.Id == "hillia-2")
                 {
@@ -169,6 +171,25 @@ namespace MiniPandoras.Tests
             yield return story.Until(() => guide.Target == null, 2f, "누르면 안내가 사라진다");
             Assert.That(Time.timeScale, Is.EqualTo(speed), "시간이 다시 흐른다");
             yield return story.Until(() => target.Hp < target.MaxHp, 3f, "휘두른 방망이가 몬스터에게 맞는다");
+        }
+
+        [UnityTest]
+        public IEnumerator LeavingTheSceneWhileTheTutorialStopsTimeLetsTimeFlowAgain()
+        {
+            yield return story.UntilExploring("hillia", "2장 첫 탐험");
+            GameState state = story.Session.State;
+            state.SetItemCount(Items.Bat, 1);
+            state.Equip(Items.Bat);
+            story.FollowsGuides = false;
+            var guide = Object.FindFirstObjectByType<TutorialGuide>();
+            var touch = Object.FindFirstObjectByType<TouchControlsView>();
+            EnemyFighter target = story.Combat.EnemyAi.Enemies.First(e => e.Group != null && e.Group.Options.Id == "hillia-2");
+            story.Mover.PlaceAt(target.Position + new Vector2(0f, -2.5f), Facing.Up);
+            yield return story.Until(() => guide.Target == touch.ActionButton, 15f, "몬스터가 다가오면 시간이 멈춘다");
+            Assert.That(Time.timeScale, Is.EqualTo(0f));
+
+            yield return SceneManager.LoadSceneAsync("Field");
+            Assert.That(Time.timeScale, Is.GreaterThan(0f), "멈춘 시간이 다음 장면까지 이어지면 게임이 멎는다");
         }
 
         /// <summary>그 버튼 자리를 화면에서 누르면 그 버튼이 받는지 보고 누른다.</summary>

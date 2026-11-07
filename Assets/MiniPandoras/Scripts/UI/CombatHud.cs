@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using MiniPandoras.Characters;
 using MiniPandoras.Combat;
 using MiniPandoras.Dialogue;
+using MiniPandoras.Progress;
 using TMPro;
 using UnityEngine;
 
@@ -129,7 +130,7 @@ namespace MiniPandoras.UI
             for (int i = 0; i < pandoraSlots.Length; i++)
             {
                 PandoraDefinition pandora = p.PandoraAt(i);
-                pandoraSlots[i].Show(pandora != null ? IconFor(pandora.Id) : null, i == p.PandoraIndex, p.SwapCooldown, FieldCombat.PandoraSwapFrames);
+                pandoraSlots[i].Show(pandora != null ? IconFor(pandora.Id) : null, i == p.PandoraIndex, p.SwapCooldown, GameBalance.Current.PandoraSwapFrames);
             }
         }
 
@@ -164,13 +165,13 @@ namespace MiniPandoras.UI
                     slotFaces[i] = actors.Sheet(combat.Catalog.Member(member).SheetId).Portrait;
                 }
 
-                summonSlots[i].Show(slotFaces[i], combat.SummonCooldown(member), combat.Catalog.SummonCooldown);
+                summonSlots[i].Show(slotFaces[i], combat.PlayerSkills.SummonCooldown(member), GameBalance.Current.SummonCooldown);
             }
         }
 
         private void ShowBoss()
         {
-            EnemyFighter boss = combat.Boss;
+            EnemyFighter boss = combat.Encounters.Boss;
             bossPanel.SetActive(boss != null);
             if (boss == null)
             {
@@ -219,7 +220,7 @@ namespace MiniPandoras.UI
             }
 
             // 알림이 떠 있는 동안 보스가 나타나도 겹치지 않게, 보스 체력이 떠 있으면 그 아래로 내린다.
-            messageBox.anchoredPosition = new Vector2(0f, combat.Boss != null ? -48f : -30f);
+            messageBox.anchoredPosition = new Vector2(0f, combat.Encounters.Boss != null ? -48f : -30f);
         }
     }
 }

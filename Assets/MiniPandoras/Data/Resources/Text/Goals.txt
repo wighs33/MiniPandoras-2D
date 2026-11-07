@@ -1,0 +1,82 @@
+# Goals
+# 메인 임무의 제목과 설명. id는 Goals의 상수와 같다.
+
+== goal.surviveHillia.title
+text			낯선 땅 힐리아에서 살아남는다
+== goal.surviveHillia.detail
+text			처음 보는 땅에 떨어졌다. 주변을 살피며 앞으로 나아가자.
+
+== goal.goToSnakeCastle.title
+text			북쪽의 뱀성으로 간다
+== goal.goToSnakeCastle.detail
+text			랑이 북쪽으로 가자고 했다. 들판 위쪽 길을 따라 뱀성으로 가자.
+
+== goal.fleeUpTheCastle.title
+text			뱀성 위층으로 도망친다
+== goal.fleeUpTheCastle.detail
+text			병사들에게 쫓기고 있다. 위층으로 올라가는 계단을 찾아 도망치자.
+
+== goal.findHidingPlace.title
+text			순찰병을 피해 숨을 곳을 찾는다
+== goal.findHidingPlace.detail
+text			마을에 순찰병이 돌고 있다. 눈에 띄지 않게 숨을 곳을 찾자.
+
+== goal.goToTrainStation.title
+text			마을 동쪽의 뱀열차 정류장으로 간다
+== goal.goToTrainStation.detail
+text			뱀열차는 마을 동쪽으로 나가서 탄다. 외곽 들판을 지나 정류장까지 걸어가자.
+
+== goal.followTheNewWave.title
+text			디엘의 기억 속 뉴웨이브를 따라간다
+== goal.followTheNewWave.detail
+text			갑판의 선원들과 모두 이야기한 뒤, 선실의 라코를 찾아가자.
+
+== goal.findTheHarbor.title
+text			선착장 가는 길을 찾는다
+== goal.findTheHarbor.detail
+text			역 밖으로 나가 선착장으로 가는 길을 알아보자.
+
+== goal.boardTheWestShip.title
+text			부두에서 힐리아 서부행 배에 탄다
+== goal.boardTheWestShip.detail
+text			아래쪽 부두에서 힐리아 서부로 가는 배에 타자.
+
+== goal.findLargo.title
+text			라르고를 찾는다
+== goal.findLargo.detail
+text			힐리아 서부에 왔다. 마을을 돌아보며 라르고를 찾아보자.
+
+== goal.hearTheVillagers.title
+text			마을 사람들의 이야기를 듣는다
+== goal.hearTheVillagers.detail
+text			동쪽 마을 광장 사람들에게 말을 걸어 보자.
+
+== goal.defeatMino.title
+text			드래곤 고원의 미노를 쓰러뜨린다
+== goal.defeatMino.detail
+text			마을의 곡식을 빼앗아 가는 미노를 혼내 주자. 북쪽 고갯길을 지나면 드래곤 고원이다.
+
+== goal.watchLargosMemory.title
+text			라르고의 기억을 끝까지 지켜본다
+== goal.watchLargosMemory.detail
+text			라르고의 기억이 이어지고 있다. 끝까지 지켜보자.
+
+== goal.clearTheSands.title
+text			모래밭의 몬스터를 쓰러뜨리고 동쪽 길로 간다
+== goal.clearTheSands.detail
+text			모래밭의 몬스터를 3마리 쓰러뜨리면 동쪽 길로 페어리가든에 갈 수 있다.
+
+== goal.climbTheGiantTree.title
+text			거대고목을 층층이 올라간다
+== goal.climbTheGiantTree.detail
+text			고목 안의 계단으로 층층이 올라가 보자.
+
+== goal.reachFairyShelter.title
+text			고목 3층 요정 마을의 쉼터로 간다
+== goal.reachFairyShelter.detail
+text			고목 3층 요정 마을의 쉼터로 가자.
+
+== goal.reachNarionStation.title
+text			고목 꼭대기의 나리온 정거장으로 올라간다
+== goal.reachNarionStation.detail
+text			쉼터를 나와 고목 꼭대기의 나리온 정거장까지 올라가자.

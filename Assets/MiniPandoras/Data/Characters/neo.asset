@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: neo
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: neo
+  size: {x: 28, y: 42}
+  down:
+  - {fileID: 21300000, guid: dbe75e2eb13807d4facc05b83dc136fc, type: 3}
+  - {fileID: 21300000, guid: 57861ec4b106952439b880ad12bf1791, type: 3}
+  - {fileID: 21300000, guid: e451f69b67b29a64692f9d5c9cc6c7dd, type: 3}
+  right:
+  - {fileID: 21300000, guid: 9585c4d0d308c094f892273ce5c8de08, type: 3}
+  - {fileID: 21300000, guid: 50b47203bd5107a47983c67af8bdb5e2, type: 3}
+  - {fileID: 21300000, guid: b856c40c93b9e294e83db2f88fbaa0eb, type: 3}
+  up:
+  - {fileID: 21300000, guid: 4f5837b9ebaddeb45ad62894e6b5fdd8, type: 3}
+  - {fileID: 21300000, guid: f681b9c335d42fe47a7f26f8f9df174a, type: 3}
+  - {fileID: 21300000, guid: 4423ad5efc7d9eb439dca1ab8f47ccff, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: ea43f256e80cf244887261a5cc5c758b, type: 3}
+  - {fileID: 21300000, guid: deaa768e3dc8a4346a8e75f066722fd4, type: 3}
+  - {fileID: 21300000, guid: 71382485eb40abc4699a83bc9518df48, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: 4d156bbbfe5b6de4eb57995241f89a63, type: 3}
+  - {fileID: 21300000, guid: 654a2fbd6b2b17547bdf500ba2e5aa96, type: 3}
+  - {fileID: 21300000, guid: 0369eb41ac5982c4493686039e2755ea, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 571b48689272bbe40864587e5af07d0b, type: 3}
+  - {fileID: 21300000, guid: 7a48dbabc1a64844b9494591247027c1, type: 3}
+  - {fileID: 21300000, guid: 3df92fc558a1ae24b880e537d2539ac1, type: 3}
+  kneelPicture: {fileID: 21300000, guid: 43b834e46917e734e874fa62182dd01b, type: 3}
+  liePicture: {fileID: 0}
+  portrait: {fileID: 21300000, guid: 9307ffb0cb2deea408b34aef91551c56, type: 3}
+  moves: []

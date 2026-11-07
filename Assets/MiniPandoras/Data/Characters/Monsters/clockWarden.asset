@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: clockWarden
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: clockWarden
+  size: {x: 30, y: 44}
+  down:
+  - {fileID: 21300000, guid: feaa44e9d1ff7e84985338e8fdcef89c, type: 3}
+  - {fileID: 21300000, guid: b3b97619767508d488cb4007e2af571b, type: 3}
+  - {fileID: 21300000, guid: 6847f01b378b0ef46a34f0d98b751ab3, type: 3}
+  right:
+  - {fileID: 21300000, guid: badfe2e30a386d44eb764d8d5cb24055, type: 3}
+  - {fileID: 21300000, guid: ef486ae3a8ef6084489af9073aea4ff7, type: 3}
+  - {fileID: 21300000, guid: b3de4da07ec332443b369d986a224a56, type: 3}
+  up:
+  - {fileID: 21300000, guid: b02e35cfbe8a29948a7e8d000f1b3d61, type: 3}
+  - {fileID: 21300000, guid: 74ce5a681daaed84093d481e7b6af528, type: 3}
+  - {fileID: 21300000, guid: f6a78f072214d304897948862fa33b36, type: 3}
+  portrait: {fileID: 0}

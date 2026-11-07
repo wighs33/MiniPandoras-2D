@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: thunderKite
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: thunderKite
+  size: {x: 30, y: 38}
+  down:
+  - {fileID: 21300000, guid: fe260928be7e8de4db87989559d63123, type: 3}
+  - {fileID: 21300000, guid: 8e77330feff01804baa317308a5d2ca5, type: 3}
+  - {fileID: 21300000, guid: 22ba24ae5ff17e94bb9a58202716a1a6, type: 3}
+  right:
+  - {fileID: 21300000, guid: 2cb390c33c9dac143b325b7fed227e44, type: 3}
+  - {fileID: 21300000, guid: 4c33ce401972fb648884200143aa1e03, type: 3}
+  - {fileID: 21300000, guid: bcaedd7679fb5f04eb2e964fab518ad9, type: 3}
+  up:
+  - {fileID: 21300000, guid: 8adf310668778024e96b9796f1fa4e7b, type: 3}
+  - {fileID: 21300000, guid: 44a0ab8ede845ad478080d7c799ce3c4, type: 3}
+  - {fileID: 21300000, guid: fe9a471047fb1544aa1da47f84b28ab1, type: 3}
+  portrait: {fileID: 0}

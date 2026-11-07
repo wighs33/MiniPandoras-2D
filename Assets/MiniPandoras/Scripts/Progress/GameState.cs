@@ -18,8 +18,6 @@ namespace MiniPandoras.Progress
         public const string Mystery = "mystery";
         /// <summary>전투에서 부를 수 있는 동료 수.</summary>
         public const int MaxSummons = 3;
-        /// <summary>레벨 하나에 드는 경험치(레벨마다 같다).</summary>
-        public const int ExperiencePerLevel = 100;
         private const string QuickSlotsFlag = "quickSlots";
         // 이 장의 튜토리얼이 퀵슬롯을 연다. 깃발은 저장하지 않으므로 다음 장부터는 장으로 판단한다.
         private const int ChapterQuickSlotsOpen = 5;
@@ -69,7 +67,7 @@ namespace MiniPandoras.Progress
         public bool QuickSlotsOpen => HasFlag(QuickSlotsFlag) || chapter > ChapterQuickSlotsOpen;
         public int Gold => gold;
         /// <summary>지금 레벨에서 모은 경험치(0부터 99까지).</summary>
-        public int ExperienceInLevel => experience % ExperiencePerLevel;
+        public int ExperienceInLevel => experience % GameBalance.Current.ExperiencePerLevel;
         /// <summary>지금 메인 임무(없으면 빈 값).</summary>
         public string Goal => goal;
         /// <summary>끝낸 메인 임무. 끝낸 순서다.</summary>
@@ -87,7 +85,7 @@ namespace MiniPandoras.Progress
         /// <summary>장마다 정한 레벨(웹게임 값).</summary>
         public int ChapterLevel => heroLevel;
         /// <summary>경험치로 오른 레벨.</summary>
-        public int EarnedLevels => experience / ExperiencePerLevel;
+        public int EarnedLevels => experience / GameBalance.Current.ExperiencePerLevel;
         /// <summary>파티 레벨: 장마다 정한 레벨에 경험치로 오른 레벨을 더한다.</summary>
         public int HeroLevel => ChapterLevel + EarnedLevels;
         public IReadOnlyList<string> Party => party;
@@ -207,15 +205,15 @@ namespace MiniPandoras.Progress
         }
 
         /// <summary>상점에서 산다. 골드가 모자라면 false.</summary>
-        public bool Buy(ShopGood good)
+        public bool Buy(ItemDefinition item)
         {
-            if (gold < good.Price)
+            if (gold < item.Price)
             {
                 return false;
             }
 
-            gold -= good.Price;
-            SetItemCount(good.Item, ItemCount(good.Item) + 1);
+            gold -= item.Price;
+            SetItemCount(item.Id, ItemCount(item.Id) + 1);
             return true;
         }
 

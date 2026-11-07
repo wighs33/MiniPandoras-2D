@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: SandWave
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: -567763801, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -634883816, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -743424959, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -1263254112, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 256384785, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 1351651052, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -1494009436, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -85747225, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -527177753, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -619490634, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 943586110, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 967358559, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -1024977844, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 455201599, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 208833799, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: -1967251053, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 1391836688, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  - {fileID: 1120662356, guid: b4daed67539a521469e66d838d6f58c6, type: 3}
+  lightFrames:
+  - {fileID: 1906616178, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -1814885024, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -2014026112, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -627449795, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -1593579689, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: 939513359, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -486791030, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -1420576480, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: 1882228661, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -213888855, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -1768163608, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -323249210, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -1257575278, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -1490846634, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: 822153851, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -127919987, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: -1837936930, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  - {fileID: 631156786, guid: 17d7e3a5fcd805f41b87569c7136fcf1, type: 3}
+  framesPerSecond: 30
+  loop: 1
+  impactSeconds: 0

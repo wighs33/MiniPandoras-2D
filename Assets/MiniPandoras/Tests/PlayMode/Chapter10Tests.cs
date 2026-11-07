@@ -55,24 +55,24 @@ namespace MiniPandoras.Tests
             }
 
             Assert.That(story.Exploration.IsLocked("east"), Is.False, "모래 늑대 셋을 잡으면 동쪽 길이 열린다");
-            yield return story.StandOn(story.Director.Point("east"));
+            yield return story.StandOn(story.Director.Field.Point("east"));
 
             // 페어리가든: 버디를 만나야 고목 문이 열린다.
             yield return story.UntilExploring("fairyGarden", "페어리가든");
             Assert.That(story.Lines, Has.Member("귀찮은 걸 하나 더 떠안았군."));
             Assert.That(story.Exploration.IsLocked("treeGate"), Is.True, "버디를 만나기 전에는 고목 문이 잠겨 있다");
-            yield return story.StandOn(story.Director.Point("buddy") + new Vector2Int(0, 2));
+            yield return story.StandOn(story.Director.Field.Point("buddy") + new Vector2Int(0, 2));
             yield return story.UntilExploring("fairyGarden", "버디를 만난 뒤");
             Assert.That(story.Lines, Has.Member("뉴웨이브의 뜻을 이어 갈 길드를 세웠다.\n이름은 에버웨이브다."), "버디가 모르는 이름이라 어떤 길드인지 먼저 말한다");
             Assert.That(story.Lines, Has.Member("그것도 말 못 해.\n하지만 네 적은 아니야.\n그건 약속할게."));
-            yield return story.StandOn(story.Director.Point("treeGate"));
+            yield return story.StandOn(story.Director.Field.Point("treeGate"));
 
             // 거대고목을 층층이 올라 5층 가지 회랑에서 케이트 → 판도라의 정원.
             yield return story.UntilExploring("treeHall", "고목 1층 뿌리 홀");
-            Assert.That(story.Director.HasActor("receptionist"), Is.True, "1층 홀에 접수 요정이 있다");
+            Assert.That(story.Director.Actors.HasActor("receptionist"), Is.True, "1층 홀에 접수 요정이 있다");
             Assert.That(story.Exploration.IsLocked("roots"), Is.True, "뿌리 계단은 아직 막혀 있다");
             yield return Walk("up", "treeHall", "treeMarket", "treeRooms", "treeLibrary", "giantTree");
-            yield return story.StandOn(story.Director.Point("warpSpot"));
+            yield return story.StandOn(story.Director.Field.Point("warpSpot"));
             yield return story.Until(() =>
             {
                 story.Fight();
@@ -82,7 +82,7 @@ namespace MiniPandoras.Tests
             yield return SettleFromTheMenu();
 
             // 빛의 문 → 고목 꼭대기 케이트전 → 촌장.
-            yield return story.StandOn(story.Director.Point("exit"));
+            yield return story.StandOn(story.Director.Field.Point("exit"));
             yield return story.Until(() =>
             {
                 story.Fight();
@@ -93,7 +93,7 @@ namespace MiniPandoras.Tests
             // 1층까지 내려가 뿌리 계단으로. 아피아를 구하면 저주가 걷혀 뿌리가 맑아진다.
             yield return Walk("down", "treeCrown", "giantTree", "treeLibrary", "treeRooms", "treeMarket", "treeHall");
             Assert.That(story.Exploration.IsLocked("door"), Is.True, "촌장의 부탁을 들어주기 전에는 고목 밖으로 나가지 않는다");
-            yield return story.StandOn(story.Director.Point("roots"));
+            yield return story.StandOn(story.Director.Field.Point("roots"));
             yield return story.Until(() =>
             {
                 story.Fight();
@@ -101,9 +101,9 @@ namespace MiniPandoras.Tests
             }, 120f, "아피아를 구한다");
             Assert.That(story.Lines, Has.Member("...고마워요.\n이제 강물이 다시 맑아질 거예요."));
             Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("clean"), "저주가 걷히면 뿌리가 맑아진다");
-            yield return story.StandOn(story.Director.Point("up"));
+            yield return story.StandOn(story.Director.Field.Point("up"));
             yield return story.UntilExploring("treeHall", "뿌리에서 고목 1층으로");
-            yield return story.StandOn(story.Director.Point("door"));
+            yield return story.StandOn(story.Director.Field.Point("door"));
 
             // 요정 마을로 돌아가면 그날 밤 연회, 이어서 11장이 밤의 페어리가든에서 시작한다.
             yield return story.Until(() => story.Runner.Chapter > 10, 60f, "연회와 10장 끝");
@@ -122,7 +122,7 @@ namespace MiniPandoras.Tests
                 yield return story.UntilExploring(floors[i], $"고목 {floors[i]}");
                 if (i < floors.Length - 1)
                 {
-                    yield return story.StandOn(story.Director.Point(stairs));
+                    yield return story.StandOn(story.Director.Field.Point(stairs));
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace MiniPandoras.Tests
         /// <summary>남은 모래 늑대 하나의 곁에 서서, 덤벼드는 늑대 쪽을 보며 공격을 눌러 쓰러뜨린다.</summary>
         private IEnumerator HuntOneWolf()
         {
-            EnemyFighter wolf = story.Combat.Enemies.FirstOrDefault(e => !e.Dead && !e.InEncounter && e.Body.IsVisible);
+            EnemyFighter wolf = story.Combat.EnemyAi.Enemies.FirstOrDefault(e => !e.Dead && !e.InEncounter && e.Body.IsVisible);
             Assert.That(wolf, Is.Not.Null, "사막에 모래 늑대가 남아 있다");
             Vector2Int stand = Approaches.Select(offset => wolf.Body.Cell + offset).First(cell => !FootMover.IsBlocked(MapCoordinates.CellFoot(cell)));
             story.Mover.PlaceAt(MapCoordinates.CellFoot(stand), FacingRules.From(wolf.Position - MapCoordinates.CellFoot(stand)));
@@ -190,7 +190,7 @@ namespace MiniPandoras.Tests
         private bool IsExploring(string mapId)
         {
             // 싸우는 동안에도 조작이 돌아오므로, 싸움이 아니라 탐험 차례인지 본다.
-            return story.Exploration.IsExploring && !story.Combat.InEncounter && !story.Mover.IsFrozen && story.Travel.CurrentMap.Id == mapId && !story.Travel.IsTravelling;
+            return story.Exploration.IsExploring && !story.Combat.Encounters.InEncounter && !story.Mover.IsFrozen && story.Travel.CurrentMap.Id == mapId && !story.Travel.IsTravelling;
         }
     }
 }

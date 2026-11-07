@@ -5,6 +5,7 @@ using MiniPandoras.Field;
 using MiniPandoras.Progress;
 using MiniPandoras.World;
 using UnityEngine;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.Story
 {
@@ -17,8 +18,8 @@ namespace MiniPandoras.Story
     /// </summary>
     public static class Chapter7
     {
-        private const string Leaving = "마차는 벌써 돌아가 버렸다.\n일단 안으로 들어가 보자.";
-        private const string WalkedHereLeaving = "여기까지 왔으니 일단 안으로 들어가 보자.";
+        private static string Leaving => T("chapter7.leaving");
+        private static string WalkedHereLeaving => T("chapter7.walkedHereLeaving");
         // 상자를 열고 이 줄까지 내려오면 나가는 것으로 본다. 루가가 서는 칸보다 위다.
         private const int LeavingRow = 12;
         private static readonly string[] Hobbits = { "hob0", "hob1", "hob2" };
@@ -26,19 +27,19 @@ namespace MiniPandoras.Story
         private const int CrowdCount = 20;
         private static readonly (string look, string line)[] CrowdLines =
         {
-            ("townMan", "서부행 배가 또 꽉 찼다네.\n레비아탄 때문에 돌아가는 길뿐이니 말이야."),
-            ("townWoman", "오늘 아침에 잡은 생선이에요!\n싱싱할 때 사 가세요!"),
-            ("merchant", "동쪽 물건은 전부 이 항구로 모이지.\n없는 게 없어!"),
-            ("townKid", "저 배 엄청 커!\n나도 나중에 뱃사람이 될 거야!"),
-            ("elder", "이 항구가 이렇게 붐비는 건 서쪽 부두가 막힌 뒤로 처음이지."),
-            ("townWoman", "서부에 있는 아들한테 편지를 부치러 왔어요."),
-            ("townMan", "짐 비켜요, 짐!\n뒤에서 수레 들어갑니다!"),
+            ("townMan", T("chapter7.readonly.1")),
+            ("townWoman", T("chapter7.readonly.2")),
+            ("merchant", T("chapter7.readonly.3")),
+            ("townKid", T("chapter7.readonly.4")),
+            ("elder", T("chapter7.readonly.5")),
+            ("townWoman", T("chapter7.readonly.6")),
+            ("townMan", T("chapter7.readonly.7")),
         };
         private static readonly string[] SailorLines =
         {
-            "힐리아 서부행은 맨 끝 부두에서 떠나.\n곧 출항이다!",
-            "바다가 넓다고 곧장 건널 생각은 마.\n레비아탄 눈에 띄면 끝이야.",
-            "동쪽 끝을 돌아서 가니까 며칠 걸리지.\n뱃멀미 약은 챙겼나?",
+            T("chapter7.readonly.8"),
+            T("chapter7.readonly.9"),
+            T("chapter7.readonly.10"),
         };
         private static readonly Color[] BookLight = { new Color32(0xff, 0xf0, 0xb0, 0xff), new Color32(0x8f, 0xf0, 0xe8, 0xff), Color.white };
         // 루가의 설명 컷인(Tools/PixelGen/cutin_ruga.py)에서 카메라가 천천히 다가갈 곳(가상 px).
@@ -52,17 +53,17 @@ namespace MiniPandoras.Story
 
         public static IEnumerator Play(StoryDirector s)
         {
-            s.SetParty(new[] { "hero", "rang", "diel" }, 4);
-            s.SetFlag(StoryFlags.Awakened);
-            s.SetFlag(StoryFlags.RangHurt, false);
-            s.SetFlag(StoryFlags.Swap, false);
-            s.SetFlag(StoryFlags.Book, false);
-            s.GrantPandoras("phase", "darkPower");
-            s.GiveAtLeast(Items.Potion, 3);
-            s.GiveAtLeast(Items.Ether, 2);
+            s.Party.SetParty(new[] { "hero", "rang", "diel" }, 4);
+            s.Progress.SetFlag(StoryFlags.Awakened);
+            s.Progress.SetFlag(StoryFlags.RangHurt, false);
+            s.Progress.SetFlag(StoryFlags.Swap, false);
+            s.Progress.SetFlag(StoryFlags.Book, false);
+            s.Progress.GrantPandoras("phase", "darkPower");
+            s.Progress.GiveAtLeast(Items.Potion, 3);
+            s.Progress.GiveAtLeast(Items.Ether, 2);
             yield return s.FadeOut(0f);
             yield return s.ChapterCard(7);
-            s.Memory(false, instant: true);
+            s.Stage.Memory(false, instant: true);
             // 호빗의 마차를 타지 않고 역 동쪽 산길을 걸어 동굴에 닿을 수도 있다.
             bool walked = false;
             yield return AtTheTerminal(s, finishedBy => walked = finishedBy == SideRoads.CaveMouth);
@@ -85,40 +86,38 @@ namespace MiniPandoras.Story
 
         private static IEnumerator AtTheTerminal(StoryDirector s, Action<string> finished)
         {
-            s.PlaceParty("station", "arrive", Facing.Up);
-            Vector2Int track = s.Point("track");
-            SnakeTrain train = s.SpawnSnakeTrain((track.x - 4) * MapCoordinates.LogicalPixelsPerTile, track.y * MapCoordinates.LogicalPixelsPerTile + 8f);
+            s.Party.PlaceParty("station", "arrive", Facing.Up);
+            Vector2Int track = s.Field.Point("track");
+            SnakeTrain train = s.Stage.SpawnSnakeTrain((track.x - 4) * MapCoordinates.LogicalPixelsPerTile, track.y * MapCoordinates.LogicalPixelsPerTile + 8f);
             s.SnapCamera();
             yield return s.FadeIn(40f);
             s.Cinema(true);
-            yield return s.Emote("hero", "!");
-            yield return s.Say("hero", "헉...!\n어, 언제 잠들었지......?");
-            yield return s.Say("diel", "...내 이야기가 지루했나 보군.\n다 왔다.\n내리자.");
-            yield return s.Say("rang", "냐하! 침까지 흘리면서 자더군.");
+            yield return s.Actors.Emote("hero", "!");
+            yield return s.Lines("chapter7.atTheTerminal.1");
             train.Depart();
             yield return s.Wait(80f);
             PlaceRoadside(s);
-            yield return s.Say("diel", "선착장까지는 아직 멀다.\n길부터 알아보자.");
+            yield return s.Lines("chapter7.atTheTerminal.2");
             SideRoads.AroundTheStation(s, () => PlaceRoadside(s));
             s.Cinema(false);
-            s.Hint("역 밖으로 나가 선착장 가는 길을 알아보자", 300f);
-            s.SetGoal("선착장 가는 길을 찾는다");
-            yield return s.Explore(finished);
+            s.Field.Hint(T("chapter7.atTheTerminal.3"), 300f);
+            s.Progress.SetGoal(Goals.FindTheHarbor);
+            yield return s.Field.Explore(finished);
         }
 
         /// <summary>역을 둘러보다가 길가의 호빗들에게 길을 묻는다.</summary>
         private static void PlaceRoadside(StoryDirector s)
         {
-            s.Spawn("hob1", "hobbit", s.Point("hobbit", 0), Facing.Left);
-            s.Spawn("hob2", "hobbit", s.Point("hobbit", 1), Facing.Left);
-            s.SetTalk("hob1", () => Finish(s, "hobbit"));
-            s.SetTalk("hob2", () => Finish(s, "hobbit"));
-            s.ArriveAt("road", s.Point("road"), 2);
+            s.Actors.Spawn("hob1", "hobbit", s.Field.Point("hobbit", 0), Facing.Left);
+            s.Actors.Spawn("hob2", "hobbit", s.Field.Point("hobbit", 1), Facing.Left);
+            s.Field.SetTalk("hob1", () => Finish(s, "hobbit"));
+            s.Field.SetTalk("hob2", () => Finish(s, "hobbit"));
+            s.Field.ArriveAt("road", s.Field.Point("road"), 2);
         }
 
         private static IEnumerator Finish(StoryDirector s, string id)
         {
-            s.FinishExplore(id);
+            s.Field.FinishExplore(id);
             yield break;
         }
 
@@ -127,27 +126,19 @@ namespace MiniPandoras.Story
         private static IEnumerator TheHobbitCarriage(StoryDirector s)
         {
             s.Cinema(true);
-            s.FaceToward("hero", "hob1");
-            s.FaceToward("hob1", "hero");
-            s.FaceToward("hob2", "hero");
-            yield return s.Say("hero", "저기요, 선착장은 어느 쪽이에요?");
-            yield return s.Say("hobbit", "선착장? 걸어가면 사흘이야, 사흘!\n우리 마차 타면 반나절!\n싸게 해 줄게!");
-            yield return s.Say("hero", "오, 친절하다!\n타자!");
-            yield return s.Say("rang", "냐...? 냄새가 수상한데.");
-            yield return s.Say("diel", "...마음대로 해라.\n어차피 조용히는 못 가겠군.");
+            s.Actors.FaceToward("hero", "hob1");
+            s.Actors.FaceToward("hob1", "hero");
+            s.Actors.FaceToward("hob2", "hero");
+            yield return s.Lines("chapter7.theHobbitCarriage.1");
             // 웹게임 마차 그림 대신, 산길과 길가 숲이 흘러가는 컷인에서 호빗 둘이 일행을 실은 수레를 끈다.
             yield return s.FadeOut(30f);
             // 수레 그림은 장면 한 장 크기라 장면 아래 가운데를 발밑으로, 장면 높이를 키로 준다. 수레 쪽으로 조금 당겨 본다.
-            s.BeginCutIn("carriage", CarriageFoot, CutInHeight);
-            yield return s.CutInZoom(CartView, 1.3f, 1f);
+            s.Scenes.BeginCutIn("carriage", CarriageFoot, CutInHeight);
+            yield return s.Scenes.CutInZoom(CartView, 1.3f, 1f);
             yield return s.FadeIn(30f);
-            yield return s.Say("hobbit", "꽉 잡아~\n지름길로 간다!");
-            yield return s.Say("hero", "와, 생각보다 빠르다!");
-            yield return s.Say("rang", "냐... 선착장은 바다 쪽 아니었나.\n왜 자꾸 산으로 올라가지?");
-            yield return s.Say("hobbit", "지, 지름길이라니까~!");
-            yield return s.Say("diel", "......");
+            yield return s.Lines("chapter7.theHobbitCarriage.2");
             yield return s.FadeOut(40f);
-            s.EndCutIn();
+            s.Scenes.EndCutIn();
         }
 
         // ── 호빗 소굴 ─────────────────────────────────────────
@@ -155,141 +146,119 @@ namespace MiniPandoras.Story
         private static IEnumerator TheHobbitDen(StoryDirector s, bool walked)
         {
             // 마차는 선착장이 아니라 산속 동굴 앞에서 멈췄다. 걸어왔으면 호빗들이 동굴 앞에서 맞는다.
-            s.PlaceParty("hobbitCave", "entrance", Facing.Up);
+            s.Party.PlaceParty("hobbitCave", "entrance", Facing.Up);
             for (int i = 0; i < Hobbits.Length; i++)
             {
-                s.Spawn(Hobbits[i], "hobbit", s.Point("hobbit", i), Facing.Down);
+                s.Actors.Spawn(Hobbits[i], "hobbit", s.Field.Point("hobbit", i), Facing.Down);
             }
 
             s.SnapCamera();
             yield return s.FadeIn(30f);
-            yield return s.Narrate(walked ? "산길 끝의 동굴 앞에 호빗들이 모여 있었다." : "마차는 선착장이 아니라 산속 동굴 앞에서 멈췄다.");
-            yield return s.Say("hobbit", walked ? "헤헤, 손님이 제 발로 왔네~\n안으로 들어와!" : "헤헤, 잠깐 쉬었다 가~\n안으로 들어와!");
-            s.LockWarp("entrance", walked ? WalkedHereLeaving : Leaving);
-            s.ArriveAt("ambush", s.Point("arrive"), 3);
+            yield return s.Narrate(walked ? T("chapter7.theHobbitDen.3") : T("chapter7.theHobbitDen.4"));
+            yield return s.Say("hobbit", walked ? T("chapter7.theHobbitDen.5") : T("chapter7.theHobbitDen.6"));
+            s.Field.LockWarp("entrance", walked ? WalkedHereLeaving : Leaving);
+            s.Field.ArriveAt("ambush", s.Field.Point("arrive"), 3);
             s.Cinema(false);
-            yield return s.Explore();
+            yield return s.Field.Explore();
 
             s.Cinema(true);
-            yield return s.Say("hobbit", "헤헤, 이제 못 나가~\n짐이랑 돈이랑 그 반짝이는 보석까지, 전부 두고 가!");
-            yield return s.Shout("hero", "역시 사기였어?!");
-            yield return s.Say("rang", "그러니까 냄새가 난다고 했잖나.");
+            yield return s.Lines("chapter7.theHobbitDen.1");
             s.Cinema(false);
-            yield return s.Battle(new BattleConfig { Enemies = new[] { "hobbit", "hobbit", "hobbit" } }, keepDark: true);
+            yield return s.Fights.Battle(new BattleConfig { Enemies = new[] { "hobbit", "hobbit", "hobbit" } }, keepDark: true);
             foreach (string id in Hobbits)
             {
-                s.Remove(id);
+                s.Actors.Remove(id);
             }
 
-            s.Spawn("giant", "giantHobbit", "giant", Facing.Down);
+            s.Actors.Spawn("giant", "giantHobbit", "giant", Facing.Down);
             yield return s.FadeIn(20f);
             s.Cinema(true);
             s.Shake(4f, 30f);
-            yield return s.Shout("giantHobbit", "누가 내 동생들을 괴롭혀어어!!");
-            yield return s.Say("hero", "호빗인데 왜 저렇게 커?!");
-            yield return s.Say("diel", "거대화 판도라겠지.\n호빗도 판도라즈가 될 수 있다.\n온다.");
+            yield return s.Lines("chapter7.theHobbitDen.2");
             s.Cinema(false);
-            yield return s.Battle(new BattleConfig { Enemies = new[] { "giantHobbit" } }, keepDark: true);
-            s.Remove("giant");
+            yield return s.Fights.Battle(new BattleConfig { Enemies = new[] { "giantHobbit" } }, keepDark: true);
+            s.Actors.Remove("giant");
             yield return TheHobbitsHoard(s);
         }
 
         /// <summary>거대 호빗이 지키던 상자를 열어 보석을 얻는다. 얻은 뒤 나가려고 하면 루가가 들어온다.</summary>
         private static IEnumerator TheHobbitsHoard(StoryDirector s)
         {
-            s.Chest("giantHobbit", "chest", Items.HobbitRuby);
-            s.LockWarp("entrance", "거대 호빗이 지키던 상자가 보인다.\n먼저 열어 보자.");
-            s.Trigger("leaving", TriggerKind.Step, cell => cell.y >= LeavingRow && s.Owns(Items.HobbitRuby), once: true, ends: true);
+            s.Field.Chest("giantHobbit", "chest", Items.HobbitRuby);
+            s.Field.LockWarp("entrance", T("chapter7.theHobbitsHoard.1"));
+            s.Field.Trigger("leaving", TriggerKind.Step, cell => cell.y >= LeavingRow && s.Progress.Owns(Items.HobbitRuby), once: true, ends: true);
             yield return s.FadeIn(20f);
             s.Cinema(false);
-            s.Hint("거대 호빗이 지키던 상자를 열어 보자", 300f);
-            yield return s.Explore();
+            s.Field.Hint(T("chapter7.theHobbitsHoard.2"), 300f);
+            yield return s.Field.Explore();
         }
 
         // ── 뱀성의 주인 ───────────────────────────────────────
 
         private static IEnumerator TheMasterOfTheSnakeCastle(StoryDirector s)
         {
-            Vector2Int entrance = s.Point("entrance");
-            s.Spawn("ruga", "ruga", entrance, Facing.Up);
-            s.Spawn("rugaGuard1", "soldier", entrance + Vector2Int.left, Facing.Up);
-            s.Spawn("rugaGuard2", "soldier", entrance + Vector2Int.right, Facing.Up);
+            Vector2Int entrance = s.Field.Point("entrance");
+            s.Actors.Spawn("ruga", "ruga", entrance, Facing.Up);
+            s.Actors.Spawn("rugaGuard1", "soldier", entrance + Vector2Int.left, Facing.Up);
+            s.Actors.Spawn("rugaGuard2", "soldier", entrance + Vector2Int.right, Facing.Up);
             yield return s.FadeIn(20f);
             s.Cinema(true);
-            Vector2Int stand = s.Point("ruga");
-            yield return s.WalkTo("ruga", stand.x, stand.y, 14f, Facing.Up, verticalFirst: true);
-            s.FaceToward("hero", "ruga");
-            yield return s.Say("ruga", "호빗 놈들과 협상을 하러 왔더니... 먼저 정리해 준 손님들이 있군.");
-            yield return s.Say("soldier", "루가 님!\n저놈입니다!\n보물고의 보석을 훔친 도둑!");
-            yield return s.Say("ruga", "내가 뱀성의 주인, 루가다.");
-            yield return s.Say("ruga", "네가 훔친 게 아니라는 것쯤은 안다.\n누가 꾸민 짓인지도 대충 짐작이 가고.");
-            yield return s.Say("ruga", "하지만 보석은 지금 네 손에 있지.");
-            yield return s.Say("ruga", "호빗들을 쓸어 준 값으로 기회를 주마.\n보석을 돌려줘라.\n그러면 목숨은 살려 주지.");
+            Vector2Int stand = s.Field.Point("ruga");
+            yield return s.Actors.WalkTo("ruga", stand.x, stand.y, 14f, Facing.Up, verticalFirst: true);
+            s.Actors.FaceToward("hero", "ruga");
+            yield return s.Lines("chapter7.theMasterOfTheSnakeCastle.1");
             int pick = 0;
-            yield return s.Choose("hero", "(보석을 어떻게 할까?)", new[] { "돌려준다", "거절한다" }, chosen => pick = chosen);
+            yield return s.Choose("hero", T("chapter7.theMasterOfTheSnakeCastle.8"), new[] { T("chapter7.theMasterOfTheSnakeCastle.9"), T("chapter7.theMasterOfTheSnakeCastle.10") }, chosen => pick = chosen);
             if (pick == 1)
             {
                 yield return RefuseRuga(s);
             }
 
-            s.TakeItem(Items.SerpentEye);
-            yield return s.Notify("뱀신의 눈을 돌려주었다.");
-            yield return s.Say("ruga", "현명하군.");
-            yield return s.Say("ruga", "그런데 그쪽.\n누명 쓴 녀석과 같이 다니는 걸 보니 평범한 떠돌이는 아니군.");
-            yield return s.Say("diel", "에버웨이브의 디엘 이브.\n에라드를 끌어내릴 길드다.");
-            yield return s.Say("ruga", "하!\n에라드를 끌어내린다라......");
+            s.Progress.TakeItem(Items.SerpentEye);
+            yield return s.Notify(T("chapter7.theMasterOfTheSnakeCastle.11"));
+            yield return s.Lines("chapter7.theMasterOfTheSnakeCastle.2");
             // 루가가 어이없다는 듯 웃는다. 주인공만 영문을 모른 채 둘을 번갈아 본다.
-            s.FaceToward("hero", "diel");
+            s.Actors.FaceToward("hero", "diel");
             yield return s.Wait(20f);
-            s.FaceToward("hero", "ruga");
-            yield return s.Emote("hero", "?", 40f);
-            yield return s.Think("에라드... 디엘의 기억 속에서 들었던 이름이야.\n그런데 비웃을 일인가......?");
-            yield return s.Say("hero", "저...... 에라드가 그렇게 대단한 데예요?");
-            yield return s.Emote("ruga", "…", 40f);
-            yield return s.Say("ruga", "...뭐?");
-            yield return s.Say("rang", "냐아. 이 녀석은 세상 물정을 하나도 모른다.\n신경 쓰지 마라.");
-            yield return s.Say("ruga", "좋다.\n보석을 돌려준 값으로 하나 가르쳐 주지.");
+            s.Actors.FaceToward("hero", "ruga");
+            yield return s.Actors.Emote("hero", "?", 40f);
+            yield return s.Lines("chapter7.theMasterOfTheSnakeCastle.3");
+            yield return s.Actors.Emote("ruga", "…", 40f);
+            yield return s.Lines("chapter7.theMasterOfTheSnakeCastle.4");
             yield return RugaExplains(s);
 
-            yield return s.Say("hero", "그, 그런 곳을 끌어내리겠다고요......?");
+            yield return s.Lines("chapter7.theMasterOfTheSnakeCastle.5");
             // 주인공이 디엘을 돌아본다. 디엘은 아무 대답도 하지 않는다.
-            s.FaceToward("hero", "diel");
-            yield return s.Emote("diel", "…", 50f);
+            s.Actors.FaceToward("hero", "diel");
+            yield return s.Actors.Emote("diel", "…", 50f);
             yield return s.Wait(20f);
-            s.FaceToward("hero", "ruga");
-            yield return s.Say("ruga", "힘만 보면 무모한 소리지.\n하지만 놈들의 통치는 숨이 막힌다.\n그래서 곳곳에서 혁명 세력이 일어나고 있고.");
-            yield return s.Say("diel", "...그걸 아는 자가 뱀성 문을 걸어 잠그고 있었군.");
-            yield return s.Say("ruga", "나는 내 성을 지킬 뿐이다.\n누구 편도 아니야.");
-            yield return s.Say("ruga", "아, 그리고.\n얼마 전 성의 일을 도와준 사내가 있었다.\n너를 만나면 이걸 전해 달라더군.");
-            yield return s.Notify("판도라 봉인서를 얻었다.");
-            s.SetFlag(StoryFlags.Book);
+            s.Actors.FaceToward("hero", "ruga");
+            yield return s.Lines("chapter7.theMasterOfTheSnakeCastle.6");
+            yield return s.Notify(T("chapter7.theMasterOfTheSnakeCastle.12"));
+            s.Progress.SetFlag(StoryFlags.Book);
             // 책장이 저절로 넘어가며 문양 몇 개가 희미하게 빛난다.
-            s.Glitter("hero", BookLight);
+            s.Stage.Glitter("hero", BookLight);
             yield return s.Wait(30f);
-            yield return s.Say("hero", "어...?\n책이 혼자 넘어가......");
-            yield return s.Say("rang", "냐...! 판도라 더스트를 봉인해 두는 책이다.\n일정 수치가 모이면 그 판도라를 네 것으로 습득할 수 있지.\n판도라 여신님이 만드신 책이다.");
-            yield return s.Say("diel", "여신이 만든 책이라고...?\n그 사내, 이름은?");
-            yield return s.Say("ruga", "묻지 않았다.\n묻고 싶지 않은 눈을 하고 있었거든.");
-            yield return s.Say("ruga", "선착장은 이 동굴을 나가서 반나절이다.\n이번엔 걸어서 가라.");
+            yield return s.Lines("chapter7.theMasterOfTheSnakeCastle.7");
             // 루가가 부하들을 데리고 동굴을 떠난다(다 걸어 나가기 전에 사라진다, 웹게임과 같다).
             foreach (string id in RugaParty)
             {
-                s.StartCoroutine(s.WalkTo(id, entrance.x, entrance.y, 10f, Facing.Down, verticalFirst: true));
+                s.StartCoroutine(s.Actors.WalkTo(id, entrance.x, entrance.y, 10f, Facing.Down, verticalFirst: true));
             }
 
             yield return s.Wait(50f);
             foreach (string id in RugaParty)
             {
-                s.Remove(id);
+                s.Actors.Remove(id);
             }
         }
 
         /// <summary>보석을 돌려주지 않으면 루가와 싸운다. 두 판을 버티면 거대한 뱀의 그림자가 휘감아 이야기가 넘어간다(이길 수 없다).</summary>
         private static IEnumerator RefuseRuga(StoryDirector s)
         {
-            yield return s.Say("ruga", "...그래?");
+            yield return s.Lines("chapter7.refuseRuga.1");
             s.Cinema(false);
-            yield return s.Battle(new BattleConfig
+            yield return s.Fights.Battle(new BattleConfig
             {
                 Enemies = new[] { "ruga" },
                 NoDeath = true,
@@ -297,7 +266,7 @@ namespace MiniPandoras.Story
             }, keepDark: true);
             yield return s.FadeIn(20f);
             s.Cinema(true);
-            yield return s.Say("hero", "도, 돌려드릴게요......");
+            yield return s.Lines("chapter7.refuseRuga.2");
         }
 
         private static IEnumerator SerpentShadow(BattleApi b)
@@ -307,24 +276,24 @@ namespace MiniPandoras.Story
                 yield break;
             }
 
-            yield return b.Message("거대한 뱀의 그림자가 일행을 휘감았다. 도저히 이길 수 없다...", 70);
+            yield return b.Message(T("chapter7.serpentShadow.1"), 70);
             b.End(BattleOutcome.Scripted);
         }
 
         /// <summary>설명 컷인: 루가의 이야기(웹게임은 설명 그림). 십이장·에라드·거신은 정확한 모습 대신 실루엣이다.</summary>
         private static IEnumerator RugaExplains(StoryDirector s)
         {
-            yield return s.ExplainInCutIn("twelve", Warlords,
-                () => s.Say("ruga", "신들이 사라진 뒤, 세상을 손에 쥔 건 열두 명의 강자였다.\n'십이장'이라고 불렀지."),
-                () => s.Say("hero", "십이장......"));
-            yield return s.ExplainInCutIn("ruga", "chaos", Warlords,
-                "하지만 열두 명이 나눠 가진 세상이 오래갈 리 없지.\n균형이 깨지고, 수백 년 동안 주인 없는 세상이 이어졌다.");
-            yield return s.ExplainInCutIn("ruga", "erad", Perni,
-                "그 난장판을 힘으로 끝낸 게 에라드다.\n재앙의 판도라를 가진 페르니를 중심으로 모인 강자들이지.");
-            yield return s.ExplainInCutIn("threePowers", ThreePowers,
-                () => s.Say("ruga", "신들, 십이장, 그리고 에라드.\n그래서 사람들은 놈들을 3대 정권이라고 부른다.\n봉인돼 있던 거신까지 굴복시켰다더군."),
-                () => s.Think("거신...... 디엘의 기억 속에서 그 사람들이 말하던......"));
-            yield return s.EndExplainCutIn();
+            yield return s.Scenes.ExplainInCutIn("twelve", Warlords,
+                () => s.Lines("chapter7.rugaExplains.1"),
+                () => s.Lines("chapter7.rugaExplains.2"));
+            yield return s.Scenes.ExplainInCutIn("ruga", "chaos", Warlords,
+                T("chapter7.rugaExplains.5"));
+            yield return s.Scenes.ExplainInCutIn("ruga", "erad", Perni,
+                T("chapter7.rugaExplains.6"));
+            yield return s.Scenes.ExplainInCutIn("threePowers", ThreePowers,
+                () => s.Lines("chapter7.rugaExplains.3"),
+                () => s.Lines("chapter7.rugaExplains.4"));
+            yield return s.Scenes.EndExplainCutIn();
         }
 
         // ── 동굴을 나가 산길을 지나 선착장까지 직접 걷는다 ─────────────
@@ -332,30 +301,30 @@ namespace MiniPandoras.Story
         private static IEnumerator DownTheMountainRoad(StoryDirector s)
         {
             // 산길에는 짐승이 나와, 봉인서를 얻자마자 판도라 더스트를 모아 볼 수 있다.
-            s.UnlockWarp("entrance");
+            s.Field.UnlockWarp("entrance");
             // 소굴을 나오면 호빗 산길이고, 호빗들이 막아 둔 아래쪽 길로 선착장 가는 산길에 내려간다.
-            s.SetMapSetup("hobbitTrail", () =>
+            s.Field.SetMapSetup("hobbitTrail", () =>
             {
                 Wildlife.Spawn(s, "hobbitTrail");
-                s.LockWarp("west", "배를 타러 왔다.\n아래쪽 산길로 내려가자.");
-                s.Hint("호빗들이 막아 둔 아래쪽 길로 내려가면 선착장 가는 산길이다", 300f);
+                s.Field.LockWarp("west", T("chapter7.downTheMountainRoad.1"));
+                s.Field.Hint(T("chapter7.downTheMountainRoad.2"), 300f);
             });
-            s.SetMapSetup("caveRoad", () =>
+            s.Field.SetMapSetup("caveRoad", () =>
             {
                 Wildlife.Spawn(s, "caveRoad");
-                s.Hint("산길의 짐승을 쓰러뜨리면 봉인서에 판도라 더스트가 모여요. 길을 따라 내려가면 선착장이에요", 360f);
+                s.Field.Hint(T("chapter7.downTheMountainRoad.3"), 360f);
             });
-            s.SetMapSetup("eastPort", () =>
+            s.Field.SetMapSetup("eastPort", () =>
             {
                 FillTheHarbor(s);
-                s.LockWarp("north", "배를 타러 왔다.\n부두로 가자.");
-                s.ArriveAt("board", s.Point("board"));
-                s.Hint("부두 끝의 힐리아 서부행 배에 타자", 300f);
-                s.SetGoal("부두에서 힐리아 서부행 배에 탄다");
+                s.Field.LockWarp("north", T("chapter7.downTheMountainRoad.4"));
+                s.Field.ArriveAt("board", s.Field.Point("board"));
+                s.Field.Hint(T("chapter7.downTheMountainRoad.5"), 300f);
+                s.Progress.SetGoal(Goals.BoardTheWestShip);
             });
             s.Cinema(false);
-            Coroutine bookLesson = s.StartCoroutine(s.SealBookTutorial(() => RangOpensTheBook(s), () => RangOnAwakening(s)));
-            yield return s.Explore();
+            Coroutine bookLesson = s.StartCoroutine(s.Tutorials.SealBookTutorial(() => RangOpensTheBook(s), () => RangOnAwakening(s)));
+            yield return s.Field.Explore();
             s.StopCoroutine(bookLesson);
         }
 
@@ -365,24 +334,23 @@ namespace MiniPandoras.Story
             for (int i = 0; i < CrowdCount; i++)
             {
                 (string look, string line) = CrowdLines[i % CrowdLines.Length];
-                s.Npc("crowd" + i, look, s.Point("crowd", i), Facing.Down, new[] { (look, line) }, wander: i % 2 == 0);
+                s.Field.Npc("crowd" + i, look, s.Field.Point("crowd", i), Facing.Down, new[] { (look, line) }, wander: i % 2 == 0);
             }
 
             for (int i = 0; i < SailorLines.Length; i++)
             {
-                s.Npc("sailor" + i, "townMan", s.Point("sailor", i), Facing.Down, new[] { ("townMan", SailorLines[i]) });
+                s.Field.Npc("sailor" + i, "townMan", s.Field.Point("sailor", i), Facing.Down, new[] { ("townMan", SailorLines[i]) });
             }
         }
 
         private static IEnumerator RangOpensTheBook(StoryDirector s)
         {
-            yield return s.Say("rang", "숨 돌린 김에 봉인서를 펼쳐 봐라.\n어떻게 쓰는지 알려 주마.");
+            yield return s.Lines("chapter7.rangOpensTheBook.1");
         }
 
         private static IEnumerator RangOnAwakening(StoryDirector s)
         {
-            yield return s.Say("rang", "어떠냐.\n체험은 언제든 봉인서에서 해 볼 수 있다.\n아직 네 힘이 된 건 아니지만.");
-            yield return s.Say("rang", "더스트를 100% 모으면 봉인서에서 활성화해라.\n그때부터 진짜 네 판도라다.");
+            yield return s.Lines("chapter7.rangOnAwakening.1");
         }
 
         // ── 지평선 너머: 부두 끝의 배에 오른다 ───────────────────────
@@ -390,18 +358,18 @@ namespace MiniPandoras.Story
         private static IEnumerator OverTheHorizon(StoryDirector s)
         {
             s.Cinema(true);
-            Vector2Int ship = s.Point("ship");
-            yield return s.WalkTo("hero", ship.x, ship.y, 12f, Facing.Down, verticalFirst: true);
-            yield return s.Notify("배를 타고 힐리아 서부로 향한다.");
-            Vector2Int watch = s.Point("hill", 1);
-            s.Spawn("krampus", "krampus", s.Point("hill", 0), Facing.Down);
-            s.Spawn("dinel", "dinel", watch, Facing.Down);
-            s.Spawn("stranger", "kata", s.Point("hill", 2), Facing.Down);
-            s.HideParty();
-            yield return s.Pan(watch.x, watch.y + 2, 0.04f);
-            yield return s.Say("krampus", "저 꼬맹이가 판도라의 그릇이라고?\n하, 바람만 불어도 날아가겠는데.");
-            yield return s.Emote("dinel", "…", 80f);
-            yield return s.Say("kata", "씨앗은 심어졌다.\n이제 지켜보면 되겠지...");
+            Vector2Int ship = s.Field.Point("ship");
+            yield return s.Actors.WalkTo("hero", ship.x, ship.y, 12f, Facing.Down, verticalFirst: true);
+            yield return s.Notify(T("chapter7.overTheHorizon.3"));
+            Vector2Int watch = s.Field.Point("hill", 1);
+            s.Actors.Spawn("krampus", "krampus", s.Field.Point("hill", 0), Facing.Down);
+            s.Actors.Spawn("dinel", "dinel", watch, Facing.Down);
+            s.Actors.Spawn("stranger", "kata", s.Field.Point("hill", 2), Facing.Down);
+            s.Party.HideParty();
+            yield return s.Stage.Pan(watch.x, watch.y + 2, 0.04f);
+            yield return s.Lines("chapter7.overTheHorizon.1");
+            yield return s.Actors.Emote("dinel", "…", 80f);
+            yield return s.Lines("chapter7.overTheHorizon.2");
             yield return s.Wait(40f);
             yield return s.FadeOut(60f);
             s.Cinema(false);

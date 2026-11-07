@@ -29,7 +29,7 @@ namespace MiniPandoras.UI
 
         private void LateUpdate()
         {
-            bool picking = combat.IsPickingGate;
+            bool picking = combat.DimensionSkills.IsPickingGate;
             if (board.activeSelf != picking)
             {
                 board.SetActive(picking);
@@ -37,7 +37,7 @@ namespace MiniPandoras.UI
 
             if (picking)
             {
-                timeBar.localScale = new Vector3(combat.GatePickLeft, 1f, 1f);
+                timeBar.localScale = new Vector3(combat.DimensionSkills.GatePickLeft, 1f, 1f);
             }
         }
     }

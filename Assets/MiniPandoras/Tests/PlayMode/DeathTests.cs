@@ -68,11 +68,11 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator WalkingOffTheBrokenBridgeFallsToDeath()
         {
-            yield return story.StandOn(story.Director.Point("south"));
+            yield return story.StandOn(story.Director.Field.Point("south"));
             yield return story.UntilExploring("cliffBridge", "벼랑 다리");
             Vector2 entered = hero.Position;
 
-            yield return story.StandOn(story.Director.Point("gap"));
+            yield return story.StandOn(story.Director.Field.Point("gap"));
 
             yield return UntilAsked();
             Choices()[CheckpointRow].onClick.Invoke();
@@ -85,11 +85,11 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator FallingInAStoryFightRestartsThatFightFromTheCheckpoint()
         {
-            story.Director.StartCoroutine(story.Director.Battle(new BattleConfig { Enemies = new[] { "thug1" } }));
+            story.Director.StartCoroutine(story.Director.Fights.Battle(new BattleConfig { Enemies = new[] { "thug1" } }));
             EnemyFighter enemy = null;
             yield return story.Until(() =>
             {
-                enemy = story.Combat.Enemies.FirstOrDefault(e => e.InEncounter);
+                enemy = story.Combat.EnemyAi.Enemies.FirstOrDefault(e => e.InEncounter);
                 return enemy != null;
             }, 10f, "싸움이 시작된다");
             enemy.SetHp(1);
@@ -99,7 +99,7 @@ namespace MiniPandoras.Tests
 
             Choices()[CheckpointRow].onClick.Invoke();
             yield return story.Until(() => !death.IsOpen && !story.Combat.IsDowned, 20f, "그 싸움을 다시 시작한다");
-            Assert.That(story.Combat.InEncounter, Is.True, "싸움은 이어진다");
+            Assert.That(story.Combat.Encounters.InEncounter, Is.True, "싸움은 이어진다");
             Assert.That(enemy.Hp, Is.EqualTo(enemy.MaxHp), "적도 처음 상태다");
             Assert.That(story.Combat.Player.Hp, Is.EqualTo(story.Combat.Player.MaxHp));
             Assert.That(hero.Pose, Is.EqualTo(BodyPose.Stand));
@@ -129,7 +129,7 @@ namespace MiniPandoras.Tests
         /// <summary>체력을 1로 두고 한 마리뿐인 무리(hillia-2) 곁에 서서 맞아 쓰러진다.</summary>
         private IEnumerator FallToAMonster()
         {
-            EnemyFighter target = story.Combat.Enemies.First(e => e.Group != null && e.Group.Options.Id == "hillia-2");
+            EnemyFighter target = story.Combat.EnemyAi.Enemies.First(e => e.Group != null && e.Group.Options.Id == "hillia-2");
             story.Combat.Player.Hp = 1;
             story.Mover.PlaceAt(target.Position + new Vector2(0f, -1f), Facing.Up);
             yield return story.Until(() => story.Combat.IsDowned, 30f, "몬스터에게 맞아 쓰러진다");

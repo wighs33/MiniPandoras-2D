@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.Story
 {
@@ -13,18 +14,18 @@ namespace MiniPandoras.Story
 
         private static readonly (string label, string title)[] Titles =
         {
-            ("0장", "여신의 환생"),
-            ("1장", "낯선 땅의 첫날"),
-            ("2장", "훔치지 않은 보석"),
-            ("3장", "낡은 집의 악마"),
-            ("4장", "디엘의 기억"),
-            ("5장", "단 한 명의 길드원"),
-            ("6장", "뉴웨이브 호의 소년"),
-            ("7장", "돌려준 보석"),
-            ("8장", "사막의 가짜 왕"),
-            ("9장", "라르고의 기억"),
-            ("10장", "깨어난 축복"),
-            ("11장", "다시 모인 파도"),
+            (T("chapterTitles.readonly.1"), T("chapterTitles.readonly.2")),
+            (T("chapterTitles.readonly.3"), T("chapterTitles.readonly.4")),
+            (T("chapterTitles.readonly.5"), T("chapterTitles.readonly.6")),
+            (T("chapterTitles.readonly.7"), T("chapterTitles.readonly.8")),
+            (T("chapterTitles.readonly.9"), T("chapterTitles.readonly.10")),
+            (T("chapterTitles.readonly.11"), T("chapterTitles.readonly.12")),
+            (T("chapterTitles.readonly.13"), T("chapterTitles.readonly.14")),
+            (T("chapterTitles.readonly.15"), T("chapterTitles.readonly.16")),
+            (T("chapterTitles.readonly.17"), T("chapterTitles.readonly.18")),
+            (T("chapterTitles.readonly.19"), T("chapterTitles.readonly.20")),
+            (T("chapterTitles.readonly.21"), T("chapterTitles.readonly.22")),
+            (T("chapterTitles.readonly.23"), T("chapterTitles.readonly.24")),
         };
 
         private static string[] lines;

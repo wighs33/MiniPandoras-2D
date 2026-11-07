@@ -1,5 +1,6 @@
 using System;
 using MiniPandoras.World;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.Story
 {
@@ -21,10 +22,10 @@ namespace MiniPandoras.Story
         private static readonly string[] Floors = { Hall, Market, Rooms, Library, Branches, Crown };
         private static readonly string[] Stock =
         {
-            "꿀 사세요~\n고목 꽃에서 딴 꿀이에요!",
-            "꽃다발 하나에 이슬 세 방울이에요.",
-            "빛나는 버섯은 밤길에 딱이죠.",
-            "물약이요, 물약!\n다친 데 바르면 금방 나아요.",
+            T("giantTree.text.1"),
+            T("giantTree.text.2"),
+            T("giantTree.text.3"),
+            T("giantTree.text.4"),
         };
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace MiniPandoras.Story
             {
                 string map = floor;
                 Action extra = Array.Find(extras, entry => entry.map == map).extra;
-                s.SetMapSetup(map, () =>
+                s.Field.SetMapSetup(map, () =>
                 {
                     Residents(s, map, cursed);
                     if (cursed)
@@ -54,33 +55,33 @@ namespace MiniPandoras.Story
             switch (map)
             {
                 case Hall:
-                    s.Npc("receptionist", "fairy", s.Point("receptionist"), Facing.Down, new[]
+                    s.Field.Npc("receptionist", "fairy", s.Field.Point("receptionist"), Facing.Down, new[]
                     {
-                        ("fairy", "어서 오세요, 거대고목이에요!\n2층은 장터, 3층은 요정 마을, 4층은 서고예요."),
-                        ("fairy", cursed ? "1층 뿌리 계단은 지금 막아 뒀어요.\n아래에서 서늘한 기운이 올라와서요." : "뿌리가 맑아졌대요!\n촌장님이 얼마나 기뻐하셨는지 몰라요."),
+                        ("fairy", T("giantTree.residents.1")),
+                        ("fairy", cursed ? T("giantTree.residents.2") : T("giantTree.residents.3")),
                     });
-                    Folk(s, cursed ? "뿌리걸음이가 자꾸 기어 올라와.\n뿌리 쪽이 이상해." : "뿌리걸음이가 싹 사라졌어!", "고목은 섬만큼 커.\n끝까지 오르려면 다리 아플걸?",
-                        "꼭대기에선 하늘이 엄청 가까워!");
+                    Folk(s, cursed ? T("giantTree.residents.4") : T("giantTree.residents.5"), T("giantTree.residents.6"),
+                        T("giantTree.residents.7"));
                     break;
                 case Market:
                     for (int i = 0; i < Stock.Length; i++)
                     {
-                        s.Npc("merchant" + i, "fairy", s.Point("merchant", i), Facing.Down, new[] { ("fairy", Stock[i]) });
+                        s.Field.Npc("merchant" + i, "fairy", s.Field.Point("merchant", i), Facing.Down, new[] { ("fairy", Stock[i]) });
                     }
 
-                    Folk(s, "장터는 언제나 북적북적해.", "가운데 샘물은 고목 수액이 섞여서 달아.", "인간 손님은 오랜만이야!", "꿀 한 병 사 갈래?");
+                    Folk(s, T("giantTree.residents.8"), T("giantTree.residents.9"), T("giantTree.residents.10"), T("giantTree.residents.11"));
                     break;
                 case Rooms:
-                    Folk(s, "여기가 요정 마을이야.\n문마다 요정 집이지.", "가운데 문이 쉼터야.\n손님들은 다 거기서 묵어.",
-                        cursed ? "밤마다 뿌리 쪽에서 이상한 소리가 나." : "오늘 밤은 다들 푹 잘 수 있겠다.", "우리 집 문 예쁘지?");
-                    foreach (UnityEngine.Vector2Int home in s.Points("home"))
+                    Folk(s, T("giantTree.residents.12"), T("giantTree.residents.13"),
+                        cursed ? T("giantTree.residents.14") : T("giantTree.residents.15"), T("giantTree.residents.16"));
+                    foreach (UnityEngine.Vector2Int home in s.Field.Points("home"))
                     {
-                        s.Sign(home, "요정의 집이다.\n문이 잠겨 있다.");
+                        s.Field.Sign(home, T("giantTree.residents.17"));
                     }
 
                     break;
                 case Library:
-                    Folk(s, "쉿, 여긴 서고야.", "이 책들은 다 고목 잎으로 만들었어.", "공방에서는 거미줄로 실을 자아.");
+                    Folk(s, T("giantTree.residents.18"), T("giantTree.residents.19"), T("giantTree.residents.20"));
                     break;
             }
         }
@@ -88,10 +89,10 @@ namespace MiniPandoras.Story
         /// <summary>그 층의 요정 자리마다 돌아다니는 요정 한 명씩, 저마다 한마디.</summary>
         private static void Folk(StoryDirector s, params string[] lines)
         {
-            var cells = s.Points("fairy");
+            var cells = s.Field.Points("fairy");
             for (int i = 0; i < cells.Count && i < lines.Length; i++)
             {
-                s.Npc("folk" + i, "fairy", cells[i], Facing.Down, new[] { ("fairy", lines[i]) }, wander: true);
+                s.Field.Npc("folk" + i, "fairy", cells[i], Facing.Down, new[] { ("fairy", lines[i]) }, wander: true);
             }
         }
     }

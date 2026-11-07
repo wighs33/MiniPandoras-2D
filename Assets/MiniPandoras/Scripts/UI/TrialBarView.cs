@@ -3,6 +3,7 @@ using MiniPandoras.Combat;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -38,16 +39,16 @@ namespace MiniPandoras.UI
 
         private void LateUpdate()
         {
-            if (bar.activeSelf != combat.InTrial)
+            if (bar.activeSelf != combat.SkillTrial.InTrial)
             {
-                bar.SetActive(combat.InTrial);
+                bar.SetActive(combat.SkillTrial.InTrial);
             }
 
-            PandoraDefinition pandora = combat.InTrial && combat.Player != null ? combat.Player.ActivePandora : null;
+            PandoraDefinition pandora = combat.SkillTrial.InTrial && combat.Player != null ? combat.Player.ActivePandora : null;
             if (pandora != null && pandora != shown)
             {
                 shown = pandora;
-                label.text = pandora.PandoraName + " 체험 중";
+                label.text = pandora.PandoraName + T("trialBarView.lateUpdate.1");
             }
         }
     }

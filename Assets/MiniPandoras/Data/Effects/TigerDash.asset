@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: TigerDash
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: -2019325156, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: 2135007014, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -1463924129, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: 1626158751, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: 1600005027, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -1724543676, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -1412262377, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -1366077499, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -436066210, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -6543981, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -347472602, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -2051297539, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -1924945470, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: 539968957, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: 1625551343, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: 215315554, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -1157654672, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  - {fileID: -194643775, guid: d25f920009e9ebe45b7203cdd7fdbb33, type: 3}
+  lightFrames:
+  - {fileID: -2134036057, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: -1518873803, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 1928120503, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 250339103, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: -942401130, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 1404809382, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 788136015, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: -1686940804, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 823448967, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 884124058, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 1733980324, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 604802916, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: -1460203541, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: -1402380011, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 1363121794, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: -1153971853, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: -133608394, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  - {fileID: 1207631570, guid: ef4ab75f7f9a7a54bb77265e74fd15c6, type: 3}
+  framesPerSecond: 30
+  loop: 0
+  impactSeconds: 0

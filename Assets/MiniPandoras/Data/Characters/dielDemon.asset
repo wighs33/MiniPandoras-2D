@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: dielDemon
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: dielDemon
+  size: {x: 28, y: 42}
+  down:
+  - {fileID: 21300000, guid: 9981441cee810704a86445785c744803, type: 3}
+  - {fileID: 21300000, guid: ec4861d7a5245ba4c8a020d17b2754db, type: 3}
+  - {fileID: 21300000, guid: cf9ecd4805b9c634da3c1d104b31aa5a, type: 3}
+  right:
+  - {fileID: 21300000, guid: 27a7a4844af52014994c9ded7d18ae9b, type: 3}
+  - {fileID: 21300000, guid: 3776d9e6064d8bd46a82e059dabbce1b, type: 3}
+  - {fileID: 21300000, guid: e2b8d8392c228ef4eb59e2b8d48c9909, type: 3}
+  up:
+  - {fileID: 21300000, guid: 15316a41b0c62a542a5816df53cd16c6, type: 3}
+  - {fileID: 21300000, guid: 89a50db788e4a314db98522e1b084d6a, type: 3}
+  - {fileID: 21300000, guid: 6e285f5bc217e8a468f8bfc44ebd2c6c, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: ad92050f0ebd66d4d80a75c73cab79db, type: 3}
+  - {fileID: 21300000, guid: 09ee2e2789d896846a99def93cc3e1fe, type: 3}
+  - {fileID: 21300000, guid: c3f9efb907f842643a72469883520a75, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: 07e551e670bb5d447aafcc85fb7088c4, type: 3}
+  - {fileID: 21300000, guid: a299391def848c444afac6cc24461b8c, type: 3}
+  - {fileID: 21300000, guid: 9f598cdbf90a23d47808c78a8695cabf, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 4377e79746c6bcf40a865dc02a68f5f6, type: 3}
+  - {fileID: 21300000, guid: 3171fb2064315b3438b8d9e2979e9ffa, type: 3}
+  - {fileID: 21300000, guid: a7c34631a463c2849a4280f9734abf40, type: 3}
+  portrait: {fileID: 21300000, guid: 390b0b43d140d8a46a2414f29fe2ed9a, type: 3}

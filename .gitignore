@@ -1,5 +1,5 @@
 # 이 저장소에는 코드·도구·문서만 올린다.
-# 씬, 프리팹, 데이터 에셋, 그림, 외부 에셋, Unity가 만드는 폴더는 올리지 않는다(로컬 Unity 프로젝트에만 있다).
+# 씬, 프리팹, 그림, 외부 에셋, Unity가 만드는 폴더는 올리지 않는다(로컬 Unity 프로젝트에만 있다).
 # 그래서 모든 것을 무시한 뒤, 올릴 것만 다시 넣는다(허용 목록).
 /*
 !/.gitignore
@@ -30,6 +30,8 @@
 !/Assets/MiniPandoras/Scripts/
 !/Assets/MiniPandoras/Editor/
 !/Assets/MiniPandoras/Tests/
+# 게임 내용(수치, 표, 글). 에셋이 정본이라 코드와 함께 올린다.
+!/Assets/MiniPandoras/Data/
 !/Assets/MiniPandoras/Settings/
 /Assets/MiniPandoras/Settings/*
 !/Assets/MiniPandoras/Settings/*.inputactions

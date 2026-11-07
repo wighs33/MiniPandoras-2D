@@ -54,11 +54,11 @@
 ### 수치
 
 두 도감 40종을 모두 적으로 들여왔다.
-- 표: `Editor/Monsters/MonsterRoster.cs`
-- 들여오기: `MonsterImporter`, 메뉴 **MiniPandoras/Import Monsters**. Import Web Game도 끝에 이것을 부른다(웹게임 전투 데이터를 다시 들여오면 적 목록이 웹게임 것으로 돌아가기 때문이다).
-- 그림을 다시 그린 뒤에는 Import Monsters와 Build Field Scene을 다시 돌린다.
+- 수치: 적 에셋 `Data/Battle/Monsters/<id>.asset`, 기술 에셋 `Data/Battle/Monsters/Skills/<id>_<n>.asset`이 정본이다(2026-11-07). 표 코드는 없앴다.
+- 그림: `MonsterImporter`, 메뉴 **MiniPandoras/Import Monsters**. 그림만 들여오고 수치는 건드리지 않는다.
+- 그림을 다시 그린 뒤에는 Import Monsters를 돌린다. 새 몬스터면 Refresh Scene Lists도 돌린다.
 
-레벨 수치는 체력 32+6×Lv, 공격 9+0.9×Lv, 방어 2+0.6×Lv, 속도 7+0.4×Lv다. 1레벨이 웹게임 들개(체력 34·공격 10)쯤, 15레벨이 모래 늑대(120·23)쯤이다. 필드에서는 웹게임 규칙대로 체력을 0.75배로 줄인다.
+처음 수치는 이 식으로 만들었고, 새 몬스터도 이 기준을 따른다. 레벨 수치는 체력 32+6×Lv, 공격 9+0.9×Lv, 방어 2+0.6×Lv, 속도 7+0.4×Lv다. 1레벨이 웹게임 들개(체력 34·공격 10)쯤, 15레벨이 모래 늑대(120·23)쯤이다. 필드에서는 웹게임 규칙대로 체력을 0.75배로 줄인다.
 
 여기에 몸놀림을 곱한다.
 
@@ -74,7 +74,7 @@
 
 ### 배치
 
-배치표는 `Story/Wildlife.cs`이고, 장의 맵 준비가 `Wildlife.Spawn`으로 세운다. 원칙은 넷이다.
+맵마다 `Data/Battle/Habitats/<맵>.asset`(`HabitatDefinition`)이 정본이고, 장의 맵 준비가 `Wildlife.Spawn`으로 세운다. 원칙은 넷이다.
 1. 그 지형에 사는 몬스터를, 그 맵을 걷는 장의 파티 레벨에 맞춰 둔다. 파티보다 레벨이 한참 높으면 덜 아프게 때리는 귀여운 생물만 둔다(2장 물이끼방울).
 2. 마을·요정 마을처럼 사람이 사는 곳과, 싸울 수 없는 장(3장 잠입, 4·6·9장 회상)은 비운다.
 3. 무리는 포탈 도착 지점에서 알아채는 거리(약 5칸)보다 멀리, 나무 그늘이나 집 지붕에 가려지지 않는 열린 자리에 둔다. 걸을 수 있는 칸인지와 도착 지점과의 거리는 `WildlifeTests`가 본다.

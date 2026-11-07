@@ -1,0 +1,118 @@
+# Chapter4
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter4.supperAtHome.1
+think	hero		......여긴 어디지?\n몸이... 작아?
+think	hero		움직일 수가 없어.\n생각도, 감정도 느껴지는데... 이건 내 몸이 아니야.
+say	jamie		디엘, 손 씻고 오렴.\n곧 저녁이야.
+say	dielChild		응, 엄마!
+think	hero		디엘......?\n그럼 이건, 디엘의 어린 시절......?
+
+== chapter4.supperAtHome.2
+say	jamie		......!
+say	jamie		디엘, 여기 있으렴.\n엄마가 잠깐 나가 볼게.
+
+== chapter4.supperAtHome.3
+think	dielChild		엄마......?
+
+== chapter4.theSiege.1
+say	soldier		포위 완료했습니다!
+say	soldier		후방에도 병력을 배치했습니다.\n빠져나갈 곳은 없습니다!
+
+== chapter4.theSiege.2
+shout	dielChild		엄마!!
+
+== chapter4.theSiege.3
+say	kyle		......
+
+== chapter4.theSiege.4
+say	soldier		대장님, 명령을!
+say	kyle		아무도 움직이지 마라.
+say	kyle		봉인을 깨는 건 내가 한다.
+
+== chapter4.theLastSeal.1
+shout	jamie		디엘!\n도망쳐!!
+say	dielChild		엄마, 엄마는——
+shout	jamie		어서!!
+
+== chapter4.theLastSeal.2
+say	jamie		카일......\n이제 그만해요.
+say	kyle		......
+say	jamie		얼마나 더 죽여야 끝나는 건가요?\n그 무거운 짐......\n이제 내려놔요.
+say	jamie		나와 함께 여기서 끝내요.
+
+== chapter4.theLastSeal.3
+say	kyle		......이미 늦었다.
+say	jamie		카일.
+say	kyle		내 과거는......\n이미 모두 끊어냈다.
+
+== chapter4.theChildRunsOut.1
+shout	dielChild		엄마한테 손대지 마!!
+
+== chapter4.theChildRunsOut.2
+say	dielChild		엄마를......\n엄마를 데려가지 마......
+say	kyle		......
+
+== chapter4.theChildRunsOut.3
+say	dielChild		......아......
+
+== chapter4.pandoraDust.1
+think	hero		몸이 가루가 되고 있어...??
+say	soldier		판도라 더스트입니다!
+say	soldier		회수할까요?
+say	kyle		아니.
+
+== chapter4.pandoraDust.2
+say	kyle		봉인의 판도라 더스트다.
+say	kyle		한 줌도 남기지 마라.
+say	soldier		전원 판도라 더스트 제거 준비!
+
+== chapter4.pandoraDust.3
+say	neo		대장님.\n시신은 제가 옮기겠습니다.
+
+== chapter4.pandoraDust.4
+say	kyle		......임무는 끝났다.\n부대로 복귀한다.
+
+== chapter4.pandoraDust.5
+say	kyle		철수한다.
+say	neo		전원 철수 준비!
+
+== chapter4.theStranger.1
+say	dielChild		엄......마......
+
+== chapter4.theStranger.2
+say	kata		......지독하구먼.
+
+== chapter4.theStranger.3
+say	kata		아직이다.
+say	kata		네 이야기가 여기서 끝날 리 없지.
+
+== chapter4.theStranger.4
+say	kata		살아라.
+
+== chapter4.theStranger.5
+narrate			......한참 뒤.
+
+== chapter4.longAfter.1
+say	dielChild		......
+
+== chapter4.longAfter.2
+say	dielChild		......엄마?
+
+== chapter4.longAfter.3
+say	dielChild		엄마......?
+
+== chapter4.longAfter.4
+shout	dielChild		으아아아아아아!!
+
+== chapter4.soldiers
+text			병사들
+
+== chapter4.theSiege.5
+text			예!
+
+== chapter4.pandoraDust.6
+text			예!
+
+== chapter4.pandoraDust.7
+text			예!

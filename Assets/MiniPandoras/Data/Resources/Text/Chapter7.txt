@@ -1,0 +1,203 @@
+# Chapter7
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter7.atTheTerminal.1
+say	hero		헉...!\n어, 언제 잠들었지......?
+say	diel		...내 이야기가 지루했나 보군.\n다 왔다.\n내리자.
+say	rang		냐하! 침까지 흘리면서 자더군.
+
+== chapter7.atTheTerminal.2
+say	diel		선착장까지는 아직 멀다.\n길부터 알아보자.
+
+== chapter7.theHobbitCarriage.1
+say	hero		저기요, 선착장은 어느 쪽이에요?
+say	hobbit		선착장? 걸어가면 사흘이야, 사흘!\n우리 마차 타면 반나절!\n싸게 해 줄게!
+say	hero		오, 친절하다!\n타자!
+say	rang		냐...? 냄새가 수상한데.
+say	diel		...마음대로 해라.\n어차피 조용히는 못 가겠군.
+
+== chapter7.theHobbitCarriage.2
+say	hobbit		꽉 잡아~\n지름길로 간다!
+say	hero		와, 생각보다 빠르다!
+say	rang		냐... 선착장은 바다 쪽 아니었나.\n왜 자꾸 산으로 올라가지?
+say	hobbit		지, 지름길이라니까~!
+say	diel		......
+
+== chapter7.theHobbitDen.1
+say	hobbit		헤헤, 이제 못 나가~\n짐이랑 돈이랑 그 반짝이는 보석까지, 전부 두고 가!
+shout	hero		역시 사기였어?!
+say	rang		그러니까 냄새가 난다고 했잖나.
+
+== chapter7.theHobbitDen.2
+shout	giantHobbit		누가 내 동생들을 괴롭혀어어!!
+say	hero		호빗인데 왜 저렇게 커?!
+say	diel		거대화 판도라겠지.\n호빗도 판도라즈가 될 수 있다.\n온다.
+
+== chapter7.theMasterOfTheSnakeCastle.1
+say	ruga		호빗 놈들과 협상을 하러 왔더니... 먼저 정리해 준 손님들이 있군.
+say	soldier		루가 님!\n저놈입니다!\n보물고의 보석을 훔친 도둑!
+say	ruga		내가 뱀성의 주인, 루가다.
+say	ruga		네가 훔친 게 아니라는 것쯤은 안다.\n누가 꾸민 짓인지도 대충 짐작이 가고.
+say	ruga		하지만 보석은 지금 네 손에 있지.
+say	ruga		호빗들을 쓸어 준 값으로 기회를 주마.\n보석을 돌려줘라.\n그러면 목숨은 살려 주지.
+
+== chapter7.theMasterOfTheSnakeCastle.2
+say	ruga		현명하군.
+say	ruga		그런데 그쪽.\n누명 쓴 녀석과 같이 다니는 걸 보니 평범한 떠돌이는 아니군.
+say	diel		에버웨이브의 디엘 이브.\n에라드를 끌어내릴 길드다.
+say	ruga		하!\n에라드를 끌어내린다라......
+
+== chapter7.theMasterOfTheSnakeCastle.3
+think	hero		에라드... 디엘의 기억 속에서 들었던 이름이야.\n그런데 비웃을 일인가......?
+say	hero		저...... 에라드가 그렇게 대단한 데예요?
+
+== chapter7.theMasterOfTheSnakeCastle.4
+say	ruga		...뭐?
+say	rang		냐아. 이 녀석은 세상 물정을 하나도 모른다.\n신경 쓰지 마라.
+say	ruga		좋다.\n보석을 돌려준 값으로 하나 가르쳐 주지.
+
+== chapter7.theMasterOfTheSnakeCastle.5
+say	hero		그, 그런 곳을 끌어내리겠다고요......?
+
+== chapter7.theMasterOfTheSnakeCastle.6
+say	ruga		힘만 보면 무모한 소리지.\n하지만 놈들의 통치는 숨이 막힌다.\n그래서 곳곳에서 혁명 세력이 일어나고 있고.
+say	diel		...그걸 아는 자가 뱀성 문을 걸어 잠그고 있었군.
+say	ruga		나는 내 성을 지킬 뿐이다.\n누구 편도 아니야.
+say	ruga		아, 그리고.\n얼마 전 성의 일을 도와준 사내가 있었다.\n너를 만나면 이걸 전해 달라더군.
+
+== chapter7.theMasterOfTheSnakeCastle.7
+say	hero		어...?\n책이 혼자 넘어가......
+say	rang		냐...! 판도라 더스트를 봉인해 두는 책이다.\n일정 수치가 모이면 그 판도라를 네 것으로 습득할 수 있지.\n판도라 여신님이 만드신 책이다.
+say	diel		여신이 만든 책이라고...?\n그 사내, 이름은?
+say	ruga		묻지 않았다.\n묻고 싶지 않은 눈을 하고 있었거든.
+say	ruga		선착장은 이 동굴을 나가서 반나절이다.\n이번엔 걸어서 가라.
+
+== chapter7.refuseRuga.1
+say	ruga		...그래?
+
+== chapter7.refuseRuga.2
+say	hero		도, 돌려드릴게요......
+
+== chapter7.rugaExplains.1
+say	ruga		신들이 사라진 뒤, 세상을 손에 쥔 건 열두 명의 강자였다.\n'십이장'이라고 불렀지.
+
+== chapter7.rugaExplains.2
+say	hero		십이장......
+
+== chapter7.rugaExplains.3
+say	ruga		신들, 십이장, 그리고 에라드.\n그래서 사람들은 놈들을 3대 정권이라고 부른다.\n봉인돼 있던 거신까지 굴복시켰다더군.
+
+== chapter7.rugaExplains.4
+think	hero		거신...... 디엘의 기억 속에서 그 사람들이 말하던......
+
+== chapter7.rangOpensTheBook.1
+say	rang		숨 돌린 김에 봉인서를 펼쳐 봐라.\n어떻게 쓰는지 알려 주마.
+
+== chapter7.rangOnAwakening.1
+say	rang		어떠냐.\n체험은 언제든 봉인서에서 해 볼 수 있다.\n아직 네 힘이 된 건 아니지만.
+say	rang		더스트를 100% 모으면 봉인서에서 활성화해라.\n그때부터 진짜 네 판도라다.
+
+== chapter7.overTheHorizon.1
+say	krampus		저 꼬맹이가 판도라의 그릇이라고?\n하, 바람만 불어도 날아가겠는데.
+
+== chapter7.overTheHorizon.2
+say	kata		씨앗은 심어졌다.\n이제 지켜보면 되겠지...
+
+== chapter7.leaving
+text			마차는 벌써 돌아가 버렸다.\n일단 안으로 들어가 보자.
+
+== chapter7.walkedHereLeaving
+text			여기까지 왔으니 일단 안으로 들어가 보자.
+
+== chapter7.readonly.1
+text			서부행 배가 또 꽉 찼다네.\n레비아탄 때문에 돌아가는 길뿐이니 말이야.
+
+== chapter7.readonly.2
+text			오늘 아침에 잡은 생선이에요!\n싱싱할 때 사 가세요!
+
+== chapter7.readonly.3
+text			동쪽 물건은 전부 이 항구로 모이지.\n없는 게 없어!
+
+== chapter7.readonly.4
+text			저 배 엄청 커!\n나도 나중에 뱃사람이 될 거야!
+
+== chapter7.readonly.5
+text			이 항구가 이렇게 붐비는 건 서쪽 부두가 막힌 뒤로 처음이지.
+
+== chapter7.readonly.6
+text			서부에 있는 아들한테 편지를 부치러 왔어요.
+
+== chapter7.readonly.7
+text			짐 비켜요, 짐!\n뒤에서 수레 들어갑니다!
+
+== chapter7.readonly.8
+text			힐리아 서부행은 맨 끝 부두에서 떠나.\n곧 출항이다!
+
+== chapter7.readonly.9
+text			바다가 넓다고 곧장 건널 생각은 마.\n레비아탄 눈에 띄면 끝이야.
+
+== chapter7.readonly.10
+text			동쪽 끝을 돌아서 가니까 며칠 걸리지.\n뱃멀미 약은 챙겼나?
+
+== chapter7.atTheTerminal.3
+text			역 밖으로 나가 선착장 가는 길을 알아보자
+
+== chapter7.theHobbitDen.3
+text			산길 끝의 동굴 앞에 호빗들이 모여 있었다.
+
+== chapter7.theHobbitDen.4
+text			마차는 선착장이 아니라 산속 동굴 앞에서 멈췄다.
+
+== chapter7.theHobbitDen.5
+text			헤헤, 손님이 제 발로 왔네~\n안으로 들어와!
+
+== chapter7.theHobbitDen.6
+text			헤헤, 잠깐 쉬었다 가~\n안으로 들어와!
+
+== chapter7.theHobbitsHoard.1
+text			거대 호빗이 지키던 상자가 보인다.\n먼저 열어 보자.
+
+== chapter7.theHobbitsHoard.2
+text			거대 호빗이 지키던 상자를 열어 보자
+
+== chapter7.theMasterOfTheSnakeCastle.8
+text			(보석을 어떻게 할까?)
+
+== chapter7.theMasterOfTheSnakeCastle.9
+text			돌려준다
+
+== chapter7.theMasterOfTheSnakeCastle.10
+text			거절한다
+
+== chapter7.theMasterOfTheSnakeCastle.11
+text			뱀신의 눈을 돌려주었다.
+
+== chapter7.theMasterOfTheSnakeCastle.12
+text			판도라 봉인서를 얻었다.
+
+== chapter7.serpentShadow.1
+text			거대한 뱀의 그림자가 일행을 휘감았다. 도저히 이길 수 없다...
+
+== chapter7.rugaExplains.5
+text			하지만 열두 명이 나눠 가진 세상이 오래갈 리 없지.\n균형이 깨지고, 수백 년 동안 주인 없는 세상이 이어졌다.
+
+== chapter7.rugaExplains.6
+text			그 난장판을 힘으로 끝낸 게 에라드다.\n재앙의 판도라를 가진 페르니를 중심으로 모인 강자들이지.
+
+== chapter7.downTheMountainRoad.1
+text			배를 타러 왔다.\n아래쪽 산길로 내려가자.
+
+== chapter7.downTheMountainRoad.2
+text			호빗들이 막아 둔 아래쪽 길로 내려가면 선착장 가는 산길이다
+
+== chapter7.downTheMountainRoad.3
+text			산길의 짐승을 쓰러뜨리면 봉인서에 판도라 더스트가 모여요. 길을 따라 내려가면 선착장이에요
+
+== chapter7.downTheMountainRoad.4
+text			배를 타러 왔다.\n부두로 가자.
+
+== chapter7.downTheMountainRoad.5
+text			부두 끝의 힐리아 서부행 배에 타자
+
+== chapter7.overTheHorizon.3
+text			배를 타고 힐리아 서부로 향한다.

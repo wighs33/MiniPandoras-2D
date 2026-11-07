@@ -49,9 +49,9 @@ namespace MiniPandoras.Tests
                 GameMap map = story.Travel.CurrentMap;
                 shipBroke |= map != null && map.Id == "ship" && map.ShownLook == "broken";
                 wallSegments = Mathf.Max(wallSegments, Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None).Count(r => r.name == "Sand Wall"));
-                if (story.Combat.InEncounter && story.Lines.Contains("아, 진짜!\n허세 좀 집어치워!"))
+                if (story.Combat.Encounters.InEncounter && story.Lines.Contains("아, 진짜!\n허세 좀 집어치워!"))
                 {
-                    foughtNeoAlone = story.Combat.Enemies.Count(e => e.InEncounter) == 1;
+                    foughtNeoAlone = story.Combat.EnemyAi.Enemies.Count(e => e.InEncounter) == 1;
                 }
 
                 return story.Runner.Chapter > 9;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -47,7 +48,7 @@ namespace MiniPandoras.UI
 
                 bool open = i < playable;
                 rows[i].interactable = open;
-                labels[i].text = open ? chapters[i] : chapters[i] + "  · 준비 중";
+                labels[i].text = open ? chapters[i] : chapters[i] + T("titleView.show.1");
                 labels[i].color = !open ? closedColor : i == last ? lastColor : openColor;
             }
 

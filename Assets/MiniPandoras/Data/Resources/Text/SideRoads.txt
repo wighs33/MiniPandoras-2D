@@ -1,0 +1,45 @@
+# SideRoads
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== sideRoads.theFalseKing.1
+say	mino		누가 감히 이 고원의 왕 앞에 발을 들이느냐!
+say	mino		...또 네놈들이냐!\n그때는 모래 녀석 때문에 물러났을 뿐이다.\n이번엔 안 봐준다!
+
+== sideRoads.seaGatePrompt
+text			「레비아탄의 바다」로 입장하시겠습니까?\n주의: 레벨 격차가 심합니다.
+
+== sideRoads.aroundTheStation.1
+text			호빗들이 세운 통행 금지 말뚝이 길을 막고 있다.
+
+== sideRoads.askToEnterTheSea.1
+text			입장한다
+
+== sideRoads.askToEnterTheSea.2
+text			돌아간다
+
+== sideRoads.theSea.1
+text			경고: 이 바다에는 레비아탄이 산다.\n건너편은 힐리아 서부의 사막이지만 배는 건너지 못한다.\n서부로 가는 배는 동쪽 선착장에서 떠난다.
+
+== sideRoads.theSea.2
+text			저 건너가 바로 힐리아 서부의 사막일세.\n배로 반나절이면 닿을 거리지.
+
+== sideRoads.theSea.3
+text			하지만 이 바다엔 레비아탄이 산다네.\n저 난파선들을 보게.\n그래서 다들 동쪽 선착장에서 멀리 돌아가는 거야.
+
+== sideRoads.theSea.4
+text			절벽 아래 바다 동굴이 그놈의 둥지라더군.\n어지간히 강하지 않고선 들어갈 생각도 말게.
+
+== sideRoads.theSea.5
+text			레비아탄이 깊은 바다로 가라앉았다.
+
+== sideRoads.alongTheSouthCoast.1
+text			팻말: 「← 철갑 동굴 · → 아이로스 가도」
+
+== sideRoads.enterTheDen.1
+text			레비아탄의 둥지 · 레벨 {0}부터 들어갈 수 있다 (지금 레벨 {1})
+
+== sideRoads.theKingFalls.1
+text			왕좌 곁에 상자가 나타났다
+
+== sideRoads.theShutDoor.1
+text			철갑 드래곤의 던전 · 아직 입장할 수 없다

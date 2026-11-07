@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using MiniPandoras.Progress;
 using UnityEngine;
 
 namespace MiniPandoras.Combat
 {
-    /// <summary>적 한 종류(웹게임 battle/data.ts의 ENEMIES). 에디터의 WebGameImporter가 battle.json에서 만든다.</summary>
+    /// <summary>적 한 종류. 웹게임 battle/data.ts의 ENEMIES에서 시작한 값이고, 몬스터 도감의 적은 Docs/MONSTERS.md의 레벨 수치를 따른다.</summary>
     [CreateAssetMenu(menuName = "MiniPandoras/Enemy")]
     public sealed class EnemyDefinition : ScriptableObject
     {
@@ -30,6 +31,8 @@ namespace MiniPandoras.Combat
         [SerializeField, Range(0f, 1f)] private float evade;
         [Tooltip("등 뒤에 악마의 날개를 편다")]
         [SerializeField] private bool wings;
+        [Tooltip("보스 기술을 쓰는 적의 공격 순서. 비우면 스킬만 쓴다")]
+        [SerializeField] private BossPatternDefinition bossPattern;
 
         public string Id => id;
         public string DisplayName => displayName;
@@ -44,7 +47,8 @@ namespace MiniPandoras.Combat
         public float ChargeRange => chargeRange;
         public float Evade => evade;
         public bool Wings => wings;
+        public BossPatternDefinition BossPattern => bossPattern;
         /// <summary>쓰러뜨리면 얻는 경험치(웹게임에 없다). 강한 적일수록 많이 주도록 체력으로 정한다.</summary>
-        public int Experience => Mathf.Max(1, hp / 10);
+        public int Experience => Mathf.Max(1, hp / GameBalance.Current.HpPerExperience);
     }
 }

@@ -74,7 +74,7 @@ namespace MiniPandoras.Tests
                 Assert.That(Time.realtimeSinceStartup, Is.LessThan(realEnd), "1장이 2분 안에 끝나지 않았다");
                 if (runner.Chapter <= 1)
                 {
-                    foughtInChapter1 |= combat.InEncounter;
+                    foughtInChapter1 |= combat.Encounters.InEncounter;
                     stickShownInCutscenes |= stick.isActiveAndEnabled;
                 }
 

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: sandWolf
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: sandWolf
+  size: {x: 40, y: 28}
+  down:
+  - {fileID: 21300000, guid: 917b37c6c543cf348b81803b9d36dc2d, type: 3}
+  - {fileID: 21300000, guid: 0ce77007eabf6aa428df146b38967d76, type: 3}
+  - {fileID: 21300000, guid: e89664aa940b3654184dae983f20efe8, type: 3}
+  right:
+  - {fileID: 21300000, guid: f17e5cc2c677e2540b5cd5984a72ea09, type: 3}
+  - {fileID: 21300000, guid: 10b8a52606cc8734b97b197751b82023, type: 3}
+  - {fileID: 21300000, guid: b275a289f04e36f42a609577c2ad2147, type: 3}
+  up:
+  - {fileID: 21300000, guid: 4d48d77fa6ad2274095746945cd6573b, type: 3}
+  - {fileID: 21300000, guid: 6a11c60db4d006f42bfc1752086ecb48, type: 3}
+  - {fileID: 21300000, guid: fb54ac597bf575840baec3792495ff3d, type: 3}
+  portrait: {fileID: 21300000, guid: 8e87cc739dfba4444b6f260371f75123, type: 3}

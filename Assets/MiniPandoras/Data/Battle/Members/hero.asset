@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe870f02f2aefb4fac6236711c275c7, type: 3}
+  m_Name: hero
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.MemberDefinition
+  id: hero
+  displayName: 
+  sheetId: hero
+  summonSkill: {fileID: 11400000, guid: 48a87f85c64e9bf4a80071af82b4d45c, type: 2}
+  summonSheetId: hero
+  battleSheetId: hero
+  levels:
+  - hp: 60
+    mana: 10
+    attack: 10
+    defense: 6
+    speed: 8
+  - hp: 76
+    mana: 12
+    attack: 12
+    defense: 7
+    speed: 9
+  - hp: 118
+    mana: 36
+    attack: 16
+    defense: 10
+    speed: 11
+  - hp: 140
+    mana: 44
+    attack: 19
+    defense: 12
+    speed: 12
+  - hp: 165
+    mana: 52
+    attack: 22
+    defense: 14
+    speed: 13
+  - hp: 190
+    mana: 60
+    attack: 25
+    defense: 16
+    speed: 14
+  - hp: 212
+    mana: 66
+    attack: 27
+    defense: 17
+    speed: 15
+  growthFromLevel: 7
+  growth:
+    hp: 22
+    mana: 6
+    attack: 2
+    defense: 1
+    speed: 1
+  chapterLevelStopsAtTable: 1
+  critPerEarnedLevel: 0.2
+  evadePerEarnedLevel: 0.1
+  skills:
+  - mystery
+  awakenedSkills:
+  - darkPower

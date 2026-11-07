@@ -58,7 +58,7 @@ namespace MiniPandoras.Story
             ContinuesSave = false;
             if (!PlayStory)
             {
-                director.PlaceParty("hillia", "landing", Facing.Down);
+                director.Party.PlaceParty("hillia", "landing", Facing.Down);
                 director.SetPlayerControl(true);
                 yield break;
             }
@@ -75,13 +75,13 @@ namespace MiniPandoras.Story
             yield return BeginFrom(from, save);
             for (Chapter = from; Chapter < PlayableChapters; Chapter++)
             {
-                director.BeginChapter(Chapter);
+                director.Progress.BeginChapter(Chapter);
                 yield return Chapters[Chapter](director);
             }
 
             // 1부 끝(웹게임 runStory 뒤): 클리어 표시를 남기고 엔딩을 본 뒤 타이틀로 돌아간다.
             session.MarkCleared();
-            yield return director.Ending();
+            yield return director.Scenes.Ending();
             SceneManager.LoadScene(gameObject.scene.name);
         }
 

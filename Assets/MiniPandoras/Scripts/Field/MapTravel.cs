@@ -102,7 +102,7 @@ namespace MiniPandoras.Field
                 parkedFeet = player.Character.Position;
                 parkedFacing = player.Character.Facing;
                 exploration.ParkMap();
-                combat.ParkMap();
+                combat.SkillTrial.ParkMap();
                 parked.gameObject.SetActive(false);
                 current = null;
                 Load(mapId, pointName, facing);
@@ -123,7 +123,7 @@ namespace MiniPandoras.Field
                 exploration.UnparkMap();
                 player.PlaceAt(parkedFeet, parkedFacing);
                 Physics2D.SyncTransforms();
-                combat.UnparkMap();
+                combat.SkillTrial.UnparkMap();
                 ShowMapSurroundings();
                 AimCameraAtPlayer();
                 arrived();

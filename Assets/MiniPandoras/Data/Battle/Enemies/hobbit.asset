@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97bb1cddb4d115e46a6f92dbf1a9352f, type: 3}
+  m_Name: hobbit
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.EnemyDefinition
+  id: hobbit
+  displayName: "\uD638\uBE57"
+  sheetId: hobbit
+  hp: 74
+  attack: 17
+  fixedDamage: 0
+  defense: 9
+  speed: 13
+  skills:
+  - {fileID: 11400000, guid: c4fe6bc9c9aa27b44a53080db6ec219c, type: 2}
+  - {fileID: 11400000, guid: 8e898f50dbb5b264cb0462688d574316, type: 2}
+  skillRate: 0.35
+  chargeRange: 0
+  evade: 0
+  wings: 0

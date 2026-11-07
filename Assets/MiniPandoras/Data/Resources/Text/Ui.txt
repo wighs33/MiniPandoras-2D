@@ -1,0 +1,224 @@
+# Ui
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== gameMenu.equip.1
+text			장착 칸이 가득 찼어요
+
+== gameMenu.toggleCompanion.1
+text			세 명까지 고를 수 있어요
+
+== gameMenu.release.1
+text			판도라는 하나 이상 정착해야 해요
+
+== inventoryEntries.lockedHint
+text			아직 무기만 장착할 수 있어요
+
+== inventoryEntries.line.1
+text			무기 · 공격력 +{0}
+
+== inventoryEntries.line.2
+text			소모품 · {0}개
+
+== inventoryEntries.line.3
+text			이야기 물건
+
+== inventoryEntries.line.4
+text			보석 · 퀘스트 아이템
+
+== inventoryEntries.line.5
+text			보석
+
+== inventoryEntries.line.6
+text			 · 장착 중
+
+== fieldCombat.boss.tryStunOnWall.1
+text			벽에 박았다!
+
+== fieldCombat.pressAttack.1
+text			무기를 장착해야 공격할 수 있다
+
+== fieldCombat.pressPandora.1
+text			아직 판도라를 바꿀 수 없다
+
+== fieldCombat.pressPandora.2
+text			판도라 ― 
+
+== fieldCombat.pressSkill.1
+text			쓸 수 있는 스킬이 없다
+
+== fieldCombat.pressSkill.2
+text			판도라 레벨 {0}에 열린다
+
+== fieldCombat.pressSkill.3
+text			아직 다시 쓸 수 없다
+
+== fieldCombat.pressSkill.4
+text			마나가 모자라다
+
+== fieldCombat.pressSkill.5
+text			근처에 적이 없다
+
+== fieldCombat.damagePlayer.1
+text			흘려보냄
+
+== fieldCombat.damagePlayer.2
+text			회피
+
+== fieldCombat.dimension.leaveGateAt.1
+text			그곳에는 열 수 없다
+
+== fieldCombat.scripted.scriptedSkill.1
+text			{0}의 {1}!
+
+== fieldCombat.scripted.scriptedEnemySkill.1
+text			{0}의 {1}!
+
+== fieldCombat.skills.text.1
+text			악마의 발톱
+
+== fieldCombat.skills.text.2
+text			광귀각성
+
+== fieldCombat.skills.pressQuickSlot.1
+text			지금은 쓸 필요가 없다
+
+== fieldCombat.skills.pressSummon.1
+text			: 아직 부를 수 없다
+
+== fieldCombat.skills.pressSummon.2
+text			근처에 적이 없다
+
+== fieldCombat.skills.castFizzle.1
+text			...하지만 아무 일도 일어나지 않았다.
+
+== fieldCombat.skills.damageEnemy.1
+text			막았다!
+
+== fieldCombat.skills.damageEnemy.2
+text			빗나감
+
+== memberStats.heroLines.1
+text			레벨
+
+== memberStats.heroLines.2
+text			경험치
+
+== gliderFlight.stepPlay.1
+text			병사: 쏴라! 놓치지 마라!
+
+== gliderFlight.stepPlay.2
+text			랑: 몸을 낮춰! 계속 온다!
+
+== gliderFlight.stepPlay.3
+text			병사: 일제 사격 준비——!
+
+== gliderFlight.stepVolley.1
+text			병사: 쏴라——!!
+
+== gliderFlight.stepVolley.2
+text			랑: 위험해——!
+
+== gliderFlight.stepFall.1
+text			랑: ...크윽......
+
+== characterStats.addLines.1
+text			체력
+
+== characterStats.addLines.2
+text			마나
+
+== characterStats.addLines.3
+text			공격력
+
+== characterStats.addLines.4
+text			치명타 확률
+
+== characterStats.addLines.5
+text			방어력
+
+== characterStats.addLines.6
+text			회피율
+
+== missions.main
+text			메인
+
+== missions.request
+text			의뢰
+
+== gliderView.buildHud.1
+text			탈출까지
+
+== loadoutView.idleHint
+text			끌어서 마법진에 놓기 · 눌러서 집기 · ×로 닫기
+
+== loadoutView.heldHint
+text			자리를 눌러 놓기 · 다른 곳을 누르면 내려놓기
+
+== missionView.showDetail.1
+text			완료
+
+== missionView.showDetail.2
+text			진행 중
+
+== missionView.showDetail.3
+text			맡긴 사람: {0}
+
+== missionView.showDetail.4
+text			{0} Gold (받음)
+
+== rewardFeedView.showExperience.1
+text			경험치 +{0}
+
+== rewardFeedView.showLevel.1
+text			레벨 업! Lv.{0}
+
+== sealBookView.refresh.1
+text			활성화 {0} / {1}
+
+== sealBookView.showDetail.1
+text			Lv.{0} · 정착 중
+
+== sealBookView.showDetail.2
+text			더스트 100% · 아직 깨어나지 않았다
+
+== sealBookView.showDetail.3
+text			더스트 {0}% · 비활성
+
+== sealBookView.showDetail.4
+text			활성화
+
+== sealBookView.showDetail.5
+text			레벨업
+
+== sealBookView.showDetail.6
+text			활성화하면 쓸 수 있다
+
+== sealBookView.showDetail.7
+text			더스트 100%에 깨어난다
+
+== sealBookView.growthNote.1
+text			다음 레벨까지 더스트 {0}/{1}
+
+== sealBookView.growthNote.2
+text			최고 레벨
+
+== skipButtonView.paint.1
+text			건너뛰는 중
+
+== skipButtonView.paint.2
+text			건너뛰기
+
+== titleView.show.1
+text			  · 준비 중
+
+== touchControlsView.captionText.1
+text			대화
+
+== touchControlsView.captionText.2
+text			공격
+
+== touchControlsView.captionText.3
+text			조사
+
+== trialBarView.lateUpdate.1
+text			 체험 중

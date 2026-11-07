@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836ea84567ed7ca43921883bb529ab1d, type: 3}
+  m_Name: mystery
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.PandoraDefinition
+  id: mystery
+  pandoraName: ???
+  firstSkill: {fileID: 11400000, guid: dadee543444b08b41aafee6fb156baeb, type: 2}
+  secondSkill: {fileID: 11400000, guid: dadee543444b08b41aafee6fb156baeb, type: 2}
+  thirdSkill: {fileID: 11400000, guid: dadee543444b08b41aafee6fb156baeb, type: 2}
+  ultimateSkill: {fileID: 0}
+  color: {r: 0.78431374, g: 0.72156864, b: 1, a: 1}
+  inSealBook: 0
+  origin: 
+  hint: 
+  glyph: 
+  lightColor: {r: 0.78431374, g: 0.72156864, b: 1, a: 1}
+  darkColor: {r: 0.78431374, g: 0.72156864, b: 1, a: 1}

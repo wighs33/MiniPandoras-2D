@@ -9,7 +9,7 @@ namespace MiniPandoras.Editor
 {
     /// <summary>
     /// 컴포넌트·에셋의 private [SerializeField]를 이름으로 채운다. 런타임 코드에 쓰기용 공개 setter를 두지 않으려고 쓴다.
-    /// 장면 조립기와 들여오기 도구가 같이 쓴다.
+    /// 들여오기 도구가 쓴다.
     /// </summary>
     public static class SerializedFields
     {

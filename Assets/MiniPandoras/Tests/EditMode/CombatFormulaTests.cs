@@ -3,6 +3,7 @@ using System.IO;
 using MiniPandoras.Combat;
 using MiniPandoras.World;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 namespace MiniPandoras.Tests
@@ -40,9 +41,10 @@ namespace MiniPandoras.Tests
         public void MemberStatsMatchTheWebGameForEveryChapter()
         {
             Assert.That(Expected.memberStats, Is.Not.Empty);
+            var catalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>("Assets/MiniPandoras/Data/Battle/BattleCatalog.asset");
             foreach (StatsCase sample in Expected.memberStats)
             {
-                MemberStatBlock stats = MemberStats.For(sample.id, sample.level, sample.awakened);
+                MemberStatBlock stats = MemberStats.For(catalog.Member(sample.id), sample.level, sample.awakened);
                 string where = $"{sample.id} {sample.level}장 깨어남 {sample.awakened}";
                 Assert.That(stats.SheetId, Is.EqualTo(sample.sprite), where);
                 Assert.That(new[] { stats.Hp, stats.Dp, stats.Attack, stats.Defense, stats.Speed },

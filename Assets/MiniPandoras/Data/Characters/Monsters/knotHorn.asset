@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: knotHorn
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: knotHorn
+  size: {x: 28, y: 26}
+  down:
+  - {fileID: 21300000, guid: 2e2dc5e824f036646aca3786fc15f59d, type: 3}
+  - {fileID: 21300000, guid: c09cc6e27ad5bf942849043f3a1c3885, type: 3}
+  - {fileID: 21300000, guid: 23f07f08b26ecd842ac41c0505eefea3, type: 3}
+  right:
+  - {fileID: 21300000, guid: 6b2f177790daf8b448cb34102998154b, type: 3}
+  - {fileID: 21300000, guid: af30e5b1b1dc993498936b9a6e261eb5, type: 3}
+  - {fileID: 21300000, guid: e04d00ef7cc081247be8185b43ad026c, type: 3}
+  up:
+  - {fileID: 21300000, guid: 8b882a88c6d29644981823a6eeb6df75, type: 3}
+  - {fileID: 21300000, guid: 974a152f89c29fe4c8a0264196bd2710, type: 3}
+  - {fileID: 21300000, guid: e423ee1f5b298a048b93d80af6157255, type: 3}
+  portrait: {fileID: 0}

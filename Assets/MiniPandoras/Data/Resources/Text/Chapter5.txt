@@ -1,0 +1,113 @@
+# Chapter5
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter5.wakeUp.1
+say	hero		으아아아아!!\n......하아, 하아.
+say	rang		정신이 드나.
+
+== chapter5.wakeUp.2
+say	hero		어라...? 다시 돌아왔네...?\n랑!! 상처는 어떻게 됐어??\n괜찮은 거야?
+say	rang		냐! 보다시피 멀쩡하다.
+
+== chapter5.wakeUp.3
+say	hero		어......?\n이게 뭐야, 손에서...... 검은 게 피어올라...
+
+== chapter5.wakeUp.4
+say	diel		......!
+say	diel		그 힘.\n내 판도라다.
+
+== chapter5.wakeUp.5
+say	diel		너 정체가 뭐지?
+think	rang		...깨어나고 있다.\n판도라님의 힘이.
+say	hero		으악, 죄송합니다!\n저, 저도 몰라요!\n전 이 세계에 온 지 얼마 안 됐다고요!!
+say	diel		뭐라는 거야...??\n꿈에서 아직 덜 깼나 보군.\n네 판도라는... 혹시... 다른 사람의 판도라를 복제하는 능력인 거냐?
+
+== chapter5.wakeUp.6
+say	hero		복제......?
+say	hero		그러고 보니 날 여기로 보낸 녀석들이, 내가 판도라 여신의 환생이라고 했었는데......
+say	rang		......
+
+== chapter5.wakeUp.7
+shout	hero		아악!!\n왜 물어?!
+say	rang		처음 본 녀석한테 그걸 전부 떠벌리는 멍청이가 어디 있나!
+say	diel		......축복의 여신을 말하는 건가?\n그 여신의 판도라가 복제 판도라였다는 사실은 처음 듣는군...
+say	diel		걱정 마라.\n네 비밀은 아무한테도 말하지 않겠다.\n역시 내 감은 틀리지 않았어.
+
+== chapter5.everwave.1
+say	diel		나는 길드를 만들 생각이다.
+say	hero		길드요?
+say	diel		에버웨이브.
+say	diel		뉴웨이브 길드의 의지를 이어 가는 길드다.
+say	hero		뉴웨이브요?
+say	diel		...예전에 내가 있던 길드다.\n지금은 없지.
+say	diel		들어와라.\n어차피 갈 곳도 없잖아.
+say	hero		그렇긴 하죠...\n좋아요. 들어갈게요.\n그런데 지금 길드원은 몇 명이에요?
+say	diel		너 한 명.
+say	hero		......네?
+say	diel		너 한 명이라고.
+shout	hero		그게 무슨 길드예요?!
+say	diel		예전에 함께했던 동료들이 있다.\n지금은 세계 곳곳에 흩어져 있지만.
+say	diel		마침 동료를 찾으러 떠날 참이었다.\n너흰 앞으로 날 따라와라.
+say	hero		아까 말했던 뉴웨이브의 사람들인가요?
+say	diel		그렇다.
+say	rang		냐... 뉴웨이브라는 길드, 들어 본 적 있는 것 같기도 하고...
+say	diel		가자.\n뱀열차는 마을 동쪽으로 나가서 탄다.
+
+== chapter5.walkToTheStation.1
+say	diel		첫 번째 동료가 있는 곳까지는 꽤 멀다.\n바다도 건너야 하지.
+
+== chapter5.dielHandsOverAPotion.1
+say	diel		출발하기 전에 이걸 받아라.\n회복약이다.
+say	diel		가방에 넣어 두기만 하면 싸우다가 꺼낼 틈이 없다.\n퀵슬롯에 장착해 둬라.
+say	diel		네가 뱀성에서 훔친 뱀신의 눈도 낄 수 있다.
+shout	hero		제가 안 훔쳤어요!!
+say	diel		그럼 네가 가지고 있는 건 뭐지...?
+shout	hero		그건... 모르는 여자아이가 멋대로 주고 갔어요!
+say	diel		...그렇다고 해 두지.
+
+== chapter5.dielExplainsQuickSlots.1
+say	diel		장착한 물건은 화면 아래 칸에 나온다.\n회복약은 그 칸을 눌러서 쓴다.
+
+== chapter5.dielExplainsSwapping.1
+say	diel		판도라가 둘이면 싸우는 도중에도 바꿔 들 수 있다.
+say	diel		스킬도 판도라를 따라 바뀐다.\n적을 보고 골라 써라.
+
+== chapter5.theSnakeTrain.1
+shout	hero		지, 지진?!
+say	diel		아니.\n왔군.
+
+== chapter5.theSnakeTrain.2
+say	hero		............
+say	hero		저거...... 기차야?\n뱀이야?
+say	diel		둘 다다.
+say	rang		냐하! 둘 다지.
+think	hero		...에라디온, 역시 이상한 세계야.
+say	diel		뱀열차다. 에라디온의 이동 수단이지.\n이 근처 부두는 서부행 배가 끊겼다.\n다른 항구 쪽 선착장까지 이걸 타고 간다.
+say	diel		가자.\n첫 번째 동료를 찾으러.
+
+== chapter5.outskirtsNorthSign
+text			팻말: 「↑ 아지트 가는 숲길 · ← 힐리아 마을」
+
+== chapter5.outskirtsSouthSign
+text			팻말: 「↓ 서쪽 부두 · → 뱀열차 정류장」
+
+== chapter5.noShipYet
+text			서부행 배는 끊겼군.\n여기서는 바다를 못 건넌다.\n뱀열차로 다른 항구 쪽에 가자.
+
+== chapter5.everwave.2
+text			디엘이 동료가 되었다!
+
+== chapter5.setupTheField.1
+text			팻말: 「↑ 힐리아 숲 · → 힐리아 마을」
+
+== chapter5.setupTheField.2
+text			팻말: 「다리 수리를 마쳤습니다.\n천천히 건너시오」
+
+== chapter5.setupTheField.3
+text			↑ 뱀성
+
+== chapter5.setupTheField.4
+text			뱀성 쪽은 병사들이 지키고 있다.\n돌아가지 않는 게 좋겠다.
+
+== chapter5.walkToTheStation.2
+text			역명판: 「뱀열차 정류장 · 선착장 방면」

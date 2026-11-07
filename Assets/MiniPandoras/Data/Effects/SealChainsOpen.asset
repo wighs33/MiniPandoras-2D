@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: SealChainsOpen
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: 2131463683, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -1851355319, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: 12999535, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -701005533, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -88599014, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: 2119773520, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -401458717, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -375190466, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -2106157600, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -1697145938, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: 1876425846, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -1771365193, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  - {fileID: -726959526, guid: cbb11797295f4ec4a8db53aae1c96522, type: 3}
+  lightFrames:
+  - {fileID: -2019674444, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: 221675763, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: 1806924618, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: -1594014304, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: 821876407, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: -77549990, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: -454367459, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: 808215471, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: -1602939152, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: -573199384, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: -1118658510, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: 1451981755, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  - {fileID: -1356185706, guid: 5274190cf9af339499a5481b43681a3c, type: 3}
+  framesPerSecond: 12
+  loop: 0
+  impactSeconds: 0

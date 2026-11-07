@@ -5,6 +5,7 @@ using MiniPandoras.Field;
 using MiniPandoras.Progress;
 using MiniPandoras.World;
 using UnityEngine;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.Story
 {
@@ -20,11 +21,9 @@ namespace MiniPandoras.Story
     {
         /// <summary>호빗 산길을 끝까지 걸어 동굴 앞에 닿았다. 이 이름으로 탐험이 끝나면 마차를 타지 않은 것이다.</summary>
         public const string CaveMouth = "caveMouth";
-        /// <summary>레비아탄의 던전에 들어갈 수 있는 레벨.</summary>
-        public const int LeviathanLevel = 30;
 
         private const int StationEastEdge = 33;
-        private const string SeaGatePrompt = "「레비아탄의 바다」로 입장하시겠습니까?\n주의: 레벨 격차가 심합니다.";
+        private static string SeaGatePrompt => T("sideRoads.seaGatePrompt");
         private const int DragonGateReach = 4;
         // 돌아올 때 서는 칸. 떠나는 발판에서 두 칸 안쪽이라 곧바로 다시 떠나지 않는다.
         private static readonly Vector2Int BackFromTrail = new Vector2Int(31, 5);
@@ -34,73 +33,73 @@ namespace MiniPandoras.Story
         /// </summary>
         public static void AroundTheStation(StoryDirector s, Action placePeople)
         {
-            Action exits = () => s.Trigger("toTrail", TriggerKind.Step, cell => cell.x >= StationEastEdge, () => s.Warp("hobbitTrail", "westArrive", Facing.Right));
+            Action exits = () => s.Field.Trigger("toTrail", TriggerKind.Step, cell => cell.x >= StationEastEdge, () => s.Field.Warp("hobbitTrail", "westArrive", Facing.Right));
             exits();
-            s.SetMapSetup("station", () =>
+            s.Field.SetMapSetup("station", () =>
             {
                 placePeople();
-                s.MoveParty(BackFromTrail, Facing.Left);
+                s.Party.MoveParty(BackFromTrail, Facing.Left);
                 exits();
             });
-            s.SetMapSetup("hobbitTrail", () =>
+            s.Field.SetMapSetup("hobbitTrail", () =>
             {
                 Wildlife.Spawn(s, "hobbitTrail");
-                s.LockWarp("south", "호빗들이 세운 통행 금지 말뚝이 길을 막고 있다.");
-                s.ArriveAt(CaveMouth, s.Point("mouth"));
+                s.Field.LockWarp("south", T("sideRoads.aroundTheStation.1"));
+                s.Field.ArriveAt(CaveMouth, s.Field.Point("mouth"));
             });
         }
 
         /// <summary>서쪽 부두의 다리 끝 게이트: 밟으면 레비아탄의 바다로 들어갈지 묻는다.</summary>
         public static void PierGate(StoryDirector s)
         {
-            Vector2Int gate = s.Point("pierGate");
-            s.Trigger("seaGate", TriggerKind.Step, cell => cell.y >= gate.y, () => AskToEnterTheSea(s));
+            Vector2Int gate = s.Field.Point("pierGate");
+            s.Field.Trigger("seaGate", TriggerKind.Step, cell => cell.y >= gate.y, () => AskToEnterTheSea(s));
         }
 
         private static IEnumerator AskToEnterTheSea(StoryDirector s)
         {
             int pick = 1;
-            yield return s.Choose("hero", SeaGatePrompt, new[] { "입장한다", "돌아간다" }, chosen => pick = chosen);
+            yield return s.Choose("hero", SeaGatePrompt, new[] { T("sideRoads.askToEnterTheSea.1"), T("sideRoads.askToEnterTheSea.2") }, chosen => pick = chosen);
             if (pick == 0)
             {
-                yield return s.Warp("leviathanCoast", "pierArrive", Facing.Down);
+                yield return s.Field.Warp("leviathanCoast", "pierArrive", Facing.Down);
             }
             else
             {
-                s.MoveParty(s.Point("gateArrive"), Facing.Up);
+                s.Party.MoveParty(s.Field.Point("gateArrive"), Facing.Up);
             }
         }
 
         /// <summary>레비아탄의 바다와 던전을 준비한다.</summary>
         public static void TheSea(StoryDirector s)
         {
-            s.SetMapSetup("leviathanCoast", () =>
+            s.Field.SetMapSetup("leviathanCoast", () =>
             {
-                s.Sign("sign", "경고: 이 바다에는 레비아탄이 산다.\n건너편은 힐리아 서부의 사막이지만 배는 건너지 못한다.\n서부로 가는 배는 동쪽 선착장에서 떠난다.");
-                s.Npc("fisher", "townMan", s.Point("fisher"), Facing.Left, new[]
+                s.Field.Sign("sign", T("sideRoads.theSea.1"));
+                s.Field.Npc("fisher", "townMan", s.Field.Point("fisher"), Facing.Left, new[]
                 {
-                    ("townMan", "저 건너가 바로 힐리아 서부의 사막일세.\n배로 반나절이면 닿을 거리지."),
-                    ("townMan", "하지만 이 바다엔 레비아탄이 산다네.\n저 난파선들을 보게.\n그래서 다들 동쪽 선착장에서 멀리 돌아가는 거야."),
-                    ("townMan", "절벽 아래 바다 동굴이 그놈의 둥지라더군.\n어지간히 강하지 않고선 들어갈 생각도 말게."),
+                    ("townMan", T("sideRoads.theSea.2")),
+                    ("townMan", T("sideRoads.theSea.3")),
+                    ("townMan", T("sideRoads.theSea.4")),
                 });
-                Vector2Int gate = s.Point("gate");
-                s.Trigger("leviathanGate", TriggerKind.Step, cell => cell.y <= gate.y && Mathf.Abs(cell.x - gate.x) <= 1, () => EnterTheDen(s));
+                Vector2Int gate = s.Field.Point("gate");
+                s.Field.Trigger("leviathanGate", TriggerKind.Step, cell => cell.y <= gate.y && Mathf.Abs(cell.x - gate.x) <= 1, () => EnterTheDen(s));
             });
-            s.SetMapSetup("leviathanDen", () => s.Monster("leviathan", s.Point("boss"), new[] { "leviathan" }, onDefeat: () => s.Notify("레비아탄이 깊은 바다로 가라앉았다.")));
+            s.Field.SetMapSetup("leviathanDen", () => s.Field.Monster("leviathan", s.Field.Point("boss"), new[] { "leviathan" }, onDefeat: () => s.Notify(T("sideRoads.theSea.5"))));
         }
 
         /// <summary>힐리아 서부에서 드래곤 고원으로 가는 길을 준비한다.</summary>
         public static void TowardTheDragonPlateau(StoryDirector s)
         {
-            s.SetMapSetup("dragonRoad", () => Wildlife.Spawn(s, "dragonRoad"));
-            s.SetMapSetup("dragonPlateau", () =>
+            s.Field.SetMapSetup("dragonRoad", () => Wildlife.Spawn(s, "dragonRoad"));
+            s.Field.SetMapSetup("dragonPlateau", () =>
             {
-                if (s.HasDefeated("kingMino"))
+                if (s.Field.HasDefeated("kingMino"))
                 {
                     TheKingsChest(s);
                 }
 
-                s.Monster("kingMino", s.Point("mino"), new[] { "mino", "minoThug", "minoThug" }, onAggro: () => TheFalseKing(s), onDefeat: () => TheKingFalls(s));
+                s.Field.Monster("kingMino", s.Field.Point("mino"), new[] { "mino", "minoThug", "minoThug" }, onAggro: () => TheFalseKing(s), onDefeat: () => TheKingFalls(s));
             });
             AlongTheSouthCoast(s);
         }
@@ -110,15 +109,15 @@ namespace MiniPandoras.Story
         {
             foreach (string map in new[] { "petalMeadow", "glowWood" })
             {
-                s.SetMapSetup(map, () => Wildlife.Spawn(s, map));
+                s.Field.SetMapSetup(map, () => Wildlife.Spawn(s, map));
             }
 
-            s.SetMapSetup("fireflyBrook", () =>
+            s.Field.SetMapSetup("fireflyBrook", () =>
             {
                 Wildlife.Spawn(s, "fireflyBrook");
-                s.Chest("fireflyBrook", "chest", Items.Potion, 3);
+                s.Field.Chest("fireflyBrook", "chest", Items.Potion, 3);
             });
-            s.SetMapSetup("fairySpring", () => s.Chest("fairySpring", "chest", Items.Ether, 3));
+            s.Field.SetMapSetup("fairySpring", () => s.Field.Chest("fairySpring", "chest", Items.Ether, 3));
         }
 
         /// <summary>고원에서 해안을 따라 철갑 동굴과 아이로스 가도로 가는 길을 준비한다.</summary>
@@ -126,55 +125,55 @@ namespace MiniPandoras.Story
         {
             foreach (string map in new[] { "duneField", "coastRoad", "ironCave" })
             {
-                s.SetMapSetup(map, () => Wildlife.Spawn(s, map));
+                s.Field.SetMapSetup(map, () => Wildlife.Spawn(s, map));
             }
 
-            s.SetMapSetup("coastFork", () =>
+            s.Field.SetMapSetup("coastFork", () =>
             {
-                s.Sign("sign", "팻말: 「← 철갑 동굴 · → 아이로스 가도」");
+                s.Field.Sign("sign", T("sideRoads.alongTheSouthCoast.1"));
                 Wildlife.Spawn(s, "coastFork");
             });
-            s.SetMapSetup("ironDepths", () =>
+            s.Field.SetMapSetup("ironDepths", () =>
             {
                 Wildlife.Spawn(s, "ironDepths");
-                Vector2Int gate = s.Point("dragonGate");
-                s.Trigger("dragonGate", TriggerKind.Step, cell => cell.y <= gate.y + 1 && Mathf.Abs(cell.x - gate.x) <= DragonGateReach, () => TheShutDoor(s));
+                Vector2Int gate = s.Field.Point("dragonGate");
+                s.Field.Trigger("dragonGate", TriggerKind.Step, cell => cell.y <= gate.y + 1 && Mathf.Abs(cell.x - gate.x) <= DragonGateReach, () => TheShutDoor(s));
             });
         }
 
         private static IEnumerator EnterTheDen(StoryDirector s)
         {
-            if (s.HeroLevel < LeviathanLevel)
+            int needed = GameBalance.Current.LeviathanLevel;
+            if (s.Progress.HeroLevel < needed)
             {
-                s.Hint($"레비아탄의 둥지 · 레벨 {LeviathanLevel}부터 들어갈 수 있다 (지금 레벨 {s.HeroLevel})", 240f);
+                s.Field.Hint(T("sideRoads.enterTheDen.1", needed, s.Progress.HeroLevel), 240f);
                 yield break;
             }
 
-            yield return s.Warp("leviathanDen", "enter", Facing.Up);
+            yield return s.Field.Warp("leviathanDen", "enter", Facing.Up);
         }
 
         private static IEnumerator TheFalseKing(StoryDirector s)
         {
-            yield return s.Say("mino", "누가 감히 이 고원의 왕 앞에 발을 들이느냐!");
-            yield return s.Say("mino", "...또 네놈들이냐!\n그때는 모래 녀석 때문에 물러났을 뿐이다.\n이번엔 안 봐준다!");
+            yield return s.Lines("sideRoads.theFalseKing.1");
         }
 
         /// <summary>미노를 쓰러뜨리면 왕좌 곁에 상자가 나타난다.</summary>
         private static IEnumerator TheKingFalls(StoryDirector s)
         {
             TheKingsChest(s);
-            s.Hint("왕좌 곁에 상자가 나타났다", 300f);
+            s.Field.Hint(T("sideRoads.theKingFalls.1"), 300f);
             yield break;
         }
 
         private static void TheKingsChest(StoryDirector s)
         {
-            s.Chest("kingMino", "chest", Items.KingsHorn);
+            s.Field.Chest("kingMino", "chest", Items.KingsHorn);
         }
 
         private static IEnumerator TheShutDoor(StoryDirector s)
         {
-            s.Hint("철갑 드래곤의 던전 · 아직 입장할 수 없다", 240f);
+            s.Field.Hint(T("sideRoads.theShutDoor.1"), 240f);
             yield break;
         }
     }

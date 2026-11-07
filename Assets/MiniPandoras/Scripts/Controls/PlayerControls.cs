@@ -38,7 +38,7 @@ namespace MiniPandoras.Controls
         public bool HasControl => Mode == ControlMode.Glider || (Mode == ControlMode.Field && !hero.IsFrozen && !combat.IsScriptRunning);
 
         /// <summary>버튼이 게임에 닿는지. 연출 중이거나 주인공이 멈춘 동안(말 걸기, 맵 이동)은 닿지 않는다.</summary>
-        private bool CanAct => Mode == ControlMode.Field && !hero.IsFrozen && !combat.InGate;
+        private bool CanAct => Mode == ControlMode.Field && !hero.IsFrozen && !combat.DimensionSkills.InGate;
 
         public void SetMode(ControlMode mode)
         {
@@ -89,7 +89,7 @@ namespace MiniPandoras.Controls
                 return;
             }
 
-            if (combat.InEncounter)
+            if (combat.Encounters.InEncounter)
             {
                 combat.PressAttack();
                 return;
@@ -132,7 +132,7 @@ namespace MiniPandoras.Controls
         {
             if (CanAct)
             {
-                combat.PressQuickSlot(slot);
+                combat.PlayerSkills.PressQuickSlot(slot);
             }
         }
 
@@ -140,13 +140,13 @@ namespace MiniPandoras.Controls
         {
             if (CanAct)
             {
-                combat.PressSummon(slot);
+                combat.PlayerSkills.PressSummon(slot);
             }
         }
 
         private void OnGatePicked(Vector2 spot)
         {
-            combat.LeaveGateAt(spot);
+            combat.DimensionSkills.LeaveGateAt(spot);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace MiniPandoras.Controls
                 return new TouchLayout(true, ActionCaption.Hidden, false, false);
             }
 
-            if (!HasControl || combat.IsDowned || combat.InGate)
+            if (!HasControl || combat.IsDowned || combat.DimensionSkills.InGate)
             {
                 return TouchLayout.Hidden;
             }

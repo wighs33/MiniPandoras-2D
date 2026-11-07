@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d89d4dacce9f0f74abd7c4faec2518ee, type: 3}
+  m_Name: dinel
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Story.Speaker
+  id: dinel
+  displayName: "\uB514\uB12C"
+  nameColor: {r: 0.65882355, g: 0.7372549, b: 0.9098039, a: 1}
+  portraitSheet: {fileID: 11400000, guid: 7296b2a56b65885478674690b291c541, type: 2}
+  figure: {fileID: 0}
+  faceCenter: {x: 0, y: 0}
+  faceSize: 0
+  figureIsWholeBody: 0

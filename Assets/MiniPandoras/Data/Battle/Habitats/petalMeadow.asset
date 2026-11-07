@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27bb4b852fbdaa54a996a103c767183a, type: 3}
+  m_Name: petalMeadow
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.HabitatDefinition
+  map: petalMeadow
+  groups:
+  - id: meadow0
+    cell: {x: 10, y: 16}
+    monsters:
+    - petalTail
+  - id: meadow1
+    cell: {x: 24, y: 12}
+    monsters:
+    - leafGlider
+    - petalTail
+  - id: meadow2
+    cell: {x: 19, y: 23}
+    monsters:
+    - cloudHorn
+  - id: meadow3
+    cell: {x: 37, y: 20}
+    monsters:
+    - petalTail
+    - cloudHorn

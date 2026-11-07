@@ -33,7 +33,7 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator JamieUsesHerOwnCollapsedPictures()
         {
-            story.Director.SetSheet("hero", "jamie");
+            story.Director.Actors.SetSheet("hero", "jamie");
 
             Hero.SetPose(BodyPose.Kneel);
             yield return null;
@@ -50,7 +50,7 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator InBedTheLyingPictureTurnsAlongTheBed()
         {
-            story.Director.SetSheet("hero", "erus");
+            story.Director.Actors.SetSheet("hero", "erus");
 
             Hero.SetPose(BodyPose.LieInBed);
             yield return null;
@@ -62,7 +62,7 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator YoungDielFallsWithHisPictureAndKneelsTheOldWay()
         {
-            story.Director.SetSheet("hero", "dielChild");
+            story.Director.Actors.SetSheet("hero", "dielChild");
 
             Hero.SetPose(BodyPose.Lie);
             yield return null;

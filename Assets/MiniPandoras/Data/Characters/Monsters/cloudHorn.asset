@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: cloudHorn
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: cloudHorn
+  size: {x: 28, y: 28}
+  down:
+  - {fileID: 21300000, guid: 796e70df1aa9261449ab7b304c1c217d, type: 3}
+  - {fileID: 21300000, guid: 4d97f5b01758c2147abc06df440acaab, type: 3}
+  - {fileID: 21300000, guid: 638addb43bb6f534ebb54f10e2189762, type: 3}
+  right:
+  - {fileID: 21300000, guid: a774753e5d72a5e428f5ddda324ba9c8, type: 3}
+  - {fileID: 21300000, guid: c64df019191283947a3fad59bb701d9f, type: 3}
+  - {fileID: 21300000, guid: 274300cd69a96074ea7e22abfe40e63a, type: 3}
+  up:
+  - {fileID: 21300000, guid: 8a93cad6f070f9840a9fc1c84e0a7a31, type: 3}
+  - {fileID: 21300000, guid: 0046c03408e525d419de0e0f3b2e2934, type: 3}
+  - {fileID: 21300000, guid: 319f7411c5125e84db5ccc0559da8a9e, type: 3}
+  portrait: {fileID: 0}

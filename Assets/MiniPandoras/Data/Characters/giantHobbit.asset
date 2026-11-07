@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: giantHobbit
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: giantHobbit
+  size: {x: 60, y: 84}
+  down:
+  - {fileID: 21300000, guid: 91a9926f4689e634b9977aac739bdfee, type: 3}
+  - {fileID: 21300000, guid: 4eda3d0c78fce5e45a0d349c277668cd, type: 3}
+  - {fileID: 21300000, guid: 140ec1390ff5de04790db414598f2752, type: 3}
+  - {fileID: 21300000, guid: 00ecf0fa6f858fd48ae6e861dfb07da4, type: 3}
+  - {fileID: 21300000, guid: 0c76262bf0bcb0940b61bb6665b5c706, type: 3}
+  right:
+  - {fileID: 21300000, guid: f78a5e42a82484a4f856d6a0b57f5bfe, type: 3}
+  - {fileID: 21300000, guid: 785ee8eaeb17fc348bf05ef9df9cf9e0, type: 3}
+  - {fileID: 21300000, guid: c8f4556dc8b6cd240803463127a6a74d, type: 3}
+  - {fileID: 21300000, guid: a5eff7e2674d94345997b91bce529a0c, type: 3}
+  - {fileID: 21300000, guid: 2baa24580318ecd4e92645042019e30b, type: 3}
+  up:
+  - {fileID: 21300000, guid: ac4ed86a15ded834eaf6732ca4bff663, type: 3}
+  - {fileID: 21300000, guid: b55fc21376240da4b9bbfc6e36969cc4, type: 3}
+  - {fileID: 21300000, guid: d9744e110c1a2e04ca0e774dead9aff0, type: 3}
+  - {fileID: 21300000, guid: ce9e591d9dee0264e8f3d63c0a81aa20, type: 3}
+  - {fileID: 21300000, guid: 176469421ceb860429a82eb9f28b5f1f, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown: []
+  breatheRight: []
+  breatheUp: []
+  kneelPicture: {fileID: 0}
+  liePicture: {fileID: 0}
+  portrait: {fileID: 21300000, guid: 4cb5042bc65adc9499f317f451c92301, type: 3}
+  moves:
+  - name: slam
+    frames:
+    - {fileID: 21300000, guid: f8066da1b313b464c8b44b708b9c4555, type: 3}
+    - {fileID: 21300000, guid: a2a7ae56f9b866142920e09bdbc2e50b, type: 3}
+    - {fileID: 21300000, guid: 383a494035858384eae4eb97e10e2a2c, type: 3}
+    - {fileID: 21300000, guid: 404e899f53c72c64ebb5b443da5d08a2, type: 3}
+    - {fileID: 21300000, guid: 0f1fb16741e8a77429a6602da5908aac, type: 3}
+    - {fileID: 21300000, guid: 7f23a79033e16d943b5c62e72db48a90, type: 3}
+    - {fileID: 21300000, guid: ca43af216c507eb4b83cb52038c1bfa8, type: 3}
+    - {fileID: 21300000, guid: b7094f33b58c2a348a8dc269e21704e5, type: 3}
+  - name: throw
+    frames:
+    - {fileID: 21300000, guid: e0b502688566af54092c95f4e252b930, type: 3}
+    - {fileID: 21300000, guid: e0e8c64a7b35b6b4397e1105a1b9b945, type: 3}
+    - {fileID: 21300000, guid: 1b02c2266481ba04b8b22ce92891a0c0, type: 3}
+    - {fileID: 21300000, guid: 1dc60238a8cc9cc4a980ea19399283fe, type: 3}
+    - {fileID: 21300000, guid: 26e57885a2257e54980b185c53f838e7, type: 3}
+    - {fileID: 21300000, guid: 773b2a8ce25331b45aaa32183cdfbe32, type: 3}
+    - {fileID: 21300000, guid: d27a570ff2dcfe442aaadcb2a92a48a4, type: 3}
+    - {fileID: 21300000, guid: ad74d6590355c384e9472d8c82e5962a, type: 3}
+  - name: stomp
+    frames:
+    - {fileID: 21300000, guid: 85844c09825f50a41ba11c72a0e8bb56, type: 3}
+    - {fileID: 21300000, guid: 99a19607d56de114e8ed9c4a33636bad, type: 3}
+    - {fileID: 21300000, guid: bf1c816984b05ee438f05500f10235ba, type: 3}
+    - {fileID: 21300000, guid: 06ee47b92011f934a80d19dea7f266e0, type: 3}
+    - {fileID: 21300000, guid: c0cec47d33d0f6546a33e7771a5d9401, type: 3}
+    - {fileID: 21300000, guid: 3a08cb38ab8c4d44ba93ad5195d3edab, type: 3}
+    - {fileID: 21300000, guid: 44f0edd962a7a8c4890f300743d224fb, type: 3}
+    - {fileID: 21300000, guid: 73a2c477823f7484496eb44a57853e91, type: 3}

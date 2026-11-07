@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: leviathan
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: leviathan
+  size: {x: 96, y: 84}
+  down:
+  - {fileID: 21300000, guid: b67b719f249aad0449af5a684b939571, type: 3}
+  - {fileID: 21300000, guid: 3732f0dde4a8bcc46b0809c6f17f39bf, type: 3}
+  - {fileID: 21300000, guid: 9251e14e5b875d644b148c21a5320f31, type: 3}
+  right:
+  - {fileID: 21300000, guid: 8240361835b37e945b2c853f1ab94ef2, type: 3}
+  - {fileID: 21300000, guid: f1e275aa5ea45c343b4ad41f831ae856, type: 3}
+  - {fileID: 21300000, guid: e89e7a7b32363534399428a5ba6b6e66, type: 3}
+  up:
+  - {fileID: 21300000, guid: 1f313f32e42b661499d8dba3a4959a2a, type: 3}
+  - {fileID: 21300000, guid: 51a0b3c7915e3254fa32d2cae0120b99, type: 3}
+  - {fileID: 21300000, guid: c7c66fdbd9948084295e7bd7b0735d09, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  portrait: {fileID: 0}

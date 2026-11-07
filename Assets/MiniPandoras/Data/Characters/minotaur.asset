@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: minotaur
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: minotaur
+  size: {x: 50, y: 70}
+  down:
+  - {fileID: 21300000, guid: 5a76bad0136eb5f4aab99145d9990190, type: 3}
+  - {fileID: 21300000, guid: b6067cfde8ca41b41925afc48cd02395, type: 3}
+  - {fileID: 21300000, guid: 498152b43293f2e49909d371e33a5715, type: 3}
+  - {fileID: 21300000, guid: c3e394195ce0bc84bb505ae176690c0e, type: 3}
+  - {fileID: 21300000, guid: 292d66b7ddd27814ba56bf22b3e7bd63, type: 3}
+  right:
+  - {fileID: 21300000, guid: 301efec9df156e2428f0fc9b88fa7f10, type: 3}
+  - {fileID: 21300000, guid: bcd051f582606a7468e71e38c16f9698, type: 3}
+  - {fileID: 21300000, guid: e1585c1dd9567964abce29b8631387d6, type: 3}
+  - {fileID: 21300000, guid: 75861d163e70220448dd28a7df3313d0, type: 3}
+  - {fileID: 21300000, guid: de9c2cda4607d7b40bb87e39168dd5ed, type: 3}
+  up:
+  - {fileID: 21300000, guid: 49424caa01836d14299f3cfe5bc9ae1f, type: 3}
+  - {fileID: 21300000, guid: 8d328a098aaf01e4287f4cbc16f4927b, type: 3}
+  - {fileID: 21300000, guid: 557b09e2d3b87c84fbb118a49d8e59c2, type: 3}
+  - {fileID: 21300000, guid: 38b08ed5337524548be871e72b8f1869, type: 3}
+  - {fileID: 21300000, guid: 099aebc85cf2154439723a086c1b1845, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown: []
+  breatheRight: []
+  breatheUp: []
+  kneelPicture: {fileID: 0}
+  liePicture: {fileID: 0}
+  portrait: {fileID: 21300000, guid: 0070b6924aa63834cbde77460987f6cb, type: 3}
+  moves:
+  - name: charge
+    frames:
+    - {fileID: 21300000, guid: fbca4293a6b5b494a8362e4d05e5072d, type: 3}
+    - {fileID: 21300000, guid: ab63a9e45ff1e554a85cb9859689cdc0, type: 3}
+    - {fileID: 21300000, guid: 4f1b5820a8071054eaf3b233567074ba, type: 3}
+    - {fileID: 21300000, guid: 2b39f451915a17a409d73f14a6799497, type: 3}
+    - {fileID: 21300000, guid: 55cb5ae2801c19c44b4557432fd144ae, type: 3}
+    - {fileID: 21300000, guid: 4b03e3c7cf971764aa01967e93427e6e, type: 3}
+    - {fileID: 21300000, guid: 77475b6907aedaa41a549041dde5cbd1, type: 3}
+    - {fileID: 21300000, guid: 9a38bd4ab11fa2b4d859254ff3942bc4, type: 3}

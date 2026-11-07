@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace MiniPandoras.Progress
@@ -12,7 +13,7 @@ namespace MiniPandoras.Progress
     [Serializable]
     public sealed class SaveData
     {
-        public const int CurrentVersion = 7;
+        public const int CurrentVersion = 8;
 
         [SerializeField] private int version = CurrentVersion;
         [SerializeField] private int chapter;
@@ -102,6 +103,14 @@ namespace MiniPandoras.Progress
             quickSlots.Add(weapon);
         }
 
+        /// <summary>저장된 메인 임무를 고친다. 바꾸지 못하면(null) 그 임무는 버린다.</summary>
+        internal void ConvertGoals(Func<string, string> convert)
+        {
+            // 임무 칸이 생기기 전의 저장은 goal이 null로 읽힌다.
+            goal = string.IsNullOrEmpty(goal) ? "" : convert(goal) ?? "";
+            finishedGoals = finishedGoals.Select(convert).Where(converted => converted != null).ToList();
+        }
+
         /// <summary>쓰러뜨린 몬스터 기록을 비운다.</summary>
         internal void ForgetDefeatedMonsters()
         {
@@ -125,6 +134,7 @@ namespace MiniPandoras.Progress
         public IReadOnlyList<string> DefeatedMonsters => defeatedMonsters;
         public IReadOnlyList<string> QuickSlots => quickSlots;
         public IReadOnlyList<string> Companions => companions;
+        /// <summary>지금 메인 임무의 id(없으면 빈 값). 8판 전에는 제목 글이었다.</summary>
         public string Goal => goal;
         public IReadOnlyList<string> FinishedGoals => finishedGoals;
         public IReadOnlyList<Count> PandoraLevels => pandoraLevels;

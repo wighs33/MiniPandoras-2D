@@ -7,6 +7,7 @@ using MiniPandoras.Field;
 using MiniPandoras.Progress;
 using MiniPandoras.World;
 using UnityEngine;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.Story
 {
@@ -39,7 +40,7 @@ namespace MiniPandoras.Story
         private const float LunaRecoil = 2f;
         private const float RecoilFrames = 14f;
         // 대본은 2장 첫머리에 말하지만, 무기를 쥐는 법과 치는 법을 알려 준 뒤에 말한다.
-        private const string GoNorthLine = "북쪽으로 가자.";
+        private static string GoNorthLine => T("chapter2.goNorthLine");
         // 건네는 보석: 손 높이(px), 꺼내 들고 있는 프레임, 손에서 손으로 가는 프레임.
         private const float HandHeight = 14f;
         private const float HoldOutFrames = 36f;
@@ -65,56 +66,54 @@ namespace MiniPandoras.Story
 
         public static IEnumerator Play(StoryDirector s)
         {
-            s.SetParty(new[] { "hero", "rang" }, 2);
-            s.GiveAtLeast(Items.Potion, 2);
+            s.Party.SetParty(new[] { "hero", "rang" }, 2);
+            s.Progress.GiveAtLeast(Items.Potion, 2);
             yield return s.FadeOut(0f);
             yield return s.ChapterCard(2);
             SetupHillia(s);
-            s.PlaceParty("hillia", "landing", Facing.Up);
-            s.RunMapSetup();
+            s.Party.PlaceParty("hillia", "landing", Facing.Up);
+            s.Field.RunMapSetup();
             yield return s.FadeIn(30f);
-            yield return s.Say("rang", "가면서 알려 주마.\n이 세계에서 살아남으려면 싸우는 법부터 알아야 한다.");
-            yield return s.Say("rang", "이 근처엔 들짐승이 많다.\n가까이 가면 덤벼들 거다.");
-            if (s.Owns(Items.Bat))
+            yield return s.Lines("chapter2.play.1");
+            if (s.Progress.Owns(Items.Bat))
             {
                 yield return s.Say("rang", GoNorthLine);
-                s.SetGoal("북쪽의 뱀성으로 간다");
+                s.Progress.SetGoal(Goals.GoToSnakeCastle);
             }
             else
             {
                 // 1장에서 불량배가 떨어뜨린 방망이(웹게임에 없다).
-                yield return s.Say("rang", "냐, 발치에 아까 그 녀석들이 떨어뜨린 방망이가 있군.\n맨손으론 싸울 수 없으니 주워 둬라.");
+                yield return s.Lines("chapter2.play.2");
                 // 무기 튜토리얼의 시작: 주울 곳을 화살표로 가리킨다.
-                s.PointAtPickup(Items.Bat);
+                s.Field.PointAtPickup(Items.Bat);
             }
 
             // 웹게임 안내의 키 이름을 화면 조작 이름으로 바꿨다. 판도라 스킬·랑 부르기는 첫 싸움 튜토리얼처럼 빼 두었다.
-            s.Hint("조이스틱 이동  ·  행동 버튼 대화·조사·공격", 480f);
+            s.Field.Hint(T("chapter2.play.6"), 480f);
             // 뱀성 앞까지 처음 몬스터와 맞붙으면 공격 튜토리얼을 한다(무기를 장착한 뒤에).
             Coroutine attackLesson = s.StartCoroutine(FirstFightLessons(s));
-            yield return s.Explore();
-            s.SetFlag(CastleSeenFlag);
-            if (!s.Owns(Items.Bat))
+            yield return s.Field.Explore();
+            s.Progress.SetFlag(CastleSeenFlag);
+            if (!s.Progress.Owns(Items.Bat))
             {
                 // 방망이를 줍지 않고 들판을 떠나면 랑이 건네고 장착하는 법을 짚어 준다(튜토리얼을 거르지 않게).
-                yield return s.Say("rang", "냐, 방망이를 그냥 두고 왔군.\n내가 챙겨 왔다.\n손에 쥐는 법을 알려 주지.");
-                yield return s.HandOverPickup(Items.Bat);
+                yield return s.Lines("chapter2.play.3");
+                yield return s.Field.HandOverPickup(Items.Bat);
                 yield return WeaponLesson(s);
             }
 
-            yield return s.Say("hero", "저 숲 너머... 뭔가 커다란 게 보여.");
-            yield return s.Say("rang", "뱀성이다.\n일단 숙소도 구해야 하니 가 볼까.");
-            s.SetMapSetup("castle", () => SetupCastleBefore(s));
+            yield return s.Lines("chapter2.play.4");
+            s.Field.SetMapSetup("castle", () => SetupCastleBefore(s));
             // 뱀탑 안으로 들어서면 탐험이 끝나고 루나와 부딪친다. 그때까지 성 밖과 안뜰을 돌아다니며 사람들과 이야기할 수 있다.
-            s.SetMapSetup("castleHall", () => s.FinishExplore("hall"));
+            s.Field.SetMapSetup("castleHall", () => s.Field.FinishExplore("hall"));
             yield return FaceTheSnakeCastle(s);
-            yield return s.Explore();
+            yield return s.Field.Explore();
             s.StopCoroutine(attackLesson);
-            if (!s.Owns(Items.WorldMap))
+            if (!s.Progress.Owns(Items.WorldMap))
             {
                 // 지도를 줍지 않고 성으로 들어가면 랑이 챙겨 와 튜토리얼을 거르지 않게 한다.
-                yield return s.Say("rang", "냐, 지도를 그냥 두고 왔군.\n내가 챙겨 왔다.");
-                yield return s.HandOverPickup(Items.WorldMap);
+                yield return s.Lines("chapter2.play.5");
+                yield return s.Field.HandOverPickup(Items.WorldMap);
                 yield return MapInHand(s);
             }
 
@@ -134,35 +133,32 @@ namespace MiniPandoras.Story
         {
             s.Cinema(true);
             yield return s.FadeOut(24f);
-            s.BeginCutIn("castleWide", PartyFoot, PartyHeight);
-            yield return s.Warp("castle", "arrive", Facing.Up);
+            s.Scenes.BeginCutIn("castleWide", PartyFoot, PartyHeight);
+            yield return s.Field.Warp("castle", "arrive", Facing.Up);
             yield return s.FadeIn(24f);
             yield return s.Wait(30f);
-            yield return s.CutInZoom(TowerTop, 1f, 210f);
-            yield return s.Say("hero", "우와... 커다란 뱀 모양의 성이다.");
-            yield return s.Say("rang", "이 근방에서 가장 큰 성이지.\n사람이 많으니 정보를 얻기엔 좋을 거다.");
-            yield return s.Say("rang", "저기에 지도가 떨어져 있는 것 같군.");
-            s.BeginCutIn("fallenMap");
-            Coroutine closeUp = s.StartCoroutine(s.CutInZoom(TowerTop, 1.2f, 120f));
-            yield return s.CutInGlow(1f, 18f);
-            yield return s.CutInGlow(0.5f, 30f);
+            yield return s.Scenes.CutInZoom(TowerTop, 1f, 210f);
+            yield return s.Lines("chapter2.faceTheSnakeCastle.1");
+            s.Scenes.BeginCutIn("fallenMap");
+            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInZoom(TowerTop, 1.2f, 120f));
+            yield return s.Scenes.CutInGlow(1f, 18f);
+            yield return s.Scenes.CutInGlow(0.5f, 30f);
             yield return s.Wait(50f);
             s.StopCoroutine(closeUp);
             yield return s.FadeOut(24f);
-            s.EndCutIn();
+            s.Scenes.EndCutIn();
             s.SnapCamera();
             yield return s.FadeIn(24f);
-            s.PointAtPickup(Items.WorldMap);
+            s.Field.PointAtPickup(Items.WorldMap);
             s.Cinema(false);
         }
 
         /// <summary>지도를 주우면 랑이 보는 법을 짚어 준다.</summary>
         private static IEnumerator MapInHand(StoryDirector s)
         {
-            yield return s.Say("rang", "쓸 만하겠군.\n보는 법을 알려 주지.");
-            yield return s.WorldMapTutorial();
-            yield return s.Say("rang", "빨간 표시가 지금 있는 곳이다.\n가 본 곳은 또렷하고, 가 보지 않은 곳은 흐리게 보이지.");
-            yield return s.Say("rang", "길을 잃으면 펼쳐 봐라.\n이제 성으로 가자.");
+            yield return s.Lines("chapter2.mapInHand.1");
+            yield return s.Tutorials.WorldMapTutorial();
+            yield return s.Lines("chapter2.mapInHand.2");
         }
 
         // ── 힐리아 동부: 첫 사냥 ─────────────────────────────────
@@ -170,25 +166,25 @@ namespace MiniPandoras.Story
         private static void SetupHillia(StoryDirector s)
         {
             // 아랫길은 벼랑 다리까지 내려가지만 다리가 끊어져 있어 마을로는 건너가지 못한다.
-            s.SetMapSetup("cliffBridge", () =>
+            s.Field.SetMapSetup("cliffBridge", () =>
             {
-                s.Sign("notice", "팻말: 「다리가 끊어졌습니다.\n건너지 마시오」");
+                s.Field.Sign("notice", T("chapter2.setupHillia.2"));
                 // 말려도 계속 건너면 끊어진 자리에서 떨어진다.
-                int gapRow = s.Point("gap").y;
-                s.Trigger("gap", TriggerKind.Step, cell => cell.y >= gapRow, s.FallToDeath);
-                s.Trigger("brokenBridge", TriggerKind.Step, cell => cell.y >= BridgeApproachRow, () => s.Say("rang", "냐, 다리가 끊어졌군.\n이쪽으로는 못 건넌다.\n뱀성으로 가자."), once: true);
+                int gapRow = s.Field.Point("gap").y;
+                s.Field.Trigger("gap", TriggerKind.Step, cell => cell.y >= gapRow, s.Fights.FallToDeath);
+                s.Field.Trigger("brokenBridge", TriggerKind.Step, cell => cell.y >= BridgeApproachRow, () => s.Lines("chapter2.setupHillia.1"), once: true);
             });
-            s.SetMapSetup("hillia", () =>
+            s.Field.SetMapSetup("hillia", () =>
             {
                 // 맵을 옮기면 트리거가 지워지므로, 마을에 다녀와도 북쪽 끝에서 뱀성을 마주하게 여기서 건다.
-                if (!s.HasFlag(CastleSeenFlag))
+                if (!s.Progress.HasFlag(CastleSeenFlag))
                 {
-                    s.Trigger("castleView", TriggerKind.Step, cell => cell.y <= 2, once: true, ends: true);
+                    s.Field.Trigger("castleView", TriggerKind.Step, cell => cell.y <= 2, once: true, ends: true);
                 }
 
-                s.Sign("sign", "↑ 뱀성");
-                s.Chest("hillia", "chest", Items.Potion);
-                s.Pickup(Items.Bat, Chapter1.DroppedBat, () => BatInHand(s));
+                s.Field.Sign("sign", T("chapter2.setupHillia.3"));
+                s.Field.Chest("hillia", "chest", Items.Potion);
+                s.Field.Pickup(Items.Bat, Chapter1.DroppedBat, () => BatInHand(s));
                 // 웹게임은 첫 싸움에서 랑이 싸우는 법을 설명하지만, 무기 튜토리얼을 방망이를 주울 때 하므로 몬스터를 만났을 때는 말하지 않는다.
                 // 「???」 스킬을 쓰면 아무 일도 없는 웹게임 장면은 그대로다.
                 var hooks = new BattleHooks
@@ -202,21 +198,20 @@ namespace MiniPandoras.Story
         /// <summary>처음 맞붙은 몬스터로 공격을 가르치고, 이어서 랑을 부르는 법과 동료 창을 가르친다.</summary>
         private static IEnumerator FirstFightLessons(StoryDirector s)
         {
-            yield return s.AttackTutorial();
-            yield return s.SummonTutorial("랑", () => s.Say("rang", "냐, 혼자 다 치려고?\n힘들 땐 나를 불러라.\n왼쪽 칸을 누르면 달려와 주지."),
+            yield return s.Tutorials.AttackTutorial();
+            yield return s.Tutorials.SummonTutorial(T("chapter2.firstFightLessons.2"), () => s.Lines("chapter2.firstFightLessons.1"),
                 () => RangExplainsCompanions(s));
         }
 
         private static IEnumerator RangExplainsCompanions(StoryDirector s)
         {
-            yield return s.Say("rang", "이게 동료를 부르는 법이다.\n부른 뒤엔 잠시 기다려야 다시 부를 수 있지.");
-            yield return s.Say("rang", "동료가 늘어나면 메뉴에서 전투에 데려갈 셋을 고를 수 있다.\n어디인지 알려 주마.");
+            yield return s.Lines("chapter2.rangExplainsCompanions.1");
         }
 
         /// <summary>방망이를 주우면 랑이 장착하는 법을 짚어 준다.</summary>
         private static IEnumerator BatInHand(StoryDirector s)
         {
-            yield return s.Say("rang", "주웠으면 손에 쥐어 둬라.\n내가 알려 주지.");
+            yield return s.Lines("chapter2.batInHand.1");
             yield return WeaponLesson(s);
         }
 
@@ -226,20 +221,20 @@ namespace MiniPandoras.Story
         /// </summary>
         private static IEnumerator WeaponLesson(StoryDirector s)
         {
-            yield return s.EquipTutorial(Items.Bat);
-            yield return s.Say("rang", "좋아.\n이제 공격 버튼으로 휘두를 수 있다.\n몇 번 이어서 치면 마지막 한 방이 세지.");
+            yield return s.Tutorials.EquipTutorial(Items.Bat);
+            yield return s.Lines("chapter2.weaponLesson.1");
             yield return s.Say("rang", GoNorthLine);
-            s.SetGoal("북쪽의 뱀성으로 간다");
+            s.Progress.SetGoal(Goals.GoToSnakeCastle);
         }
 
         private static IEnumerator MysteryInTheField(StoryDirector s, BattleApi b)
         {
             yield return b.Wait(30);
-            yield return b.Message("...하지만 아무 일도 일어나지 않았다.", 50);
-            if (!s.HasFlag("mysteryJoke"))
+            yield return b.Message(T("chapter2.mysteryInTheField.1"), 50);
+            if (!s.Progress.HasFlag("mysteryJoke"))
             {
-                s.SetFlag("mysteryJoke");
-                yield return b.Say("rang", "냐?? 아직 판도라에 적응하지 못한 건가...");
+                s.Progress.SetFlag("mysteryJoke");
+                yield return b.Say("rang", T("chapter2.mysteryInTheField.2"));
             }
         }
 
@@ -248,26 +243,26 @@ namespace MiniPandoras.Story
         /// <summary>뱀성 입구의 상인: 인사한 뒤 상점을 연다.</summary>
         private static IEnumerator MerchantTalks(StoryDirector s)
         {
-            yield return s.Say("merchant", "어서 와!\n뱀성 구경은 처음이야?");
-            yield return s.OpenShop();
+            yield return s.Lines("chapter2.merchantTalks.1");
+            yield return s.Progress.OpenShop();
         }
 
         private static void SetupCastleBefore(StoryDirector s)
         {
-            s.Pickup(Items.WorldMap, FallenMapCell, () => MapInHand(s));
+            s.Field.Pickup(Items.WorldMap, FallenMapCell, () => MapInHand(s));
             // 본관을 지키는 병사(말을 걸어도 대답하지 않는다).
-            s.Spawn("guardA", "soldier", s.Point("guard", 0), Facing.Down);
-            s.Spawn("guardB", "soldier", s.Point("guard", 1), Facing.Down);
-            s.Npc("npc0", "merchant", s.Point("npc", 0), Facing.Down, () => MerchantTalks(s), wander: true);
-            s.Npc("npc2", "elder", s.Point("npc", 2), Facing.Down,
-                new[] { ("elder", "옛날에 비하면 성이 많이 번듯해졌지.\n세상이 하나로 묶였다고들 하니 말이야.") });
+            s.Actors.Spawn("guardA", "soldier", s.Field.Point("guard", 0), Facing.Down);
+            s.Actors.Spawn("guardB", "soldier", s.Field.Point("guard", 1), Facing.Down);
+            s.Field.Npc("npc0", "merchant", s.Field.Point("npc", 0), Facing.Down, () => MerchantTalks(s), wander: true);
+            s.Field.Npc("npc2", "elder", s.Field.Point("npc", 2), Facing.Down,
+                new[] { ("elder", T("chapter2.setupCastleBefore.1")) });
             Wildlife.Spawn(s, "castle");
             // 성문을 지나 안뜰(courtyard 지점의 줄)에 처음 들어서면 탑을 올려다본다. 바깥 풀밭이 성벽을 돌아 같은 줄까지 이어지므로
             // 안뜰 양 끝(side 지점) 사이에 있을 때만 일어나게 한다.
-            int courtyard = s.Point("courtyard").y;
-            int west = s.Point("side", 0).x;
-            int east = s.Point("side", 1).x;
-            s.Trigger("lookUp", TriggerKind.Step, cell => cell.y <= courtyard && cell.x >= west && cell.x <= east, () => LookUpAtTheTower(s), once: true);
+            int courtyard = s.Field.Point("courtyard").y;
+            int west = s.Field.Point("side", 0).x;
+            int east = s.Field.Point("side", 1).x;
+            s.Field.Trigger("lookUp", TriggerKind.Step, cell => cell.y <= courtyard && cell.x >= west && cell.x <= east, () => LookUpAtTheTower(s), once: true);
         }
 
         /// <summary>
@@ -277,80 +272,73 @@ namespace MiniPandoras.Story
         private static IEnumerator LunaAndTheJewel(StoryDirector s)
         {
             s.Cinema(true);
-            CharacterBody hero = s.Actor("hero");
-            Vector2Int entrance = s.Point("entrance");
-            yield return s.WalkTo("hero", entrance.x, entrance.y - HallWalkIn, 9f, Facing.Up);
+            CharacterBody hero = s.Actors.Actor("hero");
+            Vector2Int entrance = s.Field.Point("entrance");
+            yield return s.Actors.WalkTo("hero", entrance.x, entrance.y - HallWalkIn, 9f, Facing.Up);
             yield return s.Wait(14f);
             // 대본의 카오모지 글자 가운데 ﾉ ≧ ∀ ≦는 게임 글꼴에 없어 ノ ≥ ω ≤로 쓴다.
-            CharacterBody luna = s.Spawn("luna", "luna", new Vector2Int(hero.Cell.x, LunaRunsFromRow), Facing.Down);
-            yield return s.WalkTo("luna", hero.Cell.x, hero.Cell.y - 1, 4f, Facing.Down);
+            CharacterBody luna = s.Actors.Spawn("luna", "luna", new Vector2Int(hero.Cell.x, LunaRunsFromRow), Facing.Down);
+            yield return s.Actors.WalkTo("luna", hero.Cell.x, hero.Cell.y - 1, 4f, Facing.Down);
             s.Shake(3f, 14f);
             hero.Flash(10f);
             luna.Flash(10f);
             s.StartCoroutine(Recoil(hero, Vector2.down, HeroRecoil));
             yield return Recoil(luna, Vector2.up, LunaRecoil);
-            yield return s.Emote("hero", "!", 30f);
-            yield return s.Say("luna", "아야얏!\n너 뭐야, 이 자식아 (｀Д´)ノ");
-            yield return s.Say("hero", "아야... 넌 뭔데 갑자기 튀어나와!");
-            yield return s.Emote("luna", "?", 30f);
-            yield return s.WalkTo("luna", hero.Cell.x, hero.Cell.y - 1, 10f, Facing.Down);
-            yield return s.Say("luna", "...응?\n너 정체가 뭐야?\n처음 보는 기운이네...? (ФωФ)");
-            yield return s.Emote("hero", "sweat", 30f);
-            yield return s.Say("hero", "...! 정체라니, 핫핫... 무슨 소리를...");
-            yield return s.Say("luna", "그 반응을 보니 수상한데... (*_*)");
+            yield return s.Actors.Emote("hero", "!", 30f);
+            yield return s.Lines("chapter2.lunaAndTheJewel.1");
+            yield return s.Actors.Emote("luna", "?", 30f);
+            yield return s.Actors.WalkTo("luna", hero.Cell.x, hero.Cell.y - 1, 10f, Facing.Down);
+            yield return s.Lines("chapter2.lunaAndTheJewel.2");
+            yield return s.Actors.Emote("hero", "sweat", 30f);
+            yield return s.Lines("chapter2.lunaAndTheJewel.3");
             // 유심히 살펴본다.
-            yield return s.Emote("luna", "…", 60f);
-            yield return s.Say("luna", "뭐, 좋아!\n부딪친 건 미안해.\n자! 여기 사과의 선물! ( ≥ω≤)ノ");
+            yield return s.Actors.Emote("luna", "…", 60f);
+            yield return s.Lines("chapter2.lunaAndTheJewel.4");
             yield return HandOverTheEye(s, luna, hero);
-            yield return s.Notify("뱀신의 눈을 받았다.");
-            s.RemoveObject("jewel");
-            s.GiveAtLeast(Items.SerpentEye, 1);
-            yield return s.Say("hero", "어?\n이게 뭔——");
+            yield return s.Notify(T("chapter2.lunaAndTheJewel.10"));
+            s.Field.RemoveObject("jewel");
+            s.Progress.GiveAtLeast(Items.SerpentEye, 1);
+            yield return s.Lines("chapter2.lunaAndTheJewel.5");
             // 여자의 모습이 눈 깜빡할 새에 사라진다.
             for (int i = 0; i < 6; i++)
             {
                 Vector2 at = luna.Position + new Vector2(MapCoordinates.Pixels(i % 2 == 1 ? 4f : -4f), MapCoordinates.Pixels(4f + i * 3f));
-                s.Sparkle(at, i % 2 == 1 ? LunaSparkleWarm : LunaSparkleCool);
+                s.Stage.Sparkle(at, i % 2 == 1 ? LunaSparkleWarm : LunaSparkleCool);
             }
 
-            s.Remove("luna");
+            s.Actors.Remove("luna");
             yield return s.Wait(30f);
-            yield return s.Say("hero", "......저기요?");
-            yield return s.Say("rang", "......");
+            yield return s.Lines("chapter2.lunaAndTheJewel.6");
             s.Alarm(true);
-            yield return s.Shout("soldier", "보물고의 보석이 사라졌다!\n도둑이다!");
-            yield return s.Shout("soldier", "성문을 닫아라!\n아무도 내보내지 마라!");
+            yield return s.Lines("chapter2.lunaAndTheJewel.7");
             // 성문이 닫히는 울림이 탑까지 오고, 입구로 병사들이 들이닥친다.
             s.Shake(3f, 16f);
-            s.Spawn("chaser1", "soldier", s.Point("entrance", 0), Facing.Up);
-            s.Spawn("chaser2", "soldier", s.Point("entrance", 1), Facing.Up);
-            s.Face("hero", Facing.Down);
-            Coroutine first = s.StartCoroutine(s.WalkTo("chaser1", hero.Cell.x - 1, hero.Cell.y + 2, 8f, Facing.Up, true));
-            yield return s.WalkTo("chaser2", hero.Cell.x + 2, hero.Cell.y + 2, 8f, Facing.Up, true);
+            s.Actors.Spawn("chaser1", "soldier", s.Field.Point("entrance", 0), Facing.Up);
+            s.Actors.Spawn("chaser2", "soldier", s.Field.Point("entrance", 1), Facing.Up);
+            s.Actors.Face("hero", Facing.Down);
+            Coroutine first = s.StartCoroutine(s.Actors.WalkTo("chaser1", hero.Cell.x - 1, hero.Cell.y + 2, 8f, Facing.Up, true));
+            yield return s.Actors.WalkTo("chaser2", hero.Cell.x + 2, hero.Cell.y + 2, 8f, Facing.Up, true);
             yield return first;
-            yield return s.Shout("soldier", "저기다!\n저놈 손에 보석이 있다!");
-            yield return s.Say("hero", "아, 아니에요!\n이건 방금 어떤 여자가——");
-            yield return s.Shout("soldier", "잡아라!!");
-            yield return s.Say("rang", "...설명해 봐야 들어 줄 놈들이 아니다.\n온다!");
+            yield return s.Lines("chapter2.lunaAndTheJewel.8");
             // 대본은 안뜰에서 본관으로 뛰라고 하지만, 이미 본관 안이라 위층만 가리킨다.
-            yield return s.Say("rang", "성문은 막혔다.\n위로 올라가자!");
+            yield return s.Lines("chapter2.lunaAndTheJewel.9");
             // 쫓아온 병사 둘은 필드의 적처럼 그대로 덤벼든다. 싸워도 되고, 따돌리고 위층으로 뛰어도 된다.
             foreach (string id in new[] { "chaser1", "chaser2" })
             {
-                Vector2Int at = s.Actor(id).Cell;
-                s.Remove(id);
-                s.Monster(id, at, new[] { "soldier" });
+                Vector2Int at = s.Actors.Actor(id).Cell;
+                s.Actors.Remove(id);
+                s.Field.Monster(id, at, new[] { "soldier" });
             }
 
             s.Cinema(false);
-            s.Hint("위층으로 도망치세요", 300f);
-            s.SetGoal("뱀성 위층으로 도망친다");
+            s.Field.Hint(T("chapter2.lunaAndTheJewel.11"), 300f);
+            s.Progress.SetGoal(Goals.FleeUpTheCastle);
             SetupHall(s);
-            s.SetMapSetup("castleHall", () => SetupHall(s));
-            s.SetMapSetup("castleBarracks", () => SetupFloor(s, "barracks", BarracksRoutes));
-            s.SetMapSetup("castleVault", () => SetupFloor(s, "vault", VaultRoutes));
-            s.SetMapSetup("castleRoof", () => s.FinishExplore("roof"));
-            yield return s.Explore();
+            s.Field.SetMapSetup("castleHall", () => SetupHall(s));
+            s.Field.SetMapSetup("castleBarracks", () => SetupFloor(s, "barracks", BarracksRoutes));
+            s.Field.SetMapSetup("castleVault", () => SetupFloor(s, "vault", VaultRoutes));
+            s.Field.SetMapSetup("castleRoof", () => s.Field.FinishExplore("roof"));
+            yield return s.Field.Explore();
         }
 
         /// <summary>
@@ -360,13 +348,13 @@ namespace MiniPandoras.Story
         private static IEnumerator LookUpAtTheTower(StoryDirector s)
         {
             s.Cinema(true);
-            s.Face("hero", Facing.Up);
-            Vector2Int top = s.Point("towerTop");
-            yield return s.Pan(top.x, top.y, 0.04f);
+            s.Actors.Face("hero", Facing.Up);
+            Vector2Int top = s.Field.Point("towerTop");
+            yield return s.Stage.Pan(top.x, top.y, 0.04f);
             yield return s.Wait(60f);
-            Vector2Int hero = s.Actor("hero").Cell;
-            yield return s.Pan(hero.x, hero.y, 0.06f);
-            s.CameraOn("hero");
+            Vector2Int hero = s.Actors.Actor("hero").Cell;
+            yield return s.Stage.Pan(hero.x, hero.y, 0.06f);
+            s.Stage.CameraOn("hero");
             s.Cinema(false);
         }
 
@@ -374,18 +362,18 @@ namespace MiniPandoras.Story
         private static IEnumerator HandOverTheEye(StoryDirector s, CharacterBody luna, CharacterBody hero)
         {
             Vector2 hand = new Vector2(0f, MapCoordinates.Pixels(HandHeight));
-            s.AddObject("jewel", "jewel", luna.Cell, false, floating: true);
-            s.MoveObject("jewel", luna.Position + hand);
-            s.Sparkle(luna.Position + hand, LunaSparkleWarm);
-            s.Sparkle(luna.Position + hand, LunaSparkleCool);
+            s.Field.AddObject("jewel", "jewel", luna.Cell, false, floating: true);
+            s.Field.MoveObject("jewel", luna.Position + hand);
+            s.Stage.Sparkle(luna.Position + hand, LunaSparkleWarm);
+            s.Stage.Sparkle(luna.Position + hand, LunaSparkleCool);
             yield return s.Wait(HoldOutFrames);
             for (float frame = 0f; frame < HandOverFrames; frame += Time.deltaTime * 60f)
             {
-                s.MoveObject("jewel", Vector2.Lerp(luna.Position, hero.Position, frame / HandOverFrames) + hand);
+                s.Field.MoveObject("jewel", Vector2.Lerp(luna.Position, hero.Position, frame / HandOverFrames) + hand);
                 yield return null;
             }
 
-            s.MoveObject("jewel", hero.Position + hand);
+            s.Field.MoveObject("jewel", hero.Position + hand);
         }
 
         /// <summary>맞부딪친 몸이 바라보는 쪽을 그대로 둔 채 뒤로 밀려난다. 처음이 빠르고 끝으로 갈수록 느려진다.</summary>
@@ -406,30 +394,27 @@ namespace MiniPandoras.Story
         private static void SetupHall(StoryDirector s)
         {
             SetupFloor(s, "hall", HallRoutes);
-            s.Chest("hall", "chest", Items.Ether);
-            s.LockWarp("entrance", "뒤에서 병사들이 몰려오고 있다!");
-            var howTo = new HashSet<Vector2Int>(s.Points("howTo"));
-            s.Trigger("howTo", TriggerKind.Step, cell => howTo.Contains(cell), () => AskHowToUsePandora(s), once: true);
+            s.Field.Chest("hall", "chest", Items.Ether);
+            s.Field.LockWarp("entrance", T("chapter2.setupHall.1"));
+            var howTo = new HashSet<Vector2Int>(s.Field.Points("howTo"));
+            s.Field.Trigger("howTo", TriggerKind.Step, cell => howTo.Contains(cell), () => AskHowToUsePandora(s), once: true);
         }
 
         /// <summary>뱀탑 한 층: 경보가 울리고 순찰병이 돈다. 1층 가운데 순찰병만 둘이 함께 다닌다.</summary>
         private static void SetupFloor(StoryDirector s, string floor, string[] routes)
         {
             s.Alarm(true);
-            var patrols = s.Points("patrol");
+            var patrols = s.Field.Points("patrol");
             for (int i = 0; i < patrols.Count; i++)
             {
                 string[] enemies = floor == "hall" && i == 1 ? new[] { "soldier", "soldier" } : new[] { "soldier" };
-                s.Monster($"{floor}Patrol{i}", patrols[i], enemies, patrol: WalkPath.Parse(routes[i % routes.Length]), patrolFramesPerTile: 16);
+                s.Field.Monster($"{floor}Patrol{i}", patrols[i], enemies, patrol: WalkPath.Parse(routes[i % routes.Length]), patrolFramesPerTile: 16);
             }
         }
 
         private static IEnumerator AskHowToUsePandora(StoryDirector s)
         {
-            yield return s.Say("hero", "랑!\n판도라 말이야, 그거 어떻게 쓰는 거야?!");
-            yield return s.Say("rang", "그냥 쓰면 된다!");
-            yield return s.Shout("hero", "그러니까 그 '그냥'을 모르겠다고!!");
-            yield return s.Say("rang", "냐...? 재능 없는 거 아냐?\n판도라는 포기하고 위로 올라가자!");
+            yield return s.Lines("chapter2.askHowToUsePandora.1");
         }
 
         // ── 옥상: 「차원」이 깨어나고 글라이더로 탈출 ───────────────
@@ -437,25 +422,22 @@ namespace MiniPandoras.Story
         private static IEnumerator Rooftop(StoryDirector s)
         {
             // 뱀탑 꼭대기는 돌뱀 머리 위다. 목의 계단 구멍으로 올라와 주둥이 쪽으로 몰리고, 경비대장이 뒤따라 올라온다.
-            CharacterBody hero = s.Actor("hero");
+            CharacterBody hero = s.Actors.Actor("hero");
             s.Cinema(true);
-            Vector2Int deadEnd = s.Point("deadEnd");
-            yield return s.WalkTo("hero", deadEnd.x, deadEnd.y, 7f, Facing.Down);
+            Vector2Int deadEnd = s.Field.Point("deadEnd");
+            yield return s.Actors.WalkTo("hero", deadEnd.x, deadEnd.y, 7f, Facing.Down);
             // 꼭대기에서 아래를 내려다본다.
             yield return s.Wait(30f);
-            yield return s.Say("hero", "하아, 하아... 너무 높잖아!");
-            s.Spawn("captain", "captain", s.Point("captain", 0), Facing.Down);
-            s.Spawn("guardR1", "soldier", s.Point("captain", 1), Facing.Down);
-            yield return s.WalkTo("captain", hero.Cell.x, hero.Cell.y - 4, 12f, Facing.Down, true);
-            yield return s.Emote("hero", "!");
-            s.Face("hero", Facing.Up);
-            yield return s.Say("captain", "거기까지다, 도둑놈.");
-            yield return s.Say("captain", "감히 뱀성의 보물에 손을 대고, 무사히 빠져나갈 수 있을 줄 알았나?");
-            yield return s.Say("hero", "그러니까 그건 오해라니까요!");
-            yield return s.Shout("captain", "변명은 감옥에서 해라!");
+            yield return s.Lines("chapter2.rooftop.1");
+            s.Actors.Spawn("captain", "captain", s.Field.Point("captain", 0), Facing.Down);
+            s.Actors.Spawn("guardR1", "soldier", s.Field.Point("captain", 1), Facing.Down);
+            yield return s.Actors.WalkTo("captain", hero.Cell.x, hero.Cell.y - 4, 12f, Facing.Down, true);
+            yield return s.Actors.Emote("hero", "!");
+            s.Actors.Face("hero", Facing.Up);
+            yield return s.Lines("chapter2.rooftop.2");
             s.Cinema(false);
             bool manifested = false;
-            yield return s.Battle(new BattleConfig
+            yield return s.Fights.Battle(new BattleConfig
             {
                 Enemies = new[] { "captain" },
                 // 끝까지 싸우는 보스전이다. 주인공은 쓰러지면 처음부터 다시 하고, 경비대장은 체력이 바닥나도 쓰러지지 않는다.
@@ -483,46 +465,39 @@ namespace MiniPandoras.Story
             s.SnapCamera();
             yield return s.FadeIn(20f);
             yield return SoldiersSwarm(s, deadEnd);
-            yield return s.Emote("hero", "!");
-            yield return s.Say("hero", "뭐, 뭐야 이 숫자는?!");
-            yield return s.Say("rang", "냐, 저 수는 당해 낼 수 없다!\n저기 글라이더가 있다!");
+            yield return s.Actors.Emote("hero", "!");
+            yield return s.Lines("chapter2.rooftop.3");
             // 주둥이 끝에 묶어 둔 글라이더(맵 소품) 옆으로 달려가 주둥이 끝에서 뛰어내린다
-            Vector2Int glider = s.Point("glider");
-            Coroutine toGlider = s.StartCoroutine(s.WalkTo("hero", glider.x, glider.y, 7f, Facing.Left));
+            Vector2Int glider = s.Field.Point("glider");
+            Coroutine toGlider = s.StartCoroutine(s.Actors.WalkTo("hero", glider.x, glider.y, 7f, Facing.Left));
             for (int i = 0; i < Swarm.Length; i++)
             {
                 Vector2Int spot = deadEnd + Swarm[i].To;
-                s.StartCoroutine(s.WalkTo(GuardId(i), spot.x, spot.y + SwarmChase, 9f, Facing.Down, true));
+                s.StartCoroutine(s.Actors.WalkTo(GuardId(i), spot.x, spot.y + SwarmChase, 9f, Facing.Down, true));
             }
 
-            yield return s.Shout("captain", "놓치지 마라!\n잡아!");
+            yield return s.Lines("chapter2.rooftop.4");
             yield return toGlider;
-            yield return s.Say("hero", "이, 이걸로 뛰어내리자고?!");
-            yield return s.Say("rang", "다른 방법이 있나!");
-            Vector2Int jump = s.Point("jump");
-            yield return s.WalkTo("hero", jump.x, jump.y, 6f, Facing.Down, true);
+            yield return s.Lines("chapter2.rooftop.5");
+            Vector2Int jump = s.Field.Point("jump");
+            yield return s.Actors.WalkTo("hero", jump.x, jump.y, 6f, Facing.Down, true);
             yield return s.FadeOut(24f, Color.white);
 
-            yield return s.FlyGlider();
+            yield return s.Scenes.FlyGlider();
             s.ResetFadeColor();
             yield return s.FadeOut(1f);
 
             // 마을 어귀에 불시착
-            s.SetFlag(StoryFlags.RangHurt);
-            s.PlaceParty("town", "arrive", Facing.Right);
+            s.Progress.SetFlag(StoryFlags.RangHurt);
+            s.Party.PlaceParty("town", "arrive", Facing.Right);
             HideoutMaps.RainyNightOverTheTown(s);
-            CharacterBody hurt = s.Spawn("rangHurt", "rang", s.Point("arrive") + Vector2Int.right, Facing.Left);
+            CharacterBody hurt = s.Actors.Spawn("rangHurt", "rang", s.Field.Point("arrive") + Vector2Int.right, Facing.Left);
             hurt.SetPose(BodyPose.Lie);
             yield return s.FadeIn(60f);
-            yield return s.Emote("hero", "!");
-            s.Face("hero", Facing.Left);
-            yield return s.Shout("hero", "랑!\n괜찮아?!");
-            yield return s.Say("rang", "...으윽, 겨우 이런 데서......\n판도라 여신님......");
-            yield return s.Say("rang", "...죄송합니다......");
-            yield return s.Shout("hero", "무슨 소리야!\n정신 차려, 랑!");
-            yield return s.Think("피가 멈추질 않아... 추격대도 곧 올 거야.");
-            yield return s.Narrate("{name은} 쓰러진 랑을 조심스럽게 안아 들었다.");
-            s.Remove("rangHurt");
+            yield return s.Actors.Emote("hero", "!");
+            s.Actors.Face("hero", Facing.Left);
+            yield return s.Lines("chapter2.rooftop.6");
+            s.Actors.Remove("rangHurt");
             yield return s.FadeOut(40f);
         }
 
@@ -531,9 +506,9 @@ namespace MiniPandoras.Story
         {
             b.Shake("e0", 3f);
             yield return b.Wait(20);
-            yield return b.Say("captain", "크윽... 도둑놈 주제에 제법이군.");
-            yield return b.Say("hero", "저, 저만큼 맞고도 안 쓰러져?!", LineStyle.Shout);
-            yield return b.Say("captain", "이 정도로 쓰러질 것 같으냐!\n전원, 옥상으로 올라와라!", LineStyle.Shout);
+            yield return b.Say("captain", T("chapter2.captainHoldsOn.1"));
+            yield return b.Say("hero", T("chapter2.captainHoldsOn.2"), LineStyle.Shout);
+            yield return b.Say("captain", T("chapter2.captainHoldsOn.3"), LineStyle.Shout);
             b.End(BattleOutcome.Scripted);
         }
 
@@ -543,9 +518,9 @@ namespace MiniPandoras.Story
             var arrivals = new Coroutine[Swarm.Length];
             for (int i = 0; i < Swarm.Length; i++)
             {
-                s.Spawn(GuardId(i), "soldier", deadEnd + Swarm[i].From, Facing.Down);
+                s.Actors.Spawn(GuardId(i), "soldier", deadEnd + Swarm[i].From, Facing.Down);
                 Vector2Int spot = deadEnd + Swarm[i].To;
-                arrivals[i] = s.StartCoroutine(s.WalkTo(GuardId(i), spot.x, spot.y, 7f, Facing.Down, true));
+                arrivals[i] = s.StartCoroutine(s.Actors.WalkTo(GuardId(i), spot.x, spot.y, 7f, Facing.Down, true));
             }
 
             // 길이 제각각이라 마지막에 띄운 병사가 마지막에 도착하지 않는다.
@@ -563,30 +538,30 @@ namespace MiniPandoras.Story
         private static IEnumerator NotNow(BattleApi b)
         {
             yield return b.Wait(20);
-            yield return b.Message("...아무 일도 일어나지 않았다.", 40);
-            yield return b.Say("rang", "지금 그럴 때가 아니다!");
+            yield return b.Message(T("chapter2.notNow.1"), 40);
+            yield return b.Say("rang", T("chapter2.notNow.2"));
         }
 
         /// <summary>경비대장에게 몰린 순간 「차원」이 처음 깨어나 창이 몸을 빠져나간다.</summary>
         private static IEnumerator PhaseAwakens(StoryDirector s, BattleApi b)
         {
             ICombatant hero = b.Get("hero");
-            yield return b.Say("hero", "이대로면... 진짜 끝이야.\n제발, 뭐라도...!", LineStyle.Thought);
+            yield return b.Say("hero", T("chapter2.phaseAwakens.1"), LineStyle.Thought);
             s.Flash(AwakenFlash, 0.9f);
             b.Flash("hero", 30);
             yield return b.Wait(20);
-            yield return b.Message($"{hero.Name}의 판도라 ― 「차원」이 처음으로 깨어났다!", 80);
-            s.GrantPandoras("phase");
+            yield return b.Message(T("chapter2.phaseAwakens.2", hero.Name), 80);
+            s.Progress.GrantPandoras("phase");
             // 끝까지 싸워야 하는 첫 보스라 깨어난 힘이 다친 몸을 채운다.
             b.SetPlayerHpRatio(1f);
-            yield return b.Message("경비대장의 창이 그대로 몸을 빠져나갔다!", 60);
+            yield return b.Message(T("chapter2.phaseAwakens.3"), 60);
             b.Shake("e0", 3f);
-            yield return b.Say("captain", "뭐, 뭐냐?!\n창이... 빠져나갔다고?!");
-            yield return b.Say("hero", "어......?\n안 아파......?");
-            yield return b.Say("rang", "냐앗?! ...힘이 제대로 깨어나지도 않았잖아!\n흘려보내는 게 고작이냐?!");
-            yield return b.Say("hero", "몰라!\n나도 처음 써 본다고!!", LineStyle.Shout);
-            yield return b.Say("rang", "지금은 그거라도 감지덕지다!\n놈이 덤벼드는 순간에 네 손으로 써 봐라!");
-            s.StartCoroutine(s.SkillTutorial(0));
+            yield return b.Say("captain", T("chapter2.phaseAwakens.4"));
+            yield return b.Say("hero", T("chapter2.phaseAwakens.5"));
+            yield return b.Say("rang", T("chapter2.phaseAwakens.6"));
+            yield return b.Say("hero", T("chapter2.phaseAwakens.7"), LineStyle.Shout);
+            yield return b.Say("rang", T("chapter2.phaseAwakens.8"));
+            s.StartCoroutine(s.Tutorials.SkillTutorial(0));
         }
     }
 }

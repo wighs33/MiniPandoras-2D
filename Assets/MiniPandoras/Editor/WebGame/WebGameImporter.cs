@@ -15,7 +15,7 @@ namespace MiniPandoras.Editor.WebGame
     /// - 맵마다 프리팹(<see cref="MapImporter"/>)
     /// - 인물마다 CharacterSheet, 화자마다 Speaker(이름·색·도트 얼굴·일러스트). 주인공 시트에는 PixelLab으로 만든 휘두르기 그림과 숨쉬는 그림을 더한다(<see cref="ExtraFrames"/>)
     /// - 감정 아이콘, 설명 컷씬 그림, 이야기가 맵에 놓는 물건 그림
-    /// - 전투 정의(스킬·적·판도라·동료, <see cref="BattleDataImporter"/>)와, 그 목록에 더하는 우리 몬스터 도감(<see cref="MonsterImporter"/>)
+    /// 전투 정의(스킬·적·판도라·동료)와 물건은 처음에 웹게임 값으로 만든 뒤로 에셋(Data)이 정본이라 들여오지 않는다.
     /// </summary>
     public static class WebGameImporter
     {
@@ -43,8 +43,6 @@ namespace MiniPandoras.Editor.WebGame
             ExtraFrames.ImportSwing();
             ExtraFrames.ImportBreathing();
             PosePicturesImporter.Import();
-            BattleDataImporter.Import(Root + "/battle.json");
-            // 웹게임 목록으로 돌아간 BattleCatalog에 우리 몬스터 도감을 다시 더한다.
             MonsterImporter.Import();
             ImportFolder(Root + "/Emotes", new Vector2(0.5f, 0f), FilterMode.Point);
             ImportFolder(Root + "/Panels", new Vector2(0.5f, 0.5f), FilterMode.Bilinear);

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: goddess
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: goddess
+  size: {x: 28, y: 42}
+  down:
+  - {fileID: 21300000, guid: ed146833a1c31164d95f4ad510301563, type: 3}
+  - {fileID: 21300000, guid: 3b5232177b464d346a0d337214afc2b7, type: 3}
+  - {fileID: 21300000, guid: bb23f381fa9f15740997d7b577935d4f, type: 3}
+  right:
+  - {fileID: 21300000, guid: 1962c813ccd42f947b9ba9f9d467577f, type: 3}
+  - {fileID: 21300000, guid: d7e02e71f8a3b88498bff8d11de677e5, type: 3}
+  - {fileID: 21300000, guid: f268b2f07c30058468837c7d74d6ef0b, type: 3}
+  up:
+  - {fileID: 21300000, guid: 4a3b972bce4fe5442adc7e92b7f7ce31, type: 3}
+  - {fileID: 21300000, guid: ae8e0ca01079cda409002e8b0a768606, type: 3}
+  - {fileID: 21300000, guid: 3a2f977292c24a3479424a18bfb9374c, type: 3}
+  portrait: {fileID: 21300000, guid: e78b495823f37c14988548458436a157, type: 3}

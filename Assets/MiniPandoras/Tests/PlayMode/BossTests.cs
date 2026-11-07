@@ -29,7 +29,7 @@ namespace MiniPandoras.Tests
             combat = UnityEngine.Object.FindFirstObjectByType<FieldCombat>();
             director = UnityEngine.Object.FindFirstObjectByType<StoryDirector>();
             hero = UnityEngine.Object.FindFirstObjectByType<TopDownMover>().Character;
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
         }
 
         [UnityTearDown]
@@ -45,7 +45,7 @@ namespace MiniPandoras.Tests
 
             yield return Waits.Until(() => combat.Effects.Telegraphs.Count(t => t.Owner == giant) >= 3, 8f, "멀리서도 돌을 던진다");
 
-            Assert.That(combat.Boss, Is.EqualTo(giant), "필드의 보스도 체력 막대가 뜬다");
+            Assert.That(combat.Encounters.Boss, Is.EqualTo(giant), "필드의 보스도 체력 막대가 뜬다");
             int waiting = combat.Effects.Telegraphs.Count(t => t.Frame < 0);
             Assert.That(waiting, Is.GreaterThan(0), "돌은 차례로 떨어진다");
             yield return Waits.Until(() => combat.Effects.Telegraphs.Count(t => t.Owner == giant) == 0, 4f, "예고가 차면 터진다");
@@ -250,13 +250,13 @@ namespace MiniPandoras.Tests
 
         private IEnumerator Fight(BattleConfig config, Action finished)
         {
-            yield return director.Battle(config);
+            yield return director.Fights.Battle(config);
             finished();
         }
 
         private EnemyFighter Spawn(string enemy, int cells)
         {
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { enemy }, At = hero.Cell + new Vector2Int(cells, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { enemy }, At = hero.Cell + new Vector2Int(cells, 0) });
             return group.Enemies[0];
         }
     }

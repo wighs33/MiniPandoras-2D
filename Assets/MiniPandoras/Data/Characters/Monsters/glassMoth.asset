@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: glassMoth
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: glassMoth
+  size: {x: 34, y: 28}
+  down:
+  - {fileID: 21300000, guid: c0b86c06829a2ee41a392af41f274ea5, type: 3}
+  - {fileID: 21300000, guid: c1dbe5765a1656c4c8837057344b613f, type: 3}
+  - {fileID: 21300000, guid: e0eaa05f379b66d42a44f917679807b5, type: 3}
+  right:
+  - {fileID: 21300000, guid: 4f0d53b76e2a3a846a2c5b44e9bcf4aa, type: 3}
+  - {fileID: 21300000, guid: ec6180b561ca34142b4fb7eecee87f68, type: 3}
+  - {fileID: 21300000, guid: ca7afa12b85e5314ea3b072212ca839c, type: 3}
+  up:
+  - {fileID: 21300000, guid: 89148de8b83298541bbb1436f52815db, type: 3}
+  - {fileID: 21300000, guid: fffa4dfef23e38444a262dcf9194ed2b, type: 3}
+  - {fileID: 21300000, guid: 4bb5b4abf71916646bb9e9cb5e58edd6, type: 3}
+  portrait: {fileID: 0}

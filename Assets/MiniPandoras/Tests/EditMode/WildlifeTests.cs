@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using MiniPandoras.Characters;
 using MiniPandoras.Combat;
-using MiniPandoras.Story;
 using MiniPandoras.World;
 using NUnit.Framework;
 using UnityEditor;
@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MiniPandoras.Tests
 {
-    /// <summary>필드 몬스터 배치표(Wildlife)가 들여온 몬스터와 맵에 맞는지 본다.</summary>
+    /// <summary>맵마다 사는 몬스터 무리(HabitatDefinition)가 몬스터와 맵에 맞는지 본다.</summary>
     public sealed class WildlifeTests
     {
         private const string CatalogPath = "Assets/MiniPandoras/Data/Battle/BattleCatalog.asset";
@@ -18,10 +18,17 @@ namespace MiniPandoras.Tests
         // 무리가 알아채는 거리(FieldCombat의 AggroRange 78px)에 1칸을 더했다. 맵에 들어서자마자 덤벼들지 않게 한다.
         private const float ArrivalClearance = 78f / MapCoordinates.LogicalPixelsPerTile + 1f;
 
+        private BattleCatalog catalog;
+
+        [SetUp]
+        public void LoadCatalog()
+        {
+            catalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>(CatalogPath);
+        }
+
         [Test]
         public void MonsterBookCountsOnlySpeciesLivingInTheField()
         {
-            var catalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>(CatalogPath);
             var huntable = new List<string>();
             foreach (EnemyDefinition monster in catalog.Huntable)
             {
@@ -34,7 +41,7 @@ namespace MiniPandoras.Tests
                 listed.Add(monster.Id);
             }
 
-            Assert.That(huntable, Is.EquivalentTo(Wildlife.Species), "필드에 없는 몬스터를 세면 도감을 다 채울 수 없다");
+            Assert.That(huntable, Is.EquivalentTo(catalog.Habitats.SelectMany(habitat => habitat.Groups).SelectMany(group => group.Monsters).Distinct()), "필드에 없는 몬스터를 세면 도감을 다 채울 수 없다");
             Assert.That(listed, Is.SupersetOf(huntable), "잡을 수 있는 몬스터는 모두 도감에 실린다");
             Assert.That(listed, Does.Contain("starWhale"), "아직 맵에 없는 몬스터도 도감에 자리가 있다");
         }
@@ -42,21 +49,20 @@ namespace MiniPandoras.Tests
         [Test]
         public void EveryPlacedMonsterIsImportedWithItsSheet()
         {
-            var catalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>(CatalogPath);
             var sheets = new HashSet<string>();
             foreach (string guid in AssetDatabase.FindAssets("t:CharacterSheet", new[] { SheetFolder }))
             {
                 sheets.Add(AssetDatabase.LoadAssetAtPath<CharacterSheet>(AssetDatabase.GUIDToAssetPath(guid)).Id);
             }
 
-            foreach (string map in Wildlife.Maps)
+            foreach (HabitatDefinition habitat in catalog.Habitats)
             {
-                foreach (Wildlife.Group group in Wildlife.In(map))
+                foreach (HabitatGroup group in habitat.Groups)
                 {
                     foreach (string monster in group.Monsters)
                     {
                         EnemyDefinition enemy = catalog.Enemy(monster);
-                        Assert.That(sheets, Does.Contain(enemy.SheetId), $"{map}의 {group.Id}: {monster}의 시트가 없다. MiniPandoras/Import Monsters로 들여온다");
+                        Assert.That(sheets, Does.Contain(enemy.SheetId), $"{habitat.Map}의 {group.Id}: {monster}의 시트가 없다. MiniPandoras/Import Monsters로 들여온다");
                     }
                 }
             }
@@ -66,14 +72,15 @@ namespace MiniPandoras.Tests
         public void EveryGroupStandsOnOpenGroundAwayFromArrivals()
         {
             Dictionary<string, List<string>> arrivals = ArrivalPoints();
-            foreach (string map in Wildlife.Maps)
+            foreach (HabitatDefinition habitat in catalog.Habitats)
             {
+                string map = habitat.Map;
                 GameObject instance = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>($"{MapFolder}/Map_{map}.prefab"));
                 try
                 {
                     Physics2D.SyncTransforms();
                     var gameMap = instance.GetComponent<GameMap>();
-                    foreach (Wildlife.Group group in Wildlife.In(map))
+                    foreach (HabitatGroup group in habitat.Groups)
                     {
                         Assert.That(FootMover.IsBlocked(MapCoordinates.CellFoot(group.Cell)), Is.False, $"{map}의 {group.Id} 자리가 막혀 있다");
                         foreach (string point in arrivals.TryGetValue(map, out List<string> names) ? names : new List<string>())

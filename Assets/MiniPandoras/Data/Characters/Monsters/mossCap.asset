@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: mossCap
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: mossCap
+  size: {x: 22, y: 24}
+  down:
+  - {fileID: 21300000, guid: 9fc51261fa4fdca4bb1d9066616bbc4c, type: 3}
+  - {fileID: 21300000, guid: c84c366e08dc2e04e9aa3a8a177beaa3, type: 3}
+  - {fileID: 21300000, guid: b132085cf3612da4ca1a548ed3ca02df, type: 3}
+  right:
+  - {fileID: 21300000, guid: 953e9c94bcaf6304d92b3ed73ae8d7a3, type: 3}
+  - {fileID: 21300000, guid: 8e1bff53e25ab4e4da609535227ca36c, type: 3}
+  - {fileID: 21300000, guid: b9de7fceee974aa44bb4c7a73644719a, type: 3}
+  up:
+  - {fileID: 21300000, guid: 010b5f414fda9af42a2f116e2c24dddf, type: 3}
+  - {fileID: 21300000, guid: e9a7cd92abd9baa4a9e1ed7f0491dae4, type: 3}
+  - {fileID: 21300000, guid: 6fa3cded1d3a25341a8c4a4aa29c6e1e, type: 3}
+  portrait: {fileID: 0}

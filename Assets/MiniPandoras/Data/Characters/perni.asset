@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: perni
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: perni
+  size: {x: 28, y: 42}
+  down:
+  - {fileID: 21300000, guid: cc2206567bf23ec4d8bae85c091be47f, type: 3}
+  - {fileID: 21300000, guid: e76ed78156f21da4b95cafd0c8510fc5, type: 3}
+  - {fileID: 21300000, guid: 712961d756762104e994409c03ef54eb, type: 3}
+  right:
+  - {fileID: 21300000, guid: 0db15a181ea5bcb4eaa57ee47cf76855, type: 3}
+  - {fileID: 21300000, guid: f66375be9cfb67c4cac6adf8e9fdbc69, type: 3}
+  - {fileID: 21300000, guid: 12264701e6564eb4ba4a2b71a715cf61, type: 3}
+  up:
+  - {fileID: 21300000, guid: aa4a277c819c11244875c5b13dd9cd20, type: 3}
+  - {fileID: 21300000, guid: f632ef405e85add4b9b8e404d6ffc93d, type: 3}
+  - {fileID: 21300000, guid: 33bf407693b46c04284d9048d5fff5c8, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: 89e8f431e98a99947a97002a233ab038, type: 3}
+  - {fileID: 21300000, guid: 39f238b973c47294f9530352816b6839, type: 3}
+  - {fileID: 21300000, guid: 4da1eee1828d3eb46898fafa90f34e2c, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: d71004c4c5631ee4097d37106d5a1168, type: 3}
+  - {fileID: 21300000, guid: 50c7cd6bba270f24aabc4c7c2a7a5070, type: 3}
+  - {fileID: 21300000, guid: 7e69df668b4f2dc469c51f4d3409a847, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 5ad86db5336725b4e84678fb09699d16, type: 3}
+  - {fileID: 21300000, guid: a093a77a14b24e64ab78c8062984ca6b, type: 3}
+  - {fileID: 21300000, guid: 4ebe70fd980bc6c45a4c2fa84a942965, type: 3}
+  portrait: {fileID: 21300000, guid: f6b51dc4370ffac429ec848501ed8e4d, type: 3}

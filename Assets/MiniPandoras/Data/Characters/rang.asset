@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: rang
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: rang
+  size: {x: 30, y: 24}
+  down:
+  - {fileID: 21300000, guid: 78a8ce062fdc7a146bd82aaf914f1cb3, type: 3}
+  - {fileID: 21300000, guid: af87dde09fefed74b90ac6f51957dd51, type: 3}
+  - {fileID: 21300000, guid: aa13c0bee9813764a89b4bd11925f264, type: 3}
+  right:
+  - {fileID: 21300000, guid: e3de2c13973b6fe46b19ee17017beb8f, type: 3}
+  - {fileID: 21300000, guid: 8861759537a46db449e6f0edb97c589b, type: 3}
+  - {fileID: 21300000, guid: b0941f88014d6904e84f40e8ad72a6bd, type: 3}
+  up:
+  - {fileID: 21300000, guid: 3999bb2b750820b46b31ddd147b8a62f, type: 3}
+  - {fileID: 21300000, guid: 73d60dac99b4e5642b007061fc18da9b, type: 3}
+  - {fileID: 21300000, guid: 8588e1fa504420a4b97fa7496371f5d2, type: 3}
+  portrait: {fileID: 21300000, guid: 8691ac381c3dd1549b0aa7d16b1d6732, type: 3}

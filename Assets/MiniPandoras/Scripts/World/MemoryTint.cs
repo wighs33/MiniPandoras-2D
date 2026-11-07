@@ -14,7 +14,7 @@ namespace MiniPandoras.World
     [RequireComponent(typeof(Camera), typeof(UniversalAdditionalCameraData))]
     public sealed class MemoryTint : MonoBehaviour
     {
-        /// <summary>회상 색을 입히지 않는 층(연출 효과, 알갱이). 장면 조립기가 프로젝트 층에 만든다.</summary>
+        /// <summary>회상 색을 입히지 않는 층(연출 효과, 알갱이). 프로젝트 설정의 층이다.</summary>
         public const string UntintedLayer = "Untinted";
 
         // 웹게임은 매 프레임 남은 차이의 4%씩 다가가고, 0.01 아래면 그리지 않는다.

@@ -1,0 +1,151 @@
+# Prologue
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== prologue.twoPersonas.1
+say	divE		오오...!\n드디어 일어났군!
+
+== prologue.twoPersonas.2
+say	divE		나는 디바인 차원을 관장하는 신이지!\n음하하!
+say	divI		정확히는 차원신 디바인이 불완전한 상태가 되어 둘로 나뉜 인격체입니다.
+
+== prologue.twoPersonas.3
+say	divE		재미없는 반응이구먼!\n에라디온과 네가 있던 세계 사이의 차원이다!
+
+== prologue.twoPersonas.4
+say	divE		..뭐라 했냐?
+
+== prologue.twoPersonas.5
+say	divI		유감스럽지만 이곳에는 출구가 없습니다.
+
+== prologue.twoPersonas.6
+say	divI		저희가 당신을 이 차원으로 소환했습니다.
+
+== prologue.reincarnation.1
+say	divI		신들이 죽고 난 뒤 수백 년 동안,\n저희는 에라디온에서 전쟁이 끊이지 않는 것을 지켜봤습니다.
+
+== prologue.reincarnation.2
+say	divI		이곳과는 다른 세계입니다.\n신들이 사라진 이후,\n그곳에서는 오랜 세월 혼란과 전쟁이 이어졌습니다.\n그리고 저희는 한 가지 결론에 도달했습니다.
+say	divI		에라디온에는 다시 신들이 필요하다.
+say	divE		그래서 죽은 신들의 환생을 찾기 시작했지.\n이 차원, 저 차원 돌아다니면서 말이야.
+say	divI		축복신 판도라.\n그녀의 환생을 찾기 위해 수많은 차원을 조사했고 마침내 찾아냈습니다.
+say	divI		바로 당신입니다.
+
+== prologue.reincarnation.3
+say	divI		총 2,817회 검증했습니다.\n오류 가능성은 극히 낮습니다.
+
+== prologue.reincarnation.4
+say	divI		그렇습니다.\n당신의 몸에 판도라를 이식해 드렸습니다.\n에라디온에서 살아가는 데 도움이 될 겁니다.
+
+== prologue.reincarnation.5
+say	divI		현재까지는 이상 반응이 없는 것 같군요.
+
+== prologue.reincarnation.6
+say	divI		판도라를 얻으면 불, 물 같은 원소를 다루거나 몸을 변형시키는 등의 고유한 능력을 사용할 수 있습니다.
+
+== prologue.throughThePortal.1
+say	divI		이런. 설명할 시간이 부족하군요.\n곧 포탈이 닫힐 겁니다.\n신속히 포탈로 이동하시길 바랍니다.\n구체적인 사용법은 현지에서 습득하십시오.
+
+== prologue.throughThePortal.2
+say	divI		에라디온에서 당신에게 주어진 운명의 끝에 도달한다면,\n돌아갈 방법 역시 찾을 수 있을 것입니다.
+
+== prologue.throughThePortal.3
+say	divE		가 보면 어떻게든 돼!\n걱정 말라고, 임마!
+say	divI		유감이지만 더 설명할 시간은 없습니다.
+
+== prologue.throughThePortal.4
+say	divI		시간이 없습니다.
+
+== prologue.throughThePortal.5
+say	divE		가 보면 알겠지!
+
+== prologue.throughThePortal.6
+shout	divE		아, 진짜 말 많네!
+
+== prologue.throughThePortal.7
+say	divE		잘 다녀와라, 애송이!
+
+== prologue.throughThePortal.8
+shout	divE		에라디온 구하고 와라!
+
+== prologue.throughThePortal.9
+say	divI		설명을 조금 더 해 주는 편이 좋지 않았습니까?
+say	divE		괜찮아.\n가면 알아서 잘하겠지.
+say	divI		현재 예상 생존 확률은 63.4%입니다.
+
+== prologue.throughThePortal.10
+say	divE		......\n생각보다 낮잖아?
+
+== prologue.wakeUp.1
+text			으으.... 추워...
+
+== prologue.twoPersonas.7
+text			누, 누구세요?
+
+== prologue.twoPersonas.8
+text			?? 신...?\n여긴... 어디죠?
+
+== prologue.twoPersonas.9
+text			...에라디온...?
+
+== prologue.twoPersonas.10
+text			저는 신 같은 거 안 믿는 무교인데......\n여기서 나가도 될까요...?
+
+== prologue.twoPersonas.11
+text			아니, 그......\n제가 이런 쪽은 잘 몰라서요.\n괜히 방해한 거면 그냥—
+
+== prologue.twoPersonas.12
+text			그럼......\n제가 어떻게 여기에 있는 거죠?
+
+== prologue.twoPersonas.13
+text			왜...... 왜 저를요?\n아니, 아니, 소환이라니...\n게임이나 만화에서나 나올 법한 얘기를...
+
+== prologue.reincarnation.7
+text			아까부터 에라디온이 대체 뭔가요?
+
+== prologue.reincarnation.8
+text			......\n사람 잘못 찾으신 것 같은데요.
+
+== prologue.reincarnation.9
+text			잠깐만......\n그러니까 정리하면......\n신들이 죽었고,\n그 신들의 환생을 찾고 있는데......\n제가 그중 하나라는 거죠?
+
+== prologue.reincarnation.10
+text			판도라라는 게 대체 뭐죠?
+
+== prologue.reincarnation.11
+text			우와!\n그럼 이능력 같은 건가요?\n제 건 어떤 능력인데요?
+
+== prologue.throughThePortal.11
+text			잠깐, 잠깐!\n집으로는 어떻게 돌아갈 수 있나요?\n가장 중요한 걸 아직 못 들었는데요!
+
+== prologue.throughThePortal.12
+text			......돌아갈 수 있는 거죠?\n저기요...?
+
+== prologue.throughThePortal.13
+text			......그게 뭐예요...\n확실하지 않다는 거네요.
+
+== prologue.throughThePortal.14
+text			......벌써요?
+
+== prologue.throughThePortal.15
+text			아니, 뭐......\n저도 갑자기 여기 와서 아직 정신도 없고......
+
+== prologue.throughThePortal.16
+text			저쪽에 도착하면 어디인지도 모르고,\n누굴 찾아가야 하는지도 모르고......\n그러니까 조금만 더 얘기를 하고 가는 게—
+
+== prologue.throughThePortal.17
+text			그래도 저 안에 뭐가 있는지 정도는......
+
+== prologue.throughThePortal.18
+text			그러면......\n진짜 마지막으로 몇 가지만 더 물어봐도—
+
+== prologue.throughThePortal.19
+text			어......?
+
+== prologue.throughThePortal.20
+text			잠깐...!\n아직 마음의 준비가—
+
+== prologue.throughThePortal.21
+text			으아악?!
+
+== prologue.throughThePortal.22
+text			으아아아아악!!

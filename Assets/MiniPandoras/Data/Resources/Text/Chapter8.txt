@@ -1,0 +1,144 @@
+# Chapter8
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter8.findLargo.1
+say	diel		라르고는 이 근처에 산다.\n찾아보자.
+
+== chapter8.largoRefuses.1
+say	diel		라르고.
+say	largo		...음. 디엘?\n...살아 있었구나.\n다행이네.
+say	diel		오랜만이다.\n넌 여전하군.
+say	largo		근데 무슨 일이야.\n나 지금 낮잠 중인데.
+say	diel		뉴웨이브의 뜻을 이어 갈 길드를 세웠다.\n이름은 에버웨이브다.
+say	diel		네 힘이 필요하다.\n같이 가자.
+say	largo		에버...?\n하아, 이름부터 귀찮네.
+
+== chapter8.largoRefuses.2
+say	largo		미안하지만 거절이다.\n그리고 넌 아직 애송이야.\n애송이가 만든 길드에 목숨 걸 생각 없어.
+say	diel		...에루스가 남긴 걸 이대로 묻어 두겠다는 거냐.
+say	largo		그 이름을 그렇게 쉽게 꺼내지 마.
+
+== chapter8.largoRefuses.3
+say	hero		저, 저기 두 분 다 진정......
+say	diel		가자.\n시간 낭비다.
+
+== chapter8.theHungryVillage.1
+say	largo		......하아.\n진짜 귀찮게 하네.
+
+== chapter8.theChildsPlea.1
+say	hero		다들 볼이 홀쭉해...... 이 마을 사람들, 굶고 있는 거야?
+say	rang		냐. 가뭄 탓만은 아닌 것 같군.
+
+== chapter8.theChildsPlea.2
+say	townKid		저기요!\n이거 맞죠?\n이 그림!
+narrate			꼬마의 손에 구겨진 현상수배지가 들려 있다.
+
+== chapter8.theChildsPlea.3
+say	hero		어, 어?!\n그, 그건......
+say	townKid		현상금이 이렇게 많이 붙었으면 엄청 센 거잖아요!\n미노를 혼내 주세요.\n제발요!
+shout	townWoman		얘가 무슨 소릴 하는 거니!\n어서 이리 와!
+say	townMan		현상범한테 그런 부탁을 하다니!\n미노 귀에 들어가면 마을이 어떻게 되는 줄 아느냐!
+say	townKid		그래도...... 배고프단 말이에요......
+say	townMan		...미안하오, 손님들.\n아이 말은 잊어 주시오.
+
+== chapter8.theChildsPlea.4
+say	hero		...디엘.
+say	diel		드래곤 고원이라고 했지.
+say	hero		도와주는 거야?
+say	diel		저런 꼴을 보고 지나칠 거면 길드 같은 건 세우지도 않았다.
+say	rang		냐하. 현상범이 의뢰를 받다니, 세상 참 재밌군.
+
+== chapter8.theFalseKing.1
+say	mino		이번 달 공물이 왜 이것뿐이냐!\n왕께 바칠 몫을 빼돌린 거냐!
+say	thug1		아, 아닙니다, 폐하!\n마을엔 이제 낟알 하나 없습니다......
+say	mino		없으면 사람이라도 끌고 와라!\n이 고원의 왕은 나, 미노다!
+say	diel		미노라는 놈이 누구냐.
+
+== chapter8.theFalseKing.2
+say	mino		......뭐?\n놈?
+say	mino		어떤 간 큰 녀석이 왕 앞에서 그따위로 입을 놀려!
+
+== chapter8.theFalseKing.3
+say	diel		왕?\n뼈다귀 의자에 앉으면 다 왕이냐.
+say	rang		냐하. 왕관도 없는 왕은 처음 보는군.
+shout	mino		여긴 내 왕국이다!\n내 땅에서 숨 쉬는 놈은 모두 내게 바쳐야 한다고!
+say	hero		마을 사람들 곡식 돌려줘요!\n아이들이 굶고 있다고요!
+say	mino		약한 놈이 바치는 건 당연한 거다!\n억울하면 힘으로 뺏어 봐라!
+say	diel		그러지.
+
+== chapter8.largosSand.1
+say	mino		허억, 허억...... 왕인 내가, 이런 놈들한테......!
+
+== chapter8.largosSand.2
+say	diel		끝이다.\n곡식은 마을에 돌려줘라.
+
+== chapter8.largosSand.3
+shout	mino		누구 마음대로!!\n네놈 하나는 데려간다!!
+
+== chapter8.largosSand.4
+say	largo		...애송이가 혼자 다 하려니까 이 꼴이지.
+say	diel		라르고......!
+say	largo		착각하지 마.\n낮잠 자는데 시끄러워서 온 거다.
+say	largo		그리고... 이 고원도 사막이다.\n발밑이 전부 내 모래라고.
+say	largo		......시끄러워.
+
+== chapter8.largosSand.5
+say	mino		이, 이건 반칙이야......!
+
+== chapter8.echoOfTheSand.1
+say	hero		......\n모래가......\n살아 있는 것처럼......
+
+== chapter8.echoOfTheSand.2
+say	hero		......?
+
+== chapter8.echoOfTheSand.3
+shout	hero		윽......!\n또...... 머리가......!
+shout	rang		냐......?! 이봐!
+
+== chapter8.eastLocked
+text			먼저 미노를 쓰러뜨리자.
+
+== chapter8.findLargo.2
+text			지금은 라르고부터 찾아야 한다.
+
+== chapter8.findLargo.3
+text			먼저 라르고를 찾아보자.
+
+== chapter8.findLargo.4
+text			라르고를 찾아보자
+
+== chapter8.theHungryVillage.2
+text			외지 사람인가.\n미안하지만 내줄 물 한 모금이 없소.
+
+== chapter8.theHungryVillage.3
+text			올해 곡식은 전부 고원으로 실려 갔지.\n남은 건 이 모래뿐이오.
+
+== chapter8.theHungryVillage.4
+text			아이들이 사흘째 묽은 죽만 먹고 있어요.
+
+== chapter8.theHungryVillage.5
+text			미노가 드래곤 고원에 앉아 왕 노릇을 하면서 세금을 걷어 가거든요.
+
+== chapter8.theHungryVillage.6
+text			쉿, 그 이름은 크게 말하지 마시오.
+
+== chapter8.theHungryVillage.7
+text			세금을 못 낸 집은 사람까지 끌려간다오.
+
+== chapter8.theHungryVillage.8
+text			마을 사람들의 모습이 마음에 걸린다.\n먼저 이야기를 들어 보자.
+
+== chapter8.theHungryVillage.9
+text			마을 사람들의 모습이 마음에 걸린다.\n먼저 이야기를 들어 보자.
+
+== chapter8.theHungryVillage.10
+text			동쪽 마을 광장 사람들에게 말을 걸어 보자
+
+== chapter8.theChildsPlea.5
+text			북쪽 고갯길을 지나 드래곤 고원으로 가자
+
+== chapter8.minoFightGoesOn.1
+text			크으윽...... 황소 판도라여, 전부 내놔라!!
+
+== chapter8.minoFightGoesOn.2
+text			미노의 몸이 부풀어 오르며 미노타우로스로 변했다!

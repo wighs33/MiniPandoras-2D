@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -83,7 +84,7 @@ namespace MiniPandoras.UI
             frame.color = on ? UiPalette.Gold : UiPalette.GoldDim;
             arrows.color = on ? Edge : UiPalette.Gold;
             label.color = on ? Edge : UiPalette.Ink;
-            label.text = on ? "건너뛰는 중" : "건너뛰기";
+            label.text = on ? T("skipButtonView.paint.1") : T("skipButtonView.paint.2");
         }
     }
 }

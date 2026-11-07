@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: sandSail
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: sandSail
+  size: {x: 28, y: 28}
+  down:
+  - {fileID: 21300000, guid: 32b75fd8202023341b9581c20b439f56, type: 3}
+  - {fileID: 21300000, guid: bea23f3bd0ac41342be6a760e47a7f31, type: 3}
+  - {fileID: 21300000, guid: 9ba080c50f30b5846a25863b78cc5c88, type: 3}
+  right:
+  - {fileID: 21300000, guid: ba7f800f1370139428d03ff9cfd54ca3, type: 3}
+  - {fileID: 21300000, guid: 68cdf1c430a9d3040b8f88ab784c1e9e, type: 3}
+  - {fileID: 21300000, guid: 60a97cfe83c2da143a7218b75944386e, type: 3}
+  up:
+  - {fileID: 21300000, guid: fe6fc28d456fb414bb651e68c5a0c01a, type: 3}
+  - {fileID: 21300000, guid: cc50a4251e9e4314da04114fc3e2ce8e, type: 3}
+  - {fileID: 21300000, guid: f4fd9e12a6aaee447854eee8c16f4793, type: 3}
+  portrait: {fileID: 0}

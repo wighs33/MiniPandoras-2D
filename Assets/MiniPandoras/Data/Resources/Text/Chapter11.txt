@@ -1,0 +1,136 @@
+# Chapter11
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter11.dielAlone.1
+say	largo		이자벨이랑 오로라, 이 근처에 있다.\n만나 봐.
+say	diel		...못 만난다.
+say	diel		에루스를 지키겠다고 약속했다.\n그 약속도 못 지킨 놈이, 무슨 얼굴로 그 딸을 만나.
+say	largo		......귀찮은 녀석.
+think	hero		디엘......
+
+== chapter11.dielAlone.2
+say	rang		냐. 오늘 밤은 고목 3층의 쉼터에서 묵는다더군.\n가자.
+
+== chapter11.theInn.1
+say	innFairy		어서 오세요~\n고목의 쉼터예요!\n고목을 구해 주신 손님들은 오늘 숙박비 공짜예요!
+say	rang		냐하! 공짜라는 말은 언제 들어도 좋군.
+
+== chapter11.theInn.2
+shout	aurora		디엘!\n찾았다!
+
+== chapter11.theInn.3
+say	diel		......!
+say	diel		...라르고.\n네가 불렀나.
+
+== chapter11.theInn.4
+say	largo		...네가 안 가니까.\n귀찮게 굴지 말고 얘기나 해.
+say	isabel		에루스가 남긴 걸 너 혼자 짊어질 생각이었니?\n그건 너무 욕심이야.
+say	aurora		아빠가 그랬잖아.\n뉴웨이브는 가족이라고.\n가족을 두고 가는 게 어디 있어!
+say	diel		...위험한 길이다.
+say	isabel		알아.\n그러니까 가는 거야.
+say	diel		......따라와.
+
+== chapter11.theInn.5
+say	rang		냐하! 갑자기 시끌벅적해졌군.
+say	largo		...낮잠은 글렀네.
+say	diel		내일은 아이로스로 간다.
+say	hero		아이로스요?
+say	diel		다음 목적지다.\n걸어서 가면 며칠은 걸리지.
+
+== chapter11.theInn.6
+say	innFairy		걸어서요?\n고목 꼭대기에 나리온 정거장이 있는걸요!
+say	hero		나리온......?
+say	innFairy		요정들이 기르는 커다란 새예요.\n하늘길로 가면 아이로스까지 금방이에요!\n첫 출발은 내일 해 뜰 때고요~
+say	innFairy		고목을 구해 주신 손님들이니까, 탑승권도 공짜로 드릴게요!
+say	largo		...걷는 것보다는 덜 귀찮겠군.
+
+== chapter11.theNight.1
+say	aurora		이불 폭신폭신해!\n요정들 솜씨 대단하다!
+say	isabel		디엘, 너도 이리 와.\n창가에 혼자 서 있지 말고.
+say	diel		......여기가 편하다.
+say	aurora		또 그런다.\n옛날이랑 똑같네.
+say	diel		......
+
+== chapter11.theNight.2
+say	isabel		후훗.
+say	largo		...난 먼저 잔다.\n오늘 하루 종일 나무만 탔어.\n깨우면 귀찮아진다.
+
+== chapter11.theNight.3
+say	innFairy		그럼 푹 주무세요~\n해 뜰 때 깨워 드릴게요!
+
+== chapter11.theNight.4
+think	hero		......이렇게 다 같이 한 방에서 자는 거, 처음인가.
+
+== chapter11.theNight.5
+narrate			밤이 깊어 간다.\n하나둘 잠이 들고, 고목의 잎사귀가 스치는 소리만 남았다.
+
+== chapter11.theDream.1
+say	goddess		...드디어, 여기까지 닿았구나.
+say	hero		당신은... 혹시......
+say	goddess		너는 내가 아니야.\n그러니 나처럼 할 필요도 없단다.
+say	goddess		다만 하나만 기억해 주렴.\n나눈 힘은, 반드시 누군가에게 이어진다는 걸.
+
+== chapter11.morning.1
+think	hero		...꿈이었나.\n창밖이 밝아 온다.
+
+== chapter11.morning.2
+say	innFairy		좋은 아침이에요~\n아이로스행 첫 나리온, 곧 출발해요!
+say	largo		......조금만 더.
+
+== chapter11.theStation.1
+say	stationFairy		아이로스행 나리온, 곧 출발합니다~\n타실 분은 서둘러 주세요~!
+think	hero		꼭 공항 같네......
+say	aurora		우와, 가까이서 보니까 엄청 커!
+narrate			나리온이 맑은 소리로 길게 울었다.
+say	rang		냐... 날 잡아먹진 않겠지.
+say	stationFairy		고목을 구해 주신 분들이시죠?\n등 위 꽃안장에 앉아서 깃털을 꼭 잡아 주세요~
+say	largo		...떨어지면 귀찮겠군.
+say	diel		꽉 잡아라.
+
+== chapter11.skyRide.1
+say	hero		와아...... 높다......!
+say	aurora		구름이 손에 닿을 것 같아!
+say	rang		냐하! 바람이 좋군.
+say	largo		...여기서 낮잠 자면 딱이겠는데.
+say	isabel		떨어지면 아무도 못 깨워 줘, 라르고.
+say	diel		......
+think	hero		아이로스.\n거기엔 또 뭐가 기다리고 있을까.
+narrate			나리온이 아이로스를 향해 구름 사이를 날아간다.
+
+== chapter11.elsewhere.1
+say	eradExec		보고드립니다.\n정찰부대의 케이트가 페어리가든에서 뉴웨이브의 잔당과 부딪쳤습니다.
+say	eradExec		디엘 이브라는 놈이 옛 뉴웨이브 놈들을 다시 모으고 있답니다.\n이름은... 에버웨이브.
+say	perni		뉴웨이브의 잔당이 다시 모인다고?
+say	raco		하하하.\n내가 누누이 얘기했잖아.\n디엘은 재능이 있다니까?
+say	eradExec		그날 정리했어야 했어.\n정찰부대장의 안일함이 화를 불렀군.
+say	perni		이름 따위는 상관없다.\n몇이나 모였지?
+say	eradExec		아직 대여섯입니다.\n대단한 수는 아닙니다.
+say	perni		......
+say	luwan		......디엘.
+
+== chapter11.elsewhere.2
+say	luna		후훗.\n보석은 잘 돌려줬나 봐?
+say	luna		...아빠 표정, 볼만했겠다.
+
+== chapter11.elsewhere.3
+say	kate		대장~\n이번엔 어디로 가요?
+say	kyle		......아이로스.
+say	neo		명령대로.
+
+== chapter11.nightText
+text			밤이다.\n오늘은 쉼터에서 쉬자.
+
+== chapter11.stationText
+text			나리온 정거장은 고목 꼭대기다.
+
+== chapter11.dielAlone.3
+text			고목 3층 요정 마을의 쉼터로 가자
+
+== chapter11.theInn.7
+text			이자벨과 오로라가 동료가 되었다!
+
+== chapter11.morning.3
+text			고목 꼭대기의 나리온 정거장으로 올라가자
+
+== chapter11.station.1
+text			나리온 정거장

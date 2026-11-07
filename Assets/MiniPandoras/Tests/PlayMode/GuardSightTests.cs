@@ -33,7 +33,7 @@ namespace MiniPandoras.Tests
         {
             GuardSight sight = PlaceGuard(0, new Vector2Int(36, 24), Facing.Right);
             yield return UntilSightSettles();
-            Vector2 feet = story.Director.Actor("townGuard0").Position;
+            Vector2 feet = story.Director.Actors.Actor("townGuard0").Position;
 
             Assert.That(sight.Touches(feet + new Vector2(3f, 0f)), Is.True, "바로 앞");
             Assert.That(sight.Touches(feet + new Vector2(4f, 1.5f)), Is.True, "앞으로 벌어진 V자 안");
@@ -57,7 +57,7 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator TouchingTheGuardFromBehindIsSafe()
         {
-            CharacterBody guard = story.Director.Actor("townGuard2");
+            CharacterBody guard = story.Director.Actors.Actor("townGuard2");
             yield return story.Until(() => guard.Facing == Facing.Right, 5f, "남쪽 길의 병사가 오른쪽으로 걷기 시작한다");
             story.Mover.PlaceAt(MapCoordinates.CellFoot(guard.Cell + Vector2Int.left), Facing.Right);
             yield return null;
@@ -69,20 +69,20 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator SteppingIntoTheFanGetsCaught()
         {
-            CharacterBody guard = story.Director.Actor("townGuard2");
+            CharacterBody guard = story.Director.Actors.Actor("townGuard2");
             yield return story.Until(() => guard.Facing == Facing.Right, 5f, "남쪽 길의 병사가 오른쪽으로 걷기 시작한다");
             yield return story.StandOn(guard.Cell + new Vector2Int(3, 0));
 
             yield return story.Until(() => story.Lines.Contains("거기, 보석 도둑이다!"), 5f, "병사가 소리친다");
             yield return story.UntilExploring("town", "들킨 뒤 마을 어귀");
-            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Point("arrive")), "들키면 마을 어귀로 돌아간다");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("arrive")), "들키면 마을 어귀로 돌아간다");
         }
 
         [UnityTest]
         public IEnumerator TurnsAroundSlowly()
         {
             GuardSight sight = PlaceGuard(0, new Vector2Int(36, 24), Facing.Right);
-            CharacterBody guard = story.Director.Actor("townGuard0");
+            CharacterBody guard = story.Director.Actors.Actor("townGuard0");
             yield return UntilSightSettles();
             Vector2 ahead = guard.Position + new Vector2(3f, 0f);
             Vector2 behind = guard.Position + new Vector2(-3f, 0f);
@@ -109,8 +109,8 @@ namespace MiniPandoras.Tests
         /// <summary>병사를 멈춰 세워 그 자리에 놓는다. 멈춘 병사는 들키는 검사를 쉬므로 시야 모양만 볼 수 있다.</summary>
         private GuardSight PlaceGuard(int index, Vector2Int cell, Facing facing)
         {
-            CharacterBody guard = story.Director.Actor($"townGuard{index}");
-            story.Exploration.SetResidentFrozen(guard, true);
+            CharacterBody guard = story.Director.Actors.Actor($"townGuard{index}");
+            story.Exploration.Residents.SetResidentFrozen(guard, true);
             guard.PlaceAt(cell, facing);
             return guard.GetComponentInChildren<GuardSight>();
         }

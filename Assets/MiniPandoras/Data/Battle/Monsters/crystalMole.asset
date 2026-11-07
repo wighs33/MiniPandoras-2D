@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97bb1cddb4d115e46a6f92dbf1a9352f, type: 3}
+  m_Name: crystalMole
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.EnemyDefinition
+  id: crystalMole
+  displayName: "\uC218\uC815\uB4F1"
+  sheetId: crystalMole
+  hp: 115
+  attack: 17
+  fixedDamage: 0
+  defense: 11
+  speed: 8
+  skills:
+  - {fileID: 11400000, guid: 5a2317169f8710c4eb2a3cdeed093d2c, type: 2}
+  - {fileID: 11400000, guid: 9070eab2b8f8e494cb7132bc48393841, type: 2}
+  skillRate: 0.3
+  chargeRange: 0
+  evade: 0
+  wings: 0

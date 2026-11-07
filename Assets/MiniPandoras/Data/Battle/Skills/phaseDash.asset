@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 564c56ff167ddf648958862610f60507, type: 3}
+  m_Name: phaseDash
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.SkillDefinition
+  id: phaseDash
+  displayName: "\uCC28\uC6D0 \uB3C4\uC57D"
+  description: "\uBAB8\uC744 \uD758\uB824\uBCF4\uB0B4\uBA70 \uBC14\uB77C\uBCF4\uB294
+    \uCABD\uC73C\uB85C \uC9E7\uAC8C \uB6F0\uC5B4\uB118\uB294\uB2E4. \uADF8\uC0AC\uC774
+    \uBC1B\uB294 \uACF5\uACA9\uC740 \uBE60\uC838\uB098\uAC04\uB2E4."
+  icon: {fileID: 0}
+  look: 0
+  cost: 4
+  target: 2
+  power: 0
+  fx: phase
+  cooldown: 110
+  palette:
+  - {r: 0.49019608, g: 0.42352942, b: 1, a: 1}
+  - {r: 0.8666667, g: 0.8392157, b: 1, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 0.22745098, g: 0.16470589, b: 0.627451, a: 1}
+  sound: wing
+  shape:
+    kind: 7
+    reach: 0
+    size: 0
+    knock: 0
+    distance: 52
+    radius: 0
+    speed: 0
+    range: 0
+    pierce: 0
+    length: 0
+    width: 0
+    ticks: 0
+    interval: 0
+    drift: 0
+    strike: 0
+    frames: 0
+    ratio: 0
+    follow: 0
+    growFrames: 0
+    band: 0
+    pull: 0
+  status:
+    slow: 0
+    freeze: 0
+    dot: 0

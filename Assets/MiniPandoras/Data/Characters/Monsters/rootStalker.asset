@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: rootStalker
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: rootStalker
+  size: {x: 30, y: 30}
+  down:
+  - {fileID: 21300000, guid: 4876527cfab5c8a4ba715fdc1f48f751, type: 3}
+  - {fileID: 21300000, guid: 44440300fd2ba42408111359c77bd641, type: 3}
+  - {fileID: 21300000, guid: fe660436338694746871d4844f69e3fd, type: 3}
+  right:
+  - {fileID: 21300000, guid: c7cb42a96cd61fc4799826fa3bb1bd72, type: 3}
+  - {fileID: 21300000, guid: b8777d0523bd4b746b379d23e07b82ec, type: 3}
+  - {fileID: 21300000, guid: 3009466d4f3b0734d9e8a5104259c2b9, type: 3}
+  up:
+  - {fileID: 21300000, guid: 602371eec916ed342a65eacf1ac2c776, type: 3}
+  - {fileID: 21300000, guid: 5bab340123b9ddd42a38e344ac1fb357, type: 3}
+  - {fileID: 21300000, guid: 4366682091bb53d44abf53943f2353f6, type: 3}
+  portrait: {fileID: 0}

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97bb1cddb4d115e46a6f92dbf1a9352f, type: 3}
+  m_Name: dripEar
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.EnemyDefinition
+  id: dripEar
+  displayName: "\uC885\uC720\uADC0"
+  sheetId: dripEar
+  hp: 83
+  attack: 19
+  fixedDamage: 0
+  defense: 7
+  speed: 15
+  skills:
+  - {fileID: 11400000, guid: e794003a3afe06246ad77f2e635de9cc, type: 2}
+  - {fileID: 11400000, guid: 1adf44fa55a58924b898eaa06ca47be9, type: 2}
+  skillRate: 0.35
+  chargeRange: 0
+  evade: 0.15
+  wings: 0

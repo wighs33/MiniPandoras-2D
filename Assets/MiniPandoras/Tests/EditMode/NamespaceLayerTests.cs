@@ -16,10 +16,11 @@ namespace MiniPandoras.Tests
 
         private static readonly Dictionary<string, int> Layers = new Dictionary<string, int>
         {
-            // 바닥: 아무것도 모른다.
+            // 바닥: 글과 대화는 아무것도 모른다. 게임에 보이는 글은 모든 층이 쓴다.
+            { "Dialogue", 0 },
+
             { "Input", 1 },
             { "World", 1 },
-            { "Dialogue", 1 },
             { "Progress", 1 },
 
             { "Characters", 2 },
@@ -41,7 +42,7 @@ namespace MiniPandoras.Tests
         };
 
         private static readonly Regex NamespaceLine = new Regex(@"^namespace MiniPandoras\.(\w+)", RegexOptions.Multiline);
-        private static readonly Regex UsingLine = new Regex(@"^using MiniPandoras\.(\w+)[\w.]*;", RegexOptions.Multiline);
+        private static readonly Regex UsingLine = new Regex(@"^using (?:static )?MiniPandoras\.(\w+)[\w.]*;", RegexOptions.Multiline);
 
         [Test]
         public void EveryScriptFolderHasALayer()

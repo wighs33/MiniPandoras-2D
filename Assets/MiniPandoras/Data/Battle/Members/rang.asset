@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe870f02f2aefb4fac6236711c275c7, type: 3}
+  m_Name: rang
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.MemberDefinition
+  id: rang
+  displayName: "\uB791"
+  sheetId: rang
+  summonSkill: {fileID: 11400000, guid: 8b12cf8c3c106f549b13b44a047273e1, type: 2}
+  summonSheetId: rangBeast
+  battleSheetId: rang
+  levels:
+  - hp: 82
+    mana: 30
+    attack: 12
+    defense: 7
+    speed: 12
+  growthFromLevel: 2
+  growth:
+    hp: 18
+    mana: 6
+    attack: 3
+    defense: 2
+    speed: 1
+  chapterLevelStopsAtTable: 0
+  critPerEarnedLevel: 0
+  evadePerEarnedLevel: 0
+  skills:
+  - bite
+  - beast
+  awakenedSkills: []

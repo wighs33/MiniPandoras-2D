@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836ea84567ed7ca43921883bb529ab1d, type: 3}
+  m_Name: sandStorm
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.PandoraDefinition
+  id: sandStorm
+  pandoraName: "\uBAA8\uB798"
+  firstSkill: {fileID: 11400000, guid: b5e2c1e2e8f4e184fa150585e92911fb, type: 2}
+  secondSkill: {fileID: 11400000, guid: 25a2659ac50864f4c9ba28885b4c665e, type: 2}
+  thirdSkill: {fileID: 11400000, guid: aa9a87ffd50f810488cc06d6de0ab5f1, type: 2}
+  ultimateSkill: {fileID: 11400000, guid: 5fa51f23a66096949bbc86695467c5ad, type: 2}
+  color: {r: 0.8509804, g: 0.65882355, b: 0.2901961, a: 1}
+  inSealBook: 1
+  origin: "\uB77C\uB974\uACE0\uC758 \uAE30\uC5B5\uACFC \uB3D9\uAE30\uD654\uB418\uBA74\uC11C
+    \uB354\uC2A4\uD2B8\uAC00 \uB2E8\uBC88\uC5D0 \uCC44\uC6CC\uC9C4 \uD798. \uB77C\uB974\uACE0\uC640
+    \uAC19\uC740 \uD310\uB3C4\uB77C\uB2E4."
+  hint: "\uB77C\uB974\uACE0\uC758 \uD310\uB3C4\uB77C. \uC544\uC9C1 \uC190\uC5D0 \uB2FF\uC9C0
+    \uC54A\uB294\uB2E4."
+  glyph: sand
+  lightColor: {r: 1, g: 0.94509804, b: 0.76862746, a: 1}
+  darkColor: {r: 0.2901961, g: 0.1882353, b: 0.03137255, a: 1}

@@ -1,0 +1,209 @@
+# Chapter3
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter3.play.1
+think	hero		사람이 많은 곳까지 내려왔어.\n어디든 숨을 곳을 찾아야 해.
+narrate			마을 게시판에 현상수배지가 붙어 있다.\n그려진 얼굴은 영락없이 {name}이다.
+narrate			「현상수배 ― 뱀성 보물고의 보석을 훔친 자.\n산 채로 잡아 오는 자에게 현상금을 준다.」
+think	hero		...이거 나잖아?!\n그림은 또 왜 이렇게 잘 그렸어......
+think	hero		랑은 싸울 수 없어.\n병사들 눈에 띄지 않게 조심하자.
+
+== chapter3.meetTheStranger.1
+think	hero		여기라면 잠깐은 숨을 수 있겠지......
+
+== chapter3.meetTheStranger.2
+shout	hero		......?!
+
+== chapter3.meetTheStranger.3
+say	hero		사, 사람이 있었어......?!
+
+== chapter3.meetTheStranger.4
+say	hero		자, 잠깐만요! 쫓기고 있어서 그래요.\n여기, 그게... 애완동물이 다쳤어요.\n잠깐만이라도 숨게 해 주세요.
+
+== chapter3.meetTheStranger.5
+say	hero		네?
+
+== chapter3.meetTheStranger.6
+say	hero		그, 그건 누명이에요!\n정말로 훔친 게 아니라—
+
+== chapter3.meetTheStranger.7
+say	hero		이상한...... 기운이요?
+
+== chapter3.meetTheStranger.8
+say	hero		뭐, 뭘요?
+
+== chapter3.meetTheStranger.9
+say	hero		잠깐만요.\n설마 지금 싸우자는—
+
+== chapter3.meetTheStranger.10
+say	hero		하아...... 하아......
+
+== chapter3.meetTheStranger.11
+say	hero		그렇게까지 말할 필요는......
+
+== chapter3.meetTheStranger.12
+say	hero		......네?
+
+== chapter3.meetTheStranger.13
+say	hero		......동료가 되라는 건가요?
+
+== chapter3.meetTheStranger.14
+say	hero		......\n그렇게까지 단정적으로......
+
+== chapter3.dielsPandora.1
+say	hero		......?
+say	diel		내 이름이다.\n기억해 둬라.
+
+== chapter3.soldiersCallFromOutside.1
+shout	soldier		안에 있는 거 다 안다!
+shout	soldier		보석 도둑, 순순히 나와라!
+say	hero		......!
+
+== chapter3.soldiersCallFromOutside.2
+say	diel		따라와.\n집이 부서지는 건 곤란하니까.
+
+== chapter3.walkOutIntoTheCircle.1
+shout	soldier		찾았다!
+shout	soldier		뱀성의 보석 도둑이다!
+say	hero		......!
+shout	soldier		옆의 녀석도 한패다!\n둘 다 체포해!
+
+== chapter3.walkOutIntoTheCircle.2
+say	diel		......
+shout	soldier		뭐 하고 있나!\n무릎 꿇어라!
+
+== chapter3.walkOutIntoTheCircle.3
+say	diel		남의 집 앞에 몰려와서......\n첫마디가 체포인가.
+shout	soldier		이 자식......!\n저항하면 현장에서 제압한다!
+
+== chapter3.dielStepsForward.1
+say	diel		내가 한다.\n뒤로 가 있어.
+say	hero		하지만—
+say	diel		방금은 네 실력을 봤으니......\n이번엔 내 걸 보여 주지.
+
+== chapter3.dielStepsForward.2
+say	soldier		......?!
+say	diel		잘 봐 둬라.\n판도라를 다룬다는 게 어떤 건지.
+
+== chapter3.showTheWingsOpening.1
+think	hero		날개......?!
+
+== chapter3.showTheWingsOpening.2
+say	soldier		뭐...... 뭐야, 저건......!
+
+== chapter3.dielCutsDownTheSoldiers.1
+say	hero		......\n저게......\n판도라......
+
+== chapter3.dielCutsDownTheSoldiers.2
+shout	hero		윽......!
+
+== chapter3.dielCutsDownTheSoldiers.3
+shout	hero		머......\n머리가......!
+
+== chapter3.caughtByGuard.1
+shout	soldier		거기, 보석 도둑이다!
+
+== chapter3.play.2
+text			그쪽은 들판이다.\n지금은 숨을 곳부터 찾자.
+
+== chapter3.play.3
+text			병사 앞의 V자 시야에 닿으면 들킨다
+
+== chapter3.meetTheStranger.15
+text			밖에는 병사들이 있다.\n여기 숨어 있자.
+
+== chapter3.meetTheStranger.16
+text			어두운 아지트 안을 살펴보자
+
+== chapter3.meetTheStranger.17
+text			나가.
+
+== chapter3.meetTheStranger.18
+text			여긴 네가 숨어들 곳이 아니다.\n문 닫고 꺼져.
+
+== chapter3.meetTheStranger.19
+text			그 얼굴......\n본 적 있군.
+
+== chapter3.meetTheStranger.20
+text			게시판에 붙어 있더군.\n뱀성의 보석을 훔친 도둑.
+
+== chapter3.meetTheStranger.21
+text			네가 도둑이든 아니든 나하고는 상관없는 일이다.
+
+== chapter3.meetTheStranger.22
+text			다만......\n너한테서 이상한 기운이 느껴지는군.
+
+== chapter3.meetTheStranger.23
+text			평범한 인간에게서는 느껴지지 않는 힘이다.
+
+== chapter3.meetTheStranger.24
+text			확인해 봐야겠어.
+
+== chapter3.meetTheStranger.25
+text			네가 어떤 녀석인지.
+
+== chapter3.meetTheStranger.26
+text			죽이지는 않는다.
+
+== chapter3.meetTheStranger.27
+text			판도라를 얻은 지 얼마 되지 않았군.
+
+== chapter3.meetTheStranger.28
+text			움직임도 허술하고,\n판단도 늦어.\n싸움 경험도 거의 없겠지.
+
+== chapter3.meetTheStranger.29
+text			하지만 가능성은 있다.
+
+== chapter3.meetTheStranger.30
+text			나와 함께 와라.
+
+== chapter3.meetTheStranger.31
+text			싫다면 강요하지 않는다.\n하지만 혼자 돌아다니다가는 머지않아 죽을 거다.
+
+== chapter3.meetTheStranger.32
+text			내 옆에 있으면 판도라를 다루는 법 정도는 가르쳐 주지.\n그리고—
+
+== chapter3.meetTheStranger.33
+text			적어도 네 목에 걸린 현상금 때문에 혼자 도망 다닐 필요는 없을 거다.
+
+== chapter3.meetTheStranger.34
+text			믿을 만한 녀석인지는 앞으로 보면 된다.\n지금 내가 본 건—
+
+== chapter3.meetTheStranger.35
+text			네가 쓸 만하다는 것뿐이다.
+
+== chapter3.strangerEndsTheBout.1
+text			......제법이군.
+
+== chapter3.strangerEndsTheBout.2
+text			일격
+
+== chapter3.dielsPandora.2
+text			디엘 이브.
+
+== chapter3.setupTown.1
+text			병사들이 마을 출구를 지키고 있다.\n숨을 곳부터 찾자.
+
+== chapter3.setupTown.2
+text			병사들이 마을 출구를 지키고 있다.\n숨을 곳부터 찾자.
+
+== chapter3.setupTown.3
+text			모험가 길드는 문을 닫았다.\n숨을 곳부터 찾자.
+
+== chapter3.setupTown.4
+text			성 쪽이 난리던데... 도둑이 들었다지 뭐야.
+
+== chapter3.setupTown.5
+text			어머, 그 아이 다쳤잖아!\n얼른 비라도 피하렴.
+
+== chapter3.setupTown.6
+text			요즘은 어딜 가도 에라드 이야기뿐이야.\n세상을 하나로 묶었다더니, 숨이 막혀.
+
+== chapter3.setupTown.7
+text			...못 들은 걸로 해 주게.
+
+== chapter3.setupTown.8
+text			비 오는 날엔 마을 끝 숲길 안쪽의 낡은 집 근처엔 가지 말래.
+
+== chapter3.setupTown.9
+text			무서운 사람이 산대.\n아무도 안 가는 집이야.

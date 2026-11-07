@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: erus
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: erus
+  size: {x: 34, y: 46}
+  down:
+  - {fileID: 21300000, guid: b1bec03387f7fbb4081aef4f10c5dbbb, type: 3}
+  - {fileID: 21300000, guid: 27b2fbca63b88ed40aa7926e4352af93, type: 3}
+  - {fileID: 21300000, guid: f03d3d70ce2f3334687c6e7c3340a4b6, type: 3}
+  right:
+  - {fileID: 21300000, guid: dc54b719ecab74b43afca3300c80cdf1, type: 3}
+  - {fileID: 21300000, guid: d3cdb5912a628be4a9dd6cb778b1af79, type: 3}
+  - {fileID: 21300000, guid: d260ff4202ae22049bbc523179078b07, type: 3}
+  up:
+  - {fileID: 21300000, guid: 630d1dc03b2eefe48b2d9c787770f67e, type: 3}
+  - {fileID: 21300000, guid: 023e78ed3db2be34dacc0d49885650b2, type: 3}
+  - {fileID: 21300000, guid: d87f8b77fb5307d4a968accbfe4fa413, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: c55c0715b19141d49af4fab5571ab080, type: 3}
+  - {fileID: 21300000, guid: bfbbca0d642cc8c47af2a1827694358a, type: 3}
+  - {fileID: 21300000, guid: 1efe7ad215e54c242915391ae686b571, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: a46446d77f465d74281bca7ca90eec65, type: 3}
+  - {fileID: 21300000, guid: b5a05ea03c30d384a961de39539bfaa8, type: 3}
+  - {fileID: 21300000, guid: 2e7b92438e3c4014993c9d8adbd8d34f, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 115bf6008b21def4ab4c5415d76138bf, type: 3}
+  - {fileID: 21300000, guid: 3e6d0831aa6d7ba43880a136a18b91e6, type: 3}
+  - {fileID: 21300000, guid: 7b58a5d8087c6674eabf5ebaf26e500d, type: 3}
+  kneelPicture: {fileID: 0}
+  liePicture: {fileID: 21300000, guid: 632f7b3115e34024b83802ddee4576f8, type: 3}
+  portrait: {fileID: 21300000, guid: 5c221146920f72f479107320ac6bc754, type: 3}

@@ -29,7 +29,7 @@ namespace MiniPandoras.App
                 int percent = Mathf.Clamp(state.Dust(id), 0, PandoraBook.FullDust);
                 int level = state.PandoraLevel(id);
                 int levelDust = state.LevelDust(id);
-                int levelCost = level < PandoraBook.MaxLevel ? PandoraBook.LevelCost(level) : 0;
+                int levelCost = level < GameBalance.Current.PandoraMaxLevel ? PandoraBook.LevelCost(level) : 0;
                 bool ready = percent >= PandoraBook.FullDust && !active;
                 // 깨운 판도라는 다음 레벨까지, 아니면 깨우기까지 채운 비율.
                 float progress = !active ? percent / (float)PandoraBook.FullDust : levelCost > 0 ? Mathf.Min(1f, levelDust / (float)levelCost) : 1f;

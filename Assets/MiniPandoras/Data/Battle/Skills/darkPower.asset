@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 564c56ff167ddf648958862610f60507, type: 3}
+  m_Name: darkPower
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.SkillDefinition
+  id: darkPower
+  displayName: "\uAC80\uC740 \uD798"
+  description: "\uB514\uC5D8\uC758 \uC545\uB9C8 \uD310\uB3C4\uB77C\uB97C \uBC1C\uD604\uD574
+    \uC801 \uD558\uB098\uB97C \uAC15\uD558\uAC8C \uACF5\uACA9\uD55C\uB2E4."
+  icon: {fileID: 0}
+  look: 0
+  cost: 8
+  target: 0
+  power: 2.3
+  fx: dark
+  cooldown: 80
+  palette:
+  - {r: 0.72156864, g: 0.1882353, b: 0.43529412, a: 1}
+  - {r: 1, g: 0.47843137, b: 0.72156864, a: 1}
+  - {r: 0.22745098, g: 0.039215688, b: 0.14901961, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  sound: dark
+  shape:
+    kind: 2
+    reach: 0
+    size: 0
+    knock: 7
+    distance: 26
+    radius: 20
+    speed: 0
+    range: 0
+    pierce: 0
+    length: 0
+    width: 0
+    ticks: 0
+    interval: 0
+    drift: 0
+    strike: 0
+    frames: 0
+    ratio: 0
+    follow: 0
+    growFrames: 0
+    band: 0
+    pull: 0
+  status:
+    slow: 0
+    freeze: 0
+    dot: 0

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MiniPandoras.Combat;
 using TMPro;
 using UnityEngine;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -98,12 +99,12 @@ namespace MiniPandoras.UI
 
         private void ShowExperience(int amount)
         {
-            Show($"경험치 +{amount}");
+            Show(T("rewardFeedView.showExperience.1", amount));
         }
 
         private void ShowLevel(int level)
         {
-            Show($"레벨 업! Lv.{level}");
+            Show(T("rewardFeedView.showLevel.1", level));
         }
 
         private void Redraw()

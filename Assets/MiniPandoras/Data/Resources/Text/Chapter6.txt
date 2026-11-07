@@ -1,0 +1,229 @@
+# Chapter6
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter6.inTheCarriage.1
+say	hero		아까 말한 뉴웨이브요.\n어떤 길드였어요?
+say	diel		엄마를 잃고 떠돌던 나를 거둬 준 곳이지.
+say	rang		냐? 그래서 그 이름을 이어받은 거냐.
+say	diel		...그래.\n선착장까지는 아직 멀다.\n들려주지.
+
+== chapter6.aboardTheNewWave.1
+think	hero		또...... 디엘의 기억이야.\n이번엔 조금 더 자란 모습인데.
+say	erus		일어났냐, 꼬마.\n해가 중천이다.
+say	dielTeen		...단장님도 누워 계시잖아요.
+say	erus		나는 단장이니까 괜찮아.\n하하!
+say	erus		빈둥대지 말고 갑판에 나가서 선원들 좀 도와라.\n뉴웨이브에 공짜 밥은 없다.
+say	dielTeen		...네.
+
+== chapter6.racoWaits.1
+say	raco		갑판 일부터 다 돕고 오렴.\n수업은 그다음이다.
+
+== chapter6.racosLesson.1
+say	raco		왔구나, 디엘.\n오늘은 이 세계가 어떻게 생겨났는지 이야기해 줄까?
+
+== chapter6.racosLesson.2
+say	dielTeen		...제 판도라는 아직 아무것도 안 나와요.
+say	raco		걱정 마라.\n큰 힘일수록 늦게 깨어나는 법이니까.
+say	raco		...언젠가 깨어나겠지.\n그게 축복일지, 재앙일지는 모르지만.
+
+== chapter6.theOverheardMeeting.1
+narrate			그날 저녁.
+
+== chapter6.theOverheardMeeting.2
+say	hass		라코는?\n또 안 보이네.
+say	erus		어디 갔겠지.\n그 녀석은 원래 바람 같은 놈이야.\n시작하자.
+say	luwan		에라드가 또 마을 하나를 '정리'했다는 소식입니다.\n세금을 못 낸 집은 전부 끌려갔다고 합니다.
+say	hass		십이장이 무너지고 수백 년 엉망이던 세상을 묶은 건 맞지.\n하지만 이건 통치가 아니라 사냥이다.
+say	erus		그게 에라드다.\n에라디온의 3대 정권... 신들, 십이장, 그다음이 저놈들이지.
+say	luwan		그리고 하나 더.\n에라드 정찰부대가 이 근처 해역까지 왔다는 소문이 있습니다.\n대장은... 카일 이브.
+
+== chapter6.theOverheardMeeting.3
+think	dielTeen		......카일.\n이브.
+say	erus		...디엘에게는 아직 말하지 마라.
+
+== chapter6.aloneToTheHideout.1
+say	buddy		다들 일어나~\n부두에 도착했어!
+say	erus		나는 마을에 들를 데가 있다.\n배에 실을 물건도 맞춰 봐야 하고.
+say	buddy		난 장 보러 가야지~\n이번엔 하스 형이 적어 준 목록이 두 장이나 돼.
+say	largo		...난 항구 주점에서 볼일이 있어.\n귀찮지만 어쩔 수 없지.
+say	erus		낮잠이겠지.\n...디엘, 넌 먼저 아지트로 가 있어라.\n가는 길은 알지?
+say	dielTeen		...네.\n알아요.
+say	erus		해 지기 전에 도착해라.\n늦으면 하스한테 혼난다.
+
+== chapter6.aloneToTheHideout.2
+say	erus		해 지기 전에 와라.\n하스한테 혼나는 건 나도 무섭거든.
+
+== chapter6.aloneToTheHideout.3
+say	largo		...아직 안 갔냐.\n어서 가라, 귀찮게 하지 말고.
+
+== chapter6.aloneToTheHideout.4
+say	buddy		혼자서도 잘할 수 있어, 디엘!
+
+== chapter6.theHideoutInItsPrime.1
+think	hero		여기... 내가 숨어들었던 그 낡은 아지트잖아?\n그땐 텅 비어 있었는데......
+say	isabel		어머, 네가 그 디엘이구나.\n에루스가 하도 자랑을 해서 얼굴이 궁금했는데.
+say	dielTeen		...누구세요?
+say	isabel		이자벨.\n앞으로 자주 볼 누나야.\n잘 부탁해, 꼬마.
+
+== chapter6.theHideoutInItsPrime.2
+say	aurora		와, 왔다! 너구나!\n아빠가 그러는데 너 오늘 혼자 여기까지 찾아왔다며?
+say	aurora		다친 데는 없어?\n있으면 말해!\n내 판도라는 빛이라서 상처도 고칠 수 있거든.
+say	dielTeen		...괜찮아.
+say	aurora		난 오로라! 오로라 마틴.\n에루스 마틴의 딸이야.\n잘 지내자, 디엘!
+
+== chapter6.theHideoutInItsPrime.3
+narrate			디엘은 오랜만에 깊이 잠들었다.
+
+== chapter6.theSearch.1
+narrate			다음 날 아침.
+
+== chapter6.theSearch.2
+say	erus		다들 모였군.\n요즘 수상한 녀석이 길드 주변을 맴도는 것 같다.
+say	erus		그냥 둘 수는 없지.\n세 명씩 팀을 짜서 길드 주변을 조사해라.
+say	erus		디엘, 넌 라르고, 루완과 한 팀이다.\n수상한 걸 보면 혼자 덤비지 마라.
+
+== chapter6.untie.1
+say	largo		...풀렸네.\n이제 북쪽으로 가 보자.
+
+== chapter6.foldBack.1
+say	largo		...또 여기냐.
+
+== chapter6.foldBack.2
+narrate			숲속.\n같은 나무를 세 번째 지나친다.
+say	luwan		...이상하군.\n분명 북쪽으로 걸었는데, 다시 같은 자리다.
+say	largo		귀찮게 됐네.\n누가 길을 비틀어 놨어.
+say	luwan		길이 어딘가에서 접혀 있는 모양이다.\n접힌 자리를 찾아서 풀어 보자.
+
+== chapter6.kateInTheClearing.1
+say	kate		어머, 길 잃었니, 꼬마야?
+shout	dielTeen		누구야!
+say	kate		에라드 정찰부대, 케이트.\n이 누나랑 같이 가 줘야겠는걸~
+
+== chapter6.kateInTheClearing.2
+shout	dielTeen		몸이...... 안 움직여......!
+
+== chapter6.kateInTheClearing.3
+say	kate		...응?\n모래?
+
+== chapter6.kateInTheClearing.4
+say	largo		하아, 또 나한테만 귀찮은 일이 생기네...\n누군지는 몰라도 모래밭에서 나랑 싸우는 것만큼 멍청한 짓도 없지.\n생포하자!
+
+== chapter6.kateInTheClearing.5
+say	kate		으읏... 이런 정보는 없었는데...\n할 수 없네.\n한 명만 데려가는 걸로 변경~
+
+== chapter6.kateInTheClearing.6
+shout	luwan		디엘!\n라르고!\n이건——
+
+== chapter6.kateInTheClearing.7
+shout	dielTeen		루완 형!!
+
+== chapter6.orderToComeBack
+text			단장님이 해 지기 전에 아지트로 오라고 했다.
+
+== chapter6.sleepFirst
+text			오늘은 이만 쉬자.
+
+== chapter6.lookAroundFirst
+text			먼저 아지트 안을 둘러보자.
+
+== chapter6.goSearching
+text			지금은 숲을 수색하러 가야 한다.
+
+== chapter6.playUpstairs
+text			2층에 네 또래 아이가 있어.\n심심할 텐데 올라가서 같이 놀렴.
+
+== chapter6.yourRoom
+text			저기 끝방이 네 방이래.\n오늘은 푹 쉬어!
+
+== chapter6.aboardTheNewWave.2
+text			갑판의 선원들과 모두 이야기한 뒤, 선실의 라코를 찾아가세요
+
+== chapter6.aboardTheNewWave.3
+text			오, 디엘!\n마침 잘 왔다.\n이 밧줄 좀 같이 당겨라!
+
+== chapter6.aboardTheNewWave.4
+text			이걸... 혼자 당기고 계셨어요?
+
+== chapter6.aboardTheNewWave.5
+text			부단장이 이 정도도 못 하면 쓰나!\n자, 하나, 둘, 셋!
+
+== chapter6.aboardTheNewWave.6
+text			바다 위에서는 내 판도라도 쓸모가 없어.\n발밑에 흙이 없으니까.
+
+== chapter6.aboardTheNewWave.7
+text			...그래서 나는 책이나 읽는 거다.\n너도 한 권 빌려줄까?
+
+== chapter6.aboardTheNewWave.8
+text			그림 많은 걸로요.
+
+== chapter6.aboardTheNewWave.9
+text			하하, 그런 건 없다.
+
+== chapter6.aboardTheNewWave.10
+text			...귀찮아.\n말 걸지 마.\n낮잠 중이다.
+
+== chapter6.aboardTheNewWave.11
+text			지금 일하는 시간인데요.
+
+== chapter6.aboardTheNewWave.12
+text			그러니까 자는 거다.\n일하는 시간에 자야 제일 달거든.
+
+== chapter6.aboardTheNewWave.13
+text			짠!\n놀랐지?\n방금까지 선미에 있었는데~
+
+== chapter6.aboardTheNewWave.14
+text			...매번 그렇게 나타나지 마세요.
+
+== chapter6.aboardTheNewWave.15
+text			순간이동 판도라를 가졌는데 안 쓰면 손해잖아!
+
+== chapter6.talkWithCrew.1
+text			선실의 라코에게 가 보세요
+
+== chapter6.racosLesson.3
+text			태초에 열 명의 신이 있었다.\n그들이 세계 에라디온을 만들고, 일손을 덜려고 인간을 만들었지.
+
+== chapter6.racosLesson.4
+text			그중 축복신 판도라는 인간에게 자신의 힘을 나눠 주었고, 재앙신 칼립스는 단 한 사람에게 힘을 몰아주었다.
+
+== chapter6.racosLesson.5
+text			그 사람이 바로 갓슬레이어.\n인간을 이끌고 신들과 싸운 자다.\n그 전쟁을 신인전쟁이라고 하지.
+
+== chapter6.racosLesson.6
+text			신들이 죽으며 흩어진 힘과 원념이 판도라 더스트가 되었고, 그게 갓 태어난 아기에게 깃들면 판도라가 된다.
+
+== chapter6.theOverheardMeeting.4
+text			단장실 쪽에서 말소리가 들린다
+
+== chapter6.aloneToTheHideout.5
+text			팻말: 「↙ 힐리아 마을 · ↘ 외곽 들판」
+
+== chapter6.aloneToTheHideout.6
+text			아지트 안을 둘러보자
+
+== chapter6.aloneToTheHideout.7
+text			아지트로 가자
+
+== chapter6.theHideoutInItsPrime.4
+text			안쪽 계단으로 2층에 올라가 보자
+
+== chapter6.theHideoutInItsPrime.5
+text			끝방의 침대에서 쉬자
+
+== chapter6.theSearch.3
+text			먼저 강당으로 가자.
+
+== chapter6.theSearch.4
+text			강당에 다들 모여 있다
+
+== chapter6.theSearch.5
+text			수색은 이제 시작이다.
+
+== chapter6.theSearch.6
+text			아지트 뒷문으로 나가 숲을 수색하자
+
+== chapter6.untie.2
+text			비틀린 공간의 매듭을 풀었다. ({0}/{1})
+
+== chapter6.foldBack.3
+text			숲 곳곳에 비틀린 자리가 있다. 찾아서 풀자

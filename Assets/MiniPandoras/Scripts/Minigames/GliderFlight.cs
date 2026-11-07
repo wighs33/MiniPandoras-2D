@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MiniPandoras.Input;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.Minigames
 {
@@ -236,17 +237,17 @@ namespace MiniPandoras.Minigames
 
             if (PhaseTime == 120)
             {
-                Say("병사: 쏴라! 놓치지 마라!");
+                Say(T("gliderFlight.stepPlay.1"));
             }
 
             if (PhaseTime == 520)
             {
-                Say("랑: 몸을 낮춰! 계속 온다!");
+                Say(T("gliderFlight.stepPlay.2"));
             }
 
             if (PhaseTime == 900)
             {
-                Say("병사: 일제 사격 준비——!");
+                Say(T("gliderFlight.stepPlay.3"));
             }
 
             for (int i = 0; i < arrows.Count; i++)
@@ -277,7 +278,7 @@ namespace MiniPandoras.Minigames
             X += (VolleyX - X) * 0.05f;
             if (t == 10)
             {
-                Say("병사: 쏴라——!!");
+                Say(T("gliderFlight.stepVolley.1"));
             }
 
             if (t >= 30 && t < 70 && t % 4 == 0)
@@ -287,7 +288,7 @@ namespace MiniPandoras.Minigames
 
             if (t == 48)
             {
-                Say("랑: 위험해——!");
+                Say(T("gliderFlight.stepVolley.2"));
                 RangLeap = 1f;
             }
 
@@ -327,7 +328,7 @@ namespace MiniPandoras.Minigames
             X += 0.4f;
             if (t == 20)
             {
-                Say("랑: ...크윽......");
+                Say(T("gliderFlight.stepFall.1"));
             }
 
             if (t == 40)

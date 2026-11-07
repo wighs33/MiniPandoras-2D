@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: jamie
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: jamie
+  size: {x: 28, y: 42}
+  down:
+  - {fileID: 21300000, guid: dab31b965bf48f04cb071b5c838df5ec, type: 3}
+  - {fileID: 21300000, guid: bc59745b0e50c984ca306ebc6396c547, type: 3}
+  - {fileID: 21300000, guid: 63a595d079b372043b78ad569d80d88f, type: 3}
+  right:
+  - {fileID: 21300000, guid: dc641068f7e41cd4cab596886e8940eb, type: 3}
+  - {fileID: 21300000, guid: 4c9eb50964821704b80cfaea73bb3fb7, type: 3}
+  - {fileID: 21300000, guid: b177bb7dcdb31bb4ab9afd319342ba1f, type: 3}
+  up:
+  - {fileID: 21300000, guid: 511a890c36a98ff468d578cc0e12e7f6, type: 3}
+  - {fileID: 21300000, guid: e76a25e6bfa656a44a652c86869b49ad, type: 3}
+  - {fileID: 21300000, guid: 94ba15cd78dd35a42b14ecfc5fb5a18d, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: 801a5313b29af914e8f651b96dfeb64b, type: 3}
+  - {fileID: 21300000, guid: 0f9a6531471529a43af4dce82115dce7, type: 3}
+  - {fileID: 21300000, guid: 3456748168eda6e46a240ad1ce9f42ba, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: 0721df62166ac4e4d8e559e102cb28fc, type: 3}
+  - {fileID: 21300000, guid: 4048f42a160b93349aac2b791e4f70eb, type: 3}
+  - {fileID: 21300000, guid: 69d074d61ca141b4fa4c4ba609efc558, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 6a3ce7fa9f681c8489529d96eba0235d, type: 3}
+  - {fileID: 21300000, guid: 450bb9ca85d423f499e7adec8ff663a6, type: 3}
+  - {fileID: 21300000, guid: 2893d064f9e40c54eb211f3cfd986e29, type: 3}
+  kneelPicture: {fileID: 21300000, guid: ad9a4f92cd8d9294282ae728208ab598, type: 3}
+  liePicture: {fileID: 21300000, guid: f168560bee869c7488d41d44fede5f23, type: 3}
+  portrait: {fileID: 21300000, guid: 6826131b836218d44afc9dbf282f575e, type: 3}

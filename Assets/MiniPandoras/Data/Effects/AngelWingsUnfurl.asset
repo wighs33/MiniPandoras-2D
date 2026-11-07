@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: AngelWingsUnfurl
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: -550436558, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 1462359925, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 412839231, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 2114770529, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 513719733, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 351871699, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 369621429, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: -869882017, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 620784209, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 475733725, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 409964033, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: -1144144465, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 763549567, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: 1366958285, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: -448078614, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  - {fileID: -1424737390, guid: 646056d24a9206a41a86a0a54a70abc8, type: 3}
+  lightFrames: []
+  framesPerSecond: 12
+  loop: 0
+  impactSeconds: 0

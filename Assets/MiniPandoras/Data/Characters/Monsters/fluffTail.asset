@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: fluffTail
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: fluffTail
+  size: {x: 28, y: 28}
+  down:
+  - {fileID: 21300000, guid: 9c31dffdba48a12448fdab15ecce0582, type: 3}
+  - {fileID: 21300000, guid: 6f0a197749a043f4097bf18613255f16, type: 3}
+  - {fileID: 21300000, guid: 0a5aacf1fce444d43b446ec6bf317919, type: 3}
+  right:
+  - {fileID: 21300000, guid: b6f5415f8edf49e4889505e2b4f4584c, type: 3}
+  - {fileID: 21300000, guid: de802aedc288b214badb737c49b4321c, type: 3}
+  - {fileID: 21300000, guid: 84450922a30fa7c48ac7d88a5aa3c99d, type: 3}
+  up:
+  - {fileID: 21300000, guid: 497a35ac471436144a03f704e07dc67f, type: 3}
+  - {fileID: 21300000, guid: 87975ea8507d87f458161a42719ba207, type: 3}
+  - {fileID: 21300000, guid: a29028c63a451b644b77d01fbe34e7f9, type: 3}
+  portrait: {fileID: 0}

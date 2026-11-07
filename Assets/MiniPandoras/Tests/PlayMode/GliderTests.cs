@@ -45,7 +45,7 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator ThreeArrowsBringTheGliderDownAndTheCheckpointFliesAgain()
         {
-            story.Director.StartCoroutine(story.Director.FlyGlider());
+            story.Director.StartCoroutine(story.Director.Scenes.FlyGlider());
             yield return story.Until(() => glider.Phase == GliderPhase.Play, 5f, "날기 시작한다");
             Assert.That(glider.Hearts, Is.EqualTo(GliderFlight.MaxHearts));
 

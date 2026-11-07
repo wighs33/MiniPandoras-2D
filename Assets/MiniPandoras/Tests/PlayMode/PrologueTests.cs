@@ -43,9 +43,9 @@ namespace MiniPandoras.Tests
             {
                 sawAwakening |= Object.FindFirstObjectByType<AwakenView>() != null;
                 sawPortal |= GameObject.Find("Portal") != null;
-                if (story.Director.HasActor("divE"))
+                if (story.Director.Actors.HasActor("divE"))
                 {
-                    godsFloated |= story.Director.Actor("divE").Floating && !story.Director.Actor("divE").CastsShadow;
+                    godsFloated |= story.Director.Actors.Actor("divE").Floating && !story.Director.Actors.Actor("divE").CastsShadow;
                 }
 
                 backdropShown |= story.Travel.CurrentMap.Id == "void" && backdrop.gameObject.activeSelf && backdrop.Shown == MapBackground.Void;

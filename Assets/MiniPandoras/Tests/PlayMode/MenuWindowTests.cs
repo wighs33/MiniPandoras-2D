@@ -50,7 +50,7 @@ namespace MiniPandoras.Tests
 
         private static IEnumerator OpenAndMark(StoryDriver story, System.Action closed)
         {
-            yield return story.Director.OpenShop();
+            yield return story.Director.Progress.OpenShop();
             closed();
         }
 
@@ -89,9 +89,10 @@ namespace MiniPandoras.Tests
 
             Assert.That(missions.IsOpen, Is.True);
             Transform box = missions.transform.Find("Screen/Frame/Box");
-            Assert.That(box.Find("List/Rows/Row 0/Title").GetComponent<TMP_Text>().text, Is.EqualTo("라르고를 찾는다"));
-            Assert.That(box.Find("Detail/Title").GetComponent<TMP_Text>().text, Is.EqualTo("라르고를 찾는다"), "맨 위 임무가 먼저 골라져 있다");
-            Assert.That(box.Find("Detail/Text").GetComponent<TMP_Text>().text, Is.EqualTo(Missions.GoalDetail("라르고를 찾는다")));
+            GoalInfo goal = Goals.Get(Goals.FindLargo);
+            Assert.That(box.Find("List/Rows/Row 0/Title").GetComponent<TMP_Text>().text, Is.EqualTo(goal.Title));
+            Assert.That(box.Find("Detail/Title").GetComponent<TMP_Text>().text, Is.EqualTo(goal.Title), "맨 위 임무가 먼저 골라져 있다");
+            Assert.That(box.Find("Detail/Text").GetComponent<TMP_Text>().text, Is.EqualTo(goal.Detail));
             Assert.That(box.Find("Detail/Reward").gameObject.activeSelf, Is.False, "보상이 없는 임무에는 보상 칸이 없다");
 
             box.Find("List/Rows/Row 1").GetComponent<Button>().onClick.Invoke();

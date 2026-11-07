@@ -4,6 +4,7 @@ using MiniPandoras.World;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -311,7 +312,7 @@ namespace MiniPandoras.UI
                 ShowRow(rows[i], entry, i == selected);
             }
 
-            activeCount.text = $"활성화 {active} / {entries.Count}";
+            activeCount.text = T("sealBookView.refresh.1", active, entries.Count);
             if (entries.Count > 0)
             {
                 ShowDetail(entries[selected]);
@@ -339,19 +340,19 @@ namespace MiniPandoras.UI
             detailIcon.sprite = IconFor(entry.Id).Large(entry.Active);
             detailName.text = entry.Name;
             detailName.color = entry.Active ? Ink : Muted;
-            status.text = entry.Active ? (entry.Settled ? $"Lv.{entry.Level} · 정착 중" : $"Lv.{entry.Level}")
-                : entry.Ready ? "더스트 100% · 아직 깨어나지 않았다" : $"더스트 {entry.Percent}% · 비활성";
+            status.text = entry.Active ? (entry.Settled ? T("sealBookView.showDetail.1", entry.Level) : $"Lv.{entry.Level}")
+                : entry.Ready ? T("sealBookView.showDetail.2") : T("sealBookView.showDetail.3", entry.Percent);
             status.color = entry.Active ? ActiveGold : entry.Ready ? ReadyOrange : Muted;
             tryButton.gameObject.SetActive(entry.CanTry);
             bool canPress = entry.Ready || entry.CanLevelUp;
             activateButton.gameObject.SetActive(canPress);
-            activateLabel.text = entry.Ready ? "활성화" : "레벨업";
+            activateLabel.text = entry.Ready ? T("sealBookView.showDetail.4") : T("sealBookView.showDetail.5");
             detailBarRoot.SetActive(!canPress);
             detailBar.color = entry.Active ? ActiveBar : entry.Color;
             detailBar.fillAmount = entry.Progress;
             description.text = entry.Text;
             // 웹게임 안내의 키 이름(Q·E)을 화면 버튼 이름으로 바꿨다.
-            skillNote.text = entry.Active ? GrowthNote(entry) : entry.Ready ? "활성화하면 쓸 수 있다" : "더스트 100%에 깨어난다";
+            skillNote.text = entry.Active ? GrowthNote(entry) : entry.Ready ? T("sealBookView.showDetail.6") : T("sealBookView.showDetail.7");
             for (int slot = 0; slot < skillNames.Length; slot++)
             {
                 bool exists = slot < entry.Skills.Count;
@@ -377,7 +378,7 @@ namespace MiniPandoras.UI
 
         private static string GrowthNote(SealBookEntry entry)
         {
-            return entry.LevelCost > 0 ? $"다음 레벨까지 더스트 {entry.LevelDust}/{entry.LevelCost}" : "최고 레벨";
+            return entry.LevelCost > 0 ? T("sealBookView.growthNote.1", entry.LevelDust, entry.LevelCost) : T("sealBookView.growthNote.2");
         }
 
         private PandoraIcon IconFor(string id)

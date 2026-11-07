@@ -44,29 +44,29 @@ namespace MiniPandoras.Tests
             yield return story.UntilExploring("fairyNight", "연회가 끝난 밤");
             Assert.That(story.Exploration.IsLocked("road"), Is.True, "밤에는 꽃잎 들판으로 나가지 않는다");
             Assert.That(story.Lines, Has.Member("에루스를 지키겠다고 약속했다.\n그 약속도 못 지킨 놈이, 무슨 얼굴로 그 딸을 만나."));
-            yield return story.StandOn(story.Director.Point("treeGate"));
+            yield return story.StandOn(story.Director.Field.Point("treeGate"));
             yield return Walk("up", "treeHall", "treeMarket", "treeRooms");
             Assert.That(story.Exploration.IsLocked("up"), Is.True, "밤에는 쉼터가 있는 3층보다 위로 오르지 않는다");
-            yield return story.StandOn(story.Director.Point("inn"));
+            yield return story.StandOn(story.Director.Field.Point("inn"));
 
             // 쉼터: 이자벨과 오로라가 동료가 되고, 다 같이 잠든 뒤 꿈에서 여신을 만나고 아침에 깬다.
             yield return story.UntilExploring("treeInn", "쉼터의 아침");
             Assert.That(story.Notices, Has.Member("이자벨과 오로라가 동료가 되었다!"));
             Assert.That(story.Session.State.Party, Is.EqualTo(new[] { "hero", "rang", "diel", "largo", "isabel", "aurora" }));
             Assert.That(story.Lines, Has.Member("다만 하나만 기억해 주렴.\n나눈 힘은, 반드시 누군가에게 이어진다는 걸."));
-            yield return story.StandOn(story.Director.Point("exit"));
+            yield return story.StandOn(story.Director.Field.Point("exit"));
             yield return story.UntilExploring("treeRooms", "쉼터에서 3층 요정 마을로");
             Assert.That(story.Exploration.IsLocked("down"), Is.True, "아침에는 아래층으로 내려가지 않는다");
-            yield return story.StandOn(story.Director.Point("up"));
+            yield return story.StandOn(story.Director.Field.Point("up"));
             yield return Walk("up", "treeLibrary", "giantTree", "treeCrown");
 
             // 나리온 정거장: 여섯이 차례로 등에 오르면 날아오른다.
             var nari = Object.FindFirstObjectByType<GiantBird>();
             Assert.That(nari, Is.Not.Null, "꼭대기 정거장에 나리온이 앉아 있다");
-            yield return story.StandOn(story.Director.Point("top") + Vector2Int.up);
+            yield return story.StandOn(story.Director.Field.Point("top") + Vector2Int.up);
             yield return story.Until(() => nari.Flying, 120f, "여섯이 다 타면 나리온이 날아오른다");
             Assert.That(nari.Riders, Is.EqualTo(6));
-            Assert.That(story.Director.Actor("hero").IsVisible, Is.False, "주인공도 나리온 등에 올랐다");
+            Assert.That(story.Director.Actors.Actor("hero").IsVisible, Is.False, "주인공도 나리온 등에 올랐다");
 
             var cutIn = Object.FindFirstObjectByType<CutInView>(FindObjectsInactive.Include);
             yield return story.Until(() => IsShowing(cutIn, "skyRide"), 30f, "하늘길 컷인");
@@ -108,7 +108,7 @@ namespace MiniPandoras.Tests
                 yield return story.UntilExploring(floors[i], $"고목 {floors[i]}");
                 if (i < floors.Length - 1)
                 {
-                    yield return story.StandOn(story.Director.Point(stairs));
+                    yield return story.StandOn(story.Director.Field.Point(stairs));
                 }
             }
         }

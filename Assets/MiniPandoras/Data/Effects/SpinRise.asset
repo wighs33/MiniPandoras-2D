@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: SpinRise
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: 572853821, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 869900679, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 1490627086, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -964562719, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -772725800, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 440620669, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 189809402, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 2074375505, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -589178865, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -218988367, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -719966820, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 1828482958, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -33404909, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -1649839654, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 638179251, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -1354586535, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -119021688, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -1677936028, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: -1589071444, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 794887661, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 1921978267, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 800217315, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 1509280092, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  - {fileID: 948596388, guid: 5620b55ab6123d7479d3f5a50fe0f20c, type: 3}
+  lightFrames:
+  - {fileID: -1649293575, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 499882754, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 710219819, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 676894454, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -315072350, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -293111814, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -722792486, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -1673632424, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 91312811, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 551632319, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 1704385317, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -990395197, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 1867894950, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 400414429, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -781075635, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 336295802, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -1614854108, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -1447884356, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 1322313550, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 1262835870, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -1393908373, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 1203935556, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: -972080778, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  - {fileID: 181113507, guid: 545517cebfa6137479921591fa9cbe8c, type: 3}
+  framesPerSecond: 30
+  loop: 0
+  impactSeconds: 0

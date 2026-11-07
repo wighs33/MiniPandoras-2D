@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: isabel
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: isabel
+  size: {x: 28, y: 42}
+  down:
+  - {fileID: 21300000, guid: 9fdf1516a47d7f649a68af97428a1810, type: 3}
+  - {fileID: 21300000, guid: 62b39aa59c42cea4d8de8608d9cfd31b, type: 3}
+  - {fileID: 21300000, guid: 993d65c90fc3d5149a5d811fc0452d6b, type: 3}
+  right:
+  - {fileID: 21300000, guid: 8b752fac05efffc40abff3e3dd59def0, type: 3}
+  - {fileID: 21300000, guid: b61fd542aab9c444ea8a172837b01977, type: 3}
+  - {fileID: 21300000, guid: 6b9cd616b3d2868408006de285172cc4, type: 3}
+  up:
+  - {fileID: 21300000, guid: f1c75e4e4d1477f43ae862a0386ec5b0, type: 3}
+  - {fileID: 21300000, guid: 9e09aa31e0a44c6439cda3eb32e0c07a, type: 3}
+  - {fileID: 21300000, guid: d14318ab154624b46af13fd6cec423c7, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: d029d2ec6225a11489612af8a6e3ef6b, type: 3}
+  - {fileID: 21300000, guid: 17671010cb9be9b40afbe47ff9317be1, type: 3}
+  - {fileID: 21300000, guid: dd061f1545b90c54ba2b8e9c64c98792, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: bae7c86b0562aaa4b80e9f8fc21ac08e, type: 3}
+  - {fileID: 21300000, guid: ec2e59a77d0a5f043bc952b04fa566d9, type: 3}
+  - {fileID: 21300000, guid: 9d3983c34c99a31418174d9e57af5db4, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 0b7f73940e616b04fa9c3e8d480cf753, type: 3}
+  - {fileID: 21300000, guid: 7e9eee719132394478691d71424e111b, type: 3}
+  - {fileID: 21300000, guid: b3cb16e0b78dd52419edc74823805e65, type: 3}
+  portrait: {fileID: 21300000, guid: 1297b21488bd76b4f87f8ec71e168317, type: 3}

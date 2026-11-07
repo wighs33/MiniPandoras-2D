@@ -53,28 +53,28 @@ namespace MiniPandoras.Tests
             Assert.That(story.Session.State.HasFlag("awakened"), Is.True, "주인공이 각성했다");
             Assert.That(story.Session.State.HeroPandoras(), Has.Member("darkPower"), "악마 판도라를 얻는다");
             Assert.That(story.Session.State.Party, Is.EqualTo(new[] { "hero", "rang", "diel" }), "랑과 디엘이 파티에 있다");
-            Assert.That(story.Director.HasActor("rang") || story.Director.HasActor("diel"), Is.False, "다시 모인 동료는 연출 인물이 아니라 따라다니는 동료다");
+            Assert.That(story.Director.Actors.HasActor("rang") || story.Director.Actors.HasActor("diel"), Is.False, "다시 모인 동료는 연출 인물이 아니라 따라다니는 동료다");
             Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("abandoned"), "5장의 아지트는 아직 버려진 모습이다");
 
             // 낡은 아지트도 계단으로 오르내린다. 2층은 1층과 같은 낡은 모습이다.
-            yield return story.StandOn(story.Director.Point("stairs"));
+            yield return story.StandOn(story.Director.Field.Point("stairs"));
             yield return story.UntilExploring("hideoutUpper", "낡은 아지트 2층");
             Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("abandoned"), "2층도 낡은 모습이다");
-            yield return story.StandOn(story.Director.Point("roomDoor"));
+            yield return story.StandOn(story.Director.Field.Point("roomDoor"));
             yield return story.UntilExploring("hideoutRoom", "낡은 아지트 방");
             Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("abandoned"), "방도 낡은 모습이다");
-            yield return story.StandOn(story.Director.Point("door"));
+            yield return story.StandOn(story.Director.Field.Point("door"));
             yield return story.UntilExploring("hideoutUpper", "방에서 복도로");
-            yield return story.StandOn(story.Director.Point("down"));
+            yield return story.StandOn(story.Director.Field.Point("down"));
             yield return story.UntilExploring("hideout", "계단으로 1층에");
 
             // 아지트 → 숲길 → 마을 → 외곽 들판(처음 들어서면 디엘이 한마디 한다).
-            yield return story.StandOn(story.Director.Point("entryExit"));
+            yield return story.StandOn(story.Director.Field.Point("entryExit"));
             yield return story.UntilExploring("hideoutPath", "숲길");
             Assert.That(story.Travel.CurrentMap.ShownLook, Is.EqualTo("abandoned"), "숲길 끝 길드 집도 버려진 모습이다");
-            yield return story.StandOn(story.Director.Point("west"));
+            yield return story.StandOn(story.Director.Field.Point("west"));
             yield return story.UntilExploring("town", "마을");
-            yield return story.StandOn(story.Director.Point("east"));
+            yield return story.StandOn(story.Director.Field.Point("east"));
             yield return story.UntilExploring("outskirts", "외곽 들판");
             Assert.That(story.Lines, Has.Member("첫 번째 동료가 있는 곳까지는 꽤 멀다.\n바다도 건너야 하지."));
             int quickSlotLesson = story.Lines.IndexOf("가방에 넣어 두기만 하면 싸우다가 꺼낼 틈이 없다.\n퀵슬롯에 장착해 둬라.");
@@ -89,9 +89,9 @@ namespace MiniPandoras.Tests
             Assert.That(MenuHasWorldMap(), Is.True, "2장에서 주운 지도가 메뉴에 있다");
 
             // 정류장: 승강장에 올라서면 뱀열차가 들어와 선다.
-            yield return story.StandOn(story.Director.Point("east"));
+            yield return story.StandOn(story.Director.Field.Point("east"));
             yield return story.UntilExploring("trainStop", "뱀열차 정류장");
-            int trackY = story.Director.Point("track").y;
+            int trackY = story.Director.Field.Point("track").y;
             yield return story.StandOn(new Vector2Int(12, trackY + 2));
             yield return story.Until(() => story.Lines.Contains("둘 다다."), 60f, "뱀열차가 들어와 서고 이야기를 나눈다");
             var train = Object.FindFirstObjectByType<SnakeTrain>();

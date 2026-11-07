@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: wolf
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: wolf
+  size: {x: 40, y: 28}
+  down:
+  - {fileID: 21300000, guid: 0042c3f95e71d724ca419467fe2788d2, type: 3}
+  - {fileID: 21300000, guid: df2bc8d45e14f5f4098a3efc70b52708, type: 3}
+  - {fileID: 21300000, guid: 2ffb2f6f01178784094e6da295f7587d, type: 3}
+  right:
+  - {fileID: 21300000, guid: 11c6abdae09c9604fb98b494d6547fc9, type: 3}
+  - {fileID: 21300000, guid: 19c8b29d9dd52834d9a7e24cbdc43359, type: 3}
+  - {fileID: 21300000, guid: 1c08007237aaf8a4ea24ede276c280c6, type: 3}
+  up:
+  - {fileID: 21300000, guid: c4cc14797f2ddf343968f90eff915214, type: 3}
+  - {fileID: 21300000, guid: 24e8e5f067c0ce040a4a7c557fd6c24f, type: 3}
+  - {fileID: 21300000, guid: 2159b39a99ed9fc43aba7944e9ab85bf, type: 3}
+  portrait: {fileID: 21300000, guid: ea4a5d508454a7e48b79e017eb76afa8, type: 3}

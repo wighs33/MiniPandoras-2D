@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: divineEmotion
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: divineEmotion
+  size: {x: 36, y: 52}
+  down:
+  - {fileID: 21300000, guid: 351dbe7c141bc9848be1e399965ec956, type: 3}
+  - {fileID: 21300000, guid: bdfce6cba13c21d4698a7596719bab2f, type: 3}
+  - {fileID: 21300000, guid: bcea30fc77e0ca5438ce71d44ba5db30, type: 3}
+  right:
+  - {fileID: 21300000, guid: 9b54f6f33b52b9c4fa941ee46cb4c4c5, type: 3}
+  - {fileID: 21300000, guid: 9ad0f2ce55c60e442ae25ce2f41fee72, type: 3}
+  - {fileID: 21300000, guid: 31d5315f1acfabd4fa8850b1e6b7991e, type: 3}
+  up:
+  - {fileID: 21300000, guid: 766e96bde6270e24cab60acfe8fb415e, type: 3}
+  - {fileID: 21300000, guid: 8667e91e32b762949be5e8d496127718, type: 3}
+  - {fileID: 21300000, guid: e4168d0c5829aab4d997fc8a50e10a43, type: 3}
+  portrait: {fileID: 21300000, guid: 1668d47fbbb85f84ab2fdf90df57abb7, type: 3}

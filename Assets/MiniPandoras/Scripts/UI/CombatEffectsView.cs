@@ -457,9 +457,9 @@ namespace MiniPandoras.UI
         /// <summary>싸우고 있거나 막 맞은 적의 머리 위 체력 막대. 보스는 화면 위쪽에 따로 그린다.</summary>
         private void DrawHealthBars()
         {
-            EnemyFighter boss = combat.Boss;
+            EnemyFighter boss = combat.Encounters.Boss;
             float width = Pixels(18f);
-            foreach (EnemyFighter e in combat.Enemies)
+            foreach (EnemyFighter e in combat.EnemyAi.Enemies)
             {
                 if (!e.IsAlive || e == boss || (!e.Aggro && e.HpShown <= 0) || (e.Hp >= e.MaxHp && e.HpShown <= 0))
                 {

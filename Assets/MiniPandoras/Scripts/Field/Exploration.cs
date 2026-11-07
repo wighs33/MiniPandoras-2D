@@ -31,12 +31,17 @@ namespace MiniPandoras.Field
     /// - Exploration.Residents.cs: 맵에 선 사람(길 막기, 어슬렁거리기, 순찰, 병사 시야, 사람에게 말 걸기).
     /// - Exploration.Objects.cs: 맵에 놓은 물건(상자·표지판·바닥에 떨어진 아이템).
     /// </summary>
-    public sealed partial class Exploration : MonoBehaviour
+    public sealed class Exploration : MonoBehaviour
     {
+        private FieldResidents fieldResidents;
+        public FieldResidents Residents => fieldResidents ??= new FieldResidents(this);
+        private FieldObjects fieldObjects;
+        public FieldObjects Objects => fieldObjects ??= new FieldObjects(this);
+
         // 웹게임 수치(논리 px, 프레임)
         private const float TalkReach = 14f;
-        private const float TalkLift = 5f;
-        private const float TalkSlack = 13f;
+        internal const float TalkLift = 5f;
+        internal const float TalkSlack = 13f;
         private const float BumpReach = 9f;
         private const float BumpLift = 4f;
         private const float BumpCooldownFrames = 90f;
@@ -45,6 +50,16 @@ namespace MiniPandoras.Field
         [SerializeField] private TopDownMover hero;
         [SerializeField] private FieldCombat combat;
         [SerializeField] private Conversation conversation;
+        [Header("주울 수 있는 물건")]
+        [Tooltip("물건 둘레의 금빛 테두리를 칠하는 한 색 재질(MiniPandoras/Sprite Silhouette)")]
+        [SerializeField] private Material pickupRim;
+        [Tooltip("물건 뒤 빛무리를 빛처럼 더해 그리는 재질(MiniPandoras/Sprite Additive)")]
+        [SerializeField] private Material pickupGlow;
+        [SerializeField] private Sprite pickupSparkle;
+        [Tooltip("튜토리얼이 주울 곳을 알려 줄 때 물건 위에 띄우는 화살표(Tools/PixelGen/tutorial.py)")]
+        [SerializeField] private Sprite pickupArrow;
+        [Tooltip("병사의 V자 시야를 빛과 상관없이 그리는 재질(Sprite-Unlit-Default)")]
+        [SerializeField] private Material sightMaterial;
 
         private readonly List<FieldTrigger> triggers = new List<FieldTrigger>();
         private readonly Dictionary<string, string> lockedPoints = new Dictionary<string, string>();
@@ -57,6 +72,15 @@ namespace MiniPandoras.Field
         private Vector2 lastHeroPosition;
         private float bumpCooldown;
         private int blockerLayer;
+
+        internal MapTravel MapTravel => mapTravel;
+        internal TopDownMover Hero => hero;
+        internal Material PickupRim => pickupRim;
+        internal Material PickupGlow => pickupGlow;
+        internal Sprite PickupSparkle => pickupSparkle;
+        internal Sprite PickupArrow => pickupArrow;
+        internal Material SightMaterial => sightMaterial;
+        internal int BlockerLayer => blockerLayer;
 
         public bool IsExploring { get; private set; }
         public bool IsBusy { get; private set; }
@@ -75,14 +99,14 @@ namespace MiniPandoras.Field
             finishedBy = null;
             IsExploring = true;
             heroCell = HeroCell();
-            SetResidentsBlocking(true);
+            Residents.SetResidentsBlocking(true);
             while (finishedBy == null)
             {
                 yield return null;
             }
 
             IsExploring = false;
-            SetResidentsBlocking(false);
+            Residents.SetResidentsBlocking(false);
             finished?.Invoke(finishedBy);
         }
 
@@ -151,12 +175,12 @@ namespace MiniPandoras.Field
             }
 
             Vector2Int cell = FrontCell(out Vector2 front);
-            if (ResidentInFront(front, cell) != null || HasTalkTrigger(cell, TriggerKind.TalkAcross))
+            if (Residents.ResidentInFront(front, cell) != null || HasTalkTrigger(cell, TriggerKind.TalkAcross))
             {
                 return TalkTarget.Person;
             }
 
-            return ObjectAt(cell) != null || HasTalkTrigger(cell, TriggerKind.Talk) ? TalkTarget.Thing : TalkTarget.None;
+            return Objects.ObjectAt(cell) != null || HasTalkTrigger(cell, TriggerKind.Talk) ? TalkTarget.Thing : TalkTarget.None;
         }
 
         /// <summary>
@@ -171,14 +195,14 @@ namespace MiniPandoras.Field
             }
 
             Vector2Int cell = FrontCell(out Vector2 front);
-            Resident resident = ResidentInFront(front, cell);
+            FieldResidents.Resident resident = Residents.ResidentInFront(front, cell);
             if (resident != null)
             {
-                StartCoroutine(TalkTo(resident, hero.Character.Facing));
+                StartCoroutine(Residents.TalkTo(resident, hero.Character.Facing));
                 return true;
             }
 
-            FieldObject item = ObjectAt(cell);
+            FieldObjects.FieldObject item = Objects.ObjectAt(cell);
             if (item != null)
             {
                 StartCoroutine(RunBusy(item.Talk()));
@@ -211,14 +235,14 @@ namespace MiniPandoras.Field
         private void Update()
         {
             float frames = FrameTime.Frames(Time.deltaTime);
-            UpdateObjects();
-            if (!IsExploring || IsFinishing || combat.InEncounter)
+            Objects.UpdateObjects();
+            if (!IsExploring || IsFinishing || combat.Encounters.InEncounter)
             {
                 return;
             }
 
-            UpdateResidents(frames);
-            UpdateSights(frames);
+            Residents.UpdateResidents(frames);
+            Residents.UpdateSights(frames);
             if (IsBusy || mapTravel.IsTravelling)
             {
                 lastHeroPosition = hero.Character.Position;
@@ -226,7 +250,7 @@ namespace MiniPandoras.Field
             }
 
             CheckArrival();
-            CheckSights();
+            Residents.CheckSights();
             CheckBump(frames);
         }
 
@@ -234,8 +258,8 @@ namespace MiniPandoras.Field
         internal void ParkMap()
         {
             parkedTriggers.AddRange(triggers);
-            parkedResidents.AddRange(residents);
-            parkedObjects.AddRange(objects);
+            Residents.Parked.AddRange(Residents.All);
+            Objects.Parked.AddRange(Objects.All);
             foreach (KeyValuePair<string, string> locked in lockedPoints)
             {
                 parkedLocks[locked.Key] = locked.Value;
@@ -248,16 +272,16 @@ namespace MiniPandoras.Field
         {
             ResetForMap();
             triggers.AddRange(parkedTriggers);
-            residents.AddRange(parkedResidents);
-            objects.AddRange(parkedObjects);
+            Residents.All.AddRange(Residents.Parked);
+            Objects.All.AddRange(Objects.Parked);
             foreach (KeyValuePair<string, string> locked in parkedLocks)
             {
                 lockedPoints[locked.Key] = locked.Value;
             }
 
             parkedTriggers.Clear();
-            parkedResidents.Clear();
-            parkedObjects.Clear();
+            Residents.Parked.Clear();
+            Objects.Parked.Clear();
             parkedLocks.Clear();
             heroCell = parkedHeroCell;
         }
@@ -266,8 +290,8 @@ namespace MiniPandoras.Field
         internal void ResetForMap()
         {
             triggers.Clear();
-            residents.Clear();
-            objects.Clear();
+            Residents.All.Clear();
+            Objects.All.Clear();
             lockedPoints.Clear();
             heroCell = new Vector2Int(int.MinValue, int.MinValue);
         }
@@ -361,7 +385,7 @@ namespace MiniPandoras.Field
             }
         }
 
-        private IEnumerator RunBusy(IEnumerator work)
+        internal IEnumerator RunBusy(IEnumerator work)
         {
             IsBusy = true;
             BusyChanged?.Invoke(true);
@@ -390,17 +414,17 @@ namespace MiniPandoras.Field
             return false;
         }
 
-        private string LockedText(string point)
+        internal string LockedText(string point)
         {
             return lockedPoints.TryGetValue(point, out string text) ? text : null;
         }
 
-        private Vector2Int HeroCell()
+        internal Vector2Int HeroCell()
         {
             return MapCoordinates.CellOf(hero.Character.Position);
         }
 
-        private bool CanTalk => IsExploring && !IsBusy && !IsFinishing && !combat.InEncounter;
+        private bool CanTalk => IsExploring && !IsBusy && !IsFinishing && !combat.Encounters.InEncounter;
 
         /// <summary>말을 거는 자리: 주인공 발에서 바라보는 쪽으로 14px, 위로 5px(웹게임 interact). 그 자리의 칸도 돌려준다.</summary>
         private Vector2Int FrontCell(out Vector2 front)

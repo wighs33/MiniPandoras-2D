@@ -1,0 +1,74 @@
+# ChapterTitles
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapterTitles.readonly.1
+text			0장
+
+== chapterTitles.readonly.2
+text			여신의 환생
+
+== chapterTitles.readonly.3
+text			1장
+
+== chapterTitles.readonly.4
+text			낯선 땅의 첫날
+
+== chapterTitles.readonly.5
+text			2장
+
+== chapterTitles.readonly.6
+text			훔치지 않은 보석
+
+== chapterTitles.readonly.7
+text			3장
+
+== chapterTitles.readonly.8
+text			낡은 집의 악마
+
+== chapterTitles.readonly.9
+text			4장
+
+== chapterTitles.readonly.10
+text			디엘의 기억
+
+== chapterTitles.readonly.11
+text			5장
+
+== chapterTitles.readonly.12
+text			단 한 명의 길드원
+
+== chapterTitles.readonly.13
+text			6장
+
+== chapterTitles.readonly.14
+text			뉴웨이브 호의 소년
+
+== chapterTitles.readonly.15
+text			7장
+
+== chapterTitles.readonly.16
+text			돌려준 보석
+
+== chapterTitles.readonly.17
+text			8장
+
+== chapterTitles.readonly.18
+text			사막의 가짜 왕
+
+== chapterTitles.readonly.19
+text			9장
+
+== chapterTitles.readonly.20
+text			라르고의 기억
+
+== chapterTitles.readonly.21
+text			10장
+
+== chapterTitles.readonly.22
+text			깨어난 축복
+
+== chapterTitles.readonly.23
+text			11장
+
+== chapterTitles.readonly.24
+text			다시 모인 파도

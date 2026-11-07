@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: frostShell
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: frostShell
+  size: {x: 36, y: 28}
+  down:
+  - {fileID: 21300000, guid: 640c3d0b9c7d7264bb9bcaf6a020212e, type: 3}
+  - {fileID: 21300000, guid: db0bc8decbc3e0b41986c091c73d0ae2, type: 3}
+  - {fileID: 21300000, guid: 4f266db1615be544cbc15be5fa08ed17, type: 3}
+  right:
+  - {fileID: 21300000, guid: 8d9c204ac75999a4f955f80f681cc3df, type: 3}
+  - {fileID: 21300000, guid: a98d0923f71f26246a58bf1f7e2eea14, type: 3}
+  - {fileID: 21300000, guid: 6f9da9212f9b130469f11a68acbcf276, type: 3}
+  up:
+  - {fileID: 21300000, guid: 824c69c99d9634d4ca1057e424252df8, type: 3}
+  - {fileID: 21300000, guid: 6a7aeb4739902ac44aec060658561015, type: 3}
+  - {fileID: 21300000, guid: c470212fbb6ab9a489e854818ea5e4aa, type: 3}
+  portrait: {fileID: 0}

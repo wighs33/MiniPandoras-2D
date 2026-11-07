@@ -12,13 +12,8 @@ namespace MiniPandoras.Combat
     {
         public const int MaxEquipped = 3;
         public const int FullDust = 100;
-        public const int MaxLevel = 10;
         private const int ThirdSkillSlot = 2;
         private const int UltimateSlot = 3;
-        private const int ThirdSkillLevel = 5;
-        private const int UltimateLevel = 10;
-        // 판도라 레벨 하나마다 스킬 위력이 5%씩 는다.
-        private const float PowerPerLevel = 0.05f;
 
         /// <summary>이야기가 판도라를 준다: 더스트를 채우고 활성화한다.</summary>
         public static void Grant(GameState state, BattleCatalog catalog, IEnumerable<string> ids)
@@ -86,19 +81,21 @@ namespace MiniPandoras.Combat
         /// <summary>그 스킬 칸을 여는 판도라 레벨. 이미 열렸으면 0.</summary>
         public static int LockedUntil(GameState state, string id, int slot)
         {
-            int needed = slot == UltimateSlot ? UltimateLevel : slot == ThirdSkillSlot ? ThirdSkillLevel : 1;
+            GameBalance balance = GameBalance.Current;
+            int needed = slot == UltimateSlot ? balance.UltimateLevel : slot == ThirdSkillSlot ? balance.ThirdSkillLevel : 1;
             return state.PandoraLevel(id) >= needed ? 0 : needed;
         }
 
-        /// <summary>그 레벨에서 다음 레벨로 오르는 데 드는 더스트. 5레벨까지 70, 10레벨까지 270이다.</summary>
+        /// <summary>그 레벨에서 다음 레벨로 오르는 데 드는 더스트.</summary>
         public static int LevelCost(int level)
         {
-            return 5 + 5 * level;
+            GameBalance balance = GameBalance.Current;
+            return balance.LevelCostBase + balance.LevelCostStep * level;
         }
 
         public static float PowerScale(int level)
         {
-            return 1f + (level - 1) * PowerPerLevel;
+            return 1f + (level - 1) * GameBalance.Current.PowerPerPandoraLevel;
         }
 
         /// <summary>스킬을 쓰는 위력: 들고 있는 판도라의 레벨만큼 세진다. 판도라 없이 쓰는 스킬(동료)은 그대로다.</summary>
@@ -110,7 +107,7 @@ namespace MiniPandoras.Combat
         /// <summary>깨운 판도라에 레벨 더스트를 더한다. 깨우지 않았거나 최고 레벨이면 더하지 않고 false.</summary>
         public static bool AddLevelDust(GameState state, string id, int amount)
         {
-            if (!Contains(state.Pandoras, id) || state.PandoraLevel(id) >= MaxLevel)
+            if (!Contains(state.Pandoras, id) || state.PandoraLevel(id) >= GameBalance.Current.PandoraMaxLevel)
             {
                 return false;
             }
@@ -122,7 +119,7 @@ namespace MiniPandoras.Combat
         public static bool CanLevelUp(GameState state, string id)
         {
             int level = state.PandoraLevel(id);
-            return Contains(state.Pandoras, id) && level < MaxLevel && state.LevelDust(id) >= LevelCost(level);
+            return Contains(state.Pandoras, id) && level < GameBalance.Current.PandoraMaxLevel && state.LevelDust(id) >= LevelCost(level);
         }
 
         /// <summary>더스트를 써서 레벨을 하나 올린다(봉인서의 「레벨업」).</summary>

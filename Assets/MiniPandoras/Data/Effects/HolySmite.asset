@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: HolySmite
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: 848204047, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 863549463, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -1070978560, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -1482039241, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 582066443, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 1202536238, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 726661734, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -1317308183, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -785823283, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -747813693, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -1510360496, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 1876653924, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -800562631, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 1418389821, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -1000355976, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 681294799, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 787812011, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -716426260, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: 950096682, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -1640146249, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -287991746, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  - {fileID: -1823700981, guid: 88edc0c85f540dd48a01fab8564aa54f, type: 3}
+  lightFrames:
+  - {fileID: 757589173, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: 129559495, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: 674059967, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -1254241929, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -620455498, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: 1812401095, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -155196365, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -1950422611, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -1320295988, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -2022876572, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -341916095, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: 626156670, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: 1819517105, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -1038359, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -561824906, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: 1667777991, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -1429390147, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -1359071057, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -343741834, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: 234307165, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -798345251, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  - {fileID: -1897092113, guid: edf58adddce69b54ca9f0f061ac74dd2, type: 3}
+  framesPerSecond: 30
+  loop: 0
+  impactSeconds: 0

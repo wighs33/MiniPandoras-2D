@@ -1,0 +1,20 @@
+# HideoutMaps
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== hideoutMaps.usePresentNames.1
+text			마을 끝 숲길
+
+== hideoutMaps.usePresentNames.2
+text			낡은 아지트
+
+== hideoutMaps.usePresentNames.3
+text			낡은 아지트 2층
+
+== hideoutMaps.usePresentNames.4
+text			낡은 아지트 방
+
+== hideoutMaps.setupHideoutPathNow.1
+text			낡은 팻말: 「↙ 힐리아 마을 · ↘ 외곽 들판」
+
+== hideoutMaps.setupHideoutNow.1
+text			뒷문은 굳게 잠겨 있다.

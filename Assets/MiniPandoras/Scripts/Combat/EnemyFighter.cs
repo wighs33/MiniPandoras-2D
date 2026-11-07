@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MiniPandoras.Characters;
+using MiniPandoras.Progress;
 using MiniPandoras.World;
 using UnityEngine;
 
@@ -83,8 +84,6 @@ namespace MiniPandoras.Combat
     /// </summary>
     public sealed class EnemyFighter : ICombatant
     {
-        // 필드에서는 적 체력을 조금 줄여 싸움이 늘어지지 않게 한다(이벤트용 체력은 그대로).
-        private const float FieldHpScale = 0.75f;
         private const int BossHp = 300;
         private const int SuperArmorHp = 400;
 
@@ -97,7 +96,7 @@ namespace MiniPandoras.Combat
             Definition = definition;
             Group = group;
             InEncounter = inEncounter;
-            MaxHp = definition.Hp >= EnemyDefinition.EventHp ? definition.Hp : Mathf.Max(10, JsMath.Round(definition.Hp * FieldHpScale));
+            MaxHp = definition.Hp >= EnemyDefinition.EventHp ? definition.Hp : Mathf.Max(10, JsMath.Round(definition.Hp * GameBalance.Current.FieldHpScale));
             hp = MaxHp;
             Boss = definition.Hp >= BossHp;
             SuperArmor = definition.Hp >= SuperArmorHp;
@@ -119,7 +118,7 @@ namespace MiniPandoras.Combat
         public string Name => Definition.DisplayName;
         public int MaxHp { get; }
         public int Hp => hp;
-        /// <summary>체력이 큰 적. 체력 막대를 따로 그리고 쓰러뜨리면 맵이 보스전을 치른 것으로 센다. 보스 기술(<see cref="BossPatterns"/>)을 쓰는 적은 이 가운데 일부다.</summary>
+        /// <summary>체력이 큰 적. 체력 막대를 따로 그리고 쓰러뜨리면 맵이 보스전을 치른 것으로 센다. 보스 기술(<see cref="BossPatternDefinition"/>)을 쓰는 적은 이 가운데 일부다.</summary>
         public bool Boss { get; }
         /// <summary>체력 숫자를 보여도 되는지. 이벤트용 체력(9999 같은 한 방)은 숫자를 감춘다.</summary>
         public bool ShowsHpNumbers => Definition.Hp < EnemyDefinition.EventHp;

@@ -4,22 +4,12 @@ using UnityEngine;
 
 namespace MiniPandoras.Editor
 {
-    /// <summary>코드가 쓰는 층(물리 충돌, 회상 색을 피하는 그리기)이 프로젝트 설정(Tags and Layers)에 있는지 보고, 없으면 빈 칸에 만든다.</summary>
+    /// <summary>맵 충돌 층이 프로젝트 설정(Tags and Layers)에 있는지 보고, 없으면 빈 칸에 만든다.</summary>
     public static class ProjectLayers
     {
         public static int EnsureMapSolid()
         {
             return Ensure(MapLayers.SolidName);
-        }
-
-        public static int EnsureBlocker()
-        {
-            return Ensure(MapLayers.BlockerName);
-        }
-
-        public static int EnsureUntinted()
-        {
-            return Ensure(MemoryTint.UntintedLayer);
         }
 
         private static int Ensure(string name)

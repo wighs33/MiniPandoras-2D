@@ -46,7 +46,7 @@ namespace MiniPandoras.Tests
             // 힐리아 동부: 랑의 안내 뒤 북쪽 끝(y ≤ 2)에 닿으면 뱀성이 보인다.
             yield return story.UntilExploring("hillia", "2장 첫 탐험");
             Assert.That(story.Runner.Chapter, Is.EqualTo(2), "저장의 장부터 이어 한다");
-            Assert.That(story.Combat.Enemies.Count, Is.EqualTo(Wildlife.In("hillia").Sum(group => group.Monsters.Count)), "힐리아 동부에 배치표의 몬스터가 다 있다");
+            Assert.That(story.Combat.EnemyAi.Enemies.Count, Is.EqualTo(story.Combat.Catalog.GroupsIn("hillia").Sum(group => group.Monsters.Count)), "힐리아 동부에 배치표의 몬스터가 다 있다");
             yield return story.StandOn(new Vector2Int(17, 2));
             yield return story.Until(() => story.Lines.Contains(LeftTheBatLine), 10f, "방망이를 두고 들판을 떠나면 랑이 건넨다");
             yield return story.Until(() => story.Session.State.Weapon == "bat", 10f, "튜토리얼을 따라 방망이를 장착한다");
@@ -77,7 +77,7 @@ namespace MiniPandoras.Tests
             Assert.That(story.Session.State.CanEquip(Items.WorldMap), Is.False, "지도는 장착하지 않는다");
 
             // 뱀성: 산길을 올라 성문을 지나 안뜰(courtyard)에 들어서면 탑을 올려다본다. 루나는 아직 나오지 않고 사람들과 이야기할 수 있다.
-            yield return story.StandOn(story.Director.Point("courtyard"));
+            yield return story.StandOn(story.Director.Field.Point("courtyard"));
             yield return story.UntilExploring("castle", "안뜰 구경");
             var shop = Object.FindFirstObjectByType<ShopView>();
             bool shopOpened = false;
@@ -88,13 +88,13 @@ namespace MiniPandoras.Tests
             Assert.That(story.Lines, Has.No.Member("아야얏!\n너 뭐야, 이 자식아 (｀Д´)ノ"), "루나는 탑에 들어가기 전에는 나오지 않는다");
 
             // 본관(keep)으로 들어서면 1층에서 루나가 정면으로 달려와 부딪치고, 보석을 쥐여 준 뒤 사라진다.
-            yield return story.StandOn(story.Director.Point("keep"));
+            yield return story.StandOn(story.Director.Field.Point("keep"));
 
             // 뱀탑: 1층 비늘 홀 → 2층 병영 → 3층 보물고를 위층 계단(up)으로 올라가면 꼭대기(뱀 머리 위)에서 탐험이 끝난다.
             foreach ((string floor, string label) in new[] { ("castleHall", "1층 탐험"), ("castleBarracks", "2층 탐험"), ("castleVault", "3층 탐험") })
             {
                 yield return story.UntilExploring(floor, label);
-                yield return story.StandOn(story.Director.Point("up"));
+                yield return story.StandOn(story.Director.Field.Point("up"));
             }
 
             // 꼭대기: 경비대장과 끝까지 싸운다. 「차원」이 깨어나 스킬 튜토리얼을 하고, 체력이 바닥나도 쓰러지지 않아 병사들이 몰려오면 글라이더로 날아간다.
@@ -108,7 +108,7 @@ namespace MiniPandoras.Tests
             yield return story.Until(() =>
             {
                 story.Fight();
-                EnemyFighter captain = story.Combat.Boss;
+                EnemyFighter captain = story.Combat.Encounters.Boss;
                 if (captain != null)
                 {
                     charged |= captain.State == EnemyState.Charge;

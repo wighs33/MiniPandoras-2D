@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: coralOtter
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: coralOtter
+  size: {x: 26, y: 30}
+  down:
+  - {fileID: 21300000, guid: cb2c18e4fd8a88049aa1161a5e8c0a30, type: 3}
+  - {fileID: 21300000, guid: a0f4ffbcb0b0f8d4c89091e503e557eb, type: 3}
+  - {fileID: 21300000, guid: 9c1f2d44fd917bd46b8ef57428c67f0b, type: 3}
+  right:
+  - {fileID: 21300000, guid: 1cc21af2aa04ad24d8237619355db5f2, type: 3}
+  - {fileID: 21300000, guid: e2a8fcae07a98454fb8f18475cf8d671, type: 3}
+  - {fileID: 21300000, guid: f59582c869d59df49b6ce5a1b02ba843, type: 3}
+  up:
+  - {fileID: 21300000, guid: 56b3c3b8fefcd984a959e0f7173b36f3, type: 3}
+  - {fileID: 21300000, guid: 0900792de230ff945bd1fd7f4a14e95e, type: 3}
+  - {fileID: 21300000, guid: 3ad9552a265b1a445aeebbe344dfe723, type: 3}
+  portrait: {fileID: 0}

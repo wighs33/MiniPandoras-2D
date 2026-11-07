@@ -7,7 +7,7 @@ namespace MiniPandoras.UI
     /// <summary>
     /// 프롤로그 첫 장면(웹게임 AwakenScene): 쓰러져 있던 주인공의 눈으로 본 차원공간. 공중에 뜬 두 인격체(일러스트)가
     /// 내려다보고, 그 앞을 눈꺼풀과 어둠이 가린다. 눈을 뜬 정도·밝기·확대·인격체가 나타난 정도는 이야기가 정해 준다
-    /// (StoryDirector.Awaken). 이 화면은 받은 대로 그리고, 인격체가 천천히 떠 있는 흔들림만 스스로 한다.
+    /// (StoryScenes.Awaken). 이 화면은 받은 대로 그리고, 인격체가 천천히 떠 있는 흔들림만 스스로 한다.
     /// 웹게임의 흐림(blur)은 옮기지 않았다.
     /// </summary>
     public sealed class AwakenView : MonoBehaviour

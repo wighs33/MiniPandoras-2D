@@ -1,0 +1,159 @@
+# Chapter9
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== chapter9.nap.1
+think	hero		......또 이 느낌이야.\n이번엔...... 누구지?
+think	hero		몸이 무겁고...... 엄청 졸려......
+shout	hass		라르고!\n또 자냐!\n오늘 그물 당번 너잖아!
+say	largo		...디엘이 하고 있잖아.\n쟤가 나보다 손이 빨라.
+think	hero		라르고......?\n그럼 이건, 라르고 씨의 기억......?
+think	hero		디엘이다.\n저 사람은...... 디엘의 기억에서 본 라코 씨?
+think	largo		...처음 배에 올라왔을 땐 웃지도 않던 꼬맹이가.
+think	largo		요즘은 제법 사람 같은 얼굴을 하네.
+say	raco		디엘.\n넌 뉴웨이브가 좋으냐?
+say	dielTeen		...네.\n여기가 집이에요.
+say	raco		그래.\n...미안하다.
+say	dielTeen		네?
+think	largo		......미안하다?\n뭐가.
+
+== chapter9.theFlare.1
+say	dielTeen		라코 형?\n아직 반도 안 끝났는데요.
+say	raco		......
+
+== chapter9.theFlare.2
+shout	hass		야, 라코!\n뭐 하는 거야!
+say	buddy		신호탄...?\n저거 우리 거 아닌데?
+
+== chapter9.theFlare.3
+say	largo		......하아.\n귀찮은 예감이 드네.
+
+== chapter9.theWarship.1
+narrate			쾅!\n에라드 군함이 뉴웨이브 호의 뱃머리를 들이받았다!
+
+== chapter9.theWarship.2
+say	kate		짠~\n길 열어 드렸어요, 대장!
+think	hero		저 여자...... 숲에서 루완 씨를 데려간......!
+
+== chapter9.theWarship.3
+think	hero		그리고 저 날개...... 디엘의 아버지......!
+say	kyle		수고했다.\n에라드 기밀부대장, 라코 바바.
+say	hass		......뭐?
+say	dielTeen		라코 형이... 에라드......?
+say	raco		...미안하지만, 이 배는 여기까지다.
+
+== chapter9.theWarship.4
+say	raco		...깨어나라, 청룡.
+
+== chapter9.theWarship.5
+narrate			거대한 청룡이 휘몰아치고, 뉴웨이브 호가 두 동강 났다!
+
+== chapter9.erus.1
+say	erus		카일 이브.\n드디어 직접 왔군.
+say	kyle		뉴웨이브는 오늘로 끝이다.
+say	erus		끝인지 아닌지는, 싸워 보고 정하자고.
+shout	erus		라르고!\n디엘 옆에서 떨어지지 마라!
+say	largo		......귀찮은 건 꼭 나한테 시키지.
+
+== chapter9.erus.2
+say	erus		디엘... 미안하구나.\n여기서 도망쳐라!\n그리고... 내 가족을 지켜 다오...
+
+== chapter9.erus.3
+say	largo		......에루스.
+
+== chapter9.rampage.1
+shout	dielTeen		으아아아아아!!
+
+== chapter9.rampage.2
+shout	dielTeen		카일...!!!!!\n엄마에 이어서 단장님까지...!!\n내게서 얼마나 빼앗아야 직성이 풀리는 거야!! 죽어라!!!
+
+== chapter9.rampage.3
+say	largo		디엘.\n그만해.
+shout	dielTeen		비켜어어어!!
+say	largo		...귀찮게 하지 말고, 정신 차려라.
+
+== chapter9.rampage.4
+say	dielTeen		......단장...... 님......
+
+== chapter9.rampage.5
+say	largo		...그래.\n이제 자라.\n깨면 혼내 줄 테니까.
+
+== chapter9.theLastBulwark.1
+say	neo		...그 아이를 넘겨라.
+
+== chapter9.theLastBulwark.2
+shout	hass		나는 뉴웨이브의 마지막 보루, 하스 로첸이다!\n아무도 나를 지나갈 순 없다!!
+
+== chapter9.theLastBulwark.3
+shout	largo		버디!\n디엘 데리고 순간이동으로 빨리 빠져나가!
+say	buddy		하지만......
+shout	largo		귀찮게 하지 말고 빨리 사라져!
+
+== chapter9.theLastBulwark.4
+say	raco		이런, 디엘을 놓쳤군, 카일.
+say	raco		저 아이는 위험해...\n방치하면 반드시 후회하게 될 거다.
+say	kyle		......
+
+== chapter9.theLastBulwark.5
+say	largo		부단장, 내가 가세할게.
+shout	hass		네가 돕는다고?\n하!\n나 혼자서도 충분하다!!
+say	largo		아, 진짜!\n허세 좀 집어치워!
+
+== chapter9.theSandWall.1
+say	neo		으... 꽤나 실력자로군.
+
+== chapter9.theSandWall.2
+say	kyle		물러나라, 네오.\n여기서부터는 내가 한다.
+shout	hass		라르고!!!!! 여기서 벗어나라!\n부단장의 명령을 거역할 셈이냐!\n네 능력으로 어서 모래벽을 쳐라!
+say	largo		......
+say	largo		......젠장, 알았다고.\n죽지 마, 꼰대.
+
+== chapter9.theSandWall.3
+say	hass		라르고...... 건강하게 지내라......
+
+== chapter9.theSandWall.4
+think	largo		......하스.
+
+== chapter9.wokenSand.1
+say	hero		......허억, 허억, 허억, 허억.
+say	rang		정신이 드나.\n미노가 날아가자마자 픽 쓰러지더군.
+
+== chapter9.wokenSand.2
+say	hero		어......?\n손에서 모래가......
+
+== chapter9.wokenSand.3
+say	rang		......쉿.
+say	rang		또 누군가의 기억을 봤군.
+say	hero		응...... 이번 기억은 좀 힘들었어.\n감정까지 생생했거든.\n디엘과 라르고 씨의 동료들이 죽는 걸 봤어...\n디엘의 아버지가...
+say	rang		거기까지.\n남의 기억을 엿봤다고 떠벌릴 셈이냐?\n입 다물고 있어라.
+say	hero		......응.
+
+== chapter9.largoJoins.1
+say	largo		...깼냐.\n남의 해먹에서 잘도 자더라.
+say	hero		아, 죄, 죄송해요......
+
+== chapter9.largoJoins.2
+say	largo		...뭘 봐.\n귀찮게.
+
+== chapter9.largoJoins.3
+say	largo		디엘, 너... 아까 그 녀석 앞에 혼자 선 거.\n예전의 에루스 같더라.
+say	diel		......
+think	hero		에루스...... 그 배 위에서 쓰러진......
+say	largo		따라가 줄게.\n대신 낮잠 시간은 보장해라.
+
+== chapter9.largoJoins.4
+say	diel		...마음대로 해.
+
+== chapter9.largoJoins.5
+say	rang		냐하! 이제 좀 길드 같아졌군.
+
+== chapter9.erus.4
+text			이 싸움은 라르고의 시점으로 진행된다.
+
+== chapter9.rampage.6
+text			디엘의 판도라 ― 악마가 깨어났다.
+
+== chapter9.wokenSand.4
+text			모래 판도라가 활성화되었다!
+
+== chapter9.largoJoins.6
+text			라르고가 동료가 되었다!

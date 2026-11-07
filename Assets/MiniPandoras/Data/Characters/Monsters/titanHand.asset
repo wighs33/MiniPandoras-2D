@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: titanHand
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: titanHand
+  size: {x: 42, y: 38}
+  down:
+  - {fileID: 21300000, guid: 4e048804e39f88c44bf5b8ac1de93430, type: 3}
+  - {fileID: 21300000, guid: 02e2440f6556a1845b24dd988ebccb60, type: 3}
+  - {fileID: 21300000, guid: b8835aca96c3d2c41a7edc6227420214, type: 3}
+  right:
+  - {fileID: 21300000, guid: f9fe127cf722d644dac7892637753ffb, type: 3}
+  - {fileID: 21300000, guid: b11a8c5ae845e26418e85c0ee17e6d73, type: 3}
+  - {fileID: 21300000, guid: c4e7267df88236346989e0ed439f913d, type: 3}
+  up:
+  - {fileID: 21300000, guid: 92efe1d593dbc784f97e2fd1b1b51dc9, type: 3}
+  - {fileID: 21300000, guid: cf0d2813f69abd34fabea46115da289f, type: 3}
+  - {fileID: 21300000, guid: 2a984a6a8ee77c9438857b1fe2f8082c, type: 3}
+  portrait: {fileID: 0}

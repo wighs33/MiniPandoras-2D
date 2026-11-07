@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: krampus
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: krampus
+  size: {x: 34, y: 46}
+  down:
+  - {fileID: 21300000, guid: 8fc4677b84afdc94880790d429099798, type: 3}
+  - {fileID: 21300000, guid: fdf1078d68201a94296caced118bdc56, type: 3}
+  - {fileID: 21300000, guid: 132ba81fe69b7e14ebc9570b888e0d86, type: 3}
+  right:
+  - {fileID: 21300000, guid: 20a7c0b8872384d45bc291b42fa42190, type: 3}
+  - {fileID: 21300000, guid: 97d28e5e99310954bb63fa17b72830df, type: 3}
+  - {fileID: 21300000, guid: b07dcd2f2d73a924a92437513d3d3d10, type: 3}
+  up:
+  - {fileID: 21300000, guid: d899a2f5544910c4da6f79eafdc16ddb, type: 3}
+  - {fileID: 21300000, guid: f5fe6924bdadf3b4eb6e5e4bde1242a6, type: 3}
+  - {fileID: 21300000, guid: 2713f44444eb4224686899aabe47a1bb, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: 3b58f85a3d5c08e4f830eac373fc94f9, type: 3}
+  - {fileID: 21300000, guid: 173c4fb4900b7fd49b88c49585430140, type: 3}
+  - {fileID: 21300000, guid: 6f90f50beeabf68429b1feb36a677607, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: c877866836e87f441aaae87d2bd399e7, type: 3}
+  - {fileID: 21300000, guid: f923105b6a2ff664db0f2509a93238de, type: 3}
+  - {fileID: 21300000, guid: b87bf12acb462c24db085911912babeb, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: c9c55d186651a094098ef759ed5e9417, type: 3}
+  - {fileID: 21300000, guid: d219beba00cb5824aae0927a54c0dbc6, type: 3}
+  - {fileID: 21300000, guid: 5993e884d7486d1439fb168752e8b504, type: 3}
+  portrait: {fileID: 21300000, guid: 35fa48bf05bd97841acb32344c0e6e57, type: 3}

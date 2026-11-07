@@ -25,14 +25,14 @@ namespace MiniPandoras.App
         [SerializeField] private TrialBarView bar;
 
         /// <summary>지금 체험하러 갈 수 있다. 봉인서가 「체험」 버튼을 보일지 묻는다.</summary>
-        public bool CanStart => combat.CanStartTrial && !exploration.IsBusy && !mapTravel.IsTravelling;
+        public bool CanStart => combat.SkillTrial.CanStartTrial && !exploration.IsBusy && !mapTravel.IsTravelling;
 
         /// <summary>그 판도라를 체험한다. 이미 훈련장에 있으면 판도라만 바꾼다.</summary>
         public void Begin(string pandora)
         {
-            if (combat.InTrial)
+            if (combat.SkillTrial.InTrial)
             {
-                combat.BeginTrial(pandora);
+                combat.SkillTrial.BeginTrial(pandora);
                 return;
             }
 
@@ -52,11 +52,11 @@ namespace MiniPandoras.App
         private void Arrive(string pandora)
         {
             weather.Show(mapTravel.CurrentMap.Weather);
-            combat.BeginTrial(pandora);
+            combat.SkillTrial.BeginTrial(pandora);
             mapTravel.CurrentMap.TryGetPointCells(DummyPoint, out Vector2Int[] cells);
             for (int i = 0; i < cells.Length; i++)
             {
-                combat.SpawnGroup(new GroupOptions { Id = "dummy" + i, Enemies = new[] { DummyEnemy }, At = cells[i], Dummy = true });
+                combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "dummy" + i, Enemies = new[] { DummyEnemy }, At = cells[i], Dummy = true });
             }
         }
 
@@ -70,7 +70,7 @@ namespace MiniPandoras.App
 
         private void Left()
         {
-            combat.EndTrial();
+            combat.SkillTrial.EndTrial();
             weather.Show(mapTravel.CurrentMap.Weather);
         }
     }

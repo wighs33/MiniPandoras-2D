@@ -46,9 +46,9 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator ThirdSlotCastsTheHeldPandorasThirdSkill()
         {
-            director.SetParty(new[] { "hero" }, 7);
-            director.GrantPandoras("phase", "darkPower");
-            combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(6, 0) });
+            director.Party.SetParty(new[] { "hero" }, 7);
+            director.Progress.GrantPandoras("phase", "darkPower");
+            combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(6, 0) });
             yield return Waits.Until(() => combat.ShowsHud, 3f, "전투 화면이 뜬다");
             PlayerFighter player = combat.Player;
             SkillDefinition third = player.SkillIn(2);
@@ -243,19 +243,19 @@ namespace MiniPandoras.Tests
 
             combat.PressSkill(3);
 
-            Assert.That(combat.InGate, Is.True, "틈에 들어간다");
+            Assert.That(combat.DimensionSkills.InGate, Is.True, "틈에 들어간다");
             yield return Waits.Until(() => pick.IsOpen, 2f, "나갈 곳을 고르는 판이 뜬다");
             yield return null;
             Assert.That(hero.Alpha, Is.EqualTo(0f), "몸이 숨는다");
             Assert.That(touch.Shown, Is.EqualTo(TouchLayout.Hidden), "화면 조작이 사라진다");
             combat.DamagePlayer(thug.Position, 500, 1f);
             Assert.That(combat.Player.Hp, Is.EqualTo(hp), "숨어 있으면 맞지 않는다");
-            Assert.That(combat.LeaveGateAt(new Vector2(-1000f, 1000f)), Is.False, "맵 밖으로는 나갈 수 없다");
+            Assert.That(combat.DimensionSkills.LeaveGateAt(new Vector2(-1000f, 1000f)), Is.False, "맵 밖으로는 나갈 수 없다");
 
             pick.OnPointerDown(new PointerEventData(EventSystem.current) { position = Camera.main.WorldToScreenPoint(spot) });
 
             Assert.That(Vector2.Distance(hero.Position, spot), Is.LessThan(0.05f), "누른 자리로 나온다");
-            yield return Waits.Until(() => !combat.InGate, 2f, "게이트에서 나온다");
+            yield return Waits.Until(() => !combat.DimensionSkills.InGate, 2f, "게이트에서 나온다");
             Assert.That(hero.Alpha, Is.GreaterThan(0f), "몸이 다시 보인다");
         }
 
@@ -272,8 +272,8 @@ namespace MiniPandoras.Tests
             combat.PressSkill(3);
             yield return Waits.Until(() => pick.IsOpen, 2f, "나갈 곳을 고르는 판이 뜬다");
 
-            Assert.That(combat.LeaveGateAt(pocket), Is.False, "벽으로 둘러싸인 곳으로는 나갈 수 없다");
-            Assert.That(combat.LeaveGateAt(open), Is.True, "걸어서 갈 수 있는 곳으로는 나간다");
+            Assert.That(combat.DimensionSkills.LeaveGateAt(pocket), Is.False, "벽으로 둘러싸인 곳으로는 나갈 수 없다");
+            Assert.That(combat.DimensionSkills.LeaveGateAt(open), Is.True, "걸어서 갈 수 있는 곳으로는 나간다");
             UnityEngine.Object.Destroy(walls);
         }
 
@@ -287,7 +287,7 @@ namespace MiniPandoras.Tests
             combat.PressSkill(3);
 
             // 들어가기 18 + 고르는 시간 300 + 나오기 18틱.
-            yield return Waits.CombatTicksUntil(combat, () => !combat.InGate, 336 + 120, "시간이 다 되면 나온다");
+            yield return Waits.CombatTicksUntil(combat, () => !combat.DimensionSkills.InGate, 336 + 120, "시간이 다 되면 나온다");
             Assert.That(Vector2.Distance(hero.Position, start), Is.LessThan(0.05f), "숨은 자리로 나온다");
         }
 
@@ -295,27 +295,27 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator TrialVisitsTheTrainingGroundAndLeavesTheGameAsItWas()
         {
-            director.SetParty(new[] { "hero" }, 7);
-            director.GrantPandoras("phase");
+            director.Party.SetParty(new[] { "hero" }, 7);
+            director.Progress.GrantPandoras("phase");
             GameState state = UnityEngine.Object.FindFirstObjectByType<GameSession>().State;
             var travel = UnityEngine.Object.FindFirstObjectByType<MapTravel>();
             string map = travel.CurrentMap.Id;
             Vector2 start = hero.Position;
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(9, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(9, 0) });
             EnemyFighter wild = group.Enemies[0];
             yield return Waits.Until(() => combat.Player != null && combat.ShowsHud, 3f, "전투 화면이 뜬다");
             var trial = UnityEngine.Object.FindFirstObjectByType<PandoraTrial>();
             Assert.That(trial.CanStart, Is.True);
 
             trial.Begin("flame");
-            yield return Waits.Until(() => combat.InTrial && !travel.IsTravelling, 3f, "훈련장에 도착한다");
+            yield return Waits.Until(() => combat.SkillTrial.InTrial && !travel.IsTravelling, 3f, "훈련장에 도착한다");
             yield return Waits.CombatTicksUntil(combat, () => combat.Player.ActivePandora.Id == "flame", 120, "그 판도라를 든다");
 
             Assert.That(travel.CurrentMap.Id, Is.EqualTo("trainingGround"));
             Assert.That(combat.Player.PandoraCount, Is.EqualTo(1), "그 판도라 하나만 든다");
             Assert.That(combat.LockedUntilLevel(3), Is.EqualTo(0), "모든 스킬을 써 볼 수 있다");
-            Assert.That(combat.Enemies.Count, Is.EqualTo(4), "허수아비 넷이 선다");
-            EnemyFighter dummy = combat.Enemies[0];
+            Assert.That(combat.EnemyAi.Enemies.Count, Is.EqualTo(4), "허수아비 넷이 선다");
+            EnemyFighter dummy = combat.EnemyAi.Enemies[0];
             Vector2 home = dummy.Position;
             hero.PlaceAt(dummy.Position + new Vector2(-1f, 0f));
             hero.Face(Facing.Right);
@@ -334,12 +334,12 @@ namespace MiniPandoras.Tests
             Assert.That(combat.Player.Dp, Is.EqualTo(combat.Player.MaxDp), "마나가 줄지 않는다");
 
             UnityEngine.Object.FindFirstObjectByType<TrialBarView>().ExitButton.onClick.Invoke();
-            yield return Waits.Until(() => !combat.InTrial && !travel.IsTravelling, 3f, "돌아온다");
+            yield return Waits.Until(() => !combat.SkillTrial.InTrial && !travel.IsTravelling, 3f, "돌아온다");
             yield return null;
 
             Assert.That(travel.CurrentMap.Id, Is.EqualTo(map));
             Assert.That(Vector2.Distance(hero.Position, start), Is.LessThan(0.05f), "서 있던 자리로 돌아온다");
-            Assert.That(combat.Enemies, Is.EqualTo(new[] { wild }), "그 맵의 적이 그대로 있다");
+            Assert.That(combat.EnemyAi.Enemies, Is.EqualTo(new[] { wild }), "그 맵의 적이 그대로 있다");
             Assert.That(wild.Body.IsVisible, Is.True);
             Assert.That(combat.Player.ActivePandora.Id, Is.EqualTo("phase"), "들고 있던 판도라로 돌아온다");
             Assert.That(state.Pandoras, Has.No.Member("flame"), "체험한 판도라를 얻지는 않는다");
@@ -366,12 +366,12 @@ namespace MiniPandoras.Tests
         /// <summary>판도라 하나를 그 레벨로 들고, 오른쪽 그 칸 앞에 적을 세워 전투 화면이 뜰 때까지 기다린다.</summary>
         private IEnumerator FaceAThug(string pandora, int level, int cells, Action<EnemyFighter> spawned)
         {
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             GameState state = UnityEngine.Object.FindFirstObjectByType<GameSession>().State;
-            director.GrantPandoras(pandora);
+            director.Progress.GrantPandoras(pandora);
             state.SetPandoras(state.Pandoras, new[] { pandora });
             state.SetPandoraLevel(pandora, level);
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(cells, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(cells, 0) });
             hero.Face(Facing.Right);
             yield return Waits.Until(() => combat.Player != null && combat.ShowsHud, 3f, "전투 화면이 뜬다");
             Assert.That(combat.Player.ActivePandora.Id, Is.EqualTo(pandora));

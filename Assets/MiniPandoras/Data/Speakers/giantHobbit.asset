@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d89d4dacce9f0f74abd7c4faec2518ee, type: 3}
+  m_Name: giantHobbit
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Story.Speaker
+  id: giantHobbit
+  displayName: "\uAC70\uB300 \uD638\uBE57"
+  nameColor: {r: 0.78431374, g: 0.6901961, b: 0.53333336, a: 1}
+  portraitSheet: {fileID: 11400000, guid: e6c5ba0abb1b8554383722b56865651c, type: 2}
+  figure: {fileID: 21300000, guid: 5ad6a704d178a274d8b9660bc87b28b4, type: 3}
+  faceCenter: {x: 520, y: 220}
+  faceSize: 320
+  figureIsWholeBody: 0

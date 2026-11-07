@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97bb1cddb4d115e46a6f92dbf1a9352f, type: 3}
+  m_Name: riftEye
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.EnemyDefinition
+  id: riftEye
+  displayName: "\uD2C8\uC0C8\uB208"
+  sheetId: riftEye
+  hp: 119
+  attack: 25
+  fixedDamage: 0
+  defense: 11
+  speed: 18
+  skills:
+  - {fileID: 11400000, guid: d64568b2583f4e440bc3ea839010d9d3, type: 2}
+  - {fileID: 11400000, guid: 847ab9736edef3c4bb57b8505f33a202, type: 2}
+  skillRate: 0.35
+  chargeRange: 0
+  evade: 0.15
+  wings: 0

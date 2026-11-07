@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: mossDrop
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: mossDrop
+  size: {x: 20, y: 22}
+  down:
+  - {fileID: 21300000, guid: b3c13925d9fa36348a81d28248a955e4, type: 3}
+  - {fileID: 21300000, guid: 16a0d1197fba94f408dc7cbd93d055ad, type: 3}
+  - {fileID: 21300000, guid: 52e52d40018ead14a910a87db37538c5, type: 3}
+  right:
+  - {fileID: 21300000, guid: 517845bee83017142a837d92d5f74655, type: 3}
+  - {fileID: 21300000, guid: 11466a159d6b2604a9eda76b9684a8c8, type: 3}
+  - {fileID: 21300000, guid: 8bccfb5dc2cdc2d4693d228424d1ef9f, type: 3}
+  up:
+  - {fileID: 21300000, guid: b2ed24b3a147e694fa57076d96a3aafb, type: 3}
+  - {fileID: 21300000, guid: 0366bae02c196b446b2cd3bf0cc45065, type: 3}
+  - {fileID: 21300000, guid: 9ff820053568aba40bee904b111c0fff, type: 3}
+  portrait: {fileID: 0}

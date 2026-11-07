@@ -54,15 +54,15 @@ namespace MiniPandoras.Tests
             }, 60f, "호빗 소굴 걷기");
             Assert.That(shots, Is.EqualTo(new[] { "carriage" }), "호빗 마차는 산길이 흐르는 컷인이다");
             Assert.That(story.Lines, Has.Member("마차는 선착장이 아니라 산속 동굴 앞에서 멈췄다."));
-            yield return story.StandOn(story.Director.Point("arrive"));
+            yield return story.StandOn(story.Director.Field.Point("arrive"));
 
             // 호빗 셋 → 거대 호빗. 쓰러뜨리면 뒤의 상자를 열어 보석을 얻는다.
             yield return story.Until(() =>
             {
                 story.Fight();
-                return !story.Mover.IsFrozen && !story.Combat.InEncounter && story.Lines.Contains("누가 내 동생들을 괴롭혀어어!!");
+                return !story.Mover.IsFrozen && !story.Combat.Encounters.InEncounter && story.Lines.Contains("누가 내 동생들을 괴롭혀어어!!");
             }, 200f, "소굴의 싸움");
-            yield return story.TalkAt(story.Director.Point("chest"), "상자");
+            yield return story.TalkAt(story.Director.Field.Point("chest"), "상자");
             yield return story.Until(() => story.Session.State.Owns(Items.HobbitRuby) && !story.Mover.IsFrozen, 10f, "상자의 보석");
 
             // 나가려고 내려가면 루가가 들어온다 → 보석을 돌려준다 → 설명 컷인 넷 → 봉인서.
@@ -83,15 +83,15 @@ namespace MiniPandoras.Tests
             yield return OpenTheSealBookAndActivateFlame();
 
             // 동굴을 나가 산길(짐승) → 선착장 부두에서 배에 오른다.
-            yield return story.StandOn(story.Director.Point("entrance"));
+            yield return story.StandOn(story.Director.Field.Point("entrance"));
             yield return story.UntilExploring("hobbitTrail", "소굴을 나온 호빗 산길");
             Assert.That(story.Exploration.IsLocked("south"), Is.False, "호빗들을 물리치면 아래쪽 길이 열린다");
-            yield return story.StandOn(story.Director.Point("south"));
+            yield return story.StandOn(story.Director.Field.Point("south"));
             yield return story.UntilExploring("caveRoad", "산길");
-            yield return story.StandOn(story.Director.Point("south"));
+            yield return story.StandOn(story.Director.Field.Point("south"));
             yield return story.UntilExploring("eastPort", "동쪽 선착장");
-            Assert.That(story.Director.HasActor("crowd0") && story.Director.HasActor("sailor0"), Is.True, "항구에 사람이 많다");
-            yield return story.StandOn(story.Director.Point("board"));
+            Assert.That(story.Director.Actors.HasActor("crowd0") && story.Director.Actors.HasActor("sailor0"), Is.True, "항구에 사람이 많다");
+            yield return story.StandOn(story.Director.Field.Point("board"));
             yield return story.Until(() => story.Runner.Chapter > 7, 60f, "배에 올라 7장 끝");
             Assert.That(story.Lines, Has.Member("씨앗은 심어졌다.\n이제 지켜보면 되겠지..."));
             Assert.That(story.Notices, Has.Member("배를 타고 힐리아 서부로 향한다."));

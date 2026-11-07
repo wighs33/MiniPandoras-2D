@@ -4,6 +4,7 @@ using MiniPandoras.Progress;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -109,12 +110,12 @@ namespace MiniPandoras.UI
         private void ShowDetail(MissionLine line)
         {
             detailKind.text = line.Kind;
-            detailState.text = line.Finished ? "완료" : "진행 중";
+            detailState.text = line.Finished ? T("missionView.showDetail.1") : T("missionView.showDetail.2");
             detailTitle.text = line.Title;
             detailText.text = line.Detail;
-            detailRequester.text = string.IsNullOrEmpty(line.Requester) ? string.Empty : $"맡긴 사람: {line.Requester}";
+            detailRequester.text = string.IsNullOrEmpty(line.Requester) ? string.Empty : T("missionView.showDetail.3", line.Requester);
             rewardBox.SetActive(line.Gold > 0);
-            rewardText.text = line.Finished ? $"{line.Gold:N0} Gold (받음)" : $"{line.Gold:N0} Gold";
+            rewardText.text = line.Finished ? T("missionView.showDetail.4", line.Gold.ToString("N0")) : $"{line.Gold:N0} Gold";
         }
 
         private void Awake()

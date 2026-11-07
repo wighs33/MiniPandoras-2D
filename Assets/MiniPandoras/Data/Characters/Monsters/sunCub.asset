@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: sunCub
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: sunCub
+  size: {x: 28, y: 26}
+  down:
+  - {fileID: 21300000, guid: bd0dbf68d2d8da7488a96c17210ef67e, type: 3}
+  - {fileID: 21300000, guid: e4d8c73186de0b542a54ce0566100e3b, type: 3}
+  - {fileID: 21300000, guid: b0ad0f841e85ba845bab7fc6da253bdb, type: 3}
+  right:
+  - {fileID: 21300000, guid: 2f1012ba0c8242d4fb9a7ba3fcffaeb9, type: 3}
+  - {fileID: 21300000, guid: e45c89ad9840f5d458ae00ba2f8f7507, type: 3}
+  - {fileID: 21300000, guid: d97dd1ca64b4d24419eb636d25e5324f, type: 3}
+  up:
+  - {fileID: 21300000, guid: 5152e13d4e1af0b41af007ab4a71253e, type: 3}
+  - {fileID: 21300000, guid: e72cd67c685d99c41be8eff268058610, type: 3}
+  - {fileID: 21300000, guid: 0633ceafaf3977d4687cf4ebed1fe9b2, type: 3}
+  portrait: {fileID: 0}

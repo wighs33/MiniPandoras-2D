@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: guardFairy
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: guardFairy
+  size: {x: 28, y: 30}
+  down:
+  - {fileID: 21300000, guid: bd93e7061b104e74d956e37c68d39cc9, type: 3}
+  - {fileID: 21300000, guid: 4a96d96c106c5d747ad49e21f7ef1603, type: 3}
+  - {fileID: 21300000, guid: cbd6ab8e5636ba2499fb0e2aec211c64, type: 3}
+  right:
+  - {fileID: 21300000, guid: 129255b0d7a622d45bcb9329c84b5644, type: 3}
+  - {fileID: 21300000, guid: 3533b6ff487a2b945bb03d3d337406f7, type: 3}
+  - {fileID: 21300000, guid: 12765e323c45d8348b4c64b99095fb70, type: 3}
+  up:
+  - {fileID: 21300000, guid: ad2c86270075f75459b9de73c9fca26f, type: 3}
+  - {fileID: 21300000, guid: 2751498a48cbe554181b82fadc21b657, type: 3}
+  - {fileID: 21300000, guid: 49190eed8814a764c9cfac049012d377, type: 3}
+  portrait: {fileID: 21300000, guid: d2e5a43723751284bbf97e06c9603e21, type: 3}

@@ -7,6 +7,7 @@ using MiniPandoras.UI;
 using MiniPandoras.World;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.App
 {
@@ -153,7 +154,7 @@ namespace MiniPandoras.App
         private void OpenInventory()
         {
             GameState state = session.State;
-            inventory.Show(inventoryEntries.Build(state), state.Equipment.Slots, state.IsQuickSlotLocked, MemberStats.HeroLines(state), state.Gold);
+            inventory.Show(inventoryEntries.Build(state), state.Equipment.Slots, state.IsQuickSlotLocked, MemberStats.HeroLines(catalog.Member(GameState.Hero), state), state.Gold);
         }
 
         private void Equip(string item)
@@ -164,7 +165,7 @@ namespace MiniPandoras.App
             }
             else
             {
-                inventory.Notify("장착 칸이 가득 찼어요");
+                inventory.Notify(T("gameMenu.equip.1"));
             }
         }
 
@@ -189,7 +190,7 @@ namespace MiniPandoras.App
             }
             else
             {
-                companions.Notify("세 명까지 고를 수 있어요");
+                companions.Notify(T("gameMenu.toggleCompanion.1"));
             }
         }
 
@@ -237,7 +238,7 @@ namespace MiniPandoras.App
             loadout.Show(loadoutEntries.Build(session.State), slots);
             if (!released)
             {
-                loadout.Notify("판도라는 하나 이상 정착해야 해요");
+                loadout.Notify(T("gameMenu.release.1"));
             }
         }
 

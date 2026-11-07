@@ -46,13 +46,13 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator SwapTutorialWalksThroughTheSwapWhenAMonsterComes()
         {
-            director.SetParty(new[] { "hero" }, 7);
-            director.GrantPandoras("phase", "darkPower");
+            director.Party.SetParty(new[] { "hero" }, 7);
+            director.Progress.GrantPandoras("phase", "darkPower");
             var guide = UnityEngine.Object.FindFirstObjectByType<TutorialGuide>();
             var touch = UnityEngine.Object.FindFirstObjectByType<TouchControlsView>();
             float scale = Time.timeScale;
-            Coroutine lesson = director.StartCoroutine(director.SwapTutorial());
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(3, 0) });
+            Coroutine lesson = director.StartCoroutine(director.Tutorials.SwapTutorial());
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(3, 0) });
 
             yield return Waits.Until(() => guide.Target == touch.SwapButton, 5f, "몬스터가 덤벼 오면 교체 아이콘을 가리킨다");
             Assert.That(Time.timeScale, Is.EqualTo(0f), "시간이 멈춘다");
@@ -72,7 +72,7 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator QuickSlotTutorialOpensTheLockedCellsAndEquipsAPotion()
         {
-            director.SetParty(new[] { "hero" }, 7);
+            director.Party.SetParty(new[] { "hero" }, 7);
             GameState state = UnityEngine.Object.FindFirstObjectByType<GameSession>().State;
             state.SetItemCount(Items.Bat, 1);
             state.Equip(Items.Bat);
@@ -86,7 +86,7 @@ namespace MiniPandoras.Tests
             Assert.That(touch.QuickSlots.transform.Find("Quick 1/Lock").GetComponent<UnityEngine.UI.Image>().enabled, Is.False, "무기 칸은 열려 있다");
             float scale = Time.timeScale;
 
-            Coroutine lesson = director.StartCoroutine(director.QuickSlotTutorial());
+            Coroutine lesson = director.StartCoroutine(director.Tutorials.QuickSlotTutorial());
             yield return Waits.UntilReal(() => guide.Target == menu.OpenButton, "메뉴를 가리킨다");
             Assert.That(Time.timeScale, Is.EqualTo(0f), "시간이 멈춘다");
             Assert.That(state.ItemCount(Items.Potion), Is.GreaterThan(0), "연습할 회복약이 있다");
@@ -112,19 +112,19 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator SummonTutorialCallsTheCompanionThenShowsTheCompanionWindow()
         {
-            director.SetParty(new[] { "hero", "rang" }, 7);
+            director.Party.SetParty(new[] { "hero", "rang" }, 7);
             var guide = UnityEngine.Object.FindFirstObjectByType<TutorialGuide>();
             var touch = UnityEngine.Object.FindFirstObjectByType<TouchControlsView>();
             var menu = UnityEngine.Object.FindFirstObjectByType<MenuView>();
             var companions = UnityEngine.Object.FindFirstObjectByType<CompanionView>(FindObjectsInactive.Include);
-            MonsterGroup group = combat.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(3, 0) });
+            MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "wild", Enemies = new[] { "thug1" }, At = hero.Cell + new Vector2Int(3, 0) });
             yield return Waits.Until(() => combat.Player != null && combat.ShowsHud, 3f, "전투 화면이 뜬다");
             float scale = Time.timeScale;
 
-            Coroutine lesson = director.StartCoroutine(director.SummonTutorial("랑", Nothing, Nothing));
+            Coroutine lesson = director.StartCoroutine(director.Tutorials.SummonTutorial("랑", Nothing, Nothing));
             yield return Waits.UntilReal(() => guide.Target == touch.SummonButton(0), "동료 칸을 가리킨다");
             Assert.That(Time.timeScale, Is.EqualTo(0f), "시간이 멈춘다");
-            combat.PressSummon(0);
+            combat.PlayerSkills.PressSummon(0);
             yield return Waits.UntilReal(() => guide.Target == null && Time.timeScale > 0f, "부르면 시간이 다시 흐른다");
 
             group.Enemies[0].Dead = true;
@@ -144,15 +144,15 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator SealBookTutorialTakesTheHeroToATrialAndBack()
         {
-            director.SetParty(new[] { "hero" }, 7);
-            director.SetFlag("book");
+            director.Party.SetParty(new[] { "hero" }, 7);
+            director.Progress.SetFlag("book");
             var guide = UnityEngine.Object.FindFirstObjectByType<TutorialGuide>();
             var menu = UnityEngine.Object.FindFirstObjectByType<MenuView>();
             var book = UnityEngine.Object.FindFirstObjectByType<SealBookView>(FindObjectsInactive.Include);
             bool finished = false;
             yield return null;
-            director.FirstDustGathered = true;
-            director.StartCoroutine(Lesson(director.SealBookTutorial(Nothing, Nothing), () => finished = true));
+            director.Tutorials.FirstDustGathered = true;
+            director.StartCoroutine(Lesson(director.Tutorials.SealBookTutorial(Nothing, Nothing), () => finished = true));
 
             yield return Waits.UntilReal(() => guide.Target == menu.OpenButton, "메뉴를 가리킨다");
             menu.Open();
@@ -161,7 +161,7 @@ namespace MiniPandoras.Tests
             yield return Waits.UntilReal(() => guide.Target == book.TryButton, "체험을 가리킨다");
             book.TryButton.GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             var travel = UnityEngine.Object.FindFirstObjectByType<MapTravel>();
-            yield return Waits.Until(() => combat.InTrial && !travel.IsTravelling, 5f, "훈련장으로 간다");
+            yield return Waits.Until(() => combat.SkillTrial.InTrial && !travel.IsTravelling, 5f, "훈련장으로 간다");
             Assert.That(guide.Target, Is.Null, "체험하는 동안은 가리키지 않는다");
             UnityEngine.Object.FindFirstObjectByType<TrialBarView>().ExitButton.onClick.Invoke();
             yield return Waits.Until(() => finished, 5f, "돌아오면 튜토리얼이 끝난다");
@@ -174,8 +174,8 @@ namespace MiniPandoras.Tests
             TestSaves.Backup();
             try
             {
-                director.SetParty(new[] { "hero" }, 7);
-                director.SetFlag("book");
+                director.Party.SetParty(new[] { "hero" }, 7);
+                director.Progress.SetFlag("book");
                 GameState state = UnityEngine.Object.FindFirstObjectByType<GameSession>().State;
                 foreach (string hunted in combat.Catalog.HuntPandoras)
                 {
@@ -192,10 +192,10 @@ namespace MiniPandoras.Tests
                     yield break;
                 }
 
-                Coroutine lesson = director.StartCoroutine(director.SealBookTutorial(Started, Nothing));
+                Coroutine lesson = director.StartCoroutine(director.Tutorials.SealBookTutorial(Started, Nothing));
                 yield return null;
                 // 튜토리얼은 안내 판으로 화면을 덮어 대사를 넘길 수 없게 하므로, 설명이 다 끝난 뒤에 시작해야 한다.
-                director.StartCoroutine(director.BeastDust(1));
+                director.StartCoroutine(director.Progress.BeastDust(1));
                 float end = Time.realtimeSinceStartup + 6f;
                 while (linesWhenStarted < 0)
                 {

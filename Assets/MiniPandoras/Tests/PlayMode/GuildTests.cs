@@ -22,7 +22,7 @@ namespace MiniPandoras.Tests
 
         private GameState State => story.Session.State;
         private BattleCatalog Catalog => story.Combat.Catalog;
-        private EmoteBalloon Balloon => story.Director.Actor("hila").GetComponentInChildren<EmoteBalloon>(true);
+        private EmoteBalloon Balloon => story.Director.Actors.Actor("hila").GetComponentInChildren<EmoteBalloon>(true);
 
         [UnitySetUp]
         public IEnumerator WalkIntoTheGuild()
@@ -30,11 +30,11 @@ namespace MiniPandoras.Tests
             TestSaves.Backup();
             story = new StoryDriver();
             yield return story.OpenAndWait(5, "hideout", "아지트에서 깨어난 뒤 직접 걷기");
-            yield return story.StandOn(story.Director.Point("entryExit"));
+            yield return story.StandOn(story.Director.Field.Point("entryExit"));
             yield return story.UntilExploring("hideoutPath", "숲길");
-            yield return story.StandOn(story.Director.Point("west"));
+            yield return story.StandOn(story.Director.Field.Point("west"));
             yield return story.UntilExploring("town", "마을");
-            yield return story.StandOn(story.Director.Point("guildDoor"));
+            yield return story.StandOn(story.Director.Field.Point("guildDoor"));
             yield return story.UntilExploring("adventurersGuild", "큰 건물로 들어간다");
         }
 
@@ -51,7 +51,7 @@ namespace MiniPandoras.Tests
             Assert.That(Balloon.IsShown, Is.True, "줄 의뢰가 있으면 머리 위에 말풍선이 뜬다");
             State.RecordDefeat(Catalog.Bestiary[0].Id);
             Assert.That(State.HasDefeated(Catalog.Bestiary[0].Id), Is.False, "받기 전에 쓰러뜨린 몬스터는 기록되지 않는다");
-            story.Mover.PlaceAt(MapCoordinates.CellFoot(story.Director.Point("counter") + Vector2Int.up), Facing.Up);
+            story.Mover.PlaceAt(MapCoordinates.CellFoot(story.Director.Field.Point("counter") + Vector2Int.up), Facing.Up);
             yield return null;
             Assert.That(story.Exploration.FindTalkTarget(), Is.EqualTo(TalkTarget.Person), "접수대 너머의 힐라에게는 조사가 아니라 대화다");
 
@@ -107,15 +107,15 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator DoorLeadsBackToTheSquare()
         {
-            yield return story.StandOn(story.Director.Point("exit"));
+            yield return story.StandOn(story.Director.Field.Point("exit"));
             yield return story.UntilExploring("town", "마을로 나온다");
 
-            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Point("guildArrive")), "길드 문 앞에 선다");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("guildArrive")), "길드 문 앞에 선다");
         }
 
         private IEnumerator TalkToHila()
         {
-            return story.TalkAt(story.Director.Point("counter"), "힐라");
+            return story.TalkAt(story.Director.Field.Point("counter"), "힐라");
         }
     }
 }

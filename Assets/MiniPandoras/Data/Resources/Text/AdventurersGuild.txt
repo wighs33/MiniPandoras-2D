@@ -1,0 +1,33 @@
+# AdventurersGuild
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== adventurersGuild.talkToHila.1
+say	hila		훈장이 참 잘 어울리세요.\n오늘도 조심해서 다녀오세요!
+
+== adventurersGuild.talkToHila.2
+say	hila		힘내세요!\n다 채워 오시면 약속대로 훈장을 드릴게요.
+
+== adventurersGuild.giveTheBook.1
+say	hila		어서 오세요, 힐리아 모험가 길드입니다!\n저는 안내원 힐라예요.
+say	hila		처음 뵙는 분이네요.\n혹시 이 근처 몬스터를 사냥하고 계신가요?
+say	hero		네, 뭐... 길을 가다 보면 자꾸 마주쳐서요.
+say	hila		그럼 마침 잘됐어요.\n이 몬스터 도감을 받으세요.\n앞으로 쓰러뜨리는 몬스터가 저절로 실린답니다.
+
+== adventurersGuild.giveTheBook.2
+say	hila		몬스터를 다 채워 오시면 길드에서 훈장을 드릴게요!
+
+== adventurersGuild.giveTheMedal.1
+say	hila		어머, 정말 도감을 다 채워 오셨네요!\n이런 분은 처음이에요.
+say	hila		약속드린 모험가 훈장이에요.\n길드의 자랑으로 삼을게요!
+
+== adventurersGuild.talkToHila.3
+text			도감은 잘 채우고 계세요?\n앞으로 {0}종 남았네요.
+
+== adventurersGuild.giveTheBook.3
+text			몬스터 도감을 받았다.
+
+== adventurersGuild.giveTheBook.4
+text			메뉴의 「몬스터 도감」에서 볼 수 있습니다
+
+== adventurersGuild.giveTheMedal.2
+text			{0}을 받았다.

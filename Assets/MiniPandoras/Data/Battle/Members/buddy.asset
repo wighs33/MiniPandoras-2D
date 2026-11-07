@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe870f02f2aefb4fac6236711c275c7, type: 3}
+  m_Name: buddy
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.MemberDefinition
+  id: buddy
+  displayName: "\uBC84\uB514"
+  sheetId: buddy
+  summonSkill: {fileID: 11400000, guid: 8082307fab045cc48af20c4841cada48, type: 2}
+  summonSheetId: buddy
+  battleSheetId: buddy
+  levels:
+  - hp: 170
+    mana: 60
+    attack: 24
+    defense: 12
+    speed: 22
+  growthFromLevel: 1
+  growth:
+    hp: 0
+    mana: 0
+    attack: 0
+    defense: 0
+    speed: 0
+  chapterLevelStopsAtTable: 0
+  critPerEarnedLevel: 0
+  evadePerEarnedLevel: 0
+  skills:
+  - blink
+  awakenedSkills: []

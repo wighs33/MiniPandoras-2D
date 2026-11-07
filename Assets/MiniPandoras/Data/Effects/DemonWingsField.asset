@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: DemonWingsField
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: -246006371, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: 51786603, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: -1131581057, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: 316838419, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: 2013079897, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: -968640737, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: 1904688247, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: 1746326259, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  - {fileID: 1056346491, guid: 1e5340454caf76f4c8be37d2259e01d5, type: 3}
+  lightFrames: []
+  framesPerSecond: 8
+  loop: 0
+  impactSeconds: 0

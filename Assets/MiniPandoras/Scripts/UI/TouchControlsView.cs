@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
@@ -62,7 +63,7 @@ namespace MiniPandoras.UI
     /// <summary>
     /// 손가락으로 누르는 화면 조작 묶음: 조이스틱, 행동 버튼(대화·조사·공격), 판도라 스킬 세 칸, 교체 버튼과 판도라 세 칸, 왼쪽 동료 칸, 아래 퀵슬롯.
     /// 버튼은 누르면 가상 게임패드 입력을 보내 키보드와 같은 액션으로 들어간다. 무엇을 보일지는 PlayerControls가 정해
-    /// <see cref="Show"/>로 넘기고, 여기서는 보이고 숨기기와 행동 버튼 글자만 바꾼다. 배치는 에디터의 ControlsUiBuilder 한 곳에 있다.
+    /// <see cref="Show"/>로 넘기고, 여기서는 보이고 숨기기와 행동 버튼 글자만 바꾼다. 배치는 프리팹(Prefabs/UI/TouchControls)에 있다.
     /// </summary>
     public sealed class TouchControlsView : MonoBehaviour
     {
@@ -168,12 +169,12 @@ namespace MiniPandoras.UI
             switch (caption)
             {
                 case ActionCaption.Talk:
-                    return "대화";
+                    return T("touchControlsView.captionText.1");
                 case ActionCaption.Attack:
                 case ActionCaption.AttackLocked:
-                    return "공격";
+                    return T("touchControlsView.captionText.2");
                 default:
-                    return "조사";
+                    return T("touchControlsView.captionText.3");
             }
         }
     }

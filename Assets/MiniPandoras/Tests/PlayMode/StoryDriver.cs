@@ -151,7 +151,7 @@ namespace MiniPandoras.Tests
         /// </summary>
         public IEnumerator TalkTo(string id)
         {
-            return TalkAt(Director.Actor(id).Cell, id);
+            return TalkAt(Director.Actors.Actor(id).Cell, id);
         }
 
         /// <summary>그 칸의 사람이나 물건 앞에 서서 말을 걸거나 조사한다.</summary>
@@ -174,7 +174,7 @@ namespace MiniPandoras.Tests
             {
                 // 곁에 서는 순간 몬스터 튜토리얼이 시간을 멈출 수 있다. 끝나면 다시 곁에 선다.
                 yield return Until(() => !Mover.IsFrozen, 60f, $"{id} 곁에서 조작이 돌아온다");
-                yield return TalkAt(Director.HasActor(id) ? Director.Actor(id).Cell : target, id);
+                yield return TalkAt(Director.Actors.HasActor(id) ? Director.Actors.Actor(id).Cell : target, id);
                 yield break;
             }
 
@@ -189,7 +189,7 @@ namespace MiniPandoras.Tests
         /// </summary>
         public void Fight()
         {
-            if (!Combat.InEncounter || Combat.Player == null)
+            if (!Combat.Encounters.InEncounter || Combat.Player == null)
             {
                 return;
             }
@@ -197,7 +197,7 @@ namespace MiniPandoras.Tests
             Combat.Player.Hp = Combat.Player.MaxHp;
             CharacterBody hero = Mover.Character;
             EnemyFighter nearest = null;
-            foreach (EnemyFighter e in Combat.Enemies)
+            foreach (EnemyFighter e in Combat.EnemyAi.Enemies)
             {
                 if (e.InEncounter && e.IsAlive && (nearest == null || Vector2.Distance(e.Position, hero.Position) < Vector2.Distance(nearest.Position, hero.Position)))
                 {
@@ -269,7 +269,7 @@ namespace MiniPandoras.Tests
                 }
                 else if (target == Object.FindFirstObjectByType<TouchControlsView>().SummonButton(0))
                 {
-                    Combat.PressSummon(0);
+                    Combat.PlayerSkills.PressSummon(0);
                 }
                 else
                 {

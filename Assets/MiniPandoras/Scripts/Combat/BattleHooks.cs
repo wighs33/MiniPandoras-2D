@@ -64,7 +64,7 @@ namespace MiniPandoras.Combat
         /// <summary>화면 위쪽 가운데에 짧은 전투 알림을 띄우고 그만큼 기다린다.</summary>
         public IEnumerator Message(string text, int frames = 50)
         {
-            return combat.ShowMessage(text, frames);
+            return combat.Encounters.ShowMessage(text, frames);
         }
 
         public IEnumerator Wait(int frames)
@@ -79,31 +79,31 @@ namespace MiniPandoras.Combat
 
         public void Shake(string key, float amount)
         {
-            combat.ShakeCombatant(key, amount);
+            combat.Encounters.ShakeCombatant(key, amount);
         }
 
         /// <summary>그 전투원이 그 스킬을 쓴다(웹게임 scene.scriptedSkill). 동료면 플레이어 곁에 나타나 쓴다.</summary>
         public IEnumerator ScriptedSkill(string casterKey, string skillId, string targetKey = null, bool lethal = false, string calledAs = null)
         {
-            return combat.ScriptedSkill(casterKey, skillId, targetKey, lethal, calledAs);
+            return combat.ScriptedCombat.ScriptedSkill(casterKey, skillId, targetKey, lethal, calledAs);
         }
 
         /// <summary>사방의 기운이 그 전투원에게 모여든다(웹게임 scene.gather).</summary>
         public IEnumerator Gather(string key, IReadOnlyList<Color> palette, int frames = 60)
         {
-            return combat.Gather(key, palette, frames);
+            return combat.ScriptedCombat.Gather(key, palette, frames);
         }
 
         /// <summary>플레이어 체력을 최대의 그 비율로 둔다(1 이상). 연이은 싸움으로 지친 모습을 낼 때 쓴다(웹게임 combatant.hp = …).</summary>
         public void SetPlayerHpRatio(float ratio)
         {
-            combat.SetPlayerHpRatio(ratio);
+            combat.ScriptedCombat.SetPlayerHpRatio(ratio);
         }
 
         /// <summary>쓰러진 적을 다시 일으킨다(끝없이 몰려오는 병사, 웹게임 훅의 hp = maxHp).</summary>
         public void Revive(string key)
         {
-            combat.ReviveEnemy(key);
+            combat.Encounters.ReviveEnemy(key);
         }
 
         public void End(BattleOutcome outcome)
@@ -113,7 +113,7 @@ namespace MiniPandoras.Combat
 
         public ICombatant Get(string key)
         {
-            return combat.Combatant(key);
+            return combat.Encounters.Combatant(key);
         }
 
         /// <summary>남은 체력의 비율(0~1). 훅이 「많이 다쳤으면」 이야기를 넘길 때 쓴다.</summary>

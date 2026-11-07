@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: hero
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: hero
+  size: {x: 28, y: 42}
+  down:
+  - {fileID: 21300000, guid: 60a3b4626a7224246b96d3bfb63f70c1, type: 3}
+  - {fileID: 21300000, guid: f34822801feb33740b7a05e2c61a4683, type: 3}
+  - {fileID: 21300000, guid: 291ba34888316b840bf6880e1e1c84c3, type: 3}
+  right:
+  - {fileID: 21300000, guid: 1c35a78a8481cb1459ecf701592f1047, type: 3}
+  - {fileID: 21300000, guid: 66ca107973608194c836e66abf22e961, type: 3}
+  - {fileID: 21300000, guid: a98f4ba0af3388441b9454abd7d4f602, type: 3}
+  up:
+  - {fileID: 21300000, guid: 3bf0ff5d1ef504c42bf2a5e5a8af486b, type: 3}
+  - {fileID: 21300000, guid: 955dc483f136d2d42bd57d3b7c53403c, type: 3}
+  - {fileID: 21300000, guid: e96885d8c0618d845acce1fc3b8b6bf3, type: 3}
+  swingDown:
+  - {fileID: 21300000, guid: 6134ed8fde28c5740aae342c6ea6fa35, type: 3}
+  - {fileID: 21300000, guid: 3960dedb7ac7aa946bd9a94d8812b9ac, type: 3}
+  - {fileID: 21300000, guid: 398bfb2d3332ebb49b151246763e512c, type: 3}
+  - {fileID: 21300000, guid: 034806064708028489413f6f30b467ea, type: 3}
+  - {fileID: 21300000, guid: f2114345391fd7c4ebd8476c65d4f277, type: 3}
+  - {fileID: 21300000, guid: cac32347eaa4e924d9d5d31bbf18ba18, type: 3}
+  swingRight:
+  - {fileID: 21300000, guid: 3ee973cb36bdd204a8a7a7a90dc81ecd, type: 3}
+  - {fileID: 21300000, guid: 5d0df7d7c8e2ab342ae9677daadc34ec, type: 3}
+  - {fileID: 21300000, guid: 602cc9fb0faf1ac45b31ff5cf7238577, type: 3}
+  - {fileID: 21300000, guid: 63786411407e90a409ffc890c04e8ec6, type: 3}
+  - {fileID: 21300000, guid: defeefe93820b924b901b402d3f46d2d, type: 3}
+  - {fileID: 21300000, guid: 69bf894c2d8c24148abcf33f3c539e15, type: 3}
+  swingUp:
+  - {fileID: 21300000, guid: c68c67517070d6b4c96070c4eac6e19c, type: 3}
+  - {fileID: 21300000, guid: 000f17630fcce8d408fecaca0068f6fb, type: 3}
+  - {fileID: 21300000, guid: ce9517e4e5e674348a88d6b3208bee75, type: 3}
+  - {fileID: 21300000, guid: 5a054c78cdf932f41a3a74028f5bb754, type: 3}
+  - {fileID: 21300000, guid: c6bf0dbab3a31fc459b54bd46b3019e3, type: 3}
+  - {fileID: 21300000, guid: 1f945ba6475bb124fb80ff154b9ac0c1, type: 3}
+  breatheDown:
+  - {fileID: 21300000, guid: 0d2d01b0db8c82b47be6e5df0ce637dc, type: 3}
+  - {fileID: 21300000, guid: 830ca7770aa5cd14ba27602aa6ae3125, type: 3}
+  - {fileID: 21300000, guid: 6b8db0a7954fc0a4fb2c5d6fab41758e, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: 267913adc7bb4c2468d7058f44166adf, type: 3}
+  - {fileID: 21300000, guid: 0fb18ac831a3f954c9a86ab98e1368e0, type: 3}
+  - {fileID: 21300000, guid: 62330e3ff1b14c547a501df66da32746, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 5586e6a55d19e74408f05a596d59347c, type: 3}
+  - {fileID: 21300000, guid: 2491daa236bcd6d4dba98b2c3d76a316, type: 3}
+  - {fileID: 21300000, guid: 48534ddb8409ea848bbb25137fbaed84, type: 3}
+  portrait: {fileID: 21300000, guid: 4c333dd92cb437548b2d999a97aa42a1, type: 3}

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: SealChainsLoop
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: -878604740, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: 504085446, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: -190832396, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: -1842097557, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: 1034053440, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: 1493666633, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: 1351372595, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: -1736220223, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: -524546324, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: -1389045145, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: -269506078, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  - {fileID: 1168082727, guid: 4c37a69ec036f774da931916de2db441, type: 3}
+  lightFrames:
+  - {fileID: -2088596062, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: -63844564, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: -1783077599, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: -659503648, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: 520809213, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: 2031426820, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: 165464653, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: -1860713154, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: 1038679163, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: 827416099, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: 2095115167, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  - {fileID: 2059757251, guid: 409166a1e48b2d343acd1c523ff231d9, type: 3}
+  framesPerSecond: 12
+  loop: 1
+  impactSeconds: 0

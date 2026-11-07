@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: crystalMole
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: crystalMole
+  size: {x: 28, y: 26}
+  down:
+  - {fileID: 21300000, guid: 6c805da5bb52de14daf524b77817b150, type: 3}
+  - {fileID: 21300000, guid: af7c32b9dd6756441880375fdfba9220, type: 3}
+  - {fileID: 21300000, guid: 243656628f8ae4745b7d53c04079fec2, type: 3}
+  right:
+  - {fileID: 21300000, guid: fabae6ea8507b4f4fb3fe66fa484b4f5, type: 3}
+  - {fileID: 21300000, guid: 8731e15ed88709543af42bd5dd12988c, type: 3}
+  - {fileID: 21300000, guid: 0fff31170a39c794fb271d2d62cb7214, type: 3}
+  up:
+  - {fileID: 21300000, guid: 6fe721871e935c947956ea40ae087bc7, type: 3}
+  - {fileID: 21300000, guid: 78cbef34a1b1bda449d290a331ffd52d, type: 3}
+  - {fileID: 21300000, guid: 92bdb18093cc02e41a6017cf2759ff76, type: 3}
+  portrait: {fileID: 0}

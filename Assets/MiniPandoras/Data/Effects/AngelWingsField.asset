@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7dadb8f62cb164ab6e6708506e4033, type: 3}
+  m_Name: AngelWingsField
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.World.EffectSheet
+  colorFrames:
+  - {fileID: -613831743, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: -1922076715, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: -258873152, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: -456549490, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: 1683973907, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: 808074352, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: 1613675703, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: 1905357, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  - {fileID: -988770766, guid: 34dc0438ba3abb84199ba102dd1819b9, type: 3}
+  lightFrames: []
+  framesPerSecond: 8
+  loop: 0
+  impactSeconds: 0

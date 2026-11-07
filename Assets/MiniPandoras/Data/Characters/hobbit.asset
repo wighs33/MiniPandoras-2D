@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: hobbit
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: hobbit
+  size: {x: 24, y: 34}
+  down:
+  - {fileID: 21300000, guid: b4576a1b66a57be4e867c4dbed7d9835, type: 3}
+  - {fileID: 21300000, guid: 7232766097ee3d640b20822099477d78, type: 3}
+  - {fileID: 21300000, guid: 0213c3c7921627644b467500f97d5124, type: 3}
+  right:
+  - {fileID: 21300000, guid: 6e483bbf0d02cfd459cf2f4e5ae650e7, type: 3}
+  - {fileID: 21300000, guid: b72ebce49a60d9842b55323b817390e1, type: 3}
+  - {fileID: 21300000, guid: 9ac7695b39cc3ad46b2c491c5b35a11c, type: 3}
+  up:
+  - {fileID: 21300000, guid: df895cc5e86a6a14aa57643f3863c789, type: 3}
+  - {fileID: 21300000, guid: 35df9113a9c59324fa51ffdddf64e51f, type: 3}
+  - {fileID: 21300000, guid: 0b59e4c9f1de97143ac9c28c94d759e2, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: 084729f189e881347a964e8196e56845, type: 3}
+  - {fileID: 21300000, guid: 3fe03520d8c0bae439b3f40e89a451aa, type: 3}
+  - {fileID: 21300000, guid: 9c3f276f5a6d1634182ef00d96e9e1df, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: 2ed3368709490f545baf8087754a7277, type: 3}
+  - {fileID: 21300000, guid: 659fc7b62b8a1d142a97ce97d3d8b3ad, type: 3}
+  - {fileID: 21300000, guid: 5f9519a2ab418b34fadd10e9001eab37, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 6c2d692aa06728d4386e1c7672654d92, type: 3}
+  - {fileID: 21300000, guid: 01a713c7eb229e04dacf3e1f69d06874, type: 3}
+  - {fileID: 21300000, guid: 950f20999f5c1aa4690e5308ca81c947, type: 3}
+  portrait: {fileID: 21300000, guid: 06fe95459a20d4a42873e269dc7a60f1, type: 3}

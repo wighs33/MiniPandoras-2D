@@ -67,7 +67,7 @@ namespace MiniPandoras.Tests
             input.SummonPressed += summoned.Add;
 
             // 직접 걷는 탐험을 연다(웹게임 explore). 끝내는 트리거가 없으니 테스트 동안 이어진다.
-            director.StartCoroutine(director.Explore());
+            director.StartCoroutine(director.Field.Explore());
             yield return null;
         }
 
@@ -84,7 +84,7 @@ namespace MiniPandoras.Tests
             Assert.That(touch.Shown.Action, Is.EqualTo(ActionCaption.Idle), "앞에 아무도 없고 적도 없으면 행동 버튼은 옅게 쉰다");
 
             hero.Character.Face(Facing.Up);
-            director.Npc("tester", "merchant", HeroCell() + new Vector2Int(0, -1), Facing.Down, new[] { ("merchant", "어서 와!") });
+            director.Field.Npc("tester", "merchant", HeroCell() + new Vector2Int(0, -1), Facing.Down, new[] { ("merchant", "어서 와!") });
             yield return null;
             Assert.That(touch.Shown.Action, Is.EqualTo(ActionCaption.Talk), "앞에 사람이 있으면 「대화」");
 
@@ -98,7 +98,7 @@ namespace MiniPandoras.Tests
         {
             Assert.That(touch.Shown, Is.EqualTo(new TouchLayout(true, ActionCaption.Idle, false, false)), "적이 없는 탐험: 조이스틱과 행동 버튼만");
 
-            director.Monster("near", HeroCell() + new Vector2Int(5, 0), new[] { "thug1" });
+            director.Field.Monster("near", HeroCell() + new Vector2Int(5, 0), new[] { "thug1" });
             yield return null;
             Assert.That(touch.Shown.Battle, Is.True, "맵에 적이 있으면 스킬·동료 버튼이 나온다");
             Assert.That(touch.Shown.Action, Is.EqualTo(ActionCaption.AttackLocked), "적이 있어도 무기가 없으면 「공격」이 옅다");
@@ -143,8 +143,8 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator ScreenButtonsAndKeysSummonTheSameCompanions()
         {
-            director.SetParty(new[] { "hero", "rang" }, 2);
-            director.Monster("near", HeroCell() + new Vector2Int(2, 0), new[] { "thug1" });
+            director.Party.SetParty(new[] { "hero", "rang" }, 2);
+            director.Field.Monster("near", HeroCell() + new Vector2Int(2, 0), new[] { "thug1" });
             yield return null;
 
             // 화면의 첫 동료 칸을 손가락으로 누른 것처럼 포인터를 보낸다(가상 게임패드 십자키 위).
@@ -165,7 +165,7 @@ namespace MiniPandoras.Tests
             yield return Press(keyboard, new KeyboardState(Key.Digit2));
 
             Assert.That(summoned, Is.EqualTo(new[] { 0, 1 }), "화면 칸과 키보드 숫자가 같은 동료 부르기 의도로 들어온다");
-            Assert.That(combat.SummonCooldown("rang"), Is.GreaterThan(0), "첫 칸을 누르면 랑이 불려 나온다");
+            Assert.That(combat.PlayerSkills.SummonCooldown("rang"), Is.GreaterThan(0), "첫 칸을 누르면 랑이 불려 나온다");
         }
 
         [UnityTest]

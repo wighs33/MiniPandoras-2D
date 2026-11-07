@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: bitingTome
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: bitingTome
+  size: {x: 30, y: 26}
+  down:
+  - {fileID: 21300000, guid: abb6f90562baec94ea33fa629e5f4607, type: 3}
+  - {fileID: 21300000, guid: e8d2c2184c9b6d84f9fead8963f468dd, type: 3}
+  - {fileID: 21300000, guid: ad34f220fe94ea24fa81673bb2d91f2e, type: 3}
+  right:
+  - {fileID: 21300000, guid: 367d99316bc0fde4285b29ac87eee2bf, type: 3}
+  - {fileID: 21300000, guid: 6165d21233577c14693f7e3fae8413af, type: 3}
+  - {fileID: 21300000, guid: 30737355233bf6747b685591727ca6e3, type: 3}
+  up:
+  - {fileID: 21300000, guid: 93c2797478db28e4b8b3abbc9f07937e, type: 3}
+  - {fileID: 21300000, guid: 9a4358f5139f53643af308a8ecee3dae, type: 3}
+  - {fileID: 21300000, guid: 701b65226873e82419d80d60fc32c3d9, type: 3}
+  portrait: {fileID: 0}

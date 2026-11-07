@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: sheafImp
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: sheafImp
+  size: {x: 22, y: 30}
+  down:
+  - {fileID: 21300000, guid: e675f25b918679f449e60cb9f2eb3a9c, type: 3}
+  - {fileID: 21300000, guid: 3948285dea22c214c85eb09f6da2a1ce, type: 3}
+  - {fileID: 21300000, guid: cc921769e04307645b8dacc88f7468c6, type: 3}
+  right:
+  - {fileID: 21300000, guid: 9c9fa229f20bc4d49884fa3b41732976, type: 3}
+  - {fileID: 21300000, guid: 9bbf567df64c5dd4a89cf113336d0010, type: 3}
+  - {fileID: 21300000, guid: ff4c9cbfade0caa479083a728c624324, type: 3}
+  up:
+  - {fileID: 21300000, guid: c08c14c79c0755f4f809c7107189bb4c, type: 3}
+  - {fileID: 21300000, guid: 7b46908c0fc490f498491f0790c52106, type: 3}
+  - {fileID: 21300000, guid: 71be22d297ab7034397fd6e155e283a2, type: 3}
+  portrait: {fileID: 0}

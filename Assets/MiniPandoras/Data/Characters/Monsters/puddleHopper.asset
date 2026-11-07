@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: puddleHopper
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: puddleHopper
+  size: {x: 24, y: 22}
+  down:
+  - {fileID: 21300000, guid: 303212502f8f61c4d81a13add11f01ef, type: 3}
+  - {fileID: 21300000, guid: d5c903f8ed34cb1439c9bffefee57fe0, type: 3}
+  - {fileID: 21300000, guid: 67792026969b4bc4a98a893d3cd48138, type: 3}
+  right:
+  - {fileID: 21300000, guid: 4c19d788cbf34ab4fb1ebd3fad4b175c, type: 3}
+  - {fileID: 21300000, guid: 645a2a8b752881e429c9df6ccb6c8117, type: 3}
+  - {fileID: 21300000, guid: dc90224c3c785e34ea2a2266bce7c84a, type: 3}
+  up:
+  - {fileID: 21300000, guid: ea7ea66bc7accd747be290fde4f34074, type: 3}
+  - {fileID: 21300000, guid: bf9a4be6a6fe484489c16f54d511e880, type: 3}
+  - {fileID: 21300000, guid: 0d45e5b14f1090e40a6f90a8eaaf535a, type: 3}
+  portrait: {fileID: 0}

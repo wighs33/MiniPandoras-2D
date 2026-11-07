@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: leaflet
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: leaflet
+  size: {x: 28, y: 22}
+  down:
+  - {fileID: 21300000, guid: 4c383c0c24cae6146816082c55e2c26f, type: 3}
+  - {fileID: 21300000, guid: b7fea754cfc0b1148a82e66e0b4d0d46, type: 3}
+  - {fileID: 21300000, guid: 3f80e4e92e5b3b74a9fbc7253bdedb10, type: 3}
+  right:
+  - {fileID: 21300000, guid: 43f77bda2ce23734d9816111d45535e6, type: 3}
+  - {fileID: 21300000, guid: 1195a0579607add4ab832b4d3ffcf1f2, type: 3}
+  - {fileID: 21300000, guid: c121b1dcccc0c1945bc624eee8144c60, type: 3}
+  up:
+  - {fileID: 21300000, guid: 2535a801e1513c44c81d9fc68c1bc9d0, type: 3}
+  - {fileID: 21300000, guid: d32a95012f147de4b9d6ecb32dd72b9d, type: 3}
+  - {fileID: 21300000, guid: 7b4c23e49078a0e498fbaf7dbc7c23aa, type: 3}
+  portrait: {fileID: 0}

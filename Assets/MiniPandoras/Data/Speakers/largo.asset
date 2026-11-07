@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d89d4dacce9f0f74abd7c4faec2518ee, type: 3}
+  m_Name: largo
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Story.Speaker
+  id: largo
+  displayName: "\uB77C\uB974\uACE0"
+  nameColor: {r: 0.8784314, g: 0.78431374, b: 0.47843137, a: 1}
+  portraitSheet: {fileID: 11400000, guid: 65b863c09cb680e4094141f9ca1c681e, type: 2}
+  figure: {fileID: 0}
+  faceCenter: {x: 0, y: 0}
+  faceSize: 0
+  figureIsWholeBody: 0

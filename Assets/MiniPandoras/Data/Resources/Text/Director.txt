@@ -1,0 +1,149 @@
+# Director
+# 말투(say, think, shout, narrate, text) / 화자 / 이름표 / 글. 칸은 탭으로 나눈다. 글의 줄바꿈은 \n, {name}은 주인공 이름이다.
+
+== storyDirector.battle.battle.1
+text			정신을 가다듬고... 다시 한번!
+
+== storyDirector.battle.reviveInField.1
+text			정신을 가다듬고... 다시 한번!
+
+== storyDirector.field.openChest.1
+text			비어 있다.
+
+== storyDirector.field.openChest.2
+text			{0} {1}개를
+
+== storyDirector.field.openChest.3
+text			을
+
+== storyDirector.field.openChest.4
+text			{0} 손에 넣었다!
+
+== storyDirector.field.pickUp.1
+text			{0} 손에 넣었다!
+
+== storyDirector.guide.worldMapTutorial.1
+text			「메뉴」를 눌러요
+
+== storyDirector.guide.worldMapTutorial.2
+text			「지도」를 눌러요
+
+== storyDirector.guide.worldMapTutorial.3
+text			힐리아를 눌러 크게 봐요
+
+== storyDirector.guide.worldMapTutorial.4
+text			×를 눌러 닫아요
+
+== storyDirector.guide.equipTutorial.1
+text			「메뉴」를 눌러요
+
+== storyDirector.guide.equipTutorial.2
+text			「가방」을 눌러요
+
+== storyDirector.guide.equipTutorial.3
+text			를
+
+== storyDirector.guide.equipTutorial.4
+text			 눌러요
+
+== storyDirector.guide.equipTutorial.5
+text			「장착」을 눌러요
+
+== storyDirector.guide.equipTutorial.6
+text			×를 눌러 닫아요
+
+== storyDirector.guide.attackTutorial.1
+text			「공격」을 눌러요
+
+== storyDirector.guide.summonTutorial.1
+text			을
+
+== storyDirector.guide.summonTutorial.2
+text			 불러요
+
+== storyDirector.guide.summonTutorial.3
+text			「메뉴」를 눌러요
+
+== storyDirector.guide.summonTutorial.4
+text			「동료」를 눌러요
+
+== storyDirector.guide.summonTutorial.5
+text			전투에 부를 동료를 세 명까지 여기서 골라요. ×를 눌러 닫아요
+
+== storyDirector.guide.sealBookTutorial.1
+text			「메뉴」를 눌러요
+
+== storyDirector.guide.sealBookTutorial.2
+text			「판도라 봉인서」를 눌러요
+
+== storyDirector.guide.sealBookTutorial.3
+text			모은 더스트와 스킬을 봐요. 「체험」을 누르면 이 판도라를 써 볼 수 있어요
+
+== storyDirector.guide.sealBookTutorial.4
+text			스킬을 눌러 허수아비에게 써 봐요. 다 써 봤으면 위쪽 「끝내기」를 눌러요
+
+== storyDirector.guide.skillTutorial.1
+text			을
+
+== storyDirector.guide.skillTutorial.2
+text			 눌러요
+
+== storyDirector.guide.swapTutorial.1
+text			교체 아이콘을 눌러요
+
+== storyDirector.guide.swapTutorial.2
+text			을
+
+== storyDirector.guide.swapTutorial.3
+text			 눌러요
+
+== storyDirector.guide.swapTutorial.4
+text			스킬도 함께 바뀌어요. 
+
+== storyDirector.guide.swapTutorial.5
+text			을
+
+== storyDirector.guide.swapTutorial.6
+text			 눌러요
+
+== storyDirector.guide.quickSlotTutorial.1
+text			퀵슬롯이 열렸어요. 「메뉴」를 눌러요
+
+== storyDirector.progress.setGoal.1
+text			임무: {0}
+
+== storyDirector.progress.buy.1
+text			{0} 1개를 샀다
+
+== storyDirector.progress.buy.2
+text			골드가 모자라요
+
+== storyDirector.progress.takeRequest.1
+text			새 의뢰: {0}
+
+== storyDirector.progress.finishRequest.1
+text			의뢰 완료: {0} (+{1} Gold)
+
+== storyDirector.progress.beastDust.1
+text			쓰러진 짐승에게서 빛 가루가 흘러나와 봉인서로 스며들었다.
+
+== storyDirector.progress.beastDust.2
+text			냐. 봉인서가 반응했다.\n쓰러진 녀석의 판도라 더스트가 새겨진 거다.
+
+== storyDirector.progress.beastDust.3
+text			이렇게 모으는 거였구나......
+
+== storyDirector.progress.beastDust.4
+text			100%가 되면 봉인서에서 깨울 수 있다.\n그때까지는 그냥 가루일 뿐이지.
+
+== storyDirector.progress.gatherHuntDust.1
+text			{0} 더스트 100%
+
+== storyDirector.progress.gatherHuntDust.2
+text			{0} 더스트 +{1}% ({2}%)
+
+== storyDirector.progress.gatherLevelDust.1
+text			{0} 레벨 더스트 {1}/{2}
+
+== storyDirector.scenes.takeOff.1
+text			조이스틱으로 움직여 화살을 피하세요

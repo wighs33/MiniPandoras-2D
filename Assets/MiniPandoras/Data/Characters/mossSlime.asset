@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: mossSlime
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: mossSlime
+  size: {x: 28, y: 22}
+  down:
+  - {fileID: 21300000, guid: 10abe3adacc2a16429e24c26370e9413, type: 3}
+  - {fileID: 21300000, guid: 544cbe424a5ad584a9319cfd3d8f1d81, type: 3}
+  - {fileID: 21300000, guid: 508a6e5aecd6f2f4790aac0f1f29c142, type: 3}
+  right:
+  - {fileID: 21300000, guid: 62b499b9c98808148a80ac92511d342b, type: 3}
+  - {fileID: 21300000, guid: 39209b36527905c4499c2821fd339dca, type: 3}
+  - {fileID: 21300000, guid: dcf14224ceb2ed940bbb88cadab11866, type: 3}
+  up:
+  - {fileID: 21300000, guid: 90f061ebf6d60a449991e19f1fb7fd69, type: 3}
+  - {fileID: 21300000, guid: 490a9685408a3954ea828ae72b2392a3, type: 3}
+  - {fileID: 21300000, guid: 6f2729d1bbb715048a47bfe03d34ba24, type: 3}
+  portrait: {fileID: 21300000, guid: 61d05cc795365c34983c86b189a1e636, type: 3}

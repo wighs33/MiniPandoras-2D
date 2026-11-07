@@ -6,6 +6,7 @@ using MiniPandoras.Combat;
 using MiniPandoras.Controls;
 using MiniPandoras.Dialogue;
 using MiniPandoras.Field;
+using MiniPandoras.Minigames;
 using MiniPandoras.Player;
 using MiniPandoras.Progress;
 using MiniPandoras.UI;
@@ -18,11 +19,28 @@ namespace MiniPandoras.Story
     /// 이야기 연출 명령 모음(웹게임 story/script.ts의 Script). 장 코드(Chapter1 …)가 이 명령을 차례로 부른다.
     /// 시간이 드는 명령은 코루틴이라 yield return으로 끝날 때까지 기다리고, 동시에 돌릴 것은 StartCoroutine으로 띄워 둔다.
     /// 시간은 웹게임처럼 60fps 프레임 수, 자리는 칸 좌표(위에서 아래로)로 받는다.
-    /// 명령이 많아 하는 일별로 파일을 나눴다: 대화·화면·조작(이 파일), 인물(Actors), 파티와 따라오는 동료(Party), 진행·물건·의뢰(Progress),
-    /// 맵과 탐험(Field), 이야기 전투(Battle), 튜토리얼(Guide), 화면 전체 장면(Scenes), 연출 효과(Stage).
+    /// 대화·화면·조작은 이 클래스가 맡고, 나머지 명령은 맡은 일별 클래스에 있다: 인물(Actors), 파티(Party), 진행·물건·의뢰(Progress),
+    /// 맵과 탐험(Field), 이야기 전투(Fights), 튜토리얼(Tutorials), 화면 전체 장면(Scenes), 연출 효과(Stage). 씬 참조는 모두 이 컴포넌트에 있다.
     /// </summary>
-    public sealed partial class StoryDirector : MonoBehaviour
+    public sealed class StoryDirector : MonoBehaviour
     {
+        private StoryActors storyActors;
+        public StoryActors Actors => storyActors ??= new StoryActors(this);
+        private StoryParty storyParty;
+        public StoryParty Party => storyParty ??= new StoryParty(this);
+        private StoryField storyField;
+        public StoryField Field => storyField ??= new StoryField(this);
+        private StoryStage storyStage;
+        public StoryStage Stage => storyStage ??= new StoryStage(this);
+        private StoryScenes storyScenes;
+        public StoryScenes Scenes => storyScenes ??= new StoryScenes(this);
+        private StoryGuide storyGuide;
+        public StoryGuide Tutorials => storyGuide ??= new StoryGuide(this);
+        private StoryProgress storyProgress;
+        public StoryProgress Progress => storyProgress ??= new StoryProgress(this);
+        private StoryBattle storyBattle;
+        public StoryBattle Fights => storyBattle ??= new StoryBattle(this);
+
         public const string HeroId = GameState.Hero;
 
         [SerializeField] private GameSession session;
@@ -48,36 +66,102 @@ namespace MiniPandoras.Story
         [SerializeField] private List<Sprite> panels = new List<Sprite>();
         [Tooltip("이야기가 맵에 놓는 물건 그림(상자, 보석 …). 이름은 웹게임 assets.images와 같다")]
         [SerializeField] private List<Sprite> images = new List<Sprite>();
+        [Tooltip("이름: exclaim, question, dots, anger, sweat, heart")]
+        [SerializeField] private List<Sprite> emotes = new List<Sprite>();
+        [SerializeField] private DeathView death;
+        [Header("튜토리얼")]
+        [SerializeField] private TutorialGuide guide;
+        [SerializeField] private MenuView menu;
+        [SerializeField] private InventoryView inventory;
+        [SerializeField] private WorldMapView worldMap;
+        [SerializeField] private CompanionView companions;
+        [SerializeField] private SealBookView sealBook;
+        [Tooltip("화면 오른쪽의 획득 소식")]
+        [SerializeField] private RewardFeedView rewardFeed;
+        [SerializeField] private ShopView shop;
+        [Header("화면 전체 장면")]
+        [SerializeField] private AwakenView awakenView;
+        [SerializeField] private GliderFlight glider;
+        [SerializeField] private GliderView gliderView;
+        [SerializeField] private CutInView cutInView;
+        [Header("회상과 연출 효과")]
+        [SerializeField] private MemoryTint memoryTint;
+        [SerializeField] private StageEffects stageEffects;
+        [SerializeField] private SandStormView sandStorm;
 
         private CharacterBody heroBody;
         private string shownPanel;
+
+        internal GameSession Session => session;
+        internal Conversation Conversation => conversation;
+        internal MapTravel MapTravel => mapTravel;
+        internal Exploration Exploration => exploration;
+        internal TopDownMover Hero => hero;
+        internal FieldCombat Combat => combat;
+        internal FollowCamera FollowCamera => followCamera;
+        internal WeatherView Weather => weather;
+        internal AmbientLight AmbientLight => ambientLight;
+        internal ScreenCaptions Captions => captions;
+        internal ParticleBurst Particles => particles;
+        internal TouchControlsView Touch => touch;
+        internal ActorFactory ActorFactory => actorFactory;
+        internal PlayerControls Controls => controls;
+        internal List<Sprite> Images => images;
+        internal List<Sprite> Emotes => emotes;
+        internal DeathView Death => death;
+        internal TutorialGuide Guide => guide;
+        internal MenuView Menu => menu;
+        internal InventoryView Inventory => inventory;
+        internal WorldMapView WorldMap => worldMap;
+        internal CompanionView Companions => companions;
+        internal SealBookView SealBook => sealBook;
+        internal RewardFeedView RewardFeed => rewardFeed;
+        internal ShopView Shop => shop;
+        internal AwakenView AwakenView => awakenView;
+        internal GliderFlight Glider => glider;
+        internal GliderView GliderView => gliderView;
+        internal CutInView CutInView => cutInView;
+        internal MemoryTint MemoryTint => memoryTint;
+        internal StageEffects StageEffects => stageEffects;
+        internal SandStormView SandStorm => sandStorm;
+        internal CharacterBody HeroBody => heroBody;
 
         public string HeroName => session.State.HeroName;
 
         private void Awake()
         {
             combat.SetTalk(Talk);
-            combat.PlayerDowned += OnPlayerDowned;
+            combat.PlayerDowned += Fights.OnPlayerDowned;
             combat.ScreenFlashed += screenFlash.Flash;
             // TopDownMover.Character는 그쪽 Awake가 끝나야 채워지므로 몸을 직접 찾아 둔다.
             heroBody = hero.GetComponent<CharacterBody>();
-            heroBody.StepStarted += OnHeroStep;
-            mapTravel.MapLoaded += OnMapLoaded;
-            mapTravel.Warped += OnWarped;
-            mapTravel.Arrived += OnArrived;
+            heroBody.StepStarted += Party.OnHeroStep;
+            mapTravel.MapLoaded += Field.OnMapLoaded;
+            mapTravel.Warped += Field.OnWarped;
+            mapTravel.Arrived += Field.OnArrived;
         }
 
         private void OnDestroy()
         {
-            combat.PlayerDowned -= OnPlayerDowned;
+            Tutorials.ReleaseFreeze();
+            combat.PlayerDowned -= Fights.OnPlayerDowned;
             combat.ScreenFlashed -= screenFlash.Flash;
-            heroBody.StepStarted -= OnHeroStep;
-            mapTravel.MapLoaded -= OnMapLoaded;
-            mapTravel.Warped -= OnWarped;
-            mapTravel.Arrived -= OnArrived;
+            heroBody.StepStarted -= Party.OnHeroStep;
+            mapTravel.MapLoaded -= Field.OnMapLoaded;
+            mapTravel.Warped -= Field.OnWarped;
+            mapTravel.Arrived -= Field.OnArrived;
         }
 
         // ── 대화 ───────────────────────────────────────────────
+
+        /// <summary>대본(Data/Resources/Text)의 한 덩어리를 차례로 보여 준다.</summary>
+        public IEnumerator Lines(string block)
+        {
+            foreach (ScriptLine line in GameText.Block(block))
+            {
+                yield return line.Style == LineStyle.Narration ? Narrate(line.Text) : Say(line.Speaker, line.Text, line.NameOverride, line.Style);
+            }
+        }
 
         public IEnumerator Say(string speakerId, string text, string nameOverride = null, LineStyle style = LineStyle.Say)
         {
@@ -134,7 +218,7 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>전투가 대사를 할 때 쓰는 입. 말하는 이가 없으면 해설로 띄운다.</summary>
-        private IEnumerator Talk(string speakerId, string text, LineStyle style, string name)
+        internal IEnumerator Talk(string speakerId, string text, LineStyle style, string name)
         {
             return speakerId == null ? Narrate(text) : Say(speakerId, text, name, style);
         }
@@ -236,7 +320,7 @@ namespace MiniPandoras.Story
             {
                 controls.SetMode(ControlMode.Field);
                 // 직접 걷는 동안 동료는 비켜 서 있다(웹게임 explore).
-                SetFollowersVisible(false);
+                Party.SetFollowersVisible(false);
             }
             else
             {
@@ -248,10 +332,10 @@ namespace MiniPandoras.Story
         /// 연출로 넘어간다(웹게임 endControl): 조작을 거두고, snapHero면 주인공을 칸에 맞춘 뒤 동료를 뒤에 한 줄로 세운다.
         /// 탐험이 끝날 때는 늘 칸에 맞춘다(연출 걸음이 칸 단위라서).
         /// </summary>
-        private void TakeControl(bool snapHero)
+        internal void TakeControl(bool snapHero)
         {
             controls.SetMode(ControlMode.Cutscene);
-            LineUpBehindHero(snapHero);
+            Party.LineUpBehindHero(snapHero);
         }
 
         private DialogueLine Line(string speakerId, string text, string nameOverride, LineStyle style)

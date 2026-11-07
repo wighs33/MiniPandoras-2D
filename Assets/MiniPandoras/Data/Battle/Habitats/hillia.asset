@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27bb4b852fbdaa54a996a103c767183a, type: 3}
+  m_Name: hillia
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.HabitatDefinition
+  map: hillia
+  groups:
+  - id: hillia-2
+    cell: {x: 21, y: 23}
+    monsters:
+    - fluffTail
+  - id: hillia-3
+    cell: {x: 8, y: 25}
+    monsters:
+    - leaflet
+  - id: hillia-9
+    cell: {x: 5, y: 31}
+    monsters:
+    - dustPuff
+    - fluffTail
+  - id: hillia-0
+    cell: {x: 8, y: 17}
+    monsters:
+    - fluffTail
+    - leaflet
+  - id: hillia-5
+    cell: {x: 10, y: 14}
+    monsters:
+    - sunCub
+    - fluffTail
+  - id: hillia-1
+    cell: {x: 24, y: 14}
+    monsters:
+    - dustPuff
+    - dustPuff
+  - id: hillia-8
+    cell: {x: 14, y: 10}
+    monsters:
+    - sunCub
+    - leaflet
+  - id: hillia-7
+    cell: {x: 4, y: 11}
+    monsters:
+    - dustPuff
+    - leaflet
+  - id: hillia-4
+    cell: {x: 27, y: 9}
+    monsters:
+    - sunCub
+  - id: hillia-6
+    cell: {x: 24, y: 4}
+    monsters:
+    - leaflet
+    - leaflet

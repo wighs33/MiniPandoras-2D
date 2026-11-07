@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: fairyElder
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: fairyElder
+  size: {x: 28, y: 32}
+  down:
+  - {fileID: 21300000, guid: 122014b695e27d44483b262b5598b9a7, type: 3}
+  - {fileID: 21300000, guid: 738d69c64785b4d4b8ee350da441b53a, type: 3}
+  - {fileID: 21300000, guid: 8399c781d362199439cd445a1054a518, type: 3}
+  right:
+  - {fileID: 21300000, guid: 1388c1aa7bc59e540ba95153ef6a31fe, type: 3}
+  - {fileID: 21300000, guid: c21d8094f5d74ad41ad00d0ab97160f4, type: 3}
+  - {fileID: 21300000, guid: 1d7b82223631ac543ac8079e72568d5b, type: 3}
+  up:
+  - {fileID: 21300000, guid: 08ad99374f58f874c899dedde5b6fb59, type: 3}
+  - {fileID: 21300000, guid: 38bbd6a4efee0864abb1f855c8df6ca3, type: 3}
+  - {fileID: 21300000, guid: c4b8680056adaff4a9456aebde6b2999, type: 3}
+  swingDown: []
+  swingRight: []
+  swingUp: []
+  breatheDown:
+  - {fileID: 21300000, guid: f06626d7ec8a3994fa27bf9866ed3b5b, type: 3}
+  - {fileID: 21300000, guid: fc6923be2bbed1d478271c5f66dd5646, type: 3}
+  - {fileID: 21300000, guid: 9477fd41c66dc8f4f80878da6127b125, type: 3}
+  breatheRight:
+  - {fileID: 21300000, guid: 6b2971f4486587c4e9bff016e8d1dd76, type: 3}
+  - {fileID: 21300000, guid: 7aaa66b85d2e259428202c3ae3102cdd, type: 3}
+  - {fileID: 21300000, guid: 58740d55fa34bf14f906a8998dada4ed, type: 3}
+  breatheUp:
+  - {fileID: 21300000, guid: 6859bfc7b8433da4cbff907c48165e83, type: 3}
+  - {fileID: 21300000, guid: 7c29b5e32d64c2d48894e81a596f62ae, type: 3}
+  - {fileID: 21300000, guid: 101c9cdc576a7ea4ea0ce0d830666053, type: 3}
+  portrait: {fileID: 21300000, guid: a86a015cf669e1e4798510de5a70d6ca, type: 3}

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: pebbleBundle
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: pebbleBundle
+  size: {x: 24, y: 22}
+  down:
+  - {fileID: 21300000, guid: 02cb093148731c54d89a52c2bf497a62, type: 3}
+  - {fileID: 21300000, guid: c38cd5fc93217eb49971af6aece754c1, type: 3}
+  - {fileID: 21300000, guid: 0049d8f209bba7c4ea58a89153cb830c, type: 3}
+  right:
+  - {fileID: 21300000, guid: b8fc48a24f4685e499dc7c0a9ea3ffea, type: 3}
+  - {fileID: 21300000, guid: 260b6ebc3970cf147a368bd5fed76c0f, type: 3}
+  - {fileID: 21300000, guid: ed0933f4a9a4294498b6fc67fd0ebee8, type: 3}
+  up:
+  - {fileID: 21300000, guid: 7f4181922485e084998d87f6d07a0d78, type: 3}
+  - {fileID: 21300000, guid: 226e46b4648bb5e4684e2372c2ceef15, type: 3}
+  - {fileID: 21300000, guid: 45053197ebbb95849823c4a82f4b7885, type: 3}
+  portrait: {fileID: 0}

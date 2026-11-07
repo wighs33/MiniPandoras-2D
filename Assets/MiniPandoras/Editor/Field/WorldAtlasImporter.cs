@@ -8,7 +8,7 @@ namespace MiniPandoras.Editor.Field
 {
     /// <summary>
     /// 세계지도 자료(Tools/PixelGen/world_map.py가 쓴 world_map.json)를 읽어 WorldAtlas 에셋(구역과 장소 자리)으로 만든다.
-    /// 지도 창을 그리는 일(<see cref="WorldMapUiBuilder"/>)과 따로 두었다. Build Field Scene이 창보다 먼저 부른다.
+    /// Refresh Scene Lists가 부른다.
     /// </summary>
     internal static class WorldAtlasImporter
     {

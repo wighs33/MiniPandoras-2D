@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using MiniPandoras.Progress;
 using MiniPandoras.UI;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.App
 {
     /// <summary>인벤토리 창에 보일 물건: 가방에 든 것(Items.All 순서). 장착한 무기도 가방에 그대로 있다.</summary>
     public sealed class InventoryEntries
     {
-        private const string LockedHint = "아직 무기만 장착할 수 있어요";
+        private static string LockedHint => T("inventoryEntries.lockedHint");
 
         private readonly List<InventoryEntry> entries = new List<InventoryEntry>();
 
@@ -28,14 +29,14 @@ namespace MiniPandoras.App
 
         private static InventoryEntry Line(string id, int count, bool equipped, bool canEquip)
         {
-            ItemInfo info = Items.Get(id);
-            string detail = info.IsWeapon ? $"무기 · 공격력 +{info.Bonus.Attack}"
-                : info.IsConsumable ? $"소모품 · {count}개"
-                : info.IsKey ? "이야기 물건"
-                : info.IsQuest ? "보석 · 퀘스트 아이템"
-                : "보석";
+            ItemDefinition info = Items.Get(id);
+            string detail = info.IsWeapon ? T("inventoryEntries.line.1", info.Bonus.Attack)
+                : info.IsConsumable ? T("inventoryEntries.line.2", count)
+                : info.IsKey ? T("inventoryEntries.line.3")
+                : info.IsQuest ? T("inventoryEntries.line.4")
+                : T("inventoryEntries.line.5");
             string hint = equipped || canEquip || info.IsKey ? string.Empty : LockedHint;
-            return new InventoryEntry(id, info.Name, count, detail + (equipped ? " · 장착 중" : ""), info.Description, equipped, canEquip, hint);
+            return new InventoryEntry(id, info.DisplayName, count, detail + (equipped ? T("inventoryEntries.line.6") : ""), info.Description, equipped, canEquip, hint);
         }
     }
 }

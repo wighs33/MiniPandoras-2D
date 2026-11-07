@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: divineIntellect
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: divineIntellect
+  size: {x: 36, y: 52}
+  down:
+  - {fileID: 21300000, guid: 920e269fd09e2494389bcd72c13d427f, type: 3}
+  - {fileID: 21300000, guid: 6f74d21b7c8edce468da2b535668b977, type: 3}
+  - {fileID: 21300000, guid: a8b3edc4ca3609e4f92a92411d689249, type: 3}
+  right:
+  - {fileID: 21300000, guid: e857c215b3c6bd74c9fcaadc495d6e76, type: 3}
+  - {fileID: 21300000, guid: 8f5df37a05c575a4da1ac4f05e763f08, type: 3}
+  - {fileID: 21300000, guid: 5077556ec11f6ba42a086659c77daf0b, type: 3}
+  up:
+  - {fileID: 21300000, guid: 770d6bd00fde8544ea62650d82589345, type: 3}
+  - {fileID: 21300000, guid: 92e4ee6709140ba47a23a918645ec658, type: 3}
+  - {fileID: 21300000, guid: 166cb3d661d932f4090d0347f52eaed1, type: 3}
+  portrait: {fileID: 21300000, guid: 03c1e525d904a1146a50fdac5831edbc, type: 3}

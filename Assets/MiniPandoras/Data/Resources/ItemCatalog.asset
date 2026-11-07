@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88dd7b6c96bd0af47b981ab0869fd68e, type: 3}
+  m_Name: ItemCatalog
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Progress.ItemCatalog
+  items:
+  - {fileID: 11400000, guid: a9c0f920c314fd9449250bfaa328ecf7, type: 2}
+  - {fileID: 11400000, guid: 7a3c271eb29baec4ebbc2c0de892108e, type: 2}
+  - {fileID: 11400000, guid: 86bb989b35d2fa14c9c570259d427c6a, type: 2}
+  - {fileID: 11400000, guid: 6ffbcd78b8305694a94b413052cf650a, type: 2}
+  - {fileID: 11400000, guid: 5bae5404ccf70e840a246e8224b12b72, type: 2}
+  - {fileID: 11400000, guid: 376f703bb6a052440a96f0591c6715dd, type: 2}
+  - {fileID: 11400000, guid: f93f66eb312d257488451b7035fbab3c, type: 2}
+  - {fileID: 11400000, guid: 29f801ce1fa02514f82e24daaae160a6, type: 2}

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: thornBloom
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: thornBloom
+  size: {x: 30, y: 24}
+  down:
+  - {fileID: 21300000, guid: 4b9cea471257aef49b8ab04b675d02be, type: 3}
+  - {fileID: 21300000, guid: cd7ca4aadc0bec44987d0c5311d51fb1, type: 3}
+  - {fileID: 21300000, guid: 61f5cb40172735b449567db7f152f39e, type: 3}
+  right:
+  - {fileID: 21300000, guid: ca9a75f799a4cbd4e9a136d35e2f9675, type: 3}
+  - {fileID: 21300000, guid: 1fd316a0b1aecb64d8603f7d999fc491, type: 3}
+  - {fileID: 21300000, guid: 775262e99f9637249a0cbf65fd0e3b2b, type: 3}
+  up:
+  - {fileID: 21300000, guid: d062351dd9aeb4349ae3fe6c56ff9753, type: 3}
+  - {fileID: 21300000, guid: 08a2db72be4810040ad572bf70152511, type: 3}
+  - {fileID: 21300000, guid: 29b21a44bf3afe4468321ab0adfde918, type: 3}
+  portrait: {fileID: 0}

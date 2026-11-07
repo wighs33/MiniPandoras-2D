@@ -1,5 +1,6 @@
 using System.Collections;
 using MiniPandoras.Characters;
+using MiniPandoras.Progress;
 using MiniPandoras.UI;
 using NUnit.Framework;
 using UnityEngine;
@@ -37,8 +38,8 @@ namespace MiniPandoras.Tests
         {
             // 부두에서 해먹의 라르고를 찾아간다.
             yield return story.UntilExploring("westSands", "부두에서 걷기");
-            Assert.That(story.Director.Actor("largo").Pose, Is.EqualTo(BodyPose.Lie), "라르고는 해먹에서 낮잠 중이다");
-            yield return story.StandOn(story.Director.Point("largo") + new Vector2Int(0, 3));
+            Assert.That(story.Director.Actors.Actor("largo").Pose, Is.EqualTo(BodyPose.Lie), "라르고는 해먹에서 낮잠 중이다");
+            yield return story.StandOn(story.Director.Field.Point("largo") + new Vector2Int(0, 3));
 
             // 거절당한 뒤 광장의 마을 사람들에게 이야기를 듣는다.
             yield return story.UntilExploring("westSands", "광장으로 걷기");
@@ -55,10 +56,10 @@ namespace MiniPandoras.Tests
             yield return story.UntilExploring("westSands", "꼬마의 부탁 뒤");
             Assert.That(story.Lines, Has.Member("현상금이 이렇게 많이 붙었으면 엄청 센 거잖아요!\n미노를 혼내 주세요.\n제발요!"));
             Assert.That(story.Lines, Has.Member("현상범한테 그런 부탁을 하다니!\n미노 귀에 들어가면 마을이 어떻게 되는 줄 아느냐!"));
-            Assert.That(story.Session.State.Goal, Is.EqualTo("드래곤 고원의 미노를 쓰러뜨린다"));
-            yield return story.StandOn(story.Director.Point("north"));
+            Assert.That(story.Session.State.Goal, Is.EqualTo(Goals.DefeatMino));
+            yield return story.StandOn(story.Director.Field.Point("north"));
             yield return story.UntilExploring("dragonRoad", "북쪽 고갯길");
-            yield return story.StandOn(story.Director.Point("north"));
+            yield return story.StandOn(story.Director.Field.Point("north"));
             yield return story.UntilExploring("dragonPlateau", "드래곤 고원");
             yield return story.StandOn(new Vector2Int(20, 21));
 
@@ -70,7 +71,7 @@ namespace MiniPandoras.Tests
             {
                 story.Fight();
                 sandBlew |= sandStorm.IsBlowing;
-                becameMinotaur |= story.Director.HasActor("mino") && story.Director.Actor("mino").Sheet.Id == "minotaur";
+                becameMinotaur |= story.Director.Actors.HasActor("mino") && story.Director.Actors.Actor("mino").Sheet.Id == "minotaur";
                 return story.Runner.Chapter > 8;
             }, 300f, "미노와의 싸움과 8장 끝");
             Assert.That(story.Lines, Has.Member("미노라는 놈이 누구냐."));

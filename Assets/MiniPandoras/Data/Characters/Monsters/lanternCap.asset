@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf31ae9684cc5514895db5314f92aa0b, type: 3}
+  m_Name: lanternCap
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Characters.CharacterSheet
+  id: lanternCap
+  size: {x: 22, y: 30}
+  down:
+  - {fileID: 21300000, guid: aef26cf09f570534686c9cd8a213ad9b, type: 3}
+  - {fileID: 21300000, guid: 02aecfbdaeb4f4c498d5164ca37388bc, type: 3}
+  - {fileID: 21300000, guid: 6c276e2eef5381c4bacdd32b9a0399d6, type: 3}
+  right:
+  - {fileID: 21300000, guid: 1e443ab0e4597494d9af0c0df1cee3f8, type: 3}
+  - {fileID: 21300000, guid: d32008da6b9f3c04680e8173eb9e5cd4, type: 3}
+  - {fileID: 21300000, guid: 0a45f9db35dcef4419433c1436fe9436, type: 3}
+  up:
+  - {fileID: 21300000, guid: 5ecea233a4d62864d9b4e36bd590e78d, type: 3}
+  - {fileID: 21300000, guid: cee89288025091e45a214c4639cfa13f, type: 3}
+  - {fileID: 21300000, guid: 5603f157fea0d6541b8d604cad91c921, type: 3}
+  portrait: {fileID: 0}
