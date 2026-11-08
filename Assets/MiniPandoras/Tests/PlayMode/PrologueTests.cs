@@ -48,7 +48,8 @@ namespace MiniPandoras.Tests
                     godsFloated |= story.Director.Actors.Actor("divE").Floating && !story.Director.Actors.Actor("divE").CastsShadow;
                 }
 
-                backdropShown |= story.Travel.CurrentMap.Id == "void" && backdrop.gameObject.activeSelf && backdrop.Shown == MapBackground.Void;
+                // 처음 몇 초는 맵을 띄우기 전 검은 화면의 1부 카드다.
+                backdropShown |= story.Travel.CurrentMap != null && story.Travel.CurrentMap.Id == "void" && backdrop.gameObject.activeSelf && backdrop.Shown == MapBackground.Void;
                 return story.Runner.Chapter > 0;
             }, 240f, "프롤로그 끝까지");
 

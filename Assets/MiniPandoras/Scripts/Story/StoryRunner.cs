@@ -11,7 +11,7 @@ namespace MiniPandoras.Story
     /// <summary>
     /// 필드 장면이 열리면 타이틀에서 시작할 장을 고르고, 거기서부터 이야기를 장 순서대로 돌린다(웹게임 main → runStory).
     /// 장이 시작될 때마다 저장한다. 저장된 장을 고르면 그 저장(물건·더스트·판도라)으로 이어서 하고, 다른 장을 고르면 그 장의 처음부터
-    /// 새 판으로 한다(웹게임은 늘 새 판이다). 마지막 장(11장)이 끝나면 1부 엔딩을 보여 주고 클리어 표시를 남긴 뒤 타이틀로 돌아간다.
+    /// 새 판으로 한다(웹게임은 늘 새 판이다). 마지막 장(11장)이 끝나면 2부 엔딩을 보여 주고 클리어 표시를 남긴 뒤 타이틀로 돌아간다.
     /// </summary>
     public sealed class StoryRunner : MonoBehaviour
     {
@@ -79,7 +79,7 @@ namespace MiniPandoras.Story
                 yield return Chapters[Chapter](director);
             }
 
-            // 1부 끝(웹게임 runStory 뒤): 클리어 표시를 남기고 엔딩을 본 뒤 타이틀로 돌아간다.
+            // 2부 끝(웹게임 runStory 뒤): 클리어 표시를 남기고 엔딩을 본 뒤 타이틀로 돌아간다.
             session.MarkCleared();
             yield return director.Scenes.Ending();
             SceneManager.LoadScene(gameObject.scene.name);
@@ -91,7 +91,9 @@ namespace MiniPandoras.Story
             pickedChapter = -1;
             Action<int> pick = chapter => pickedChapter = chapter;
             title.ChapterPicked += pick;
-            title.Show(ChapterTitles.Lines, PlayableChapters, save != null ? save.Chapter : -1, save != null && save.Cleared);
+            // 타이틀은 저장된 장이 속한 부의 풍경을 보인다. 끝까지 본 판이면 마지막 부다.
+            int part = save == null ? 1 : save.Cleared ? ChapterTitles.PartCount : ChapterTitles.PartOf(save.Chapter);
+            title.Show(ChapterTitles.Lines, PlayableChapters, save != null ? save.Chapter : -1, save != null && save.Cleared, part, ChapterTitles.PartLines);
             while (pickedChapter < 0)
             {
                 yield return null;

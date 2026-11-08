@@ -119,7 +119,12 @@ namespace MiniPandoras.Story
                     continue;
                 }
 
-                yield return Guide(director.Inventory.CellOf(item), NameFill.Attach(Items.NameOf(item), T("storyDirector.guide.equipTutorial.3")) + T("storyDirector.guide.equipTutorial.4"), () => director.Inventory.SelectedId == item);
+                // 가방은 첫 물건을 골라 둔 채 열리므로, 골라졌는지가 아니라 그 칸을 눌렀는지를 기다린다.
+                string pressed = null;
+                Action<string> onPressed = id => pressed = id;
+                director.Inventory.ItemPressed += onPressed;
+                yield return Guide(director.Inventory.CellOf(item), NameFill.Attach(Items.NameOf(item), T("storyDirector.guide.equipTutorial.3")) + T("storyDirector.guide.equipTutorial.4"), () => pressed == item);
+                director.Inventory.ItemPressed -= onPressed;
                 yield return Guide(director.Inventory.EquipButton, T("storyDirector.guide.equipTutorial.5"), () => director.Session.State.Equipment.Holds(item));
             }
 

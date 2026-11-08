@@ -148,7 +148,7 @@ namespace MiniPandoras.Tests
             yield return null;
 
             // 화면의 첫 동료 칸을 손가락으로 누른 것처럼 포인터를 보낸다(가상 게임패드 십자키 위).
-            var slot = touch.transform.Find("Battle Buttons/Summon 1").GetComponent<OnScreenButton>();
+            var slot = touch.transform.Find("Safe Area/Battle Buttons/Summon 1").GetComponent<OnScreenButton>();
             // 동료 칸은 전투가 파티를 짜고 전투 화면이 칸을 채운 뒤에 켜진다.
             for (int frame = 0; frame < 30 && !slot.isActiveAndEnabled; frame++)
             {

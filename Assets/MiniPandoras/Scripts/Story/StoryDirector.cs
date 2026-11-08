@@ -236,6 +236,18 @@ namespace MiniPandoras.Story
             return captions.ShowChapterCard(label, title);
         }
 
+        /// <summary>부가 시작하는 카드: 「2부 / 모래 위의 파도」.</summary>
+        public IEnumerator PartCard(int part)
+        {
+            return ChapterCard(ChapterTitles.PartLabel(part), ChapterTitles.PartTitle(part));
+        }
+
+        /// <summary>부가 끝나는 카드: 「1부 · 에버웨이브 / 끝」.</summary>
+        public IEnumerator PartEndCard(int part)
+        {
+            return ChapterCard(ChapterTitles.PartLines[part - 1], ChapterTitles.PartEnd);
+        }
+
         public IEnumerator Wait(float frames)
         {
             yield return new WaitForSeconds(frames / 60f);

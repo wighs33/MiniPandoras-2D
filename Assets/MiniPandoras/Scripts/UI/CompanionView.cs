@@ -53,7 +53,7 @@ namespace MiniPandoras.UI
             public GameObject Chosen => chosen;
         }
 
-        [SerializeField] private GameObject screen;
+        [SerializeField] private WindowMotion window;
         [SerializeField] private Button closeButton;
         [SerializeField] private Card[] cards = Array.Empty<Card>();
         [SerializeField] private TMP_Text notice;
@@ -63,7 +63,7 @@ namespace MiniPandoras.UI
         public event Action<string> ToggleRequested;
         public event Action Closed;
 
-        public bool IsOpen => screen.activeSelf;
+        public bool IsOpen => window.IsOpen;
 
         /// <summary>튜토리얼이 가리킬 자리: 닫기 버튼.</summary>
         public RectTransform CloseButton => (RectTransform)closeButton.transform;
@@ -85,7 +85,7 @@ namespace MiniPandoras.UI
             }
 
             notice.text = string.Empty;
-            screen.SetActive(true);
+            window.Open();
         }
 
         public void Notify(string text)
@@ -101,7 +101,7 @@ namespace MiniPandoras.UI
                 cards[i].Button.onClick.AddListener(() => ToggleRequested?.Invoke(shown[index].Id));
             }
 
-            screen.SetActive(false);
+            window.CloseInstantly();
         }
 
         private void OnEnable()
@@ -116,7 +116,7 @@ namespace MiniPandoras.UI
 
         private void Close()
         {
-            screen.SetActive(false);
+            window.Close();
             Closed?.Invoke();
         }
     }

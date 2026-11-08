@@ -51,7 +51,7 @@ namespace MiniPandoras.UI
 
         private static readonly Color Shadow = new Color(0.17f, 0.17f, 0.25f, 1f);
 
-        [SerializeField] private GameObject screen;
+        [SerializeField] private WindowMotion window;
         [SerializeField] private Button closeButton;
         [SerializeField] private TMP_Text countText;
         [SerializeField] private Cell[] cells = Array.Empty<Cell>();
@@ -61,7 +61,7 @@ namespace MiniPandoras.UI
 
         public event Action Closed;
 
-        public bool IsOpen => screen.activeSelf;
+        public bool IsOpen => window.IsOpen;
         internal int CellCount => cells.Length;
 
         /// <summary>도감을 보인다. 칸보다 많으면 뒤의 것은 보이지 않는다.</summary>
@@ -81,7 +81,7 @@ namespace MiniPandoras.UI
             int rows = Mathf.CeilToInt(Mathf.Min(entries.Count, cells.Length) / (float)columns);
             scroll.content.sizeDelta = new Vector2(scroll.content.sizeDelta.x, rows * rowHeight);
             scroll.content.anchoredPosition = Vector2.zero;
-            screen.SetActive(true);
+            window.Open();
         }
 
         private static void Fill(Cell cell, MonsterBookEntry entry)
@@ -93,7 +93,7 @@ namespace MiniPandoras.UI
 
         private void Awake()
         {
-            screen.SetActive(false);
+            window.CloseInstantly();
         }
 
         private void OnEnable()
@@ -108,7 +108,7 @@ namespace MiniPandoras.UI
 
         private void Close()
         {
-            screen.SetActive(false);
+            window.Close();
             Closed?.Invoke();
         }
     }

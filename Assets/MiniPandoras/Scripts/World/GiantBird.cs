@@ -6,7 +6,7 @@ namespace MiniPandoras.World
     /// <summary>
     /// 나리온: 요정들이 기르는 거대한 새(웹게임 GiantBird, 11장 고목 꼭대기의 정거장). 맵 위 큰 그림(<see cref="StageImage"/>) 하나에
     /// 앉은 그림과 날갯짓 두 장을 바꿔 끼운다. 일행이 한 사람씩 등에 오르면(<see cref="Board"/>) 그만큼 탄 앉은 그림으로 바뀌고
-    /// (탄 사람까지 Tools/PixelGen/narion.py가 그렸다), 날아오르면 18프레임마다 날개를 바꾸며 위아래로 흔들린다.
+    /// (탄 사람까지 Tools/WebGame/narion.py가 구웠다), 날아오르면 18프레임마다 날개를 바꾸며 위아래로 흔들린다.
     /// 기준점은 발이 닿는 줄 가운데이고, 자리는 맵 기준 논리 px(아래가 +)다.
     /// </summary>
     [RequireComponent(typeof(StageImage))]

@@ -36,7 +36,7 @@ namespace MiniPandoras.App
                 : info.IsQuest ? T("inventoryEntries.line.4")
                 : T("inventoryEntries.line.5");
             string hint = equipped || canEquip || info.IsKey ? string.Empty : LockedHint;
-            return new InventoryEntry(id, info.DisplayName, count, detail + (equipped ? T("inventoryEntries.line.6") : ""), info.Description, equipped, canEquip, hint);
+            return new InventoryEntry(id, info.DisplayName, count, detail, info.Description, equipped, canEquip, hint);
         }
     }
 }

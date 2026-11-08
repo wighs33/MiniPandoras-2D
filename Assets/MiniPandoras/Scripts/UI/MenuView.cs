@@ -15,7 +15,7 @@ namespace MiniPandoras.UI
     {
         [SerializeField] private Button openButton;
         [Tooltip("열린 메뉴(화면을 덮는 판과 창)")]
-        [SerializeField] private GameObject window;
+        [SerializeField] private WindowMotion window;
         [SerializeField] private Button resumeButton;
         [SerializeField] private Button inventoryButton;
         [SerializeField] private Button missionButton;
@@ -37,7 +37,7 @@ namespace MiniPandoras.UI
         public event Action BookRequested;
         public event Action TitleRequested;
 
-        public bool IsOpen => window.activeSelf;
+        public bool IsOpen => window.IsOpen;
 
         /// <summary>튜토리얼이 가리킬 자리: 오른쪽 위 「메뉴」 버튼과 열린 메뉴의 「인벤토리」 버튼.</summary>
         public RectTransform OpenButton => (RectTransform)openButton.transform;
@@ -53,7 +53,7 @@ namespace MiniPandoras.UI
                 return;
             }
 
-            window.SetActive(true);
+            window.Open();
             Opened?.Invoke();
         }
 
@@ -94,13 +94,13 @@ namespace MiniPandoras.UI
                 return;
             }
 
-            window.SetActive(false);
+            window.Close();
             Closed?.Invoke();
         }
 
         private void Awake()
         {
-            window.SetActive(false);
+            window.CloseInstantly();
         }
 
         private void OnEnable()

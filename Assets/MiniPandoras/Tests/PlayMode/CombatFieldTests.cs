@@ -85,7 +85,7 @@ namespace MiniPandoras.Tests
 
             Assert.That(state.ExperienceInLevel, Is.EqualTo(before + thug.Definition.Experience));
             var feed = UnityEngine.Object.FindFirstObjectByType<RewardFeedView>();
-            Assert.That(feed.transform.Find("Reward 0/Text").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo($"경험치 +{thug.Definition.Experience}"));
+            Assert.That(feed.transform.Find("Safe Area/Reward 0/Text").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo($"경험치 +{thug.Definition.Experience}"));
         }
 
 
@@ -153,16 +153,16 @@ namespace MiniPandoras.Tests
             var touch = UnityEngine.Object.FindFirstObjectByType<TouchControlsView>();
             yield return Waits.Until(() => touch.Shown.Pandoras, 3f, "판도라가 둘 이상이면 교체 버튼이 보인다");
             Assert.That(touch.Shown.PickingPandora, Is.False, "처음에는 스킬 칸이 보인다");
-            touch.transform.Find("Swap").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            touch.transform.Find("Safe Area/Swap").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             yield return null;
             yield return null;
             Assert.That(touch.Shown.PickingPandora, Is.True, "교체를 누르면 스킬 칸 자리에 판도라 칸이 나온다");
-            Assert.That(touch.transform.Find("Skill Buttons").gameObject.activeSelf, Is.False);
-            Assert.That(touch.transform.Find("Pandora Buttons").gameObject.activeSelf, Is.True);
-            touch.transform.Find("Swap").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            Assert.That(touch.transform.Find("Safe Area/Skill Buttons").gameObject.activeSelf, Is.False);
+            Assert.That(touch.transform.Find("Safe Area/Pandora Buttons").gameObject.activeSelf, Is.True);
+            touch.transform.Find("Safe Area/Swap").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             yield return null;
             yield return null;
-            Assert.That(touch.transform.Find("Skill Buttons").gameObject.activeSelf, Is.True, "다시 누르면 스킬 칸으로 돌아온다");
+            Assert.That(touch.transform.Find("Safe Area/Skill Buttons").gameObject.activeSelf, Is.True, "다시 누르면 스킬 칸으로 돌아온다");
             PlayerFighter player = combat.Player;
             string first = player.ActivePandora.Id;
             string second = player.PandoraAt(1).Id;

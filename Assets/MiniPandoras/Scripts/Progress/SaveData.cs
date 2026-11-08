@@ -34,7 +34,7 @@ namespace MiniPandoras.Progress
         [SerializeField] private List<string> finishedGoals = new List<string>();
         [SerializeField] private List<Count> pandoraLevels = new List<Count>();
         [SerializeField] private List<Count> levelDust = new List<Count>();
-        [Tooltip("1부를 끝까지 봤는지(타이틀에서 장 고르기를 연다)")]
+        [Tooltip("이야기를 끝까지(2부 엔딩까지) 봤는지(타이틀에서 장 고르기를 연다)")]
         [SerializeField] private bool cleared;
 
         public SaveData(int chapter, string heroName, IEnumerable<Count> items, IEnumerable<Count> dust,

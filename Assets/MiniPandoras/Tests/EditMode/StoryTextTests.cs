@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MiniPandoras.Tests
 {
-    /// <summary>대사 속 이름 자리 채우기(조사)와 연출의 걸음 표기.</summary>
+    /// <summary>대사 속 이름 자리 채우기(조사), 연출의 걸음 표기, 장이 속한 부.</summary>
     public sealed class StoryTextTests
     {
         [TestCase("{name이라}. 좋다.", "하늘", "하늘이라. 좋다.")]
@@ -54,6 +54,24 @@ namespace MiniPandoras.Tests
                 Is.EqualTo(new[] { Facing.Left, Facing.Left, Facing.Down, Facing.Down }));
             Assert.That(WalkPath.Between(new Vector2Int(5, 30), new Vector2Int(3, 32), verticalFirst: true),
                 Is.EqualTo(new[] { Facing.Down, Facing.Down, Facing.Left, Facing.Left }));
+        }
+
+        [TestCase(0, 1)]
+        [TestCase(5, 1)]
+        [TestCase(6, 2)]
+        [TestCase(11, 2)]
+        public void SplitsThePartsWhereTheSnakeTrainLeaves(int chapter, int part)
+        {
+            // 1부는 5장 끝에 뱀열차에 오르기까지, 2부는 6장 객실부터 끝까지다.
+            Assert.That(ChapterTitles.PartOf(chapter), Is.EqualTo(part));
+        }
+
+        [Test]
+        public void NamesEachPartOnOneLine()
+        {
+            Assert.That(ChapterTitles.PartCount, Is.EqualTo(2));
+            Assert.That(ChapterTitles.PartLines, Is.EqualTo(new[] { "1부 · 에버웨이브", "2부 · 모래 위의 파도" }));
+            Assert.That(ChapterTitles.PartOf(ChapterTitles.Count - 1), Is.EqualTo(ChapterTitles.PartCount), "마지막 장은 마지막 부에 든다");
         }
     }
 }

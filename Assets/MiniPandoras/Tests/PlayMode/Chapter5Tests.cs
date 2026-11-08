@@ -1,6 +1,7 @@
 using System.Collections;
 using MiniPandoras.Characters;
 using MiniPandoras.Progress;
+using MiniPandoras.Story;
 using MiniPandoras.UI;
 using MiniPandoras.World;
 using NUnit.Framework;
@@ -12,7 +13,8 @@ namespace MiniPandoras.Tests
 {
     /// <summary>
     /// 5장 「단 한 명의 길드원」를 저장에서 이어 끝까지 돌린다. 낡은 아지트에서 깨어나 악마 판도라를 얻고 디엘이 동료가 된 뒤,
-    /// 숲길·마을·외곽 들판을 지나 정류장에서 뱀열차에 올라탄다. 그다음 6장이 뱀열차 객실에서 이어진다.
+    /// 숲길·마을·외곽 들판을 지나 정류장에서 뱀열차에 올라탄다. 열차가 떠나면 1부가 끝나고(「1부 · 에버웨이브 / 끝」),
+    /// 2부 카드 뒤에 6장이 뱀열차 객실에서 이어진다.
     /// </summary>
     public sealed class Chapter5Tests
     {
@@ -104,10 +106,33 @@ namespace MiniPandoras.Tests
             yield return story.Until(() => !hero.IsVisible, 30f, "파티가 열차에 올라탄다");
             Assert.That(hero.Cell.x, Is.EqualTo(Mathf.RoundToInt(train.DoorX / 16f)), "문 앞에서 올라탄다");
             yield return story.Until(() => train == null || train.Speed > 1f, 30f, "열차가 떠난다");
-            yield return story.Until(() => story.Runner.Chapter > 5, 30f, "5장 끝");
 
-            // 6장이 달리는 뱀열차의 객실에서 이어진다.
-            yield return story.Until(() => story.Lines.Contains("아까 말한 뉴웨이브요.\n어떤 길드였어요?"), 30f, "6장이 뱀열차 객실에서 시작한다");
+            // 1부는 뱀열차에 오르기까지다: 부가 끝나는 카드, 2부 카드가 차례로 뜬 뒤 6장이 달리는 뱀열차의 객실에서 이어진다.
+            bool partOneEnded = false;
+            bool partTwoBegan = false;
+            yield return story.Until(() =>
+            {
+                partOneEnded |= IsShowingCard(ChapterTitles.PartLines[0], ChapterTitles.PartEnd);
+                partTwoBegan |= partOneEnded && IsShowingCard(ChapterTitles.PartLabel(2), ChapterTitles.PartTitle(2));
+                return story.Lines.Contains("아까 말한 뉴웨이브요.\n어떤 길드였어요?");
+            }, 60f, "6장이 뱀열차 객실에서 시작한다");
+            Assert.That(partOneEnded, Is.True, "열차가 떠나면 「1부 · 에버웨이브 / 끝」 카드가 뜬다");
+            Assert.That(partTwoBegan, Is.True, "그 뒤 「2부 / 모래 위의 파도」 카드가 뜬다");
+            Assert.That(story.Runner.Chapter, Is.EqualTo(6));
+        }
+
+        /// <summary>장 카드(작은 글 아래 큰 글)가 지금 이 두 줄을 보이는지. 켜진 글 가운데에서 찾는다.</summary>
+        private static bool IsShowingCard(string label, string title)
+        {
+            bool hasLabel = false;
+            bool hasTitle = false;
+            foreach (TMPro.TMP_Text text in Object.FindObjectsByType<TMPro.TMP_Text>(FindObjectsSortMode.None))
+            {
+                hasLabel |= text.text == label;
+                hasTitle |= text.text == title;
+            }
+
+            return hasLabel && hasTitle;
         }
     }
 }

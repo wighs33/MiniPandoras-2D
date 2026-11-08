@@ -10,10 +10,10 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 11장 「다시 모인 파도」(1부 마지막 장)을 저장에서 이어 엔딩까지 돌린다. 연회가 끝난 밤, 요정 마을 밖 길은 잠겨 있고 고목으로 들어가 1층 홀·2층 장터를 지나
+    /// 11장 「다시 모인 파도」(2부 마지막 장)을 저장에서 이어 엔딩까지 돌린다. 연회가 끝난 밤, 요정 마을 밖 길은 잠겨 있고 고목으로 들어가 1층 홀·2층 장터를 지나
     /// 3층 요정 마을의 쉼터로(밤에는 3층 위로 오르지 않는다) → 이자벨과 오로라가 동료가 되어 여섯이 됨 → 쉼터의 밤과 꿈속 여신 → 아침에는 아래층으로
     /// 내려가지 않고 꼭대기 정거장까지 오름 → 여섯이 차례로 나리온 등에 오르면 날아오름 → 하늘길 컷인 → 에라드의 탑·뱀성 옥상·밤바다 →
-    /// 1부 엔딩: 시작하면 클리어가 저장되고, 글귀가 다 뜨기 전에는 눌러도 넘어가지 않으며, 다 뜬 뒤 누르면 타이틀로 돌아가 「1부 클리어」가 뜬다.
+    /// 2부 엔딩: 시작하면 클리어가 저장되고, 글귀가 다 뜨기 전에는 눌러도 넘어가지 않으며, 다 뜬 뒤 누르면 타이틀로 돌아가 「2부 클리어」가 뜬다.
     /// </summary>
     public sealed class Chapter11Tests
     {
@@ -71,12 +71,12 @@ namespace MiniPandoras.Tests
             var cutIn = Object.FindFirstObjectByType<CutInView>(FindObjectsInactive.Include);
             yield return story.Until(() => IsShowing(cutIn, "skyRide"), 30f, "하늘길 컷인");
 
-            // 다른 곳에서(에라드의 탑, 뱀성 옥상, 밤바다)를 지나 1부 엔딩.
-            yield return story.Until(() => IsShowing(cutIn, "ending"), 120f, "1부 엔딩");
+            // 다른 곳에서(에라드의 탑, 뱀성 옥상, 밤바다)를 지나 2부 엔딩.
+            yield return story.Until(() => IsShowing(cutIn, "ending"), 120f, "2부 엔딩");
             Assert.That(story.Lines, Has.Member("......디엘."));
             Assert.That(story.Lines, Has.Member("...아빠 표정, 볼만했겠다."));
             Assert.That(story.Lines, Has.Member("명령대로."));
-            Assert.That(SaveStore.Read().Cleared, Is.True, "엔딩이 시작되면 1부 클리어가 저장된다");
+            Assert.That(SaveStore.Read().Cleared, Is.True, "엔딩이 시작되면 클리어가 저장된다");
 
             // 화면이 밝아지고 글귀가 시작되면 누르는 판이 켜진다.
             yield return story.Until(() => GameObject.Find("Story UI/Card Tap") != null, 10f, "엔딩 글귀가 시작된다");
@@ -97,7 +97,7 @@ namespace MiniPandoras.Tests
                 title = Object.FindFirstObjectByType<TitleView>();
             }
 
-            Assert.That(title.transform.Find("Screen/Cleared").gameObject.activeSelf, Is.True, "타이틀에 「1부 클리어」가 뜬다");
+            Assert.That(title.transform.Find("Screen/Safe Area/Logo/Cleared").gameObject.activeSelf, Is.True, "타이틀에 「2부 클리어」가 뜬다");
         }
 
         /// <summary>층마다 그 층의 계단(up 또는 down) 칸에 서서 다음 층으로 옮긴다. 마지막 층에서는 서지 않는다.</summary>

@@ -9,12 +9,12 @@ using static MiniPandoras.Dialogue.GameText;
 namespace MiniPandoras.Story
 {
     /// <summary>
-    /// 11장 「다시 모인 파도」(1부 마지막 장). 웹게임 story/chapters.ts의 chapter11을 줄마다 옮겼다.
+    /// 11장 「다시 모인 파도」(2부 마지막 장, 웹게임에서는 1부 마지막 장). 웹게임 story/chapters.ts의 chapter11을 줄마다 옮겼다.
     /// 연회가 끝난 밤, 디엘은 이자벨과 오로라를 만나지 않겠다고 한다 → 고목 3층 요정 마을의 쉼터까지 걸어가 묵고, 라르고가 불러 둔 이자벨과 오로라가
     /// 동료가 된다 → 다 같이 한 방에서 잠들고 꿈속에서 여신을 만난다 → 아침에 고목 꼭대기의 나리온 정거장까지 걸어 올라가 나리온을 타고
     /// 아이로스로 떠난다(하늘길 컷인) → 다른 곳에서: 에라드의 탑, 뱀성 옥상의 루나, 밤바다의 카일 일행.
     /// 웹게임 쉼터는 「고목 밑동」이지만 고목이 여러 층이 되어(GiantTree) 3층 요정 마을의 한 방이다. 맵은 생성기로 그렸다
-    /// (tree_inn.py 쉼터, dream.py 꿈, erad_tower.py 에라드의 탑, narion.py 나리온, cutin_sky.py 하늘길). 소리(sfx·music)는 아직 옮기지 않아 빠져 있다.
+    /// (tree_inn.py 쉼터, dream.py 꿈, erad_tower.py 에라드의 탑, cutin_sky.py 하늘길. 나리온은 웹게임 원화를 바꾼 Tools/WebGame/narion.py). 소리(sfx·music)는 아직 옮기지 않아 빠져 있다.
     /// </summary>
     public static class Chapter11
     {
@@ -26,7 +26,7 @@ namespace MiniPandoras.Story
         {
             ("hero", "bed"), ("rang", "bedRang"), ("diel", "bedDiel"), ("largo", "bedLargo"), ("isabel", "bedIsabel"), ("aurora", "bedAurora"),
         };
-        // 나리온 등에 오르는 순서(꼬리 쪽 자리부터, narion.py의 RIDERS와 같다).
+        // 나리온 등에 오르는 순서(꼬리 쪽 자리부터, Tools/WebGame/narion.py의 RIDERS와 같다).
         private static readonly string[] Riders = { "largo", "isabel", "aurora", "diel", "hero", "rang" };
         private static readonly Color Night = new Color32(0x0e, 0x14, 0x30, 0xff);
         private static readonly Color Dawn = new Color32(0x3a, 0x34, 0x56, 0xff);

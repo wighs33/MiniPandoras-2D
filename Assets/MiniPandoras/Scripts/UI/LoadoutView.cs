@@ -95,7 +95,7 @@ namespace MiniPandoras.UI
             public TMP_Text BadgeNumber => badgeNumber;
         }
 
-        [SerializeField] private GameObject screen;
+        [SerializeField] private WindowMotion window;
         [SerializeField] private Button closeButton;
         [SerializeField] private RectTransform runes;
         [SerializeField] private RectTransform star;
@@ -125,7 +125,7 @@ namespace MiniPandoras.UI
         public event Action<int> ReleaseRequested;
         public event Action Closed;
 
-        public bool IsOpen => screen.activeSelf;
+        public bool IsOpen => window.IsOpen;
 
         /// <summary>활성화된 판도라 목록과 세 자리(빈자리는 null)를 보인다. 집고 있던 것은 놓는다.</summary>
         public void Show(IReadOnlyList<LoadoutEntry> available, IReadOnlyList<string> slotIds)
@@ -138,7 +138,7 @@ namespace MiniPandoras.UI
             }
 
             Drop();
-            screen.SetActive(true);
+            window.Open();
             Redraw();
         }
 
@@ -235,7 +235,7 @@ namespace MiniPandoras.UI
 
         private void Awake()
         {
-            screen.SetActive(false);
+            window.CloseInstantly();
             notice.gameObject.SetActive(false);
             dragged.gameObject.SetActive(false);
         }
@@ -302,7 +302,7 @@ namespace MiniPandoras.UI
             // 알림 시간은 창이 열린 동안만 흐르므로, 닫을 때 지워야 다시 열었을 때 옛 알림이 남지 않는다.
             noticeLeft = 0f;
             notice.gameObject.SetActive(false);
-            screen.SetActive(false);
+            window.Close();
             Closed?.Invoke();
         }
 

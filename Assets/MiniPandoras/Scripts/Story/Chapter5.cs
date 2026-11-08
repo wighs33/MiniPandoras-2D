@@ -45,6 +45,8 @@ namespace MiniPandoras.Story
             yield return Everwave(s);
             yield return WalkToTheStation(s);
             yield return TheSnakeTrain(s);
+            // 1부는 뱀열차에 오르기까지다. 열차가 떠나 화면이 어두워지면 1부가 끝난다.
+            yield return s.PartEndCard(ChapterTitles.PartOf(5));
         }
 
         // ── 낡은 아지트: 깨어남 ─────────────────────────────────

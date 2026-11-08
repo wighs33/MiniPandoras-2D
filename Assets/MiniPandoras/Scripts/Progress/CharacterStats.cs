@@ -8,12 +8,13 @@ namespace MiniPandoras.Progress
     /// <summary>능력치 창의 한 줄. 더해지는 값이 있으면 값 뒤 괄호에 보인다(예: 공격력 16 (+2)).</summary>
     public readonly struct StatLine
     {
-        public StatLine(string label, float value, float bonus = 0f, string unit = "")
+        public StatLine(string label, float value, float bonus = 0f, string unit = "", float max = 0f)
         {
             Label = label;
             Value = value;
             Bonus = bonus;
             Unit = unit;
+            Max = max;
         }
 
         public string Label { get; }
@@ -21,6 +22,8 @@ namespace MiniPandoras.Progress
         public float Value { get; }
         public float Bonus { get; }
         public string Unit { get; }
+        /// <summary>끝값(경험치는 다음 레벨까지). 있으면 창이 「값/끝값」과 막대로 보이고, 0이면 값만 보인다.</summary>
+        public float Max { get; }
     }
 
     /// <summary>

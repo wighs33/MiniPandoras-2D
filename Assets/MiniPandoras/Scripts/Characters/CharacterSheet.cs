@@ -15,6 +15,12 @@ namespace MiniPandoras.Characters
     [CreateAssetMenu(menuName = "MiniPandoras/Character Sheet")]
     public sealed class CharacterSheet : ScriptableObject
     {
+        /// <summary>숨 한 번이 걸리는 시간. 쉬는 그림(0)에서 숨쉬는 그림 1~3을 거쳐 돌아오는 여덟 박자다.</summary>
+        public const float BreathCycleSeconds = 8 * SecondsPerBreathBeat;
+
+        private const float SecondsPerBreathBeat = 0.3f;
+        private static readonly int[] BreathBeats = { 0, 1, 2, 3, 2, 1, 0, 0 };
+
         /// <summary>기술 하나를 쓸 때의 그림(보스의 내려찍기, 돌진 …). 왼쪽은 뒤집어 쓴다.</summary>
         [Serializable]
         public struct MovePictures
@@ -82,6 +88,15 @@ namespace MiniPandoras.Characters
         public IReadOnlyList<Sprite> BreathFramesFor(Facing facing)
         {
             return ByFacing(facing, breatheDown, breatheRight, breatheUp);
+        }
+
+        /// <summary>숨쉬기 시작한 뒤 seconds초에 보일 숨쉬는 그림. 쉬는 박자이거나 숨쉬는 그림이 없으면 null(걷기 첫 그림을 쓴다).</summary>
+        public Sprite BreathFrameAt(Facing facing, float seconds)
+        {
+            int beat = (int)(seconds / SecondsPerBreathBeat) % BreathBeats.Length;
+            int stage = BreathBeats[beat];
+            IReadOnlyList<Sprite> breath = BreathFramesFor(facing);
+            return stage > 0 && stage <= breath.Count ? breath[stage - 1] : null;
         }
 
         private static Sprite[] ByFacing(Facing facing, Sprite[] facingDown, Sprite[] facingRight, Sprite[] facingUp)

@@ -112,7 +112,7 @@
 - 9장 「라르고의 기억」: 라르고의 기억 속 뉴웨이브 호. 에라드 군함(`warship.py`)·청룡(`sea_dragon.py`)을 생성기로 그려 맵에 세우고(`StageImage`), 청룡이 휘몰아치면 배가 두 동강 난 모습이 된다(`ship.py` broken). 신호탄·모래벽(`sand_wall.py`)·눈물 효과, 쓰러진 병사가 다시 일어서는 훅(`BattleApi.Revive`)을 더해 연출을 옮겼다(`Chapter9`). 끝에 모래 판도라를 얻고 라르고가 동료가 된다.
 - 10장 「깨어난 축복」: 페어리가든 낮·밤(`fairy_garden.py`, 소품 `fairy_props.py`), 거대고목 여섯 층(`tree_floors.py` 뿌리 홀·장터·요정 마을과 쉼터·서고, `giant_tree.py` 가지 회랑·꼭대기, 사용자 요청으로 뱀성처럼 여러 층, 층마다 요정은 `GiantTree`), 판도라의 정원(`hidden_garden.py`), 고목의 뿌리(`tree_roots.py`, 아피아를 구하면 맑아지는 모습)를 생성기로 새로 짜고 연출을 옮겼다(`Chapter10`). 메뉴에 판도라 정착 창(`LoadoutView`, 그림 `pandora_loadout.py`)을 더해 마법진 세 자리에 판도라를 끌어다 놓는다.
 - 인벤토리와 무기 장착(2026-11-03 사용자 요청, 웹게임에 없다): 1장 불량배가 떨어뜨린 방망이를 2장에서 주워, 메뉴의 인벤토리(`InventoryView`, 그림 `inventory.py`)에서 장착·장착 해제한다. 옷은 고정이고 무기만 장착한다(처음 만든 여섯 자리 장비창은 사용자 결정으로 뺐다). 장착한 무기의 공격력이 주인공에게 더해진다. 저장 형식 2판. 방망이를 장착한 채 치면 휘두르기 그림이 나온다(웹게임 주인공 그림에 방망이를 쥐여 PixelLab으로 방향마다 1장, `Docs/ArtUpgrade/PixelLab/hero_swing.md`).
-- 11장 「다시 모인 파도」: 3층 요정 마을의 쉼터(`tree_inn.py`), 꿈(`dream.py`), 에라드의 탑(`erad_tower.py`), 나리온(`narion.py`, 맵 위 `GiantBird`), 하늘길·엔딩 컷인(`cutin_sky.py`)을 생성기로 그리고 연출을 옮겼다(`Chapter11`). 11장이 끝나면 1부 클리어를 저장하고 1부 엔딩 뒤 타이틀로 돌아간다(타이틀에 「1부 클리어」).
+- 11장 「다시 모인 파도」: 3층 요정 마을의 쉼터(`tree_inn.py`), 꿈(`dream.py`), 에라드의 탑(`erad_tower.py`), 나리온(맵 위 `GiantBird`, 그림은 2026-11-09에 웹게임 원화를 PixelOE로 바꾼 `Tools/WebGame/narion.py`), 하늘길·엔딩 컷인(`cutin_sky.py`)을 생성기로 그리고 연출을 옮겼다(`Chapter11`). 11장이 끝나면 1부 클리어를 저장하고 1부 엔딩 뒤 타이틀로 돌아간다(타이틀에 「1부 클리어」).
 
 남은 4단계: 상태 메뉴(`mp-screen-stack`), 날씨(비·빛 알갱이)와 맵 밖 배경(차원공간·노을), 소리, Sprite Atlas, Addressables.
 

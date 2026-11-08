@@ -2,7 +2,7 @@
 웹게임 skyRidePanel(하늘길)과 EndingScene(1부 엔딩)을 다시 그린다.
 
 두 장면 모두 화면 전체가 창이다(배경 back은 비어 있다). 뒤에 풍경 겹을 깔고 컷인 화면이 겹마다 다른 빠르기로 옆으로 민다.
-나리온과 탄 일행은 narion.py가 그린 날갯짓 두 장(Art/PixelGen/Stage/narion_fly0·1.png)을 컷인 인물로 넘긴다.
+나리온과 탄 일행은 Tools/WebGame/narion.py가 웹게임 원화로 구운 날갯짓 두 장(Art/PixelGen/Stage/narion_fly0·1.png)을 컷인 인물로 넘긴다.
   skyRide/   하늘길: 맑은 낮 하늘과 해(sky, 멈춤), 발아래로 멀어지는 숲(forest), 먼 구름(far)·가까운 구름(near)·바로 앞 구름(front)
   ending/    1부 엔딩: 노을 하늘과 아이로스 쪽에 낮게 걸린 해(sky), 멀리 펼쳐진 구름 바다(far), 그 위 구름 덩이와 구름 바다 바닥(near),
              가까이 지나가는 구름(front)

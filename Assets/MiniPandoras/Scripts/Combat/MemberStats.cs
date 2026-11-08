@@ -65,7 +65,7 @@ namespace MiniPandoras.Combat
             var lines = new List<StatLine>
             {
                 new StatLine(T("memberStats.heroLines.1"), state.HeroLevel),
-                new StatLine(T("memberStats.heroLines.2"), state.ExperienceInLevel, 0, $"/{GameBalance.Current.ExperiencePerLevel}"),
+                new StatLine(T("memberStats.heroLines.2"), state.ExperienceInLevel, max: GameBalance.Current.ExperiencePerLevel),
             };
             For(hero, state.ChapterLevel, state.Awakened, null, state.EarnedLevels).Stats.AddLines(lines, state.Equipment.Bonus);
             return lines;

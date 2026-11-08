@@ -58,7 +58,7 @@ namespace MiniPandoras.UI
             public Button Buy => buy;
         }
 
-        [SerializeField] private GameObject screen;
+        [SerializeField] private WindowMotion window;
         [SerializeField] private Button closeButton;
         [SerializeField] private Row[] rows = Array.Empty<Row>();
         [SerializeField] private ItemIcon[] icons = Array.Empty<ItemIcon>();
@@ -70,7 +70,7 @@ namespace MiniPandoras.UI
         public event Action<string> BuyRequested;
         public event Action Closed;
 
-        public bool IsOpen => screen.activeSelf;
+        public bool IsOpen => window.IsOpen;
 
         public void Show(IReadOnlyList<ShopEntry> goods, int goldAmount)
         {
@@ -91,7 +91,7 @@ namespace MiniPandoras.UI
                 }
             }
 
-            screen.SetActive(true);
+            window.Open();
         }
 
         public void Notify(string text)
@@ -107,7 +107,7 @@ namespace MiniPandoras.UI
                 rows[i].Buy.onClick.AddListener(() => BuyRequested?.Invoke(shown[index].Item));
             }
 
-            screen.SetActive(false);
+            window.CloseInstantly();
         }
 
         private void OnEnable()
@@ -122,7 +122,7 @@ namespace MiniPandoras.UI
 
         private void Close()
         {
-            screen.SetActive(false);
+            window.Close();
             Closed?.Invoke();
         }
     }

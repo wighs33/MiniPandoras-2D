@@ -25,7 +25,7 @@ namespace MiniPandoras.Progress
             SaveStore.Write(state.ToSave(chapter, previous != null && previous.Cleared));
         }
 
-        /// <summary>1부를 끝까지 봤다. 저장된 장은 그대로 두고 표시만 더한다(웹게임 markCleared).</summary>
+        /// <summary>이야기를 끝까지(2부 엔딩까지) 봤다. 저장된 장은 그대로 두고 표시만 더한다(웹게임 markCleared).</summary>
         public void MarkCleared()
         {
             SaveData previous = SaveStore.Read();

@@ -28,9 +28,6 @@ text			보석 · 퀘스트 아이템
 == inventoryEntries.line.5
 text			보석
 
-== inventoryEntries.line.6
-text			 · 장착 중
-
 == fieldCombat.boss.tryStunOnWall.1
 text			벽에 박았다!
 
@@ -210,6 +207,9 @@ text			건너뛰기
 
 == titleView.show.1
 text			  · 준비 중
+
+== titleView.confirmNewGame
+text			저장된 「{0}」 진행이 지워져요.\n처음부터 시작할까요?
 
 == touchControlsView.captionText.1
 text			대화

@@ -19,7 +19,7 @@ namespace MiniPandoras.Story
         private static readonly Vector2[] LightKeys = { new Vector2(40f, 0.25f), new Vector2(300f, 1f) };
         private static readonly Vector2[] ZoomKeys = { new Vector2(0f, 1.1f), new Vector2(400f, 1f) };
 
-        // 1부 엔딩: 나리온(288×136)은 웹게임 마지막 크기(0.55배)로 장면에 두고, 장면을 1.9배로 당겨 처음엔 웹게임 첫 크기(1.05배)로 보이게 한다.
+        // 2부 엔딩: 나리온(288×136)은 웹게임 마지막 크기(0.55배)로 장면에 두고, 장면을 1.9배로 당겨 처음엔 웹게임 첫 크기(1.05배)로 보이게 한다.
         // 520프레임에 걸쳐 장면 전체로 물러난다. 자리는 웹게임 520프레임째 나리온 가운데(214, 138)다.
         private static readonly Vector2 EndingBirdFoot = new Vector2(214f, 175f);
         private const float EndingBirdHeight = 75f;
@@ -209,7 +209,7 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>
-        /// 1부 엔딩(웹게임 EndingScene): 에버웨이브 일행을 태운 나리온이 노을 진 구름 위를 날아 아이로스로 향하고, 카메라가 천천히 멀어진다.
+        /// 2부 엔딩(웹게임 EndingScene, 웹게임에서는 1부 엔딩): 에버웨이브 일행을 태운 나리온이 노을 진 구름 위를 날아 아이로스로 향하고, 카메라가 천천히 멀어진다.
         /// 글귀가 차례로 떠오르고, 다 뜬 뒤 화면을 누르면 어두워지며 끝난다. 어두운 화면에서 시작한다.
         /// </summary>
         public IEnumerator Ending()

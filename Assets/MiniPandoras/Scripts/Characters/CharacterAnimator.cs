@@ -23,8 +23,6 @@ namespace MiniPandoras.Characters
     {
         private static readonly int[] threeFrameWalk = { 1, 0, 2, 0 };
         // 한 호흡의 순서. 0은 서 있는 그림, 1~3은 숨쉬는 그림의 단계다. 다 내쉬고 나서 잠깐 쉰다.
-        private static readonly int[] BreathBeats = { 0, 1, 2, 3, 2, 1, 0, 0 };
-        private const float SecondsPerBreathBeat = 0.3f;
         private const float LieLiftPixels = 7f;
         // 정렬은 그림 자리를 따르므로 하늘에 뜬 인물은 땅의 집 뒤로 숨는다. 이만큼(논리 px) 뜨면 맵의 모든 것 앞에 그린다.
         private const float AirborneLiftPixels = 24f;
@@ -89,7 +87,7 @@ namespace MiniPandoras.Characters
             shadowAlpha = shadow != null ? shadow.color.a : 0f;
             castShadowAlpha = castShadow != null ? castShadow.color.a : 0f;
             // 모여 선 인물들이 한꺼번에 숨쉬지 않게 시작 박자를 흩뜨린다.
-            breathClock = Random.value * BreathBeats.Length * SecondsPerBreathBeat;
+            breathClock = Random.value * CharacterSheet.BreathCycleSeconds;
         }
 
         // 잘라서 만든 조각은 소유한 곳이 없어 스스로 지워야 한다.
@@ -179,10 +177,7 @@ namespace MiniPandoras.Characters
             }
 
             breathClock += Time.deltaTime;
-            int beat = (int)(breathClock / SecondsPerBreathBeat) % BreathBeats.Length;
-            int stage = BreathBeats[beat];
-            IReadOnlyList<Sprite> breath = body.Sheet.BreathFramesFor(body.Facing);
-            return stage > 0 && stage <= breath.Count ? breath[stage - 1] : null;
+            return body.Sheet.BreathFrameAt(body.Facing, breathClock);
         }
 
         private int CurrentFrame(int frameCount)

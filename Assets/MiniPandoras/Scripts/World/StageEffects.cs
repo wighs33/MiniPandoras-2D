@@ -46,7 +46,7 @@ namespace MiniPandoras.World
         [SerializeField] private Sprite[] trainTongue;
         [Tooltip("맵에 세우는 큰 그림(Tools/PixelGen/warship.py·sea_dragon.py). 이름으로 고른다. 기준점은 아래 가운데")]
         [SerializeField] private Sprite[] stageImages;
-        [Tooltip("나리온(Tools/PixelGen/narion.py) 앉은 그림: 탄 사람 0명부터 여섯까지. 기준점은 발이 닿는 줄 가운데")]
+        [Tooltip("나리온(Tools/WebGame/narion.py) 앉은 그림: 탄 사람 0명부터 여섯까지. 기준점은 발이 닿는 줄 가운데")]
         [SerializeField] private Sprite[] narionPerched;
         [Tooltip("나리온 날갯짓 두 장(여섯이 다 탄 모습). 하늘길·엔딩 컷인도 같은 그림을 쓴다")]
         [SerializeField] private Sprite[] narionFlying;

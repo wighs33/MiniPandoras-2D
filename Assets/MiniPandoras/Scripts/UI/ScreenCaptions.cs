@@ -9,7 +9,7 @@ namespace MiniPandoras.UI
 {
     /// <summary>
     /// 장면 위에 잠깐 뜨는 글자들: 장 제목 카드(웹게임 renderCard), 안내 띠(renderHint), 위아래 검은 띠(cinema),
-    /// 1부 엔딩 글귀(웹게임 EndingScene LINES).
+    /// 2부 엔딩 글귀(웹게임 EndingScene LINES. 웹게임의 「1부」를 이 게임의 부 나누기에 맞춰 「2부」로 바꿨다).
     /// 좌표는 가상 화면(384×216) 단위다.
     /// </summary>
     public sealed class ScreenCaptions : MonoBehaviour
@@ -43,9 +43,9 @@ namespace MiniPandoras.UI
         [SerializeField] private CanvasGroup hint;
         [SerializeField] private RectTransform hintBox;
         [SerializeField] private TMP_Text hintText;
-        [Header("1부 엔딩 글귀")]
+        [Header("2부 엔딩 글귀")]
         [SerializeField] private CanvasGroup ending;
-        [Tooltip("차례로 떠오르는 줄(「― 1부 종료 ―」부터)")]
+        [Tooltip("차례로 떠오르는 줄(「― 2부 종료 ―」부터)")]
         [SerializeField] private CanvasGroup[] endingLines;
         [Tooltip("다 떠오른 뒤 깜빡이는 「화면을 누르면 타이틀로」")]
         [SerializeField] private CanvasGroup endingPrompt;
@@ -90,7 +90,7 @@ namespace MiniPandoras.UI
         }
 
         /// <summary>
-        /// 1부 엔딩 글귀(웹게임 EndingScene): 「― 1부 종료 ―」와 세 줄이 차례로 떠오르고, 900프레임 뒤에는 「화면을 누르면 타이틀로」가
+        /// 2부 엔딩 글귀(웹게임 EndingScene): 「― 2부 종료 ―」와 세 줄이 차례로 떠오르고, 900프레임 뒤에는 「화면을 누르면 타이틀로」가
         /// 깜빡인다. 그 뒤에 누르면 끝난다. 글귀는 남겨 두고 <see cref="HideEnding"/>으로 흐리게 지운다.
         /// </summary>
         public IEnumerator ShowEnding()

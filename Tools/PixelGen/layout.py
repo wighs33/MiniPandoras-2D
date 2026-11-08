@@ -42,7 +42,7 @@ class MapLayout:
         self.solid = np.zeros((height * SUB, width * SUB), dtype=bool)
         self.open = np.zeros((height * SUB, width * SUB), dtype=bool)
         self.props, self.uprights, self.decals, self.lights, self.warps = [], [], [], [], []
-        self.gates, self.fires = [], []
+        self.fires = []
         # 바닥을 직접 그리는 맵(실내 …)은 여기에 그리는 함수를 둔다. 없으면 칸 종류로 야외 바닥을 그린다.
         self.paint_ground = None
         self.points = {}
@@ -205,17 +205,10 @@ class MapLayout:
             self.upright(f"fence_{mask}", image, x * pg.TILE + pg.TILE // 2, (y + 1) * pg.TILE - 1, pivot, (y + 1) * LOGICAL)
             self.block(x, y + 0.5, x + 1, y + 1)
 
-    def gate(self, point, opened, closed, foot_x_dots, foot_y_dots, pivot, foot_logical):
-        """
-        이야기가 닫을 수 있는 문(맵 들여오기의 MapGate). 열린 그림을 세우고 닫힌 그림은 gates에 적는다(두 그림은 크기가 같다).
-        닫히면 지점 point의 칸이 막힌다.
-        """
+    def gate(self, point, opened, foot_x_dots, foot_y_dots, pivot, foot_logical):
+        """열린 채로 서 있는 문. 들여오기가 「성문」이라는 이름으로 세운다."""
         self.upright(f"{point}_open", opened, foot_x_dots, foot_y_dots, pivot, foot_logical)
         self.uprights[-1]["gate"] = point
-        self.images[f"{point}_closed"] = closed
-        entry = dict(self.uprights[-1], image=f"{point}_closed")
-        del entry["gate"]
-        self.gates.append(dict(entry, point=point))
 
     def fire(self, x, y, kind="fire"):
         """칸 (x, y)에 타는 불꽃(웹게임 fire·torch 타일, 맵 들여오기가 움직이는 불꽃을 얹는다)."""
@@ -313,7 +306,7 @@ class MapLayout:
             "collision": ["".join("1" if v else "0" for v in row) for row in solid],
             "props": self.props,
             "points": [{"name": name, "cells": [{"x": x, "y": y} for x, y in cells]} for name, cells in self.points.items()],
-            "warps": self.warps, "uprights": self.uprights, "decals": self.decals, "gates": self.gates,
+            "warps": self.warps, "uprights": self.uprights, "decals": self.decals,
             "animated": water + self.fires, "glints": glints, "lights": self.lights,
             "background": self.background, "ambient": self.ambient, "weather": self.weather,
             "looks": [{"name": name, "collision": ["".join("1" if v else "0" for v in row) for row in solid_cells]}

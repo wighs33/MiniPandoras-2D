@@ -233,7 +233,8 @@ namespace MiniPandoras.UI
 
         private void BuildHud()
         {
-            hud = Group("Hud").gameObject;
+            hud = Stretch("Hud").gameObject;
+            hud.AddComponent<SafeAreaPanel>();
             Label(hud.transform, "Label", T("gliderView.buildHud.1"), font, 7.5f, Ink, TextAlignmentOptions.TopLeft).rectTransform.anchoredPosition = new Vector2(12f, -8f);
             Box(hud.transform, "Bar Back", 50f, 11f, 120f, 4f, new Color(0f, 0f, 0f, 0.45f));
             progressFill = Box(hud.transform, "Bar Fill", 50f, 11f, 120f, 4f, gold).rectTransform;

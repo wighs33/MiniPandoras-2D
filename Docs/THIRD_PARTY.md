@@ -2,6 +2,24 @@
 
 게임에 들어가는 외부 코드·그림과 그 라이선스. 출시판의 크레딧 화면에도 같은 내용을 넣는다.
 
+## 글꼴 (모두 SIL Open Font License 1.1)
+
+| 글꼴 | 쓰는 곳 | 출처 | 파일 |
+|---|---|---|---|
+| Pretendard | 아직 옮기지 않은 화면의 글 | https://github.com/orioncactus/pretendard | `Assets/ThirdParty/Pretendard` |
+| 갈무리(Galmuri) 2.40.4 | 새 UI의 버튼과 본문(도트). 11·9·7을 12·10·8 크기로만 쓴다 | https://github.com/quiple/galmuri | `Assets/ThirdParty/Galmuri` |
+| Noto Serif KR Bold | 타이틀 로고와 제목(웹게임 타이틀과 같은 명조) | https://github.com/notofonts/noto-cjk (`Serif/SubsetOTF/KR`) | `Assets/ThirdParty/NotoSerifKR` |
+
+- OFL은 글꼴을 게임에 넣어 팔아도 되고, 글꼴 파일만 따로 팔면 안 된다. 원문은 각 폴더의 `LICENSE.txt`이고, 출시판 크레딧에 글꼴 이름과 라이선스를 적는다.
+- TMP 글꼴 에셋은 `Assets/MiniPandoras/Art/Fonts`에 있다. 갈무리와 명조는 지금 동적 아틀라스라 원본 글꼴 파일이 빌드에 들어간다(갈무리 약 14MB, 명조 약 8MB). 웹 빌드 전에 쓰는 글자만 담은 정적 아틀라스로 바꾼다.
+
+## PrimeTween
+
+- 무엇: 메모리를 할당하지 않는 트윈(움직임) 라이브러리. 창을 열고 닫는 움직임(`UI.WindowMotion`)에 쓴다(2026-11-08).
+- 출처: https://github.com/KyryloKuzyk/PrimeTween, 판 1.5.2. Copyright Kyrylo Kuzyk 2023.
+- 설치: NPM 패키지(`Packages/manifest.json`의 scoped registry `https://registry.npmjs.org/`, 범위 `com.kyrylokuzyk`). 소스를 이 저장소에 두지 않는다.
+- 라이선스: MIT가 아니라 PrimeTween 자체 라이선스다. 무료·상업 게임에 써도 되고, 공개 저장소의 프로젝트도 NPM 패키지로 설치하면 된다. PrimeTween의 소스나 .tgz를 다른 결과물에 넣어 배포하거나, 되팔거나, 자기 것이라고 하면 안 된다. 원문: https://github.com/KyryloKuzyk/PrimeTween/blob/main/LICENSE
+
 ## pixelfx
 
 - 무엇: 코드로 그리는 도트 이펙트 모음. 효과를 `Tools/PixelFx/export_pixelfx.mjs`로 스프라이트 시트로 뽑아 쓴다(`Art/PixelFx`).
@@ -34,3 +52,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## PixelOE
+
+- 무엇: 큰 그림을 도트 그림으로 바꾸는 도구. 칸마다 대비를 살려 한 색을 고른다. 게임에 들어가는 것은 바꾼 그림뿐이고 도구 코드는 싣지 않는다.
+- 출처: https://github.com/KohakuBlueleaf/PixelOE (PyPI `pixeloe` 1.0.0). 이 저장소 밖의 가상환경(`E:/ArtTools/venv-pixeloe`)에 설치해 쓴다.
+- 쓰는 곳: 나리온(`Tools/WebGame/narion.py`, 2026-11-09). 웹게임 원화 `narion-mount.png`를 게임 크기(논리 px 하나 = 4px)와 2부 타이틀 크기(3/4)로 바꾼다.
+- 라이선스: Apache-2.0.

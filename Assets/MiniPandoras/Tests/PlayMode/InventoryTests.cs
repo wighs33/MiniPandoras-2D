@@ -80,15 +80,16 @@ namespace MiniPandoras.Tests
             yield return story.Until(() => guide.Target == menu.InventoryButton, 2f, "열린 메뉴의 「인벤토리」를 가리킨다");
             Press(menu.InventoryButton);
             yield return story.Until(() => guide.Target == panel.Find("Bag 1"), 2f, "가방의 방망이 칸(회복약 다음)을 가리킨다");
+            Assert.That(inventory.SelectedId, Is.EqualTo(Items.Potion), "열면 첫 물건(회복약)이 골라져 있어 정보 칸이 비지 않는다");
             Assert.That(StoryDriver.PressedAt((RectTransform)panel.Find("Bag 0")), Is.Not.EqualTo(panel.Find("Bag 0").gameObject), "가리키지 않은 칸은 덮개에 가려 누를 수 없다");
             Press(panel.Find("Bag 1"));
             yield return story.Until(() => guide.Target == panel.Find("Details/Equip"), 2f, "「장착」을 가리킨다");
             Assert.That(panel.Find("Details/Name").GetComponent<TMP_Text>().text, Is.EqualTo("방망이"));
             Assert.That(panel.Find("Details/Detail").GetComponent<TMP_Text>().text, Is.EqualTo("무기 · 공격력 +2"));
             Assert.That(panel.Find("Details/Unequip").gameObject.activeSelf, Is.False, "장착하지 않은 무기에는 장착 해제가 없다");
-            Assert.That(panel.Find("Stat 4").GetComponent<TMP_Text>().text, Is.EqualTo("공격력"));
-            Assert.That(panel.Find("Stat 4 Value").GetComponent<TMP_Text>().text, Does.Not.Contain("(+"), "맨손이면 괄호가 없다");
-            Assert.That(panel.Find("Stat 5 Value").GetComponent<TMP_Text>().text, Is.EqualTo("8%"), "치명타 확률은 전투의 값이다");
+            Assert.That(panel.Find("Stats/Stat 4").GetComponent<TMP_Text>().text, Is.EqualTo("공격력"));
+            Assert.That(panel.Find("Stats/Stat 4 Value").GetComponent<TMP_Text>().text, Does.Not.Contain("(+"), "맨손이면 괄호가 없다");
+            Assert.That(panel.Find("Stats/Stat 5 Value").GetComponent<TMP_Text>().text, Is.EqualTo("8%"), "치명타 확률은 전투의 값이다");
             Assert.That(panel.Find("Gold").GetComponent<TMP_Text>().text, Is.EqualTo("Gold 0"));
             Press(panel.Find("Details/Equip"));
             yield return story.Until(() => guide.Target == panel.Find("Close"), 2f, "닫기를 가리킨다");
@@ -96,7 +97,7 @@ namespace MiniPandoras.Tests
             Assert.That(panel.Find("Bag 1/Icon").GetComponent<Image>().enabled, Is.True, "장착해도 가방 칸에 그대로 있다");
             Assert.That(panel.Find("Bag 1/Equipped").gameObject.activeSelf, Is.True, "장착한 칸에 「E」 표시가 붙는다");
             Assert.That(panel.Find("Bag 0/Equipped").gameObject.activeSelf, Is.False, "회복약 칸에는 없다");
-            Assert.That(panel.Find("Stat 4 Value").GetComponent<TMP_Text>().text, Does.Contain("(+2)"), "장착하면 공격력에 괄호로 더해진다");
+            Assert.That(panel.Find("Stats/Stat 4 Value").GetComponent<TMP_Text>().text, Does.Contain("(+2)"), "장착하면 공격력에 괄호로 더해진다");
             Press(panel.Find("Close"));
             yield return story.Until(() => story.Lines.Contains(LessonEndLine), 5f, "튜토리얼이 끝나면 랑이 치는 법을 알려 준다");
             yield return story.Until(() => story.Lines.Contains(GoNorthLine), 5f, "치는 법을 알려 준 뒤에야 북쪽으로 가자고 한다");

@@ -37,7 +37,7 @@ namespace MiniPandoras.UI
         private const float BlinkSeconds = 0.45f;
         private const float ZoomSeconds = 0.3f;
 
-        [SerializeField] private GameObject screen;
+        [SerializeField] private WindowMotion window;
         [SerializeField] private Button closeButton;
         [SerializeField] private AreaPiece[] pieces = Array.Empty<AreaPiece>();
         [Tooltip("지금 있는 곳을 짚는 핀. 기준점이 핀 끝이다")]
@@ -65,7 +65,7 @@ namespace MiniPandoras.UI
 
         public event Action Closed;
 
-        public bool IsOpen => screen.activeSelf;
+        public bool IsOpen => window.IsOpen;
         public bool IsFocused => focused;
         public RectTransform FocusArea => (RectTransform)focusButton.transform;
         public RectTransform CloseButton => (RectTransform)closeButton.transform;
@@ -91,12 +91,12 @@ namespace MiniPandoras.UI
             zoom = 0f;
             SetFocused(false);
             ApplyZoom();
-            screen.SetActive(true);
+            window.Open();
         }
 
         private void Awake()
         {
-            screen.SetActive(false);
+            window.CloseInstantly();
         }
 
         private void OnEnable()
@@ -160,7 +160,7 @@ namespace MiniPandoras.UI
 
         private void Close()
         {
-            screen.SetActive(false);
+            window.Close();
             Closed?.Invoke();
         }
     }

@@ -125,7 +125,7 @@ namespace MiniPandoras.UI
             public TMP_Text Percent => percent;
         }
 
-        [SerializeField] private GameObject screen;
+        [SerializeField] private WindowMotion window;
         [Tooltip("책 밖을 누르는 판(누르면 닫힌다)")]
         [SerializeField] private Button outside;
         [SerializeField] private Button closeButton;
@@ -164,7 +164,7 @@ namespace MiniPandoras.UI
 
         public event Action Closed;
 
-        public bool IsOpen => screen.activeSelf;
+        public bool IsOpen => window.IsOpen;
 
         /// <summary>튜토리얼이 가리킬 자리: 「체험」 버튼. 지금 체험할 수 없으면 꺼져 있다.</summary>
         public RectTransform TryButton => (RectTransform)tryButton.transform;
@@ -181,7 +181,7 @@ namespace MiniPandoras.UI
                 burstAge = 0f;
             }
 
-            screen.SetActive(true);
+            window.Open();
             Refresh();
         }
 
@@ -192,7 +192,7 @@ namespace MiniPandoras.UI
                 return;
             }
 
-            screen.SetActive(false);
+            window.Close();
             burstId = null;
             Closed?.Invoke();
         }
@@ -239,7 +239,7 @@ namespace MiniPandoras.UI
                 rows[i].Button.onClick.AddListener(() => Select(index));
             }
 
-            screen.SetActive(false);
+            window.CloseInstantly();
         }
 
         private void OnEnable()

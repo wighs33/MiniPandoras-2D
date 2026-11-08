@@ -1,9 +1,9 @@
 # Mini Pandoras
 
-직접 만든 웹게임 판도라즈 1부를 Unity로 옮긴 탑뷰 2D 액션 RPG입니다. 휴대폰 가로 화면을 기준으로 하며, 0장부터 11장과 엔딩까지 끝까지 플레이할 수 있습니다.
+직접 만든 웹게임 판도라즈 1부를 Unity로 옮긴 탑뷰 2D 액션 RPG입니다. 휴대폰 가로 화면을 기준으로 하며, 0장부터 11장과 엔딩까지 끝까지 플레이할 수 있습니다. 이 게임에서는 뱀열차에 오르기까지(프롤로그~5장)를 1부, 그 뒤(6~11장)를 2부로 나누고, 타이틀 풍경도 부마다 다릅니다.
 
 - 포트폴리오 페이지: https://hyeonsik-game-portfolio.vercel.app/projects/minipandoras/
-- 환경: Unity 6000.3.25f1, URP 2D Renderer, Input System, Test Framework
+- 환경: Unity 6000.3.25f1, URP 2D Renderer, Input System, Test Framework, PrimeTween
 - 개발: 1인 개발. 코드는 Claude Code와 함께 작성했습니다.
 
 ## 저장소에 있는 것
@@ -52,7 +52,7 @@ Dialogue
 
 ## 테스트
 
-Unity Test Runner로 실행합니다. EditMode 80개는 공식과 규칙을, PlayMode 114개는 Field 장면에서 장별 이야기와 전투, 메뉴를 확인합니다.
+Unity Test Runner로 실행합니다. EditMode 84개는 공식과 규칙을, PlayMode 116개는 Field 장면에서 장별 이야기와 전투, 메뉴를 확인합니다.
 
 ## 외부 자료
 

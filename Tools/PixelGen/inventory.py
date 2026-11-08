@@ -1,12 +1,11 @@
-"""인벤토리 창과 아이템의 그림(불량배의 방망이를 주워 인벤토리에서 장착). 웹게임에는 없는 창이다.
+"""가방의 아이템 그림(불량배의 방망이를 주워 가방에서 장착). 웹게임에는 없는 창이다.
 
-창은 판도라 정착 창(pandora_loadout.py)과 같은 남색 창에 금테 두 줄이고, 그 위에 왼쪽 능력치 칸·오른쪽 위 장착 칸·그 아래 가방 칸·오른쪽 아래 정보 칸을 새겨 둔다.
+창 틀·칸 바탕·고른 테는 모든 창이 같이 쓰는 부품(ui_kit.py)이고, 여기서는 아이템 문양 여덟 개와 맵 바닥에 떨어진 물건, 그 위의 별빛만 그린다. 글자는 창이 얹는다.
 장비창은 없다(옷은 바꿔 입지 않고 무기만 가방에서 장착한다).
-아이템 칸, 고른 칸의 금빛 테, 아이템 문양(방망이·회복약·더스트 결정·뱀신의 눈), 맵 바닥에 떨어진 방망이도 함께 그린다. 글자는 창이 얹는다.
-창 그림은 가상 px의 두 배 점으로 그려 점 하나 = 2px로 키워 저장한다. 바닥의 방망이는 맵 그림과 같이 한 칸 32점이다.
+문양은 가상 px의 두 배 점으로 그려 점 하나 = 2px로 키워 저장한다. 바닥의 물건은 맵 그림과 같이 한 칸 32점이다.
 
-  Assets/MiniPandoras/Art/PixelGen/UI/Inventory/panel.png, cell.png, cell_focus.png, item_<아이템>.png
-  Assets/MiniPandoras/Art/PixelGen/Items/bat_ground.png, bat_ground_shape.png(그림자 없는 모양, 금빛 테두리용)
+  Assets/MiniPandoras/Art/PixelGen/UI/Inventory/item_<아이템>.png
+  Assets/MiniPandoras/Art/PixelGen/Items/bat_ground.png, worldMap_ground.png, *_shape.png(그림자 없는 모양, 금빛 테두리용)
   Assets/MiniPandoras/Art/PixelGen/Effects/pickup_sparkle.png(바닥에 떨어진 아이템 위에서 반짝이는 별빛)
   Docs/ArtUpgrade/PixelGen/inventory_preview.png
 
@@ -20,69 +19,12 @@ from PIL import Image
 
 import pixelgen as pg
 from houses import Canvas
-from pandora_loadout import GOLD, NAVY, rounded
+from pandora_loadout import GOLD
 
 D = 2                              # 가상 px 하나 = 2점
 PARCHMENT = pg.hexes("#7a5a34", "#b08d57", "#d9bd85", "#efdcae")
-PANEL = (10, 8, 364, 200)          # 창 자리(가상 화면 x, y, 너비, 높이). 아래 칸들은 창 왼쪽 위에서 잰다
-STATS_BOX = (8, 28, 112, 192)      # 능력치 칸(x0, y0, x1, y1)
-EQUIP_BOX = (118, 28, 356, 62)     # 장착 칸
-BAG_BOX = (118, 66, 356, 127)      # 가방 칸
-INFO_BOX = (118, 131, 356, 192)    # 정보 칸
-CELL = 24                          # 아이템 칸 한 변
-PITCH = 27                         # 아이템 칸 사이(가운데에서 가운데)
-BAG_TOP_LEFT = (131, 71)           # 가방 첫 칸의 왼쪽 위(8×2 칸을 가방 칸 가운데에 둔다)
-BAG_COLUMNS, BAG_ROWS = 8, 2
 ICON = 20                          # 아이템 문양 한 변
 INK = pg.hexes("#0a0d1c")[0]
-SHADE = pg.hexes("#0b0f22", "#0e1328", "#11172f")
-
-
-# ── 창 ────────────────────────────────────────────────
-
-def inset(c, box, shade):
-    """창에 새긴 칸: 바탕보다 짙은 남색, 안쪽 위·왼쪽에 그늘, 옅은 금테 한 줄."""
-    x0, y0, x1, y1 = (v * D for v in box)
-    body = rounded(c, x0, y0, x1, y1, 3 * D)
-    c.paint(body, shade)
-    c.paint(body & ~rounded(c, x0, y0 + D, x1, y1, 3 * D), SHADE[0])
-    c.paint(body & pg.neighbours(~body), GOLD[0])
-
-
-def panel():
-    """창 바탕(가상 364×200): 정착 창과 같은 남색·금테에, 가방 칸·정보 칸을 새긴다."""
-    w, h = PANEL[2] * D, PANEL[3] * D
-    c = Canvas(w, h)
-    body = rounded(c, 0, 0, w, h, 5 * D)
-    c.paint(body, pg.quantize(np.clip(1 - c.yy / h, 0, 0.999), NAVY, dither=0.15))
-    outer = body & pg.neighbours(~body)
-    outer |= pg.neighbours(outer) & body
-    c.paint(outer, GOLD[1])
-    inner_body = rounded(c, 3 * D, 3 * D, w - 3 * D, h - 3 * D, 3 * D)
-    c.paint(inner_body & pg.neighbours(~inner_body), GOLD[0])
-    inset(c, STATS_BOX, SHADE[1])
-    inset(c, EQUIP_BOX, SHADE[2])
-    inset(c, BAG_BOX, SHADE[2])
-    inset(c, INFO_BOX, SHADE[1])
-    return c.image
-
-
-def cell(focused):
-    """아이템 칸(가상 24×24): 짙은 남색 판에 금테. 고른 칸은 밝은 금테 두 줄에 옅은 금빛이 돈다."""
-    size = CELL * D
-    c = Canvas(size, size)
-    # 테가 그림 끝에 닿으면 바깥을 모양 밖으로 보지 못해 테가 그려지지 않으므로 한 점씩 비워 둔다.
-    body = rounded(c, 1, 1, size - 1, size - 1, 2 * D)
-    if focused:
-        c.image[body, :3] = pg.hexes("#ffdc8c")[0]
-        c.image[body, 3] = 34
-        edge = body & pg.neighbours(~body)
-        c.paint(edge | (pg.neighbours(edge) & body), GOLD[3])
-        return c.image
-    c.paint(body, NAVY[0])
-    c.paint(body & ~rounded(c, 1, 1 + D, size - 1, size - 1, 2 * D), SHADE[0])
-    c.paint(body & pg.neighbours(~body), GOLD[1])
-    return c.image
 
 
 # ── 아이템 문양 ─────────────────────────────────────────
@@ -277,20 +219,11 @@ ITEMS = {"bat": bat_icon, "worldMap": map_icon, "potion": potion_icon, "ether": 
          "hobbitRuby": hobbit_ruby_icon, "kingsHorn": kings_horn_icon, "guildMedal": guild_medal_icon}
 
 
-def paste(preview, path, x, y):
-    """미리보기에 그림 하나를 창 왼쪽 위에서 잰 가상 좌표(가운데)에 얹는다."""
-    image = Image.open(path)
-    scale = D * pg.SCALE
-    preview.alpha_composite(image, (round(x * scale - image.width / 2), round(y * scale - image.height / 2)))
-
-
 def main(project):
     out = project / "Assets/MiniPandoras/Art/PixelGen/UI/Inventory"
     out.mkdir(parents=True, exist_ok=True)
-    parts = {"panel": panel(), "cell": cell(False), "cell_focus": cell(True)}
-    parts.update({f"item_{item}": draw() for item, draw in ITEMS.items()})
-    for name, image in parts.items():
-        pg.save_png(image, out / f"{name}.png")
+    for item, draw in ITEMS.items():
+        pg.save_png(draw(), out / f"item_{item}.png")
     items = project / "Assets/MiniPandoras/Art/PixelGen/Items"
     items.mkdir(parents=True, exist_ok=True)
     pg.save_png(bat_ground(), items / "bat_ground.png")
@@ -301,19 +234,21 @@ def main(project):
     effects.mkdir(parents=True, exist_ok=True)
     pg.save_png(pickup_sparkle(), effects / "pickup_sparkle.png")
 
-    # 미리보기: 창에 가방 칸(회복약·더스트 결정·방망이, 더스트 결정을 고름)과 정보 칸의 문양을 얹는다.
-    preview = Image.open(out / "panel.png").convert("RGBA")
-    shown = ("item_potion.png", "item_ether.png", "item_bat.png")
-    for i in range(BAG_COLUMNS * BAG_ROWS):
-        x = BAG_TOP_LEFT[0] + CELL / 2 + (i % BAG_COLUMNS) * PITCH
-        y = BAG_TOP_LEFT[1] + CELL / 2 + (i // BAG_COLUMNS) * PITCH
-        paste(preview, out / ("cell_focus.png" if i == 1 else "cell.png"), x, y)
-        if i < len(shown):
-            paste(preview, out / shown[i], x, y)
-    paste(preview, out / "cell.png", INFO_BOX[0] + 6 + CELL / 2, INFO_BOX[1] + 6 + CELL / 2)
-    paste(preview, out / "item_ether.png", INFO_BOX[0] + 6 + CELL / 2, INFO_BOX[1] + 6 + CELL / 2)
-    ground = Image.open(items / "bat_ground.png")
-    preview.alpha_composite(ground.resize((ground.width * 2, ground.height * 2), Image.NEAREST), (40, 40))
+    # 미리보기: 칸 바탕색 위에 문양 여덟 개를 한 줄로, 그 아래에 바닥에 떨어진 방망이와 지도.
+    icons = [Image.open(out / f"item_{item}.png").convert("RGBA") for item in ITEMS]
+    grounds = [Image.open(items / f"{name}_ground.png").convert("RGBA") for name in ("bat", "worldMap")]
+    gap = 16
+    icon_height = max(icon.height for icon in icons)
+    width = max(gap + sum(icon.width + gap for icon in icons), gap + sum(ground.width + gap for ground in grounds))
+    preview = Image.new("RGBA", (width, gap * 3 + icon_height + max(ground.height for ground in grounds)), (17, 23, 47, 255))
+    x = gap
+    for icon in icons:
+        preview.alpha_composite(icon, (x, gap))
+        x += icon.width + gap
+    x = gap
+    for ground in grounds:
+        preview.alpha_composite(ground, (x, gap * 2 + icon_height))
+        x += ground.width + gap
     preview.save(project / "Docs/ArtUpgrade/PixelGen/inventory_preview.png")
     print(out)
 

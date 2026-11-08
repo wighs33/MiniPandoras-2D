@@ -12,6 +12,19 @@ namespace MiniPandoras.Story
         /// <summary>1장에서 이름을 정하므로, 이 장부터 시작하면 이름을 먼저 정한다.</summary>
         public const int NamedFrom = 2;
 
+        /// <summary>
+        /// 2부가 시작되는 장. 1부는 뱀열차에 오르기까지(0~5장, 5장 끝에 정류장에서 올라탄다), 2부는 뱀열차에 탄 뒤부터 끝까지(6장 객실~11장)다(사용자 결정 2026-11-09).
+        /// </summary>
+        public const int SecondPartFrom = 6;
+
+        private static readonly (string label, string title)[] Parts =
+        {
+            (T("chapterTitles.part1.label"), T("chapterTitles.part1.title")),
+            (T("chapterTitles.part2.label"), T("chapterTitles.part2.title")),
+        };
+
+        private static string[] partLines;
+
         private static readonly (string label, string title)[] Titles =
         {
             (T("chapterTitles.readonly.1"), T("chapterTitles.readonly.2")),
@@ -31,6 +44,47 @@ namespace MiniPandoras.Story
         private static string[] lines;
 
         public static int Count => Titles.Length;
+
+        public static int PartCount => Parts.Length;
+
+        /// <summary>부가 끝났다는 카드의 큰 글(「끝」).</summary>
+        public static string PartEnd => T("chapterTitles.partEnd");
+
+        /// <summary>그 장이 속한 부(1부터).</summary>
+        public static int PartOf(int chapter)
+        {
+            return chapter >= SecondPartFrom ? 2 : 1;
+        }
+
+        /// <summary>부의 이름표(「2부」).</summary>
+        public static string PartLabel(int part)
+        {
+            return Parts[part - 1].label;
+        }
+
+        /// <summary>부의 이름(「모래 위의 파도」).</summary>
+        public static string PartTitle(int part)
+        {
+            return Parts[part - 1].title;
+        }
+
+        /// <summary>부마다 한 줄(「2부 · 모래 위의 파도」). 타이틀의 로고 아래와 장 선택 창의 줄 머리에 보인다.</summary>
+        public static IReadOnlyList<string> PartLines
+        {
+            get
+            {
+                if (partLines == null)
+                {
+                    partLines = new string[Parts.Length];
+                    for (int i = 0; i < Parts.Length; i++)
+                    {
+                        partLines[i] = $"{Parts[i].label} · {Parts[i].title}";
+                    }
+                }
+
+                return partLines;
+            }
+        }
 
         public static string Label(int chapter)
         {

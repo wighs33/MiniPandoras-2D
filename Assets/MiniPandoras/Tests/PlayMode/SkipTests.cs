@@ -74,7 +74,7 @@ namespace MiniPandoras.Tests
         /// <summary>버튼 자리를 화면에서 누르면 대사를 넘기는 판이 아니라 건너뛰기 버튼이 받는지 보고 누른다.</summary>
         private static void Press(SkipButtonView view)
         {
-            var target = (RectTransform)view.transform.Find("Skip");
+            var target = (RectTransform)view.transform.Find("Safe Area/Skip");
             var button = target.GetComponent<Button>();
             Assert.That(StoryDriver.PressedAt(target), Is.EqualTo(button.gameObject), "건너뛰기 버튼 자리를 누르면 그 버튼이 받는다");
             button.onClick.Invoke();

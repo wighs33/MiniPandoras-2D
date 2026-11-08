@@ -14,10 +14,11 @@ namespace MiniPandoras.World
     public sealed class SnakeTrain : MonoBehaviour
     {
         // 몸통 그림(Tools/PixelGen/snake_train.py)과 같은 값: 머리 기준점에서 꼬리 쪽으로 잰 몸통 시작, 올라타는 문, 머리가 서는 목 자리.
-        private const float BodyStart = 14f;
+        // 타이틀 풍경(UI.SlitherGraphic, UI.TitleScenery)도 같은 값으로 뱀열차를 세운다.
+        public const float BodyStart = 14f;
+        public const float Neck = 16f;
+        public const float SliceWidth = 2f;
         private const float DoorOffset = 102f;
-        private const float Neck = 16f;
-        private const float SliceWidth = 2f;
 
         // 땅 위 S자 물결: 한 굽이의 길이와 깊이(화면에서 앞뒤로 휘는 정도).
         private const float GrooveLength = 140f;
@@ -197,7 +198,7 @@ namespace MiniPandoras.World
         }
 
         /// <summary>땅에 놓인 물결이 그 x에서 앞(+)이나 뒤(−)로 휜 정도(논리 px).</summary>
-        private static float Groove(float x)
+        public static float Groove(float x)
         {
             return Mathf.Sin(x * 2f * Mathf.PI / GrooveLength) * GrooveDepth;
         }

@@ -42,7 +42,7 @@ namespace MiniPandoras.UI
 
         private const float FinishedAlpha = 0.5f;
 
-        [SerializeField] private GameObject screen;
+        [SerializeField] private WindowMotion window;
         [SerializeField] private Button closeButton;
         [Header("왼쪽 목록")]
         [SerializeField] private Row[] rows = Array.Empty<Row>();
@@ -63,7 +63,7 @@ namespace MiniPandoras.UI
 
         public event Action Closed;
 
-        public bool IsOpen => screen.activeSelf;
+        public bool IsOpen => window.IsOpen;
 
         /// <summary>임무를 보이고 맨 위 임무를 고른다. 칸보다 많으면 오래된 것은 보이지 않는다.</summary>
         public void Show(IReadOnlyList<MissionLine> lines)
@@ -88,7 +88,7 @@ namespace MiniPandoras.UI
 
             scroll.content.sizeDelta = new Vector2(scroll.content.sizeDelta.x, shown.Count * rowHeight);
             scroll.content.anchoredPosition = Vector2.zero;
-            screen.SetActive(true);
+            window.Open();
             Select(0);
         }
 
@@ -126,7 +126,7 @@ namespace MiniPandoras.UI
                 rows[i].Button.onClick.AddListener(() => Select(index));
             }
 
-            screen.SetActive(false);
+            window.CloseInstantly();
         }
 
         private void OnEnable()
@@ -141,7 +141,7 @@ namespace MiniPandoras.UI
 
         private void Close()
         {
-            screen.SetActive(false);
+            window.Close();
             Closed?.Invoke();
         }
     }
