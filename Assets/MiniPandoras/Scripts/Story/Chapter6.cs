@@ -51,7 +51,6 @@ namespace MiniPandoras.Story
             s.Progress.SetFlag(StoryFlags.Awakened);
             s.Progress.SetFlag(StoryFlags.RangHurt, false);
             yield return s.FadeOut(0f);
-            yield return s.PartCard(ChapterTitles.PartOf(6));
             yield return s.ChapterCard(6);
             yield return InTheCarriage(s);
             // 여기서부터 소년 디엘의 기억이다. 기억 속 아지트와 숲길은 낡기 전의 모습이다.

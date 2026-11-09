@@ -97,7 +97,7 @@ namespace MiniPandoras.Tests
                 title = Object.FindFirstObjectByType<TitleView>();
             }
 
-            Assert.That(title.transform.Find("Screen/Safe Area/Logo/Cleared").gameObject.activeSelf, Is.True, "타이틀에 「2부 클리어」가 뜬다");
+            Assert.That(title.transform.Find("Screen/Safe Area/Logo/Cleared").gameObject.activeSelf, Is.True, "타이틀에 「CHAPTER 2 클리어」가 뜬다");
         }
 
         /// <summary>층마다 그 층의 계단(up 또는 down) 칸에 서서 다음 층으로 옮긴다. 마지막 층에서는 서지 않는다.</summary>

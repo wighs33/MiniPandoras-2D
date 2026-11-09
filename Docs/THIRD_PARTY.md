@@ -6,12 +6,12 @@
 
 | 글꼴 | 쓰는 곳 | 출처 | 파일 |
 |---|---|---|---|
-| Pretendard | 아직 옮기지 않은 화면의 글 | https://github.com/orioncactus/pretendard | `Assets/ThirdParty/Pretendard` |
-| 갈무리(Galmuri) 2.40.4 | 새 UI의 버튼과 본문(도트). 11·9·7을 12·10·8 크기로만 쓴다 | https://github.com/quiple/galmuri | `Assets/ThirdParty/Galmuri` |
+| Pretendard | 버튼과 본문 등 제목 밖의 모든 글 | https://github.com/orioncactus/pretendard | `Assets/ThirdParty/Pretendard` |
+| 갈무리(Galmuri) 2.40.4 | 사망 화면의 「사망했습니다」 한 줄(2026-11-09에 나머지 글에서는 뺐다). 11을 12 크기로 쓴다 | https://github.com/quiple/galmuri | `Assets/ThirdParty/Galmuri` |
 | Noto Serif KR Bold | 타이틀 로고와 제목(웹게임 타이틀과 같은 명조) | https://github.com/notofonts/noto-cjk (`Serif/SubsetOTF/KR`) | `Assets/ThirdParty/NotoSerifKR` |
 
 - OFL은 글꼴을 게임에 넣어 팔아도 되고, 글꼴 파일만 따로 팔면 안 된다. 원문은 각 폴더의 `LICENSE.txt`이고, 출시판 크레딧에 글꼴 이름과 라이선스를 적는다.
-- TMP 글꼴 에셋은 `Assets/MiniPandoras/Art/Fonts`에 있다. 갈무리와 명조는 지금 동적 아틀라스라 원본 글꼴 파일이 빌드에 들어간다(갈무리 약 14MB, 명조 약 8MB). 웹 빌드 전에 쓰는 글자만 담은 정적 아틀라스로 바꾼다.
+- TMP 글꼴 에셋은 `Assets/MiniPandoras/Art/Fonts`에 있다. 갈무리와 명조는 지금 동적 아틀라스라 원본 글꼴 파일이 빌드에 들어간다(갈무리11 약 14MB 중 일부, 명조 약 8MB). 갈무리는 한 줄만 쓰니 웹 빌드 전에 그 글자만 담은 정적 아틀라스로 바꾸면 원본 파일을 빼도 된다. 웹 빌드 전에 쓰는 글자만 담은 정적 아틀라스로 바꾼다.
 
 ## PrimeTween
 

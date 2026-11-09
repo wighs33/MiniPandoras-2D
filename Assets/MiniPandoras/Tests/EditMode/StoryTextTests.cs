@@ -67,11 +67,20 @@ namespace MiniPandoras.Tests
         }
 
         [Test]
-        public void NamesEachPartOnOneLine()
+        public void LabelsThePartsWithoutNames()
         {
-            Assert.That(ChapterTitles.PartCount, Is.EqualTo(2));
-            Assert.That(ChapterTitles.PartLines, Is.EqualTo(new[] { "1부 · 에버웨이브", "2부 · 모래 위의 파도" }));
+            // 부는 화면에 CHAPTER로 보이고 따로 이름을 두지 않는다. 장 이름으로 충분하다(사용자 결정 2026-11-09).
+            Assert.That(ChapterTitles.PartLabels, Is.EqualTo(new[] { "CHAPTER 1", "CHAPTER 2" }));
             Assert.That(ChapterTitles.PartOf(ChapterTitles.Count - 1), Is.EqualTo(ChapterTitles.PartCount), "마지막 장은 마지막 부에 든다");
+        }
+
+        [Test]
+        public void PartCardsShowTheirChaptersAndTheComingPart()
+        {
+            // 타이틀의 챕터 선택 카드: 나온 부는 장 범위를, 나오기로 한 다음 부(CHAPTER 3)는 COMING SOON을 보인다.
+            Assert.That(ChapterTitles.ChaptersOf(1), Is.EqualTo("0장 ~ 5장"));
+            Assert.That(ChapterTitles.ChaptersOf(2), Is.EqualTo("6장 ~ 11장"));
+            Assert.That(ChapterTitles.UpcomingPartLabels, Is.EqualTo(new[] { "CHAPTER 3" }));
         }
     }
 }

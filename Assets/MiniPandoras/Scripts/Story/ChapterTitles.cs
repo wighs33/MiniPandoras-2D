@@ -17,13 +17,17 @@ namespace MiniPandoras.Story
         /// </summary>
         public const int SecondPartFrom = 6;
 
-        private static readonly (string label, string title)[] Parts =
+        private static readonly string[] Parts =
         {
-            (T("chapterTitles.part1.label"), T("chapterTitles.part1.title")),
-            (T("chapterTitles.part2.label"), T("chapterTitles.part2.title")),
+            T("chapterTitles.part1"),
+            T("chapterTitles.part2"),
         };
 
-        private static string[] partLines;
+        // 나오기로 한 다음 부. 타이틀의 챕터 선택에 COMING SOON 카드로 선다. 그 부를 옮기면 Parts로 옮긴다.
+        private static readonly string[] UpcomingParts =
+        {
+            T("chapterTitles.part3"),
+        };
 
         private static readonly (string label, string title)[] Titles =
         {
@@ -56,34 +60,31 @@ namespace MiniPandoras.Story
             return chapter >= SecondPartFrom ? 2 : 1;
         }
 
-        /// <summary>부의 이름표(「2부」).</summary>
-        public static string PartLabel(int part)
+        /// <summary>
+        /// 부마다의 표시(「CHAPTER 1」, 「CHAPTER 2」). 타이틀의 로고 아래와 챕터 선택 카드, 장 선택 창의 줄 머리, 부가 끝나는 카드에 보인다.
+        /// 부는 화면에 CHAPTER로 보이고 따로 이름을 두지 않는다(사용자 결정 2026-11-09). 코드의 Chapter는 장이라서 부는 Part로 부른다.
+        /// </summary>
+        public static IReadOnlyList<string> PartLabels => Parts;
+
+        /// <summary>아직 나오지 않은 다음 부의 표시(「CHAPTER 3」).</summary>
+        public static IReadOnlyList<string> UpcomingPartLabels => UpcomingParts;
+
+        /// <summary>그 부의 첫 장.</summary>
+        public static int FirstChapterOf(int part)
         {
-            return Parts[part - 1].label;
+            return part == 1 ? 0 : SecondPartFrom;
         }
 
-        /// <summary>부의 이름(「모래 위의 파도」).</summary>
-        public static string PartTitle(int part)
+        /// <summary>그 부의 마지막 장.</summary>
+        public static int LastChapterOf(int part)
         {
-            return Parts[part - 1].title;
+            return part == 1 ? SecondPartFrom - 1 : Count - 1;
         }
 
-        /// <summary>부마다 한 줄(「2부 · 모래 위의 파도」). 타이틀의 로고 아래와 장 선택 창의 줄 머리에 보인다.</summary>
-        public static IReadOnlyList<string> PartLines
+        /// <summary>챕터 선택 카드에 적는 장 범위(「6장 ~ 11장」).</summary>
+        public static string ChaptersOf(int part)
         {
-            get
-            {
-                if (partLines == null)
-                {
-                    partLines = new string[Parts.Length];
-                    for (int i = 0; i < Parts.Length; i++)
-                    {
-                        partLines[i] = $"{Parts[i].label} · {Parts[i].title}";
-                    }
-                }
-
-                return partLines;
-            }
+            return T("chapterTitles.partChapters", Label(FirstChapterOf(part)), Label(LastChapterOf(part)));
         }
 
         public static string Label(int chapter)

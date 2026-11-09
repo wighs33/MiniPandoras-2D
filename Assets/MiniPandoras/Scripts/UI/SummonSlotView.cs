@@ -11,7 +11,7 @@ namespace MiniPandoras.UI
     public sealed class SummonSlotView : MonoBehaviour
     {
         private const float Size = 26f;
-        private static readonly Color Waiting = new Color32(0xa7, 0xa2, 0x96, 0xff);
+        private static readonly Color Waiting = new Color32(0x7c, 0x88, 0xa9, 0xff);
 
         [SerializeField] private Image portrait;
         [SerializeField] private RectTransform shade;

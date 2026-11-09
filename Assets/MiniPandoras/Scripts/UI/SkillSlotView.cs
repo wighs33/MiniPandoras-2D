@@ -13,7 +13,7 @@ namespace MiniPandoras.UI
     /// </summary>
     public sealed class SkillSlotView : MonoBehaviour
     {
-        private static readonly Color Waiting = new Color(6f / 255f, 5f / 255f, 12f / 255f, 0.72f);
+        private static readonly Color Waiting = new Color(8f / 255f, 20f / 255f, 33f / 255f, 0.72f);
         private static readonly Color Lacking = new Color(20f / 255f, 30f / 255f, 70f / 255f, 0.7f);
 
         [SerializeField] private Image icon;

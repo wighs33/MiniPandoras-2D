@@ -33,11 +33,11 @@ namespace MiniPandoras.Tests
             }
         }
 
-        /// <summary>그 장의 처음부터 이어 하도록 저장을 써 둔다(웹게임 이어 하기와 같다).</summary>
-        public static void StartAt(int chapter, string heroName)
+        /// <summary>그 장의 처음부터 이어 하도록 저장을 써 둔다(웹게임 이어 하기와 같다). cleared면 끝까지 본 판이다.</summary>
+        public static void StartAt(int chapter, string heroName, bool cleared = false)
         {
             SaveStore.Write(new SaveData(chapter, heroName, Array.Empty<Count>(), Array.Empty<Count>(),
-                Array.Empty<string>(), Array.Empty<string>(), null, false));
+                Array.Empty<string>(), Array.Empty<string>(), null, cleared));
         }
     }
 }

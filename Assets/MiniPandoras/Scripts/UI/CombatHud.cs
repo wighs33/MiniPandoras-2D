@@ -5,22 +5,24 @@ using MiniPandoras.Dialogue;
 using MiniPandoras.Progress;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 전투 화면(웹게임 FieldCombat.renderHud): 체력·마나, 동료 부르기 칸, 판도라 스킬 칸, 판도라 칸, 보스 체력, 전투 알림.
+    /// 전투 화면(웹게임 FieldCombat.renderHud): 왼쪽 아래 체력 칸(조종하는 인물의 얼굴, 이름, 체력·마나 막대), 동료 부르기 칸, 판도라 스킬 칸, 판도라 칸, 보스 체력, 전투 알림.
     /// 이야기 전투 중이거나 필드에 살아 있는 적이 있을 때만 보이고, 대사가 뜨면 옅어진다.
     /// 스킬 칸·판도라 칸·동료 칸은 화면 조작의 버튼 위에 있다. 여기서는 그 칸에 무엇을 보일지만 채우고, 누르기와 보이기는 화면 조작이 맡는다.
     /// 값은 전투가 매 프레임 바꾸므로(재사용 대기, 체력) 이벤트 대신 그리기 직전에 읽어 보여 준다. 계산은 하지 않는다.
     /// </summary>
     public sealed class CombatHud : MonoBehaviour
     {
-        private static readonly Color HpColor = new Color32(0x6c, 0xc4, 0x6a, 0xff);
-        private static readonly Color HpLowColor = new Color32(0xe0, 0xa0, 0x40, 0xff);
-        private static readonly Color HpCriticalColor = new Color32(0xe0, 0x50, 0x4a, 0xff);
-        private static readonly Color ManaColor = new Color32(0x6a, 0xa8, 0xe8, 0xff);
-        private static readonly Color BossColor = new Color32(0xe8, 0x58, 0x4a, 0xff);
+        // 체력·마나 막대는 위가 밝은 회색조 그림(ui_kit.py의 bar_fill)을 물들이므로, 가운데 줄이 웹게임 색쯤 되게 한 단계 밝게 둔다.
+        private static readonly Color HpColor = new Color32(0x80, 0xdc, 0x7c, 0xff);
+        private static readonly Color HpLowColor = new Color32(0xf2, 0xb6, 0x52, 0xff);
+        private static readonly Color HpCriticalColor = new Color32(0xf0, 0x62, 0x58, 0xff);
+        private static readonly Color ManaColor = new Color32(0x7c, 0xbc, 0xf6, 0xff);
+        private static readonly Color BossColor = new Color32(0xf2, 0x6c, 0x5c, 0xff);
         // 웹게임처럼 대사가 떠 있으면 전투 화면을 옅게 둔다.
         private const float DimmedAlpha = 0.35f;
 
@@ -29,6 +31,8 @@ namespace MiniPandoras.UI
         [SerializeField] private ActorFactory actors;
         [SerializeField] private CanvasGroup group;
         [Header("체력·마나")]
+        [Tooltip("조종하는 인물의 얼굴(동료 칸과 같은 초상)")]
+        [SerializeField] private Image portrait;
         [SerializeField] private TMP_Text playerName;
         [SerializeField] private TMP_Text hpNumbers;
         [SerializeField] private BarView hpBar;
@@ -52,6 +56,7 @@ namespace MiniPandoras.UI
         [SerializeField] private TMP_Text messageText;
 
         private string shownName;
+        private string shownMember;
         private string shownMessage;
         private int shownHp = -1;
         private int shownMaxHp = -1;
@@ -89,6 +94,14 @@ namespace MiniPandoras.UI
 
         private void ShowVitals(PlayerFighter p)
         {
+            // 회상 장면에서는 다른 인물(소년 디엘, 라르고)을 조종하니 사람이 바뀔 때만 얼굴을 다시 찾는다.
+            if (p.Member != shownMember)
+            {
+                shownMember = p.Member;
+                portrait.sprite = actors.Sheet(combat.Catalog.Member(p.Member).SheetId).Portrait;
+                portrait.enabled = portrait.sprite != null;
+            }
+
             if (p.Name != shownName)
             {
                 shownName = p.Name;

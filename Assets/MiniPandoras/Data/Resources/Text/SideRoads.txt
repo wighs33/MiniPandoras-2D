@@ -6,7 +6,7 @@ say	mino		누가 감히 이 고원의 왕 앞에 발을 들이느냐!
 say	mino		...또 네놈들이냐!\n그때는 모래 녀석 때문에 물러났을 뿐이다.\n이번엔 안 봐준다!
 
 == sideRoads.seaGatePrompt
-text			「레비아탄의 바다」로 입장하시겠습니까?\n주의: 레벨 격차가 심합니다.
+text			「레비아탄의 바다」로 입장하시겠습니까?
 
 == sideRoads.aroundTheStation.1
 text			호빗들이 세운 통행 금지 말뚝이 길을 막고 있다.

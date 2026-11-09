@@ -47,7 +47,8 @@ namespace MiniPandoras.UI
         // 메뉴나 연출이 시간을 멈춰도 사라지도록 실제 시간으로 잰다.
         private const float StaySeconds = 2.4f;
         private const float FadeSeconds = 0.5f;
-        private const float PlatePadding = 8f;
+        // 판(키트 plate.png)의 테두리 4 px 안쪽에 글이 오도록 양옆에 7 px씩 둔다.
+        private const float PlatePadding = 14f;
 
         [SerializeField] private FieldCombat combat;
         [SerializeField] private Row[] rows = Array.Empty<Row>();

@@ -13,7 +13,8 @@ namespace MiniPandoras.UI
     /// </summary>
     public sealed class TutorialGuide : MonoBehaviour
     {
-        private static readonly Color FrameColor = new Color32(0xff, 0xd3, 0x4d, 0xff);
+        // 가리키는 칸의 테(키트 focus.png)는 등불 밝은 색으로 깜빡인다.
+        private static readonly Color FrameColor = UiPalette.ReadyGold;
         // 가리키는 버튼 둘레의 여백, 화살표·안내 글과 버튼 사이(가상 px).
         private const float HolePadding = 2f;
         private const float ArrowGap = 3f;

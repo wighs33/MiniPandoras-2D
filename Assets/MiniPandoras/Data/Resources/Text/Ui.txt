@@ -146,7 +146,7 @@ text			의뢰
 text			탈출까지
 
 == loadoutView.idleHint
-text			끌어서 마법진에 놓기 · 눌러서 집기 · ×로 닫기
+text			끌어서 마법진에 놓기 · 눌러서 집기
 
 == loadoutView.heldHint
 text			자리를 눌러 놓기 · 다른 곳을 누르면 내려놓기
@@ -210,6 +210,24 @@ text			  · 준비 중
 
 == titleView.confirmNewGame
 text			저장된 「{0}」 진행이 지워져요.\n처음부터 시작할까요?
+
+== titleView.confirmPart
+text			저장된 「{0}」 진행이 지워져요.\n「{1}」부터 시작할까요?
+
+== titleView.partStart
+text			시작
+
+== titleView.partContinue
+text			이어 하기
+
+== titleView.partStartsAt
+text			「{0}」부터 시작해요.
+
+== titleView.partContinuesAt
+text			「{0}」부터 이어 해요.
+
+== titleView.partComingSoon
+text			아직 준비 중이에요.
 
 == touchControlsView.captionText.1
 text			대화

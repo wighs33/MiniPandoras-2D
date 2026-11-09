@@ -73,17 +73,17 @@ text			11장
 == chapterTitles.readonly.24
 text			다시 모인 파도
 
-== chapterTitles.part1.label
-text			1부
+== chapterTitles.part1
+text			CHAPTER 1
 
-== chapterTitles.part1.title
-text			에버웨이브
+== chapterTitles.part2
+text			CHAPTER 2
 
-== chapterTitles.part2.label
-text			2부
+== chapterTitles.part3
+text			CHAPTER 3
 
-== chapterTitles.part2.title
-text			모래 위의 파도
+== chapterTitles.partChapters
+text			{0} ~ {1}
 
 == chapterTitles.partEnd
 text			끝

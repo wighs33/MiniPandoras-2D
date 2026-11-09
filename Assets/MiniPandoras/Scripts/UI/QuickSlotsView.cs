@@ -19,19 +19,23 @@ namespace MiniPandoras.UI
             [SerializeField] private Button button;
             [SerializeField] private Image icon;
             [SerializeField] private TMP_Text count;
+            [Tooltip("개수 뒤에 까는 어두운 배지. 도트 글꼴은 테두리가 없어 문양 위에서 읽히게 한다")]
+            [SerializeField] private GameObject countBadge;
             [SerializeField] private Image lockMark;
 
-            public Cell(Button button, Image icon, TMP_Text count, Image lockMark)
+            public Cell(Button button, Image icon, TMP_Text count, GameObject countBadge, Image lockMark)
             {
                 this.button = button;
                 this.icon = icon;
                 this.count = count;
+                this.countBadge = countBadge;
                 this.lockMark = lockMark;
             }
 
             public Button Button => button;
             public Image Icon => icon;
             public TMP_Text Count => count;
+            public GameObject CountBadge => countBadge;
             public Image LockMark => lockMark;
         }
 
@@ -84,6 +88,7 @@ namespace MiniPandoras.UI
             cell.Icon.enabled = filled;
             cell.Icon.sprite = filled ? Array.Find(icons, icon => icon.Id == item).Sprite : null;
             cell.Count.text = count > 1 ? count.ToString() : string.Empty;
+            cell.CountBadge.SetActive(count > 1);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using MiniPandoras.Progress;
 using MiniPandoras.UI;
 using MiniPandoras.World;
@@ -93,7 +94,7 @@ namespace MiniPandoras.Story
             title.ChapterPicked += pick;
             // 타이틀은 저장된 장이 속한 부의 풍경을 보인다. 끝까지 본 판이면 마지막 부다.
             int part = save == null ? 1 : save.Cleared ? ChapterTitles.PartCount : ChapterTitles.PartOf(save.Chapter);
-            title.Show(ChapterTitles.Lines, PlayableChapters, save != null ? save.Chapter : -1, save != null && save.Cleared, part, ChapterTitles.PartLines);
+            title.Show(ChapterTitles.Lines, PlayableChapters, save != null ? save.Chapter : -1, save != null && save.Cleared, part, PartsFor(save));
             while (pickedChapter < 0)
             {
                 yield return null;
@@ -101,6 +102,29 @@ namespace MiniPandoras.Story
 
             title.ChapterPicked -= pick;
             title.Hide();
+        }
+
+        /// <summary>
+        /// 타이틀의 챕터 선택(부)에 붙일 카드. 나온 부는 고르면 그 부의 첫 장부터 새로 하고, 저장된 장이 그 부에 있으면 그 장을 이어 한다.
+        /// 나오기로 한 다음 부는 COMING SOON 카드다.
+        /// </summary>
+        private static StoryPart[] PartsFor(SaveData save)
+        {
+            IReadOnlyList<string> upcoming = ChapterTitles.UpcomingPartLabels;
+            var parts = new StoryPart[ChapterTitles.PartCount + upcoming.Count];
+            for (int part = 1; part <= ChapterTitles.PartCount; part++)
+            {
+                bool continues = save != null && ChapterTitles.PartOf(save.Chapter) == part;
+                int start = continues ? save.Chapter : ChapterTitles.FirstChapterOf(part);
+                parts[part - 1] = StoryPart.Released(ChapterTitles.PartLabels[part - 1], ChapterTitles.ChaptersOf(part), start, ChapterTitles.Lines[start], continues);
+            }
+
+            for (int i = 0; i < upcoming.Count; i++)
+            {
+                parts[ChapterTitles.PartCount + i] = StoryPart.Upcoming(upcoming[i]);
+            }
+
+            return parts;
         }
 
         /// <summary>

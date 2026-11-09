@@ -31,7 +31,6 @@ namespace MiniPandoras.Story
             s.Party.SetParty(new[] { Hero }, 1);
             s.Progress.ClearFlagsAndItems();
             yield return s.FadeOut(0f);
-            yield return s.PartCard(ChapterTitles.PartOf(0));
             CharacterBody hero = s.Party.PlaceParty("void", "start", Facing.Up);
             hero.SetPose(BodyPose.Lie);
             CharacterBody emotion = s.Actors.Spawn(Emotion, "divineEmotion", "emotion", Facing.Down);
