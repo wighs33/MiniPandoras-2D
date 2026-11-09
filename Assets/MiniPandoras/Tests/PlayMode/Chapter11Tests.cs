@@ -40,9 +40,10 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator FromTheFeastNightToTheEnding()
         {
-            // 밤의 페어리가든: 디엘은 이자벨과 오로라를 만나지 않겠다고 한다. 쉼터로 가는 길만 열려 있다.
+            // 밤의 요정 마을: 디엘은 이자벨과 오로라를 만나지 않겠다고 한다. 쉼터로 가는 길만 열려 있다.
             yield return story.UntilExploring("fairyNight", "연회가 끝난 밤");
-            Assert.That(story.Exploration.IsLocked("road"), Is.True, "밤에는 꽃잎 들판으로 나가지 않는다");
+            Assert.That(story.Exploration.IsLocked("south"), Is.True, "밤에는 마을 남쪽 숲으로 나가지 않는다");
+            Assert.That(story.Exploration.IsLocked("north"), Is.True, "밤에는 마을 북쪽 샘으로 나가지 않는다");
             Assert.That(story.Lines, Has.Member("에루스를 지키겠다고 약속했다.\n그 약속도 못 지킨 놈이, 무슨 얼굴로 그 딸을 만나."));
             yield return story.StandOn(story.Director.Field.Point("treeGate"));
             yield return Walk("up", "treeHall", "treeMarket", "treeRooms");

@@ -11,7 +11,7 @@ namespace MiniPandoras.Story
 {
     /// <summary>
     /// 10장 「깨어난 축복」. 웹게임 story/chapters.ts의 chapter10을 줄마다 옮겼다.
-    /// 사막에서 몬스터를 사냥해야 동쪽 길이 열리고 → 요정 마을에서 버디를 만난 뒤 거대고목을 층층이 오르다(1층 뿌리 홀 → 2층 장터 → 3층 요정 마을 →
+    /// 사막 항구에서 해안을 돌아 들판과 숲을 지나 요정 마을에 닿고 → 요정 마을에서 버디를 만난 뒤 거대고목을 층층이 오르다(1층 뿌리 홀 → 2층 장터 → 3층 요정 마을 →
     /// 4층 서고 → 5층 가지 회랑) 케이트의 공간 비틀기에 휘말려 → 판도라의 정원에서 축복이 깨어나 「판도라 정착」을 익히고(메뉴의 정착 창) →
     /// 빛의 문으로 고목 꼭대기에 나와 버디와 함께 케이트를 물리친다 → 촌장의 부탁으로 1층까지 내려가 뿌리 계단 아래 저주받은 아피아를 구하고 →
     /// 요정 마을로 걸어 돌아가 그날 밤 연회.
@@ -21,7 +21,6 @@ namespace MiniPandoras.Story
     /// </summary>
     public static class Chapter10
     {
-        private const int WestHunt = 3;
         private static readonly Color[] Cleansed = { new Color32(0x2a, 0x12, 0x40, 0xff), new Color32(0x5a, 0x2a, 0x8a, 0xff), Color.white };
         private static readonly string[] FairyLines =
         {
@@ -44,7 +43,7 @@ namespace MiniPandoras.Story
             s.Progress.GiveAtLeast(Items.Ether, 2);
             yield return s.FadeOut(0f);
             yield return s.ChapterCard(10);
-            yield return HuntInTheSands(s);
+            yield return RoundTheCoast(s);
             yield return LargoNotices(s);
             yield return UpTheGiantTree(s);
             yield return KateInTheTree(s);
@@ -54,56 +53,25 @@ namespace MiniPandoras.Story
             yield return TheFeast(s);
         }
 
-        // ── 사막 사냥: 몬스터를 셋 쓰러뜨려야 동쪽 길이 열린다 ──────────
-        // 웹게임은 모래 늑대 사냥이다. 모래밭 몬스터를 우리 도감 몬스터로 바꿔(Wildlife) 안내와 라르고의 말에서 「모래 늑대」를 뺐다.
+        // ── 사막 항구에서 해안을 돌아 페어리가든으로 ──────────
+        // 웹게임은 사막에서 모래 늑대 셋을 잡아야 동쪽 길이 열려 페어리가든에 바로 갔다. 사용자가 세계지도 배치판에서 길을 다시 정해(2026-11-09)
+        // 사냥 조건과 바로 가는 길을 빼고, 해안을 돌아 들판과 숲을 지나 요정 마을에 닿는다.
 
-        private static IEnumerator HuntInTheSands(StoryDirector s)
+        private static IEnumerator RoundTheCoast(StoryDirector s)
         {
             s.Party.PlaceParty("westSands", "largo", Facing.Down);
             s.Party.MoveParty(s.Field.Point("largo") + new Vector2Int(0, 1), Facing.Down);
             s.SnapCamera();
             yield return s.FadeIn(40f);
-            int hunted = 0;
-            s.Field.SetMapSetup("westSands", () =>
-            {
-                Wildlife.Spawn(s, "westSands", onDefeat: group => () =>
-                {
-                    hunted += group.Monsters.Count;
-                    return PreyDown(s, hunted, group.Monsters.Count);
-                });
-                OpenEastWhenHunted(s, hunted);
-            });
+            s.Field.SetMapSetup("westSands", () => Wildlife.Spawn(s, "westSands"));
             s.Field.SetMapSetup("fairyGarden", () => s.Field.FinishExplore("fairyGarden"));
             SideRoads.TowardTheDragonPlateau(s);
+            SideRoads.AlongTheSouthCoast(s);
             SideRoads.BeyondTheFairyVillage(s);
             s.Field.RunMapSetup();
-            s.Field.Hint(T("chapter10.huntInTheSands.1", WestHunt), 420f);
+            s.Field.Hint(T("chapter10.roundTheCoast.1"), 420f);
             s.Progress.SetGoal(Goals.ClearTheSands);
             yield return s.Field.Explore();
-        }
-
-        /// <summary>무리를 잡을 때마다 다시 확인해, 맵을 다시 들어오지 않아도 길이 열리게 한다.</summary>
-        private static void OpenEastWhenHunted(StoryDirector s, int hunted)
-        {
-            if (hunted >= WestHunt)
-            {
-                s.Field.UnlockWarp("east");
-            }
-            else
-            {
-                s.Field.LockWarp("east", T("chapter10.openEastWhenHunted.1", hunted, WestHunt));
-            }
-        }
-
-        private static IEnumerator PreyDown(StoryDirector s, int hunted, int pack)
-        {
-            OpenEastWhenHunted(s, hunted);
-            if (hunted - pack < WestHunt && hunted >= WestHunt)
-            {
-                s.Field.Hint(T("chapter10.preyDown.1"), 300f);
-            }
-
-            yield break;
         }
 
         // ── 페어리가든에 닿다 ─────────────────────────────────────

@@ -33,7 +33,10 @@ text			절벽 아래 바다 동굴이 그놈의 둥지라더군.\n어지간히 �
 text			레비아탄이 깊은 바다로 가라앉았다.
 
 == sideRoads.alongTheSouthCoast.1
-text			팻말: 「← 철갑 동굴 · → 아이로스 가도」
+text			팻말: 「← 철갑 동굴 · ↑ 페어리가든」
+
+== sideRoads.beyondTheFairyVillage.1
+text			팻말: 「↑ 아이로스」\n산사태로 길이 무너져 지나갈 수 없다.
 
 == sideRoads.enterTheDen.1
 text			레비아탄의 둥지 · 레벨 {0}부터 들어갈 수 있다 (지금 레벨 {1})

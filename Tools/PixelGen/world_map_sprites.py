@@ -259,6 +259,42 @@ def watchtower():
     return sprite(c)
 
 
+# ── 이야기 자리의 작은 표식(세계지도 배치판의 체크포인트, 2026-11-09) ──
+
+def hideout():
+    """뉴웨이브 아지트: 숲속의 낡은 목조 건물. 창 하나에 불이 켜져 있다."""
+    c = Canvas(12, 11)
+    c.paint(c.rect(2, 4, 10, 11), pg.WOOD[3])
+    c.paint(c.rect(7, 4, 10, 11), pg.WOOD[2])
+    c.paint(c.polygon([(0.5, 4.5), (6, 0), (11.5, 4.5)]), TILE[2])
+    c.paint(c.polygon([(6, 0), (11.5, 4.5), (6, 4.5)]), TILE[1])
+    c.paint(c.rect(3, 6, 5, 8), GOLD[3])
+    c.paint(c.rect(7, 8, 9, 11), pg.BARK[1])
+    return sprite(c)
+
+
+def cave_mouth():
+    """바위 언덕에 뚫린 동굴 입구."""
+    c = Canvas(13, 9)
+    c.paint(c.ellipse(6.5, 8, 6.2, 7), ROCK[1])
+    c.paint(c.ellipse(5.4, 6.6, 4.2, 4.6), ROCK[2])
+    c.paint(c.ellipse(4.4, 4.2, 1.6, 1.2), ROCK[3])
+    c.paint(c.ellipse(6.8, 9, 2.4, 3.6), INK_LINE)
+    return sprite(c)
+
+
+def mushroom_house(cap):
+    """요정 마을의 버섯 집: 흰 기둥 벽에 둥근 갓 지붕과 흰 점."""
+    c = Canvas(7, 8)
+    c.paint(c.rect(2, 4, 5, 8), PLASTER[1])
+    c.paint(c.rect(4, 4, 5, 8), PLASTER[0])
+    c.paint(c.ellipse(3.5, 3.4, 3.4, 2.6) & c.rect(0, 0, 7, 4), cap[1])
+    c.paint(c.ellipse(2.6, 2.4, 1.6, 1.0) & c.rect(0, 0, 7, 4), cap[2])
+    c.paint(c.rect(1, 2, 2, 3) | c.rect(4, 1, 5, 2), PLASTER[1])
+    c.paint(c.rect(3, 6, 4, 8), pg.BARK[2])
+    return sprite(c)
+
+
 # ── 힐리아: 농경지, 뱀성, 뱀열차, 항구 ─────────────────────
 
 def farmhouse():

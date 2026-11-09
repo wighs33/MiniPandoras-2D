@@ -97,14 +97,8 @@ text			고목 아래쪽이 요즘 이상해.\n물에서 나쁜 냄새가 나.
 == chapter10.text.4
 text			위로 올라가면 하늘이 엄청 가까워!
 
-== chapter10.huntInTheSands.1
-text			모래밭의 몬스터를 {0}마리 쓰러뜨리면 동쪽 길로 페어리가든에 갈 수 있어요
-
-== chapter10.openEastWhenHunted.1
-text			라르고: ...아직 몸이 덜 풀렸어.\n이 근처 놈들이나 좀 잡고 가자. ({0}/{1})
-
-== chapter10.preyDown.1
-text			동쪽 길로 페어리가든에 가자
+== chapter10.roundTheCoast.1
+text			동쪽 해안을 따라가다 갈림 해안에서 북쪽 길로 페어리가든에 가자
 
 == chapter10.upTheGiantTree.1
 text			먼저 쉼터의 버디를 만나 보자.

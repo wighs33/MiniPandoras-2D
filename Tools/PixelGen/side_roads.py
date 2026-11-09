@@ -7,8 +7,8 @@
                    부서진 배가 그 까닭을 보여 준다.
   leviathanDen     레비아탄의 둥지: 바위섬 절벽의 바다 동굴 안쪽. 물로 둘러싸인 돌 마당에서 싸운다.
   dragonRoad       드래곤 고원 가는 길: 힐리아 서부 북쪽 고갯길(미노가 달아난 길)에서 이어지는 산길.
-  dragonPlateau    드래곤 고원: 옛 용의 뼈가 널린 고원. 미노가 뼈 왕좌에서 왕 행세를 하고,
-                   남동쪽 길로 나가면 해안을 따라 철갑 동굴로 간다(west_coast.py).
+  dragonPlateau    드래곤 고원: 옛 용의 뼈가 널린 고원. 미노가 뼈 왕좌에서 왕 행세를 한다. 들어온 남쪽 길 하나뿐이다
+                   (해안으로 가는 길은 사막 항구 동쪽에서 시작한다, west_coast.py).
 
 사용: python Tools/PixelGen/side_roads.py <프로젝트 루트> [맵 id ...]
   Assets/MiniPandoras/Art/PixelGen/Maps/<맵 id>/…    맵 데이터와 그림(layout.py)
@@ -304,10 +304,7 @@ def dragon_plateau():
     m.kinds[~bowl] = "cliff"
     m.kinds[bowl & (((m.cx - 20) / 15.0) ** 2 + ((m.cy - 15.0) / 9.5) ** 2 > 1)] = "dune"
     route = [(20, 29), (20, 22), (19.5, 15), (20, 7)]
-    south_east = [(20, 19), (28, 20), (32, 24), (32, 29)]
-    m.kinds[m.near_line(south_east, 3)] = "sand"
     m.line("path", route, 2.4)
-    m.line("path", south_east, 2.2)
     m.rect("sand", 19, 24, 22, 28)
     m.stamp("dry", (13, 12), (14, 12), (27, 18), (28, 18), (12, 19), (26, 10))
     m.stamp("rock", (10, 15), (31, 13), (14, 22), (27, 22))
@@ -321,10 +318,7 @@ def dragon_plateau():
     m.point("chest", (23, 12))
     m.point("south", (20, 27), (21, 27))
     m.point("southArrive", (20, 25))
-    m.point("southEast", (31, 27), (32, 27))
-    m.point("southEastArrive", (32, 25))
     m.warp("south", "dragonRoad", "northArrive", "down")
-    m.warp("southEast", "duneField", "northArrive", "down")
     desert_ground(m)
     return m
 
@@ -334,7 +328,7 @@ MAPS = {
     "leviathanCoast": (leviathan_coast, "pierArrive", ("back", "gateArrive", "fisher")),
     "leviathanDen": (leviathan_den, "enter", ("boss",)),
     "dragonRoad": (dragon_road, "southArrive", ("northArrive",)),
-    "dragonPlateau": (dragon_plateau, "southArrive", ("mino", "southEastArrive")),
+    "dragonPlateau": (dragon_plateau, "southArrive", ("mino",)),
 }
 
 

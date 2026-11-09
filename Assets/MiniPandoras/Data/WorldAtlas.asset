@@ -21,73 +21,87 @@ MonoBehaviour:
     arrivalChapter: 10
   - id: airos
     arrivalChapter: 0
+  - id: titanHand
+    arrivalChapter: 0
   places:
   - mapId: hillia
     area: hilliaEast
-    position: {x: 88, y: 187.6}
+    position: {x: 92, y: 185.6}
     insideMaps: []
   - mapId: castle
     area: hilliaEast
-    position: {x: 97.6, y: 177.2}
-    insideMaps:
-    - castleHall
-    - castleBarracks
-    - castleVault
-    - castleRoof
+    position: {x: 97.6, y: 179.2}
+    insideMaps: []
+  - mapId: castleHall
+    area: hilliaEast
+    position: {x: 97.4, y: 175.4}
+    insideMaps: []
+  - mapId: castleBarracks
+    area: hilliaEast
+    position: {x: 97.4, y: 170.8}
+    insideMaps: []
+  - mapId: castleVault
+    area: hilliaEast
+    position: {x: 97.4, y: 166.2}
+    insideMaps: []
+  - mapId: castleRoof
+    area: hilliaEast
+    position: {x: 97.6, y: 160.2}
+    insideMaps: []
   - mapId: cliffBridge
     area: hilliaEast
-    position: {x: 86.8, y: 193}
+    position: {x: 89.2, y: 190}
     insideMaps: []
   - mapId: town
     area: hilliaEast
-    position: {x: 94.4, y: 196.8}
+    position: {x: 94.2, y: 195.2}
     insideMaps:
     - adventurersGuild
   - mapId: outskirts
     area: hilliaEast
-    position: {x: 93.2, y: 203.2}
+    position: {x: 102.6, y: 200.8}
     insideMaps: []
   - mapId: port
     area: hilliaEast
-    position: {x: 83.8, y: 209.2}
+    position: {x: 84, y: 207.6}
     insideMaps: []
   - mapId: trainStop
     area: hilliaEast
-    position: {x: 103.2, y: 207.2}
+    position: {x: 104.6, y: 209.6}
     insideMaps: []
   - mapId: hideoutPath
     area: hilliaEast
-    position: {x: 103.2, y: 191.6}
+    position: {x: 103.4, y: 189.6}
     insideMaps: []
   - mapId: hideout
     area: hilliaEast
-    position: {x: 110.4, y: 186.4}
+    position: {x: 111.2, y: 183.4}
     insideMaps:
     - hideoutUpper
     - hideoutRoom
   - mapId: forest
     area: hilliaEast
-    position: {x: 101.2, y: 183.2}
+    position: {x: 114, y: 176.4}
     insideMaps: []
   - mapId: station
     area: hilliaEast
-    position: {x: 124.4, y: 192}
+    position: {x: 121.6, y: 192.4}
     insideMaps: []
   - mapId: hobbitTrail
     area: hilliaEast
-    position: {x: 131.2, y: 185}
+    position: {x: 126, y: 188.6}
     insideMaps: []
   - mapId: hobbitCave
     area: hilliaEast
-    position: {x: 125.6, y: 179.6}
+    position: {x: 130.6, y: 181.8}
     insideMaps: []
   - mapId: caveRoad
     area: hilliaEast
-    position: {x: 130, y: 198.8}
+    position: {x: 129, y: 194.4}
     insideMaps: []
   - mapId: eastPort
     area: hilliaEast
-    position: {x: 128.2, y: 206}
+    position: {x: 128.4, y: 202}
     insideMaps: []
   - mapId: leviathanCoast
     area: hilliaEast
@@ -96,83 +110,99 @@ MonoBehaviour:
     - leviathanDen
   - mapId: westSands
     area: hilliaWest
-    position: {x: 19.6, y: 182.4}
+    position: {x: 16, y: 187}
     insideMaps: []
   - mapId: dragonRoad
     area: hilliaWest
-    position: {x: 23.2, y: 177.2}
+    position: {x: 21, y: 175.2}
     insideMaps: []
   - mapId: dragonPlateau
     area: hilliaWest
-    position: {x: 25.6, y: 171.6}
+    position: {x: 28.6, y: 164}
     insideMaps: []
   - mapId: duneField
     area: hilliaWest
-    position: {x: 34.2, y: 197}
+    position: {x: 29.6, y: 198.8}
     insideMaps: []
   - mapId: coastRoad
     area: hilliaWest
-    position: {x: 50.2, y: 201}
+    position: {x: 40.6, y: 188.4}
     insideMaps: []
   - mapId: coastFork
     area: hilliaWest
-    position: {x: 59.6, y: 185}
+    position: {x: 48.4, y: 168.4}
     insideMaps: []
   - mapId: ironCave
     area: hilliaWest
-    position: {x: 50.2, y: 176}
+    position: {x: 42.6, y: 158}
     insideMaps:
     - ironDepths
-  - mapId: fairyGarden
-    area: fairyGarden
-    position: {x: 52.2, y: 137.6}
-    insideMaps:
-    - fairyNight
-  - mapId: treeInn
-    area: fairyGarden
-    position: {x: 66.8, y: 133.6}
+  - mapId: fairyRoad
+    area: hilliaWest
+    position: {x: 51.2, y: 152.8}
     insideMaps: []
   - mapId: petalMeadow
     area: fairyGarden
-    position: {x: 72.8, y: 139.2}
+    position: {x: 51.8, y: 141}
     insideMaps: []
   - mapId: fireflyBrook
     area: fairyGarden
-    position: {x: 85.6, y: 138}
+    position: {x: 64.6, y: 136.6}
     insideMaps: []
   - mapId: glowWood
     area: fairyGarden
-    position: {x: 77.2, y: 128}
+    position: {x: 84.6, y: 136}
     insideMaps: []
+  - mapId: fairyGarden
+    area: fairyGarden
+    position: {x: 78.2, y: 122.4}
+    insideMaps:
+    - fairyNight
   - mapId: fairySpring
     area: fairyGarden
-    position: {x: 86.4, y: 124.4}
+    position: {x: 77, y: 104.6}
+    insideMaps: []
+  - mapId: airosRoad
+    area: fairyGarden
+    position: {x: 73.6, y: 90}
+    insideMaps: []
+  - mapId: treeHall
+    area: fairyGarden
+    position: {x: 67, y: 121.8}
+    insideMaps: []
+  - mapId: treeRoots
+    area: fairyGarden
+    position: {x: 61.8, y: 123.8}
+    insideMaps: []
+  - mapId: treeMarket
+    area: fairyGarden
+    position: {x: 63.4, y: 116.6}
+    insideMaps: []
+  - mapId: treeRooms
+    area: fairyGarden
+    position: {x: 61.8, y: 110.6}
+    insideMaps: []
+  - mapId: treeInn
+    area: fairyGarden
+    position: {x: 57.4, y: 110}
+    insideMaps: []
+  - mapId: treeLibrary
+    area: fairyGarden
+    position: {x: 61.4, y: 104.6}
     insideMaps: []
   - mapId: giantTree
     area: fairyGarden
-    position: {x: 60.6, y: 111.2}
-    insideMaps:
-    - treeHall
-    - treeMarket
-    - treeRooms
-    - treeLibrary
+    position: {x: 61.6, y: 101.2}
+    insideMaps: []
   - mapId: treeCrown
     area: fairyGarden
     position: {x: 61.6, y: 97.8}
     insideMaps: []
-  - mapId: treeRoots
-    area: fairyGarden
-    position: {x: 62.2, y: 121.8}
-    insideMaps: []
   - mapId: hiddenGarden
     area: fairyGarden
-    position: {x: 35, y: 122.6}
-    insideMaps: []
-  - mapId: airosRoad
-    area: airos
-    position: {x: 86, y: 88.2}
+    position: {x: 53.2, y: 109.8}
     insideMaps: []
   - mapId: eradTower
-    area: airos
-    position: {x: 87.6, y: 68.4}
+    area: titanHand
+    position: {x: 155, y: 93}
     insideMaps: []

@@ -157,7 +157,7 @@ def forest(m):
 
 
 def build():
-    m = MapLayout("castle", "뱀성", WIDTH, HEIGHT, theme="castle", music="town", seed=77)
+    m = MapLayout("castle", "뱀성 입구", WIDTH, HEIGHT, theme="castle", music="town", seed=77)
     mountain(m)
     bridge(m, np.random.default_rng(6))
     fortress(m, np.random.default_rng(5))

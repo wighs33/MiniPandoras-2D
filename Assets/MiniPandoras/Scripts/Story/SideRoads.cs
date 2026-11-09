@@ -14,8 +14,10 @@ namespace MiniPandoras.Story
     /// - 뱀열차 종착역의 동쪽 길은 호빗 소굴까지 걷는 산길이다.
     /// - 서쪽 부두의 다리 끝 게이트로 레비아탄의 바다에 들어간다. 그 바다만 건너면 사막이지만 레비아탄 때문에 배가 다니지 못해 다들 동쪽 선착장에서 돌아간다.
     ///   바다 동굴이 레비아탄의 던전이고 레벨이 높아야 들어간다.
-    /// - 드래곤 고원에서 해안을 따라 U자로 돌면 갈림 해안에서 철갑 동굴과 아이로스 가도로 갈린다(Tools/PixelGen/west_coast.py).
-    /// - 힐리아 서부의 북쪽 고갯길은 드래곤 고원으로 이어진다. 미노가 왕 행세를 한다.
+    /// - 사막 항구의 북쪽 고갯길은 드래곤 고원으로 이어진다. 미노가 왕 행세를 한다.
+    /// - 사막 항구 동쪽에서 해안을 따라 돌면 갈림 해안에서 철갑 동굴과 페어리가든 가는 길로 갈린다(Tools/PixelGen/west_coast.py).
+    /// - 페어리가든은 들판과 숲을 지나 요정 마을에 닿고, 마을 북쪽 요정의 샘 너머가 아이로스 가는 길이다(Tools/PixelGen/fairy_wilds.py).
+    ///   그 길은 무너진 비탈에서 끊겨 아직 아이로스로 가지 못한다.
     /// </summary>
     public static class SideRoads
     {
@@ -88,7 +90,7 @@ namespace MiniPandoras.Story
             s.Field.SetMapSetup("leviathanDen", () => s.Field.Monster("leviathan", s.Field.Point("boss"), new[] { "leviathan" }, onDefeat: () => s.Notify(T("sideRoads.theSea.5"))));
         }
 
-        /// <summary>힐리아 서부에서 드래곤 고원으로 가는 길을 준비한다.</summary>
+        /// <summary>사막 항구에서 드래곤 고원으로 가는 길을 준비한다.</summary>
         public static void TowardTheDragonPlateau(StoryDirector s)
         {
             s.Field.SetMapSetup("dragonRoad", () => Wildlife.Spawn(s, "dragonRoad"));
@@ -101,10 +103,9 @@ namespace MiniPandoras.Story
 
                 s.Field.Monster("kingMino", s.Field.Point("mino"), new[] { "mino", "minoThug", "minoThug" }, onAggro: () => TheFalseKing(s), onDefeat: () => TheKingFalls(s));
             });
-            AlongTheSouthCoast(s);
         }
 
-        /// <summary>요정 마을 동쪽의 들판과 숲을 준비한다.</summary>
+        /// <summary>페어리가든의 들판과 숲, 요정의 샘과 그 너머 아이로스 가는 길을 준비한다.</summary>
         public static void BeyondTheFairyVillage(StoryDirector s)
         {
             foreach (string map in new[] { "petalMeadow", "glowWood" })
@@ -118,10 +119,11 @@ namespace MiniPandoras.Story
                 s.Field.Chest("fireflyBrook", "chest", Items.Potion, 3);
             });
             s.Field.SetMapSetup("fairySpring", () => s.Field.Chest("fairySpring", "chest", Items.Ether, 3));
+            s.Field.SetMapSetup("airosRoad", () => s.Field.Sign("sign", T("sideRoads.beyondTheFairyVillage.1")));
         }
 
-        /// <summary>고원에서 해안을 따라 철갑 동굴과 아이로스 가도로 가는 길을 준비한다.</summary>
-        private static void AlongTheSouthCoast(StoryDirector s)
+        /// <summary>사막 항구 동쪽에서 해안을 따라 철갑 동굴과 페어리가든 가는 길로 가는 길을 준비한다.</summary>
+        public static void AlongTheSouthCoast(StoryDirector s)
         {
             foreach (string map in new[] { "duneField", "coastRoad", "ironCave" })
             {

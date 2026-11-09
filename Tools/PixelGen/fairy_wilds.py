@@ -1,14 +1,16 @@
-"""페어리가든 동쪽의 들판과 숲을 짠다(페어리가든도 분위기에 맞게 맵을 넓힌다).
+"""페어리가든의 들판과 숲을 짠다(페어리가든도 분위기에 맞게 맵을 넓힌다).
 
-요정 마을 동쪽 출구에서 이어진다. 낮의 꽃밭에서 저녁 냇가, 밤의 버섯 숲으로 깊어지고 끝에 요정의 샘이 있다.
+남쪽 사막에서 올라오는 페어리가든 가는 길(west_coast.py) 끝에서 시작해, 낮의 꽃밭에서 저녁 냇가, 밤의 버섯 숲으로 깊어진 뒤
+요정 마을(fairy_garden.py)에 닿는다. 마을 북쪽은 요정의 샘이고, 그 너머로 아이로스 가는 길이 이어진다.
+사용자가 세계지도 배치판에서 정한 길이다(2026-11-09).
 
-    페어리가든 → 꽃잎 들판 ┬ 반딧불 냇가
-                         └ 달빛 버섯 숲 → 요정의 샘
+    페어리가든 가는 길 → 꽃잎 들판 → 반딧불 냇가 → 달빛 버섯 숲 → 요정 마을 → 요정의 샘 → 아이로스 가는 길
 
   petalMeadow    꽃잎 들판: 사람 키보다 큰 꽃이 핀 들판. 꽃가루가 날리고 자작나무 숲이 둘러싼다.
   fireflyBrook   반딧불 냇가: 해 질 녘의 굽은 냇물과 작은 못. 판자 다리를 건너면 못가에 상자가 있다. 반딧불이 떠다닌다.
   glowWood       달빛 버섯 숲: 밤처럼 어두운 침엽수림을 빛나는 큰 버섯이 밝힌다.
-  fairySpring    요정의 샘: 숲 끝 빈터의 맑은 샘을 이끼 낀 돌 고리가 둘러싼다.
+  fairySpring    요정의 샘: 숲 빈터의 맑은 샘을 이끼 낀 돌 고리가 둘러싼다.
+  airosRoad      아이로스 가는 길: 샘 북쪽 숲길. 끝은 무너진 바위가 막고 있어 아직 아이로스까지 가지 못한다.
 
 사용: python Tools/PixelGen/fairy_wilds.py <프로젝트 루트> [맵 id ...]
   Assets/MiniPandoras/Art/PixelGen/Maps/<맵 id>/…    맵 데이터와 그림(layout.py)
@@ -176,32 +178,29 @@ def petal_meadow():
     width, height = 46, 30
     m = MapLayout("petalMeadow", "꽃잎 들판", width, height, music="field", seed=421)
     rng = np.random.default_rng(422)
-    west, east, north = [(-1, 12.5), (10, 13), (20, 15), (30, 14)], [(30, 14), (38, 16), (width + 1, 17)], [(30, 14), (30, 7), (30, -1)]
+    south, east = [(11, height + 1), (11, 23), (14, 17), (21, 15), (30, 14)], [(30, 14), (38, 16), (width + 1, 17)]
     m.kinds[pg.noise(height, width, 5, rng) > 0.5] = "flowers"
     m.kinds[pg.noise(height, width, 4, rng) > 0.72] = "tallgrass"
-    for road in (west, east, north):
+    for road in (south, east):
         m.line("path", road, 2.0)
     m.stamp("rock", (8, 7), (37, 24), (19, 25))
-    walk = m.near_line(west, 2.4) | m.near_line(east, 2.4) | m.near_line(north, 2.4)
+    walk = m.near_line(south, 2.4) | m.near_line(east, 2.4)
     plant_edges(m, walk, 423, GARDEN)
-    for k, (x, y, columns, rows) in enumerate(((6, 8, 5, 3), (15, 4, 6, 2), (33, 5, 5, 3), (4, 17, 6, 3), (14, 18, 6, 3), (25, 19, 7, 3), (36, 19, 5, 3))):
+    for k, (x, y, columns, rows) in enumerate(((6, 8, 5, 3), (15, 4, 6, 2), (33, 5, 5, 3), (4, 17, 6, 3), (15, 19, 5, 3), (25, 19, 7, 3), (36, 19, 5, 3))):
         m.decal(f"flower_bed_{k}", hidden_garden.flower_bed(columns, rows, np.random.default_rng(436 + k)), x * T, y * T)
     palette = (PINK, SUN, LILAC, SKY_BLUE)
-    spots = ((7, 11), (13, 9), (17, 6), (24, 8), (35, 8), (40, 11), (6, 20), (12, 22), (16, 19), (23, 21), (28, 24), (34, 21), (40, 23))
+    spots = ((7, 11), (13, 9), (17, 6), (24, 8), (35, 8), (40, 11), (6, 20), (7, 24), (16, 19), (23, 21), (28, 24), (34, 21), (40, 23))
     for k, (x, ground) in enumerate(spots):
         m.stand(f"flower_{k % 8}", giant_flower(424 + k % 8, palette[k % 8 % len(palette)]), x, ground, block=FLOWER_BLOCK)
     for k, (x, ground) in enumerate(((21.5, 12.6), (37.6, 13.6))):
         m.stand(f"meadow_lantern_{k}", fp.fairy_lantern(np.random.default_rng(433 + k)), x, ground)
         m.light((x + 0.3) * LOGICAL, ground * LOGICAL - 26, 30, GLOW_LIGHT)
-    m.point("west", (0, 12), (0, 13))
-    m.point("westArrive", (2, 13))
+    m.point("south", (10, height - 1), (11, height - 1))
+    m.point("southArrive", (11, height - 3))
     m.point("east", (width - 1, 16), (width - 1, 17))
     m.point("eastArrive", (width - 3, 17))
-    m.point("north", (29, 0), (30, 0))
-    m.point("northArrive", (30, 2))
-    m.warp("west", "fairyGarden", "roadArrive", "left")
+    m.warp("south", "fairyRoad", "northArrive", "down")
     m.warp("east", "fireflyBrook", "westArrive", "right")
-    m.warp("north", "glowWood", "southArrive", "up")
     return m
 
 
@@ -214,7 +213,7 @@ def firefly_brook():
     m.line("water", [(13, -1), (16, 7), (23, 13), (22, 20), (28, 29)], 4.6)
     m.disc("water", 36, 9, 4.8)
     m.line("water", [(36, 9), (29, 11), (24, 13)], 2.2)
-    road = [(-1, 17), (10, 16.6), (19, 15), (30, 15), (37, 18), (39, 19)]
+    road = [(-1, 17), (10, 16.6), (19, 15), (30, 15), (37, 18), (41, 18), (width + 1, 18)]
     m.line("path", road, 2.0)
     m.rect("bridge", 19, 14, 28, 17)
     m.stamp("rock", (6, 9), (31, 22), (40, 15), (12, 23))
@@ -230,14 +229,17 @@ def firefly_brook():
     m.point("west", (0, 16), (0, 17))
     m.point("westArrive", (2, 17))
     m.point("chest", (40, 19))
+    m.point("east", (width - 1, 17), (width - 1, 18), (width - 1, 19))
+    m.point("eastArrive", (width - 3, 18))
     m.warp("west", "petalMeadow", "eastArrive", "left")
+    m.warp("east", "glowWood", "westArrive", "right")
     return m
 
 
 def glow_wood():
     width, height = 40, 34
     m = MapLayout("glowWood", "달빛 버섯 숲", width, height, music="sorrow", weather="motes", ambient=NIGHT, seed=461)
-    road = [(20, height + 1), (18, 27), (24, 20), (15, 13), (22, 7), (21, -1)]
+    road = [(-1, 25), (9, 26), (18, 27), (24, 20), (15, 13), (22, 7), (21, -1)]
     clearings = [(18, 27, 7, 4.4), (24, 20, 7.5, 4), (15, 13, 7.5, 4.2), (22, 7, 7, 3.6)]
     open_ground = m.near_line(road, 2.8)
     for cx, cy, rx, ry in clearings:
@@ -249,19 +251,19 @@ def glow_wood():
     m.block_where(woods)
     m.border()
     caps = ((TEAL_CAP, 78), (VIOLET_CAP, 64), (TEAL_CAP, 58))
-    spots = ((13, 26.6), (24.4, 29), (29, 20.6), (19, 17.6), (10, 13.6), (19.6, 11.6), (17, 7.4), (27, 6.6))
+    spots = ((14, 30.2), (24.4, 29), (29, 20.6), (19, 17.6), (10, 13.6), (19.6, 11.6), (17, 7.4), (27, 6.6))
     for k, (x, ground) in enumerate(spots):
         cap, size = caps[k % len(caps)]
         m.stand(f"big_shroom_{k % len(caps)}", giant_mushroom(463 + k % len(caps), cap, size), x, ground, block=(size / T * 0.34, 0.5))
         m.light(x * LOGICAL, (ground - 3) * LOGICAL, 58, GLOW_LIGHT if cap is TEAL_CAP else VIOLET_LIGHT, flicker=True)
-    for k, (x, ground) in enumerate(((15, 29), (22, 23), (12, 11), (24, 9))):
+    for k, (x, ground) in enumerate(((21, 30), (22, 23), (12, 11), (24, 9))):
         m.stand(f"glow_shrooms_{k}", fp.glow_shrooms(np.random.default_rng(470 + k)), x, ground)
-    m.point("south", (19, height - 1), (20, height - 1))
-    m.point("southArrive", (20, height - 3))
+    m.point("west", (0, 24), (0, 25), (0, 26))
+    m.point("westArrive", (2, 25))
     m.point("north", (20, 0), (21, 0))
     m.point("northArrive", (21, 2))
-    m.warp("south", "petalMeadow", "northArrive", "down")
-    m.warp("north", "fairySpring", "southArrive", "up")
+    m.warp("west", "fireflyBrook", "eastArrive", "left")
+    m.warp("north", "fairyGarden", "southArrive", "up")
     return m
 
 
@@ -270,11 +272,13 @@ def fairy_spring():
     m = MapLayout("fairySpring", "요정의 샘", width, height, music="sorrow", weather="motes", ambient=NIGHT, seed=481)
     glade = ((m.cx - 15) / 12.5) ** 2 + ((m.cy - 11) / 8.6) ** 2 <= 1
     road = [(15, height + 1), (15, 17)]
-    open_ground = glade | m.near_line(road, 2.6)
+    north_road = [(15, 17), (19, 16.5), (24, 13), (24.5, 7), (22, 2), (21, -1)]
+    open_ground = glade | m.near_line(road, 2.6) | m.near_line(north_road, 2.6)
     m.kinds[~open_ground] = "tallgrass"
     m.kinds[pg.noise(height, width, 3, np.random.default_rng(482)) > 0.62] = "flowers"
     m.kinds[~open_ground] = "tallgrass"
     m.line("path", road, 2.0)
+    m.line("path", north_road, 2.0)
     m.disc("water", 15, 10, 3.8)
     woods = ~open_ground
     forest.plant(m, woods, np.random.default_rng(483), PINES)
@@ -287,20 +291,57 @@ def fairy_spring():
     m.light(15 * LOGICAL, 10 * LOGICAL, 90, GLOW_LIGHT, flicker=True)
     for k, (x, y) in enumerate(((13.2, 8.8), (16, 10.6))):
         m.decal(f"spring_lily_{k}", lily(490 + k), x * T, y * T)
-    for k, (x, ground) in enumerate(((5, 12), (25, 12), (9, 17), (21, 17))):
+    for k, (x, ground) in enumerate(((5, 12), (8, 6), (9, 17), (21, 18.6))):
         m.stand(f"spring_shrooms_{k}", fp.glow_shrooms(np.random.default_rng(492 + k)), x, ground)
     m.point("chest", (15, 4))
     m.point("south", (14, height - 1), (15, height - 1))
     m.point("southArrive", (15, height - 3))
-    m.warp("south", "glowWood", "northArrive", "down")
+    m.point("north", (20, 0), (21, 0), (22, 0))
+    m.point("northArrive", (21, 2))
+    m.warp("south", "fairyGarden", "northArrive", "down")
+    m.warp("north", "airosRoad", "southArrive", "up")
+    return m
+
+
+def airos_road():
+    """샘 북쪽의 숲길. 북쪽 끝은 무너진 바위가 막아 팻말만 서 있다(아이로스는 아직 만들지 않았다)."""
+    width, height = 28, 34
+    m = MapLayout("airosRoad", "아이로스 가는 길", width, height, music="field", seed=501)
+    rng = np.random.default_rng(502)
+    road = [(14, height + 1), (14.5, 27), (10, 20), (15, 12), (14, 6), (14, 3)]
+    m.kinds[pg.noise(height, width, 4, rng) > 0.64] = "tallgrass"
+    m.kinds[pg.noise(height, width, 3, rng) > 0.78] = "flowers"
+    m.line("path", road, 2.0)
+    # 길 끝: 산사태로 무너진 바위 비탈이 길을 끊었다.
+    m.kinds[m.cy < 2.6 + 0.8 * np.sin(m.cx * 0.6)] = "cliff"
+    open_ground = m.near_line(road, 3.4)
+    for cx, cy, rx, ry in ((14, 4.5, 6, 3), (11, 19, 6, 4)):
+        open_ground |= ((m.cx - cx) / rx) ** 2 + ((m.cy - cy) / ry) ** 2 <= 1
+    woods = ~open_ground & np.isin(m.kinds, NIGHT_KINDS)
+    forest.plant(m, woods, np.random.default_rng(503), (forest.CONIFERS, forest.BIRCHES, forest.CONIFERS),
+                 low=woods & forest.canopy_over(m.kinds == "path"))
+    m.block_where(woods)
+    # 무너진 비탈 앞의 바위 무더기와 팻말.
+    m.stamp("rock", (10, 4), (11, 3), (12, 4), (16, 3), (17, 4), (18, 3))
+    m.stamp("sign", (17, 6))
+    for k, (x, ground) in enumerate(((8, 19), (17, 24))):
+        m.stand(f"road_lantern_{k}", fp.fairy_lantern(np.random.default_rng(505 + k)), x, ground)
+        m.light((x + 0.3) * LOGICAL, ground * LOGICAL - 26, 30, GLOW_LIGHT)
+    m.border()
+    m.point("sign", (17, 6), blocked=True)
+    m.point("blocked", (13, 4), (14, 4), (15, 4))
+    m.point("south", (13, height - 1), (14, height - 1))
+    m.point("southArrive", (14, height - 3))
+    m.warp("south", "fairySpring", "northArrive", "down")
     return m
 
 
 MAPS = {
-    "petalMeadow": (petal_meadow, "westArrive", ("eastArrive", "northArrive")),
-    "fireflyBrook": (firefly_brook, "westArrive", ("chest",)),
-    "glowWood": (glow_wood, "southArrive", ("northArrive",)),
-    "fairySpring": (fairy_spring, "southArrive", ("chest",)),
+    "petalMeadow": (petal_meadow, "southArrive", ("eastArrive",)),
+    "fireflyBrook": (firefly_brook, "westArrive", ("chest", "eastArrive")),
+    "glowWood": (glow_wood, "westArrive", ("northArrive",)),
+    "fairySpring": (fairy_spring, "southArrive", ("chest", "northArrive")),
+    "airosRoad": (airos_road, "southArrive", ("blocked",)),
 }
 
 

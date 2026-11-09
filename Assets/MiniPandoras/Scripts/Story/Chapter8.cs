@@ -178,7 +178,6 @@ namespace MiniPandoras.Story
                 s.Actors.Spawn("thug" + i, "thug1", Thugs[i], Facing.Up).SetPose(BodyPose.Kneel);
             }
 
-            s.Field.LockWarp("southEast", EastLocked);
             s.Field.ArriveAt("throne", ThroneApproach, 4);
         }
 

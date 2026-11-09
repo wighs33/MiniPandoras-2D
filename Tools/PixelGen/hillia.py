@@ -129,7 +129,7 @@ def place(m, kind, flat, standing, x, y, rng):
 def build(project):
     data, kinds = load_web(project)
     # 웹게임 이름 「힐리아 동부」는 이제 섬 전체를 뜻한다. 이 들판은 힐리아 숲이다.
-    m = MapLayout("hillia", "힐리아 숲", data["width"], data["height"], music=data["music"], seed=21)
+    m = MapLayout("hillia", "시작의 숲", data["width"], data["height"], music=data["music"], seed=21)
     rng = np.random.default_rng(22)
 
     # ── 웹게임 바탕: 칸 종류(담과 곧은 흙길은 풀밭으로 비운다), 충돌 ──

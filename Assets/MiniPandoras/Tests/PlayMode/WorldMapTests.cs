@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 메뉴의 세계지도: 8장 힐리아 서부에서 열면 다녀온 힐리아 두 구역만 선명하고, 아직 가지 않은 페어리가든과 아이로스는 흐린 바탕 그대로다.
+    /// 메뉴의 세계지도: 8장 사막 항구에서 열면 다녀온 힐리아 두 구역만 선명하고, 아직 가지 않은 페어리가든과 아이로스는 흐린 바탕 그대로다.
     /// 핀이 지금 맵의 자리를 짚고, 닫으면 메뉴도 닫혀 게임으로 돌아간다.
     /// 힐리아를 누르면 그쪽으로 다가가 세부 지역 이름이 보이고, 가지 않은 구역의 이름은 보이지 않으며, 「전체」로 돌아온다.
     /// </summary>
@@ -73,12 +73,12 @@ namespace MiniPandoras.Tests
             map.transform.Find("Screen/Frame/Map/Focus").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(ZoomWait);
             Assert.That(names.gameObject.activeSelf, Is.True, "힐리아를 누르면 세부 지역 이름이 보인다");
-            Assert.That(ShownNames(names), Does.Contain("뱀성").And.Contain("힐리아 서부").And.Contain("드래곤 고원"));
+            Assert.That(ShownNames(names), Does.Contain("뱀성 입구").And.Contain("사막 항구").And.Contain("드래곤 고원"));
 
             map.Show(new HashSet<string> { "hilliaEast" }, null);
             map.transform.Find("Screen/Frame/Map/Focus").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(ZoomWait);
-            Assert.That(ShownNames(names), Does.Contain("뱀성"));
+            Assert.That(ShownNames(names), Does.Contain("뱀성 입구"));
             Assert.That(ShownNames(names), Does.Not.Contain("드래곤 고원"), "가지 않은 구역의 이름은 보이지 않는다");
 
             map.transform.Find("Screen/Frame/Back").GetComponent<Button>().onClick.Invoke();

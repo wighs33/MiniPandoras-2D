@@ -1,19 +1,20 @@
-"""힐리아 서부의 남쪽 해안과 철갑 동굴을 짠다(서부도 동부처럼 갈 수 있는 곳을 넓힌다).
+"""힐리아 서부의 남쪽 해안, 철갑 동굴, 페어리가든으로 올라가는 길을 짠다(서부도 동부처럼 갈 수 있는 곳을 넓힌다).
 
-드래곤 고원에서 산줄기 남쪽 끝을 돌아 해안선을 따라 U자로 간다. 동굴은 산 바깥(동쪽) 자락에 있다.
+사막 항구 동쪽에서 해안선을 따라 돌다가 갈림 해안에서 갈린다. 동굴은 산 바깥(동쪽) 자락에 있고,
+북쪽 길은 사막이 숲으로 바뀌는 고개를 넘어 페어리가든의 꽃잎 들판으로 간다(사용자가 세계지도 배치판에서 정한 길, 2026-11-09).
 
-    드래곤 고원 → 모래바람 들판 → 바닷바람 해안길 → 갈림 해안 ┬ 철갑 동굴 통로 → 철갑 동굴 깊은 곳(철갑 드래곤의 던전 문)
-                                                         └ 아이로스 가도
+    사막 항구 → 모래바람 들판 → 바닷바람 해안길 → 갈림 해안 ┬ 철갑 동굴 통로 → 철갑 동굴 깊은 곳(철갑 드래곤의 던전 문)
+                                                        └ 페어리가든 가는 길 → 꽃잎 들판(fairy_wilds.py)
 
-  duneField     모래바람 들판: 고원 아래 사구 벌판. 남쪽은 바다다.
+  duneField     모래바람 들판: 사막 항구 동쪽의 사구 벌판. 남쪽은 바다다.
   coastRoad     바닷바람 해안길: 남쪽 바닷가를 동쪽으로 가다가 북쪽으로 굽는다. 난파선이 밀려와 있다.
-  coastFork     갈림 해안: 왼쪽 산 벽에 동굴 입구가, 오른쪽 위로 아이로스 가도가 있다. 팻말이 선 곳에서 길이 갈린다.
+  coastFork     갈림 해안: 왼쪽 산 벽에 동굴 입구가, 오른쪽 위로 페어리가든 가는 길이 있다. 팻말이 선 곳에서 길이 갈린다.
+  fairyRoad     페어리가든 가는 길: 모래 고개를 넘으면 풀이 돋고 자작나무 숲이 시작된다.
   ironCave      철갑 동굴 통로: 녹슨 쇳덩이가 박힌 구불구불한 굴. 군데군데 빈 갑주가 돌아다닌다.
   ironDepths    철갑 동굴 깊은 곳: 북쪽 끝의 쇠문이 철갑 드래곤의 던전 입구다. 아직 쇠사슬로 잠겨 있다.
 
 사용: python Tools/PixelGen/west_coast.py <프로젝트 루트> [맵 id ...]
   Assets/MiniPandoras/Art/PixelGen/Maps/<맵 id>/…    맵 데이터와 그림(layout.py)
-  Assets/MiniPandoras/Art/PixelGen/Maps/airosRoad/map.json   갈림 해안으로 돌아오는 출구를 더한 아이로스 가도
   Docs/ArtUpgrade/PixelGen/<맵 id>_preview.png       미리보기
 """
 import sys
@@ -22,11 +23,11 @@ from pathlib import Path
 import numpy as np
 
 import cave
+import forest
 import pixelgen as pg
 import ship
 import side_roads
 import terrain
-import web_map
 from houses import Canvas, outline
 from layout import SUB, MapLayout
 
@@ -149,13 +150,12 @@ def dune_field():
     width, height = 44, 30
     m = MapLayout("duneField", "모래바람 들판", width, height, music="field", seed=371)
     m.kinds[:, :] = "sand"
-    road = [(14, -1), (14, 8), (19, 14), (29, 15), (35, 19), (width + 1, 19)]
+    road = [(-1, 12), (8, 12.6), (19, 14), (29, 15), (35, 19), (width + 1, 19)]
     shore = 25.4 + 0.9 * np.sin(m.cx * 0.34) + 0.4 * np.sin(m.cx * 1.1 + 1)
     m.kinds[m.cy > shore] = "water"
     for cx, cy, rx, ry in ((7, 12, 6, 4), (33, 7, 8, 3.6), (24, 21, 7, 2.6), (39, 13, 3.6, 3)):
         m.kinds[(((m.cx - cx) / rx) ** 2 + ((m.cy - cy) / ry) ** 2 < 1) & (m.kinds == "sand")] = "dune"
-    m.rect("cliff", 0, 0, 11, 3)
-    m.rect("cliff", 18, 0, width, 3)
+    m.rect("cliff", 0, 0, width, 3)
     m.line("path", road, 2.2)
     m.stamp("dry", (8, 18), (9, 18), (10, 19), (24, 9), (25, 9), (26, 10), (31, 12), (5, 21), (6, 21), (41, 23))
     m.stamp("rock", (6, 7), (22, 6), (38, 8), (11, 22), (30, 22))
@@ -164,11 +164,11 @@ def dune_field():
     for k, (x, ground) in enumerate(((30, 11), (12, 15.6), (22, 23.2))):
         m.stand(f"dune_ribs_{k}", side_roads.rib_pair(372 + k), x, ground, block=(0.8, 0.3))
     m.border()
-    m.point("north", (13, 0), (14, 0))
-    m.point("northArrive", (14, 2))
+    m.point("west", (0, 11), (0, 12), (0, 13))
+    m.point("westArrive", (2, 12))
     m.point("east", (width - 1, 18), (width - 1, 19), (width - 1, 20))
     m.point("eastArrive", (width - 3, 19))
-    m.warp("north", "dragonPlateau", "southEastArrive", "up")
+    m.warp("west", "westSands", "eastArrive", "left")
     m.warp("east", "coastRoad", "westArrive", "right")
     side_roads.desert_ground(m)
     return m
@@ -210,15 +210,16 @@ def coast_fork():
     m.kinds[:, :] = "sand"
     south_road = [(21, height + 1), (21, 22), (21, 19)]
     cave_road = [(21, 19), (15, 16), (14, 11)]
-    airos_road = [(21, 19), (28, 14), (34, 8.4), (width + 1, 8)]
+    fairy_road = [(21, 19), (28, 14), (32.5, 8), (33, -1)]
     wall = 9.2 + 0.6 * np.sin(m.cx * 0.5)
     side_wall = 6 + 1.2 * np.sin(m.cy * 0.45)
-    m.kinds[((m.cy < wall) & (m.cx < 30)) | (m.cx < side_wall) | (m.cy < 3.4)] = "cliff"
+    pass_gap = (m.cx > 31) & (m.cx < 35)
+    m.kinds[((m.cy < wall) & (m.cx < 30)) | (m.cx < side_wall) | ((m.cy < 3.4) & ~pass_gap)] = "cliff"
     sea = (m.cx > 36 + 1.6 * np.sin(m.cy * 0.42)) & (m.cy > 12.4)
     m.kinds[sea] = "water"
     m.line("path", south_road, 2.2)
     m.line("path", cave_road, 2.2)
-    m.line("path", airos_road, 2.2)
+    m.line("path", fairy_road, 2.2)
     m.stamp("dry", (10, 22), (11, 22), (26, 24), (27, 24), (31, 19), (14, 26))
     m.stamp("rock", (11, 14), (27, 11), (30, 26), (9, 27), (33, 16))
     for x, y in ((12, 18), (16, 25), (28, 21), (31, 12), (9, 13)):
@@ -231,12 +232,47 @@ def coast_fork():
     m.point("caveArrive", (14, 12))
     m.point("south", (20, height - 1), (21, height - 1))
     m.point("southArrive", (21, height - 3))
-    m.point("east", (width - 1, 7), (width - 1, 8), (width - 1, 9))
-    m.point("eastArrive", (width - 3, 8))
+    m.point("north", (32, 0), (33, 0), (34, 0))
+    m.point("northArrive", (33, 2))
     m.point("sign", (24, 20), blocked=True)
     m.warp("south", "coastRoad", "northArrive", "down")
     m.warp("cave", "ironCave", "southArrive", "up")
-    m.warp("east", "airosRoad", "start", "right")
+    m.warp("north", "fairyRoad", "southArrive", "up")
+    side_roads.desert_ground(m)
+    return m
+
+
+def fairy_road():
+    """모래 고개를 넘어 숲으로: 아래쪽은 사구와 선인장, 위로 갈수록 풀이 돋고 자작나무가 선다."""
+    width, height = 30, 34
+    m = MapLayout("fairyRoad", "페어리가든 가는 길", width, height, music="field", seed=401)
+    rng = np.random.default_rng(402)
+    m.kinds[:, :] = "sand"
+    road = [(16, height + 1), (15.5, 28), (11, 21), (13.5, 14), (19, 8), (17, 2), (17, -1)]
+    # 위쪽 절반은 풀밭이다. 경계가 곧지 않게 물결을 준다.
+    meadow = m.cy < 14 + 2.2 * np.sin(m.cx * 0.45) + 1.2 * np.sin(m.cx * 1.3 + 2)
+    m.kinds[meadow] = "grass"
+    m.kinds[~meadow & (pg.noise(height, width, 4, rng) > 0.62)] = "dune"
+    m.kinds[(m.cx < 2.5 + 1.5 * np.sin(m.cy * 0.4)) & ~meadow] = "cliff"
+    m.kinds[(m.cx > width - 2.5 - 1.5 * np.sin(m.cy * 0.35 + 1)) & ~meadow] = "cliff"
+    m.line("path", road, 2.2)
+    m.stamp("dry", (20, 25), (21, 25), (8, 29), (23, 18), (7, 17))
+    m.stamp("rock", (6, 25), (24, 29), (22, 21))
+    for x, y in ((8, 31), (22, 26), (5, 21), (25, 22)):
+        m.tree(x, y, "cactus")
+    walk = m.near_line(road, 2.6)
+    woods = meadow & ~walk & ((m.cx < 9) | (m.cx > 22) | (m.cy < 5) | ((m.cy < 10) & ((m.cx < 12) | (m.cx > 24))))
+    # 사막 바닥 그림은 숲 바닥(woods)을 모르므로 나무 밑도 풀밭으로 둔다(floor=False).
+    forest.plant(m, woods, np.random.default_rng(403), (forest.BIRCHES, forest.BIRCHES, forest.BROADLEAF), floor=False,
+                 low=woods & forest.canopy_over(m.kinds == "path"))
+    m.block_where(woods)
+    m.border()
+    m.point("south", (15, height - 1), (16, height - 1))
+    m.point("southArrive", (16, height - 3))
+    m.point("north", (16, 0), (17, 0), (18, 0))
+    m.point("northArrive", (17, 2))
+    m.warp("south", "coastFork", "northArrive", "down")
+    m.warp("north", "petalMeadow", "southArrive", "up")
     side_roads.desert_ground(m)
     return m
 
@@ -280,9 +316,10 @@ def iron_depths():
 
 
 MAPS = {
-    "duneField": (dune_field, "northArrive", ("eastArrive",)),
+    "duneField": (dune_field, "westArrive", ("eastArrive",)),
     "coastRoad": (coast_road, "westArrive", ("northArrive",)),
-    "coastFork": (coast_fork, "southArrive", ("caveArrive", "eastArrive")),
+    "coastFork": (coast_fork, "southArrive", ("caveArrive", "northArrive")),
+    "fairyRoad": (fairy_road, "southArrive", ("northArrive",)),
     "ironCave": (iron_cave, "southArrive", ("northArrive",)),
     "ironDepths": (iron_depths, "southArrive", ("dragonGate",)),
 }
@@ -298,7 +335,6 @@ def main(project, only):
                 if not m.reachable(m.points[start][0], [cell]):
                     print(f"{map_id}: {start}에서 {goal} {cell}에 닿지 못한다")
         print(m.publish(project))
-    web_map.reroute(project, "airosRoad", [{"point": "behind", "map": "coastFork", "target": "eastArrive", "dir": "left"}])
 
 
 if __name__ == "__main__":

@@ -36,7 +36,7 @@ namespace MiniPandoras.Tests
             yield return story.OpenAndWait(2, "hillia", "2장 첫 탐험");
             PlaceNameView place = Object.FindFirstObjectByType<TouchControlsView>().PlaceName;
             yield return story.Until(() => place.gameObject.activeInHierarchy, 10f, "조작이 돌아오면 지명이 보인다");
-            Assert.That(place.Place, Is.EqualTo("힐리아 숲"));
+            Assert.That(place.Place, Is.EqualTo("시작의 숲"));
 
             yield return story.StandOn(story.Director.Field.Point("south"));
             yield return story.UntilExploring("cliffBridge", "들판 아래 벼랑 다리");
@@ -92,35 +92,13 @@ namespace MiniPandoras.Tests
             Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("arrive")));
         }
 
+        /// <summary>사막 항구 동쪽에서 해안을 따라 갈림 해안까지 가고, 거기서 철갑 동굴과 페어리가든 가는 길로 갈린다.</summary>
         [UnityTest]
-        public IEnumerator FairyWildsOpenEastOfTheVillage()
+        public IEnumerator CoastRoadLeadsFromTheDesertPortToTheIronCaveAndTheFairyGarden()
         {
-            yield return story.OpenAndWait(10, "westSands", "10장 사막");
-            // 사막의 사냥을 마쳐야 마을로 가므로, 맵만 걸어 보려고 곧바로 마을에 선다.
-            story.Travel.LoadNow("fairyGarden", "arrive", Facing.Right);
-            yield return null;
-            yield return Through("road", "petalMeadow");
-            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("westArrive")));
-            yield return Through("east", "fireflyBrook");
-            yield return Through("west", "petalMeadow");
-            yield return Through("north", "glowWood");
-            yield return Through("north", "fairySpring");
-            yield return Through("south", "glowWood");
-            yield return Through("south", "petalMeadow");
-            yield return Through("west", "fairyGarden");
-            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("roadArrive")));
-        }
-
-        [UnityTest]
-        public IEnumerator CoastRoadForksToTheIronCaveAndAiros()
-        {
-            yield return story.OpenAndWait(10, "westSands", "10장 사막");
-            yield return Through("north", "dragonRoad");
-            yield return Through("north", "dragonPlateau");
-
-            // 고원에서 해안을 따라 U자로 돈다.
-            yield return Through("southEast", "duneField");
-            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("northArrive")));
+            yield return story.OpenAndWait(10, "westSands", "10장 사막 항구");
+            yield return Through("east", "duneField");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("westArrive")), "사막 항구 동쪽으로 나가면 들판 서쪽으로 들어온다");
             yield return Through("east", "coastRoad");
             Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("westArrive")));
             yield return Through("north", "coastFork");
@@ -134,11 +112,46 @@ namespace MiniPandoras.Tests
             yield return Through("south", "coastFork");
             Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("caveArrive")));
 
-            // 오른쪽 갈래는 아이로스 가도다.
-            yield return Through("east", "airosRoad");
-            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("start")));
-            yield return Through("behind", "coastFork");
-            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("eastArrive")));
+            // 북쪽 갈래는 페어리가든 가는 길이고, 꽃잎 들판으로 올라간다.
+            yield return Through("north", "fairyRoad");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("southArrive")));
+            yield return Through("north", "petalMeadow");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("southArrive")));
+            yield return Through("south", "fairyRoad");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("northArrive")));
+            yield return Through("south", "coastFork");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("northArrive")));
+        }
+
+        /// <summary>꽃잎 들판에서 냇가와 버섯 숲을 지나 요정 마을 남쪽으로 들어온다.</summary>
+        [UnityTest]
+        public IEnumerator FairyWildsLeadThroughTheWoodsToTheVillage()
+        {
+            yield return story.OpenAndWait(10, "westSands", "10장 사막 항구");
+            story.Travel.LoadNow("petalMeadow", "southArrive", Facing.Up);
+            yield return null;
+            yield return Through("east", "fireflyBrook");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("westArrive")));
+            yield return Through("east", "glowWood");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("westArrive")));
+            yield return Through("north", "fairyGarden");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("southArrive")), "버섯 숲 북쪽으로 나가면 마을 남쪽으로 들어온다");
+        }
+
+        /// <summary>요정 마을 북쪽의 샘 너머가 아이로스 가는 길이고, 그 길은 무너진 비탈에서 끊긴다.</summary>
+        [UnityTest]
+        public IEnumerator TheSpringLeadsToTheBrokenRoadToAiros()
+        {
+            yield return story.OpenAndWait(10, "westSands", "10장 사막 항구");
+            story.Travel.LoadNow("fairySpring", "southArrive", Facing.Up);
+            yield return null;
+            yield return Through("north", "airosRoad");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("southArrive")));
+            Assert.That(story.Director.Field.Point("sign"), Is.Not.EqualTo(default(Vector2Int)), "끊긴 길 앞에 팻말이 있다");
+            yield return Through("south", "fairySpring");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("northArrive")));
+            yield return Through("south", "fairyGarden");
+            Assert.That(story.HeroCell, Is.EqualTo(story.Director.Field.Point("northArrive")), "샘 남쪽으로 나가면 마을 북쪽으로 들어온다");
         }
 
         private IEnumerator Through(string exit, string map)

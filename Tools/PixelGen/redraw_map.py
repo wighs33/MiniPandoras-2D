@@ -47,7 +47,7 @@ BACKDROPS = {"void": backdrop.void}
 # 웹게임 나무 대신 숲 구역을 다시 심는 맵과 그 무리 비율. 정원은 침엽수 없이, 모래땅은 활엽수만.
 GARDEN = (forest.BIRCHES, forest.BIRCHES, forest.BROADLEAF)
 REPLANT = {
-    "airosRoad": None, "caveRoad": None, "forest": None, "port": None, "station": None,
+    "caveRoad": None, "forest": None, "port": None, "station": None,
     "fairyGarden": GARDEN, "fairyNight": GARDEN, "hiddenGarden": GARDEN,
     "westSands": (forest.BROADLEAF, forest.BROADLEAF, forest.BROADLEAF),
 }

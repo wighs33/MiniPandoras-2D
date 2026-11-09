@@ -213,7 +213,7 @@ def residents(m, *cells):
 
 
 def hall():
-    m, room = new_floor("treeHall", "거대고목 1층 · 뿌리 홀", 501)
+    m, room = new_floor("treeHall", "고목 로비", 501)
     rng = np.random.default_rng(501)
     for x in (6, 20):
         room.round_window(x)

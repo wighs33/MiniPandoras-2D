@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Linq;
-using MiniPandoras.Characters;
 using MiniPandoras.Combat;
 using MiniPandoras.UI;
-using MiniPandoras.World;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -13,16 +11,18 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 10장 「깨어난 축복」을 저장에서 이어 끝까지 돌린다. 사막에서 모래 늑대 셋을 잡아야 동쪽 길이 열림 → 요정 마을에서 버디를 만나야 고목 문이 열림 →
+    /// 10장 「깨어난 축복」을 저장에서 이어 끝까지 돌린다. 사막 항구에서 해안을 돌아 들판과 숲을 지나 요정 마을에 닿음 → 요정 마을에서 버디를 만나야 고목 문이 열림 →
     /// 고목을 층층이 올라(1층 뿌리 홀, 2층 장터, 3층 요정 마을, 4층 서고, 층마다 요정들) 5층 가지 회랑에서 케이트 → 판도라의 정원 싸움 뒤 판도라 정착을 익힘(메뉴의 정착 창에서 목록의 판도라를 눌러 집고 자리를 눌러 놓으면, 닫을 때 그대로 정착) →
     /// 빛의 문으로 고목 꼭대기, 케이트전 → 1층까지 내려가 뿌리 계단 아래 아피아를 구하면 뿌리가 맑아짐 → 요정 마을로 걸어 돌아가 밤의 연회.
     /// 연회가 끝나면 11장이 이어져 밤의 페어리가든에서 쉼터로 걸어간다.
     /// </summary>
     public sealed class Chapter10Tests
     {
-        private static readonly Vector2Int[] Approaches =
+        // 사막 항구에서 요정 마을까지 걷는 길: (나가는 출구, 다음 맵).
+        private static readonly (string exit, string map)[] RoadToTheVillage =
         {
-            new Vector2Int(-3, 0), new Vector2Int(3, 0), new Vector2Int(0, 3), new Vector2Int(0, -3), new Vector2Int(-2, 0), new Vector2Int(2, 0),
+            ("east", "duneField"), ("east", "coastRoad"), ("north", "coastFork"), ("north", "fairyRoad"),
+            ("north", "petalMeadow"), ("east", "fireflyBrook"), ("east", "glowWood"), ("north", "fairyGarden"),
         };
 
         private StoryDriver story;
@@ -45,20 +45,16 @@ namespace MiniPandoras.Tests
         [UnityTest]
         public IEnumerator FromTheSandsToTheFairyFeast()
         {
-            // 사막: 늑대 셋을 잡기 전에는 동쪽 길이 잠겨 있다.
-            yield return story.UntilExploring("westSands", "사막 사냥");
-            Assert.That(story.Exploration.IsLocked("east"), Is.True, "늑대를 잡기 전에는 동쪽 길이 잠겨 있다");
-            // 무리(두 마리)를 반만 잡으면 마릿수에 들지 않으므로, 길이 열릴 때까지 잡는다.
-            for (int i = 0; i < 6 && story.Exploration.IsLocked("east"); i++)
+            // 사막 항구: 사냥 조건 없이 동쪽 길이 열려 있고, 해안을 돌아 들판과 숲을 지나 요정 마을까지 걷는다.
+            yield return story.UntilExploring("westSands", "사막 항구");
+            Assert.That(story.Exploration.IsLocked("east"), Is.False, "몬스터를 잡지 않아도 동쪽 길로 나갈 수 있다");
+            foreach ((string exit, string map) in RoadToTheVillage)
             {
-                yield return HuntOneWolf();
+                yield return story.StandOn(story.Director.Field.Point(exit));
+                yield return story.UntilExploring(map, exit + " 출구로 " + map);
             }
 
-            Assert.That(story.Exploration.IsLocked("east"), Is.False, "모래 늑대 셋을 잡으면 동쪽 길이 열린다");
-            yield return story.StandOn(story.Director.Field.Point("east"));
-
-            // 페어리가든: 버디를 만나야 고목 문이 열린다.
-            yield return story.UntilExploring("fairyGarden", "페어리가든");
+            // 요정 마을: 버디를 만나야 고목 문이 열린다.
             Assert.That(story.Lines, Has.Member("귀찮은 걸 하나 더 떠안았군."));
             Assert.That(story.Exploration.IsLocked("treeGate"), Is.True, "버디를 만나기 전에는 고목 문이 잠겨 있다");
             yield return story.StandOn(story.Director.Field.Point("buddy") + new Vector2Int(0, 2));
@@ -125,31 +121,6 @@ namespace MiniPandoras.Tests
                     yield return story.StandOn(story.Director.Field.Point(stairs));
                 }
             }
-        }
-
-        /// <summary>남은 모래 늑대 하나의 곁에 서서, 덤벼드는 늑대 쪽을 보며 공격을 눌러 쓰러뜨린다.</summary>
-        private IEnumerator HuntOneWolf()
-        {
-            EnemyFighter wolf = story.Combat.EnemyAi.Enemies.FirstOrDefault(e => !e.Dead && !e.InEncounter && e.Body.IsVisible);
-            Assert.That(wolf, Is.Not.Null, "사막에 모래 늑대가 남아 있다");
-            Vector2Int stand = Approaches.Select(offset => wolf.Body.Cell + offset).First(cell => !FootMover.IsBlocked(MapCoordinates.CellFoot(cell)));
-            story.Mover.PlaceAt(MapCoordinates.CellFoot(stand), FacingRules.From(wolf.Position - MapCoordinates.CellFoot(stand)));
-            Physics2D.SyncTransforms();
-            CharacterBody hero = story.Mover.Character;
-            yield return story.Until(() =>
-            {
-                if (story.Combat.Player != null)
-                {
-                    story.Combat.Player.Hp = story.Combat.Player.MaxHp;
-                }
-
-                hero.Face(FacingRules.From(wolf.Position - hero.Position));
-                story.Combat.PressAttack();
-                return wolf.Dead;
-            }, 40f, "모래 늑대를 쓰러뜨린다");
-            // 무리를 다 잡으면 다음 프레임들에 쓰러짐 처리(더스트, 길 열기)가 돈다.
-            float settled = Time.time + 1.5f;
-            yield return story.Until(() => Time.time > settled && !story.Exploration.IsBusy && !story.Mover.IsFrozen, 20f, "늑대를 쓰러뜨린 뒤 다시 걷는다");
         }
 
         /// <summary>

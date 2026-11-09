@@ -7,7 +7,7 @@
 | 글꼴 | 쓰는 곳 | 출처 | 파일 |
 |---|---|---|---|
 | Pretendard | 버튼과 본문 등 제목 밖의 모든 글 | https://github.com/orioncactus/pretendard | `Assets/ThirdParty/Pretendard` |
-| 갈무리(Galmuri) 2.40.4 | 사망 화면의 「사망했습니다」 한 줄(2026-11-09에 나머지 글에서는 뺐다). 11을 12 크기로 쓴다 | https://github.com/quiple/galmuri | `Assets/ThirdParty/Galmuri` |
+| 갈무리(Galmuri) 2.40.4 | 사망 화면의 「사망했습니다」 한 줄(2026-11-09에 나머지 글에서는 뺐다). 11을 18 크기(1.5배)로 쓴다 | https://github.com/quiple/galmuri | `Assets/ThirdParty/Galmuri` |
 | Noto Serif KR Bold | 타이틀 로고와 제목(웹게임 타이틀과 같은 명조) | https://github.com/notofonts/noto-cjk (`Serif/SubsetOTF/KR`) | `Assets/ThirdParty/NotoSerifKR` |
 
 - OFL은 글꼴을 게임에 넣어 팔아도 되고, 글꼴 파일만 따로 팔면 안 된다. 원문은 각 폴더의 `LICENSE.txt`이고, 출시판 크레딧에 글꼴 이름과 라이선스를 적는다.

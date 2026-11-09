@@ -62,9 +62,9 @@ text			라르고의 기억을 끝까지 지켜본다
 text			라르고의 기억이 이어지고 있다. 끝까지 지켜보자.
 
 == goal.clearTheSands.title
-text			모래밭의 몬스터를 쓰러뜨리고 동쪽 길로 간다
+text			해안을 돌아 페어리가든으로 간다
 == goal.clearTheSands.detail
-text			모래밭의 몬스터를 3마리 쓰러뜨리면 동쪽 길로 페어리가든에 갈 수 있다.
+text			사막 항구 동쪽에서 해안을 따라가다 갈림 해안에서 북쪽 길로 올라가면, 꽃잎 들판과 숲을 지나 요정 마을에 닿는다.
 
 == goal.climbTheGiantTree.title
 text			거대고목을 층층이 올라간다

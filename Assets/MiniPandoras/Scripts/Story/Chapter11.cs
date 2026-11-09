@@ -77,8 +77,8 @@ namespace MiniPandoras.Story
             yield return s.Party.Regroup();
             s.Field.SetMapSetup("fairyNight", () =>
             {
-                s.Field.LockWarp("west", NightText);
-                s.Field.LockWarp("road", NightText);
+                s.Field.LockWarp("north", NightText);
+                s.Field.LockWarp("south", NightText);
             });
             GiantTree.Furnish(s, cursed: false,
                 (GiantTree.Hall, () =>

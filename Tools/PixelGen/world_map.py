@@ -140,77 +140,93 @@ AREAS = [
     Area("hilliaWest", 8, ("힐리아",), None, ((134, 900, 205, 965),)),
     Area("fairyGarden", 10, ("페어리가든",), "페어리가든", ()),
     Area("airos", 0, ("아이로스",), "아이로스", ()),
+    Area("titanHand", 0, ("타이탄 핸드",), "타이탄 핸드", ()),
 ]
 
 # 게임에 있는 바깥 맵의 자리(맵 id, 표시 이름, 구역, 스케치 좌표, 그 자리에 드는 건물 안 맵).
 # 차원공간, 꿈, 배, 디엘의 기억 속 집은 지도에 없다.
+# 자리·이름·길은 사용자가 세계지도 배치판(claude.ai 아티팩트)에서 정했다(2026-11-09). 뱀성과 거대고목은 층마다 점을 찍는다.
 PLACES = [
     # 맵의 출구와 방향을 맞춘다. 섬 전체가 힐리아 동부다.
-    # 서쪽 해안을 따라 뱀성 → 힐리아 숲 → 벼랑 다리 → 마을 → 외곽이 내려오고, 외곽 남쪽 길은 남서쪽 끝의 서쪽 부두에 닿는다.
-    # 뱀열차는 외곽 동쪽 정류장에서 섬 아랫부분을 돌아 동쪽 종착역까지 길게 달린다.
-    Place("hillia", "힐리아 숲", "hilliaEast", 574, 938, ()),
-    Place("castle", "뱀성", "hilliaEast", 622, 886, ("castleHall", "castleBarracks", "castleVault", "castleRoof")),
-    Place("cliffBridge", "벼랑 다리", "hilliaEast", 568, 965, ()),
-    Place("town", "힐리아 마을", "hilliaEast", 606, 984, ("adventurersGuild",)),
-    Place("outskirts", "힐리아 외곽", "hilliaEast", 600, 1016, ()),
-    Place("port", "서쪽 부두", "hilliaEast", 553, 1046, ()),
-    Place("trainStop", "뱀열차 정류장", "hilliaEast", 650, 1036, ()),
-    Place("hideoutPath", "아지트 가는 숲길", "hilliaEast", 650, 958, ()),
-    Place("hideout", "뉴웨이브 아지트", "hilliaEast", 686, 932, ("hideoutUpper", "hideoutRoom")),
-    Place("forest", "아지트 뒤 숲", "hilliaEast", 640, 916, ()),
-    # 뱀열차로 동쪽 종착역에 닿아 호빗 소굴을 지나고, 산길로 내려와 동쪽 선착장에서 배를 탄다. 호빗 소굴은 선착장 반대쪽 산에 있다.
-    Place("station", "뱀열차 종착역", "hilliaEast", 756, 960, ()),
-    Place("hobbitTrail", "호빗 소굴 가는 산길", "hilliaEast", 790, 925, ()),
-    Place("hobbitCave", "호빗 소굴", "hilliaEast", 762, 898, ()),
-    Place("caveRoad", "선착장 가는 산길", "hilliaEast", 784, 994, ()),
-    Place("eastPort", "동쪽 선착장", "hilliaEast", 775, 1030, ()),
+    Place("hillia", "시작의 숲", "hilliaEast", 594, 928, ()),
+    Place("castle", "뱀성 입구", "hilliaEast", 622, 896, ()),
+    Place("castleHall", "뱀성 1층", "hilliaEast", 621, 877, ()),
+    Place("castleBarracks", "뱀성 2층", "hilliaEast", 621, 854, ()),
+    Place("castleVault", "뱀성 3층", "hilliaEast", 621, 831, ()),
+    Place("castleRoof", "뱀성 꼭대기", "hilliaEast", 622, 801, ()),
+    Place("cliffBridge", "벼랑 다리", "hilliaEast", 580, 950, ()),
+    Place("town", "힐리아 마을", "hilliaEast", 605, 976, ("adventurersGuild",)),
+    Place("outskirts", "힐리아 외곽", "hilliaEast", 647, 1004, ()),
+    Place("port", "서쪽 부두", "hilliaEast", 554, 1038, ()),
+    Place("trainStop", "뱀열차 정류장", "hilliaEast", 657, 1048, ()),
+    Place("hideoutPath", "아지트 가는 숲길", "hilliaEast", 651, 948, ()),
+    Place("hideout", "뉴웨이브 아지트", "hilliaEast", 690, 917, ("hideoutUpper", "hideoutRoom")),
+    Place("forest", "아지트 뒤 숲", "hilliaEast", 704, 882, ()),
+    # 뱀열차로 동쪽 종착역에 닿아 호빗 소굴을 지나고, 산길로 내려와 동쪽 선착장에서 배를 탄다.
+    Place("station", "뱀열차 종착역", "hilliaEast", 742, 962, ()),
+    Place("hobbitTrail", "호빗 소굴 가는 산길", "hilliaEast", 764, 943, ()),
+    Place("hobbitCave", "호빗 소굴", "hilliaEast", 787, 909, ()),
+    Place("caveRoad", "선착장 가는 산길", "hilliaEast", 779, 972, ()),
+    Place("eastPort", "동쪽 선착장", "hilliaEast", 776, 1010, ()),
     # 힐리아 서부와 동부 사이 바다 한가운데. 서쪽 부두 끝의 문으로만 간다.
     Place("leviathanCoast", "레비아탄의 바다", "hilliaEast", 485, 960, ("leviathanDen",)),
-    # 배가 닿는 서쪽 끝의 사막 바닷가 마을.
-    Place("westSands", "힐리아 서부", "hilliaWest", 232, 912, ()),
-    Place("dragonRoad", "드래곤 고원 가는 길", "hilliaWest", 250, 886, ()),
-    Place("dragonPlateau", "드래곤 고원", "hilliaWest", 262, 858, ()),
-    # 고원에서 산줄기 남쪽 끝을 돌아 해안을 따라 U자로 간다. 철갑 동굴은 산 바깥 자락이다.
-    Place("duneField", "모래바람 들판", "hilliaWest", 305, 985, ()),
-    Place("coastRoad", "바닷바람 해안길", "hilliaWest", 385, 1005, ()),
-    Place("coastFork", "갈림 해안", "hilliaWest", 432, 925, ()),
-    Place("ironCave", "철갑 동굴", "hilliaWest", 385, 880, ("ironDepths",)),
-    # 페어리가든: 힐리아 서부에서 올라오면 숲 남쪽 끝의 마을이고, 스케치의 꼭대기와 동굴 점이 고목의 꼭대기와 뿌리다.
-    Place("fairyGarden", "페어리가든", "fairyGarden", 395, 688, ("fairyNight",)),
-    Place("treeInn", "고목의 쉼터", "fairyGarden", 468, 668, ()),
-    # 마을 동쪽의 들판과 숲.
-    Place("petalMeadow", "꽃잎 들판", "fairyGarden", 498, 696, ()),
-    Place("fireflyBrook", "반딧불 냇가", "fairyGarden", 562, 690, ()),
-    Place("glowWood", "달빛 버섯 숲", "fairyGarden", 520, 640, ()),
-    Place("fairySpring", "요정의 샘", "fairyGarden", 566, 622, ()),
-    Place("giantTree", "거대고목", "fairyGarden", 437, 556, ("treeHall", "treeMarket", "treeRooms", "treeLibrary")),
+    # 배가 닿는 서쪽 끝의 사막 항구. 북쪽은 드래곤 고원, 동쪽은 해안을 돌아 페어리가든으로 가는 길이다.
+    Place("westSands", "사막 항구", "hilliaWest", 214, 935, ()),
+    Place("dragonRoad", "드래곤 고원 가는 길", "hilliaWest", 239, 876, ()),
+    Place("dragonPlateau", "드래곤 고원", "hilliaWest", 277, 820, ()),
+    Place("duneField", "모래바람 들판", "hilliaWest", 282, 994, ()),
+    Place("coastRoad", "바닷바람 해안길", "hilliaWest", 337, 942, ()),
+    Place("coastFork", "갈림 해안", "hilliaWest", 376, 842, ()),
+    Place("ironCave", "철갑 동굴", "hilliaWest", 347, 790, ("ironDepths",)),
+    Place("fairyRoad", "페어리가든 가는 길", "hilliaWest", 390, 764, ()),
+    # 페어리가든: 들판과 숲을 지나 거대고목 동쪽의 요정 마을에 닿는다. 마을 북쪽은 요정의 샘이다.
+    Place("petalMeadow", "꽃잎 들판", "fairyGarden", 393, 705, ()),
+    Place("fireflyBrook", "반딧불 냇가", "fairyGarden", 457, 683, ()),
+    Place("glowWood", "달빛 버섯 숲", "fairyGarden", 557, 680, ()),
+    Place("fairyGarden", "요정 마을", "fairyGarden", 525, 612, ("fairyNight",)),
+    Place("fairySpring", "요정의 샘", "fairyGarden", 519, 523, ()),
+    Place("airosRoad", "아이로스 가는 길", "fairyGarden", 502, 450, ()),
+    # 거대고목: 로비(1층)에서 층층이 올라 등반로 끝이 꼭대기의 나리온 정거장이다. 쉼터는 3층의 방이다.
+    Place("treeHall", "고목 로비", "fairyGarden", 469, 609, ()),
+    Place("treeRoots", "고목의 뿌리", "fairyGarden", 443, 619, ()),
+    Place("treeMarket", "고목 2층", "fairyGarden", 451, 583, ()),
+    Place("treeRooms", "고목 3층", "fairyGarden", 443, 553, ()),
+    Place("treeInn", "고목의 쉼터", "fairyGarden", 421, 550, ()),
+    Place("treeLibrary", "고목 4층", "fairyGarden", 441, 523, ()),
+    Place("giantTree", "고목 등반로", "fairyGarden", 442, 506, ()),
     Place("treeCrown", "거대고목 꼭대기(나리온 정거장)", "fairyGarden", 442, 489, ()),
-    Place("treeRoots", "고목의 뿌리", "fairyGarden", 445, 609, ()),
-    Place("hiddenGarden", "판도라의 정원", "fairyGarden", 309, 613, ()),
-    # 아이로스
-    Place("airosRoad", "아이로스 가는 길", "airos", 564, 441, ()),
-    Place("eradTower", "에라드의 탑", "airos", 572, 342, ()),
+    Place("hiddenGarden", "판도라의 정원", "fairyGarden", 400, 549, ()),
+    # 에라드의 탑은 타이탄 핸드에 있다.
+    Place("eradTower", "에라드의 탑", "titanHand", 909, 465, ()),
 ]
 
 # 걸어서 이어진 곳(맵 포탈과 이야기의 길). 뱀열차 구간은 선로 그림이 대신하고, 배로 건너는 곳은 잇지 않는다.
 UNKNOWN_LAND = np.array([104, 108, 114], dtype=float)
 UNKNOWN_LAND_SHARE = 0.9
 ROADS = [
-    ("hillia", "castle"), ("hillia", "cliffBridge"), ("cliffBridge", "town"), ("town", "outskirts"), ("town", "hideoutPath"),
+    ("hillia", "castle"), ("castle", "castleHall"), ("castleHall", "castleBarracks"), ("castleBarracks", "castleVault"),
+    ("castleVault", "castleRoof"),
+    ("hillia", "cliffBridge"), ("cliffBridge", "town"), ("town", "outskirts"), ("town", "hideoutPath"),
     ("hideoutPath", "outskirts"), ("hideoutPath", "hideout"), ("hideout", "forest"),
     ("outskirts", "trainStop"), ("outskirts", "port"), ("port", "leviathanCoast"),
-    ("station", "hobbitTrail"), ("hobbitTrail", "hobbitCave"),
-    ("hobbitTrail", "caveRoad"), ("caveRoad", "eastPort"),
-    ("westSands", "dragonRoad"), ("dragonRoad", "dragonPlateau"), ("westSands", "fairyGarden"),
-    ("dragonPlateau", "duneField"), ("duneField", "coastRoad"), ("coastRoad", "coastFork"), ("coastFork", "ironCave"),
-    ("coastFork", "airosRoad"),
-    ("fairyGarden", "petalMeadow"), ("petalMeadow", "fireflyBrook"), ("petalMeadow", "glowWood"), ("glowWood", "fairySpring"),
-    ("fairyGarden", "giantTree"), ("giantTree", "treeInn"), ("giantTree", "treeCrown"), ("giantTree", "treeRoots"),
-    ("giantTree", "hiddenGarden"), ("airosRoad", "eradTower"),
+    ("station", "hobbitTrail"), ("hobbitTrail", "hobbitCave"), ("hobbitTrail", "caveRoad"), ("caveRoad", "eastPort"),
+    ("westSands", "dragonRoad"), ("dragonRoad", "dragonPlateau"),
+    ("westSands", "duneField"), ("duneField", "coastRoad"), ("coastRoad", "coastFork"), ("coastFork", "ironCave"),
+    ("coastFork", "fairyRoad"), ("fairyRoad", "petalMeadow"),
+    ("petalMeadow", "fireflyBrook"), ("fireflyBrook", "glowWood"), ("glowWood", "fairyGarden"),
+    ("fairyGarden", "fairySpring"), ("fairySpring", "airosRoad"),
+    ("fairyGarden", "treeHall"), ("treeHall", "treeRoots"), ("treeHall", "treeMarket"), ("treeMarket", "treeRooms"),
+    ("treeRooms", "treeInn"), ("treeRooms", "treeLibrary"), ("treeLibrary", "giantTree"), ("giantTree", "treeCrown"),
 ]
 
 # 곧게 그으면 다른 점을 지나 이어진 길처럼 보이는 길은 이 자리(스케치 좌표)를 거쳐 꺾는다.
-ROAD_BENDS = {("coastFork", "airosRoad"): [(612, 700)]}
+ROAD_BENDS = {}
+
+# 사용자가 체크포인트로 그려 달라고 한 이야기 자리의 표식(스케치 좌표)과, 둘레에 나무를 심지 않을 반지름(점).
+STORY_MARKS = [((682, 920), 7), ((362, 817), 7), ((534, 615), 9), ((529, 530), 6), ((450, 676), 8)]
+# 냇가와 샘(스케치 좌표).
+BROOK = [(422, 663), (436, 670), (450, 676), (464, 680), (478, 686)]
+SPRING = (529, 532)
 
 # 지도 창에서 누르면 크게 보는 곳(스케치 좌표)과, 그 안의 세부 지역 이름.
 FOCUS_TITLE = "힐리아"
@@ -223,9 +239,8 @@ REGION_NAMES = [("hilliaEast", "힐리아 동부", 730, 802)]
 FUTURE_TOWNS = [
     (304, 71), (449, 110), (600, 101), (373, 150), (253, 199),                                      # 칼티마
     (593, 212), (477, 250), (699, 291), (311, 329), (448, 355), (242, 447), (712, 554),             # 아이로스
-    (355, 998),                                                                                     # 힐리아의 푸른 육각 표식
     (835, 81), (862, 147), (928, 114), (809, 187), (915, 200), (939, 229),                          # 시트라
-    (866, 390), (897, 384), (845, 430), (947, 419), (908, 466), (835, 485),                         # 타이탄 핸드
+    (866, 390), (897, 384), (845, 430), (947, 419), (835, 485),                                     # 타이탄 핸드
     (879, 718), (1036, 696), (963, 770), (880, 820), (1055, 780), (975, 862),                       # 드라니아
     (1526, 65), (1224, 235), (1301, 203), (1197, 333), (1175, 402),                                 # 마르, 무릉도원
     (1446, 256), (1394, 362), (1503, 336), (1290, 371), (1245, 469),                                # 팬데모니엄
@@ -435,7 +450,8 @@ def district_zones(land, regions, rng):
     base = blob(676, 298, 62, 66, rng) & settled
     city = blob(586, 325, 104, 98, rng) & settled & ~base
     paddies = (blob(1212, 440, 92, 56, rng) | blob(1362, 196, 56, 36, rng) | blob(1120, 300, 40, 60, rng)) & settled & mar
-    grove = blob(672, 948, 44, 26, rng) & settled & farmland
+    north = np.mgrid[0:HEIGHT, 0:WIDTH][0] < 935 / SKETCH_PER_DOT
+    grove = (blob(672, 948, 44, 26, rng) | north) & settled & farmland
     return Zones(city, base, paddies, grove)
 
 
@@ -521,6 +537,7 @@ def paint_coast(world, land):
 
 
 def paint_rivers(world, land, ink):
+    # 힐리아 서부 끝의 파란 육각형(스케치의 표식)은 강이 아니다. 지도에는 그리지 않는다(사용자 요청, 2026-11-09).
     rivers = boxed(ink.blue, 134, 330, 800, 1080) & ~boxed(ink.blue, 330, 975, 380, 1022)
     thin = to_dots(rivers, 0.16) & land
     world[thin] = RIVER[1]
@@ -582,6 +599,12 @@ def keep_out_mask():
     for x, y in FUTURE_TOWNS + [(place.x, place.y) for place in PLACES]:
         cx, cy = dot(x, y)
         draw.ellipse([cx - 5, cy - 5, cx + 5, cy + 7], fill=1)
+    for (x, y), radius in STORY_MARKS:
+        cx, cy = dot(x, y)
+        draw.ellipse([cx - radius, cy - radius, cx + radius, cy + radius], fill=1)
+    for x, y in BROOK:
+        cx, cy = dot(x, y)
+        draw.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=1)
     tall = grow(world_tree_shapes(), 3) | tapered(Canvas(WIDTH, HEIGHT), RAILWAY, 9, 9)
     return np.asarray(canvas) | tall | shifted(tall, 0, 4) | shifted(tall, 0, 8)
 
@@ -642,10 +665,10 @@ def keep_clear_of(points, radius):
 
 def place_airos(placed, zones, rng):
     """최첨단 도시: 스케치의 건물 세 자리는 에라드의 탑, 쌍둥이 건물, 복합 건물이고 둘레에 작은 고층 건물이 늘어선다."""
-    place_at(placed, art.erad_tower(rng), 572, 345)
+    place_at(placed, art.erad_tower(rng), 909, 470)
     place_at(placed, art.twin_towers(rng), 618, 335)
     place_at(placed, art.civic_block(rng), 578, 398)
-    towers = zones.city & ~keep_clear_of(((572, 330), (618, 320), (578, 385)), 13)
+    towers = zones.city & ~keep_clear_of(((618, 320), (578, 385)), 13)
     for x, y in scatter(shrink(towers, 3), 8, rng):
         place(placed, art.glass_tower(int(rng.integers(5, 8)), int(rng.integers(9, 20)), rng), x, y)
 
@@ -665,7 +688,10 @@ def place_hillia_farms(placed, zones, free, farmland, rng):
         place_at(placed, art.windmill(), x, y)
     plant(placed, free & farmland & ~zones.grove, 19, [art.round_tree(pg.LEAF)], rng)
     forest = pg.hexes("#1b2e20", "#2b4a2c", "#3b6432", "#507f3a", "#74a347")
-    plant(placed, free & zones.grove, 4, [art.round_tree(forest), art.round_tree(pg.LEAF)], rng)
+    castle = np.zeros(free.shape, dtype=bool)
+    castle_x, castle_y = dot(622, 906)
+    castle[int(castle_y) - 50:int(castle_y) + 4, int(castle_x) - 20:int(castle_x) + 21] = True
+    plant(placed, free & zones.grove & ~castle, 4, [art.round_tree(forest), art.round_tree(pg.LEAF)], rng)
 
     harbor = art.harbor()
     place_at(placed, harbor, 186, 945)
@@ -702,6 +728,15 @@ def place_paradise_mist(world):
     stamp_all(world, placed)
 
 
+def place_story_marks(placed):
+    place_at(placed, art.hideout(), 682, 924)
+    place_at(placed, art.cave_mouth(), 362, 822)
+    caps = (pg.hexes("#7a1e1e", "#c43a32", "#f08a78"), pg.hexes("#22306e", "#3a5ac0", "#8aa8f0"),
+            pg.hexes("#4a2470", "#7a48b8", "#b890e8"))
+    for k, (x, y) in enumerate(((522, 610), (538, 604), (548, 618), (530, 624))):
+        place_at(placed, art.mushroom_house(caps[k % len(caps)]), x, y)
+
+
 def place_scenery(world, land, regions, zones, ink, rng):
     placed = []
     inland = steps_from(~land, 12)
@@ -713,6 +748,7 @@ def place_scenery(world, land, regions, zones, ink, rng):
 
     place_mountains(placed, land, ink, rng)
     place_airos(placed, zones, rng)
+    place_story_marks(placed)
     place_hillia_farms(placed, zones, free & (inland >= 5), region_of(FARMLAND), rng)
     place_mar(placed, free & region_of("마르") & ~zones.paddies, rng)
     place_paradise(placed, land & (inland >= 2) & region_of("무릉도원"), rng)
@@ -858,11 +894,16 @@ def paint_craters(world, land):
     world[canvas.ellipse(*dot(964, 770), 3, 5)] = EMBER[4]
 
 
-def paint_hexagon(world, ink):
-    """힐리아 끝의 푸른 육각 표식."""
-    ring = to_dots(boxed(ink.blue, 330, 975, 380, 1022), 0.14)
-    world[grow(ring) & ~ring] = INK_LINE
-    world[ring] = pg.hexes("#3a56e0")[0]
+def paint_brook_and_spring(world):
+    """반딧불 냇가의 냇물과 요정의 샘(체크포인트 #5, #6)."""
+    canvas = Canvas(WIDTH, HEIGHT)
+    brook = tapered(canvas, BROOK, 2.4, 1.4)
+    world[grow(brook) & ~brook] = RIVER[0]
+    world[brook] = RIVER[1]
+    spring = canvas.ellipse(*dot(*SPRING), 3.2, 2.2)
+    world[grow(spring) & ~spring] = RIVER[0]
+    world[spring] = RIVER[1]
+    world[spring & shifted(~spring, 1, 1)] = pg.hexes("#bfe4ee")[0]
 
 
 def paint_labels(world, font_path):
@@ -1068,7 +1109,7 @@ def draw_world(root):
     paint_craters(world, land)
     place_scenery(world, land, regions, zones, ink, rng)
     paint_snake_train(world)
-    paint_hexagon(world, ink)
+    paint_brook_and_spring(world)
     return world, land, regions, land | cloud_land | whirlpool
 
 
