@@ -1,0 +1,388 @@
+<title>판도라즈 대본</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 대본 낭독대: 왼쪽 장 목록(넓은 화면), 가운데 [화자 | 대사] 두 칸. 장 머리는 명조, 장면 표지는 고정폭 글꼴. */
+:root {
+  --bg: #eef0f4;
+  --sheet: #ffffff;
+  --ink: #172a49;
+  --muted: #5f6a86;
+  --line: #d7dbe5;
+  --accent: #a3611f;
+  --accent-soft: #f4e7d6;
+  --edit: #2f6fb0;
+  --edit-soft: #e3eefb;
+  --danger: #b2412d;
+  --sp-mix: 62%;
+  --display: "Gowun Batang", "Nanum Myeongjo", "AppleMyungjo", serif;
+  --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --who-w: 7.4rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1726; --sheet: #142339; --ink: #f3e9d8; --muted: #9aa5c1; --line: #263a58;
+    --accent: #deaf76; --accent-soft: #2e2a24; --edit: #8db8ec; --edit-soft: #1b3150; --danger: #ef7a62;
+    --sp-mix: 92%; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1726; --sheet: #142339; --ink: #f3e9d8; --muted: #9aa5c1; --line: #263a58;
+  --accent: #deaf76; --accent-soft: #2e2a24; --edit: #8db8ec; --edit-soft: #1b3150; --danger: #ef7a62;
+  --sp-mix: 92%; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--ink); font: 15px/1.75 var(--body); word-break: keep-all; overflow-wrap: anywhere;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 96px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 44px; }
+.masthead { grid-column: 1 / -1; padding-block: 48px 22px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+.eyebrow { margin: 0; font: 500 12px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(2rem, 5vw, 3rem)/1.15 var(--display); text-wrap: balance; }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
+.facts b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.2rem); align-self: start; max-height: calc(100vh - 2.4rem); overflow: auto; padding-top: 26px; font-size: 13.5px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.toc a { text-decoration: none; color: var(--muted); display: flex; gap: 8px; }
+.toc a:hover, .toc a[aria-current="true"] { color: var(--ink); }
+.toc .l { font: 500 11px/1.9 var(--mono); color: var(--accent); min-width: 3.8em; }
+main { min-width: 0; }
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; margin-top: 10px; padding-block: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+}
+.bar input[type="search"] { flex: 1 1 200px; min-width: 0; padding: 8px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--sheet); }
+.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.btn { border: 1px solid var(--line); background: var(--sheet); border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.btn .n { font: 500 11.5px/1 var(--mono); color: var(--edit); margin-left: 4px; font-variant-numeric: tabular-nums; }
+.btn[aria-pressed="true"] .n { color: inherit; }
+.result { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.status { font-size: 12.5px; color: var(--muted); }
+.status.bad { color: var(--danger); }
+.chapter { padding-top: 34px; }
+.ch-head { display: grid; gap: 4px; margin-bottom: 14px; }
+.ch-label { margin: 0; font: 500 12px/1 var(--mono); letter-spacing: 0.12em; color: var(--accent); }
+.ch-head h2 { margin: 0; font: 700 1.75rem/1.25 var(--display); text-wrap: balance; }
+.ch-meta { margin: 0; font-size: 12.5px; color: var(--muted); }
+.block { padding: 6px 0 8px; border-top: 1px dotted var(--line); }
+.key { margin: 0 0 2px calc(var(--who-w) + 14px); font: 500 10.5px/1.6 var(--mono); color: var(--muted); letter-spacing: 0.02em; }
+.ln { display: grid; grid-template-columns: var(--who-w) minmax(0, 1fr); gap: 14px; padding-block: 3px; border-radius: 0 6px 6px 0; }
+.who { font-weight: 600; font-size: 13.5px; line-height: 1.75; text-align: right; color: color-mix(in oklab, var(--sp, var(--muted)) var(--sp-mix), var(--ink)); }
+.who .as { display: block; font: 400 11px/1.3 var(--body); color: var(--muted); }
+.say { margin: 0; max-width: 62ch; white-space: pre-wrap; }
+.tag { font: 500 10.5px/1 var(--mono); font-style: normal; font-weight: 500; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 2px 5px; margin-right: 7px; vertical-align: 2px; }
+.ln.shout .say { font-weight: 600; }
+.ln.think .say { font-style: italic; color: color-mix(in srgb, var(--ink) 72%, var(--bg)); }
+.ln.narrate .say { font: 15.5px/1.85 var(--display); }
+.ln.text .say { font-size: 13.5px; color: var(--muted); }
+.ln.text .who { font-weight: 500; font-size: 12px; color: var(--muted); }
+.ln.choice .say::before { content: "▸ "; color: var(--accent); }
+.ln.notify .say { font-size: 14px; color: var(--accent); }
+body.editing .ln.code .say::after { content: "코드에 적힌 글이라 여기서는 못 고쳐요"; display: block; font: 500 10.5px/1.6 var(--mono); color: var(--muted); }
+.name { display: inline-block; padding: 0 5px; margin: 0 1px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); font-size: 0.92em; font-style: normal; }
+.ln.edited { background: var(--edit-soft); box-shadow: -6px 0 0 var(--edit-soft), -9px 0 0 var(--edit); }
+.ln.edited .who::after { content: "고침"; display: block; font: 500 10px/1.4 var(--mono); color: var(--edit); }
+body.editing .say[contenteditable] { cursor: text; outline: 1px dashed transparent; outline-offset: 3px; border-radius: 4px; }
+body.editing .say[contenteditable]:hover { outline-color: color-mix(in srgb, var(--edit) 55%, transparent); }
+body.editing .say[contenteditable]:focus { outline: 2px solid var(--edit); background: var(--sheet); }
+.hide-text .ln.text, .hide-text .block.only-text { display: none; }
+.empty { margin: 30px 0; color: var(--muted); }
+.panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 30; width: min(440px, 100%); display: flex; flex-direction: column;
+  background: var(--sheet); border-left: 1px solid var(--line); box-shadow: -16px 0 40px color-mix(in srgb, var(--ink) 14%, transparent);
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+.panel header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px 20px 10px; border-bottom: 1px solid var(--line); }
+.panel h3 { margin: 0; font: 700 1.2rem/1.3 var(--display); }
+.panel-body { overflow: auto; padding: 12px 20px 28px; display: grid; gap: 12px; align-content: start; }
+.panel-help { margin: 0; font-size: 13px; color: var(--muted); }
+.edit-item { padding: 10px 0; border-top: 1px solid var(--line); display: grid; gap: 4px; }
+.edit-where { font: 500 11px/1.5 var(--mono); color: var(--muted); }
+.edit-item del { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--danger); white-space: pre-wrap; font-size: 13.5px; }
+.edit-item ins { text-decoration: none; background: var(--edit-soft); border-radius: 4px; padding: 2px 6px; white-space: pre-wrap; font-size: 13.5px; }
+.edit-acts { display: flex; gap: 14px; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font-size: 12.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 860px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; } .toc { display: none; } }
+@media (max-width: 560px) {
+  :root { --who-w: 0px; }
+  .ln { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .who { text-align: left; }
+  .who .as { display: inline; margin-left: 6px; }
+  .key { margin-left: 0; }
+  .bar { position: static; }
+}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow">Pandoras · Script</p>
+    <h1>판도라즈 대본</h1>
+    <p class="lede">게임 대사 파일(Unity의 <code>Data/Resources/Text</code>)의 대사를 장마다 이야기 코드가 부르는 순서대로 모았어요. 주인공의 대답처럼 코드가 덩어리 사이에 한 줄씩 끼워 넣는 대사도 제자리에 있어요. 게임 대사가 정본이에요. 「편집 모드」에서 대사를 누르면 그 자리에서 고칠 수 있고, 고친 줄은 이 페이지에 저장돼요. Claude에게 「대본 고친 것 게임에 반영해 줘」라고 하면 게임 대사 파일에 넣고 이 페이지도 새로 고쳐요. 세계관과 인물은 <a href="https://claude.ai/artifact/b7d97f66-259e-4f13-a297-8ae7893b352d">판도라즈 설정집</a>에 있어요.</p>
+    <ul class="facts" id="facts"></ul>
+  </header>
+
+  <nav class="toc" aria-label="장 목록"><ol id="toc"></ol></nav>
+
+  <main>
+    <div class="bar" role="toolbar" aria-label="대본 도구">
+      <input id="q" type="search" placeholder="대사나 화자 검색" aria-label="대사나 화자 검색" autocomplete="off">
+      <label class="chk" for="show-text"><input type="checkbox" id="show-text"> 안내 글도 보기</label>
+      <span class="result" id="result" aria-live="polite"></span>
+      <button type="button" class="btn" id="edit-toggle" aria-pressed="false" hidden>편집 모드</button>
+      <button type="button" class="btn" id="edits-open" aria-expanded="false" aria-controls="panel">고친 줄<span class="n" id="edit-count">0</span></button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+    <div id="script" class="hide-text"></div>
+    <p class="empty" id="empty" hidden>찾는 대사가 없어요.</p>
+  </main>
+</div>
+
+<aside class="panel" id="panel" aria-labelledby="panel-title" hidden>
+  <header><h3 id="panel-title">고친 줄</h3><button type="button" class="btn" id="panel-close">닫기</button></header>
+  <div class="panel-body" id="panel-body"></div>
+</aside>
+
+<script type="application/json" id="lines">__LINES__</script>
+<script>
+(() => {
+  "use strict";
+  const DATA = JSON.parse(document.getElementById("lines").textContent);
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const STYLE = { say: "", shout: "외침", think: "속마음", narrate: "해설", text: "안내", choice: "선택지", notify: "알림" };
+  const state = { db: null, edits: new Map(), editing: false, canWrite: false };
+
+  // 줄마다 고칠 때 쓰는 이름: 파일~열쇠~순번. 게임 대사 파일에서 같은 자리를 찾는 데 쓴다.
+  const lineId = (file, key, i) => `${file}~${key}~${i}`;
+  // 줄: 고칠 수 있는 줄은 key·i가 있고, 코드에 바로 적힌 줄(code)은 없다.
+  const ROWS = [];
+  const lineIndex = new Map();
+  for (const sec of DATA.sections) for (const scene of sec.scenes) for (const ln of scene.rows) {
+    const id = ln.key != null ? lineId(sec.file, ln.key, ln.i || 0) : "";
+    const item = { sec, ln, id, r: ROWS.length };
+    ROWS.push(item);
+    if (id) lineIndex.set(id, item);
+  }
+  const allRows = (test) => ROWS.filter((x) => test(x.ln)).length;
+
+  // 파일 속 글(\n, {name})을 화면 글로
+  const shown = (raw) => esc(raw.replace(/\\n/g, "\n")).replace(/\{name\}/g, '<span class="name">〈이름〉</span>');
+  const editable = (raw) => raw.replace(/\\n/g, "\n");
+  const stored = (plain) => plain.replace(/\r/g, "").replace(/\n+$/g, "").replace(/\n/g, "\\n");
+  const currentText = (id) => (state.edits.has(id) ? state.edits.get(id).text : lineIndex.get(id).ln.text);
+  const rowText = (item) => (item.id ? currentText(item.id) : item.ln.text);
+
+  function whoHtml(ln) {
+    if (!ln.who) return '<div class="who">' + (ln.s === "text" ? "안내" : "") + "</div>";
+    const sp = DATA.speakers[ln.who] || { name: ln.who, color: "" };
+    const label = ln.name ? `${esc(ln.name)}<span class="as">${esc(sp.name)}</span>` : esc(sp.name);
+    return `<div class="who" style="--sp:${esc(sp.color || "var(--muted)")}">${label}</div>`;
+  }
+
+  function render() {
+    const isChapter = (sec) => /^(prologue|ch\d+)$/.test(sec.id);
+    const facts = [
+      `장 <b>${DATA.sections.filter(isChapter).length}</b>개 (0~11장) · 곁 이야기 <b>${DATA.sections.filter((s) => !isChapter(s)).length}</b>편`,
+      `대사 <b>${allRows((ln) => ln.s !== "text")}</b>줄 · 안내 글 <b>${allRows((ln) => ln.s === "text")}</b>줄`,
+      `화자 <b>${Object.keys(DATA.speakers).length}</b>명`,
+      "〈이름〉 = 플레이어가 정한 주인공 이름",
+    ];
+    $("facts").innerHTML = facts.map((f) => `<li>${f}</li>`).join("");
+    $("toc").innerHTML = DATA.sections.map((s) => `<li><a href="#${esc(s.id)}"><span class="l">${esc(s.label)}</span><span>${esc(s.title)}</span></a></li>`).join("");
+    let r = 0;
+    $("script").innerHTML = DATA.sections.map((sec) => {
+      const spoken = sec.scenes.reduce((n, sc) => n + sc.rows.filter((ln) => ln.s !== "text").length, 0);
+      const scenes = sec.scenes.map((scene) => {
+        const onlyText = scene.rows.every((ln) => ln.s === "text");
+        const lines = scene.rows.map((ln) => {
+          const item = ROWS[r++];
+          const tags = [ln.s !== "text" ? STYLE[ln.s] : "", ln.tag || ""].filter(Boolean).map((t) => `<span class="tag">${esc(t)}</span>`).join("");
+          const attrs = item.id ? ` data-id="${esc(item.id)}"` : "";
+          return `<div class="ln ${esc(ln.s)}${item.id ? "" : " code"}" data-r="${item.r}"${attrs}>${whoHtml(ln)}<p class="say">${tags}<span class="t">${shown(rowText(item))}</span></p></div>`;
+        }).join("");
+        return `<section class="block${onlyText ? " only-text" : ""}"><p class="key">${esc(scene.key || "그 밖의 글")}</p>${lines}</section>`;
+      }).join("");
+      return `<article class="chapter" id="${esc(sec.id)}"><header class="ch-head"><p class="ch-label">${esc(sec.label)}</p><h2>${esc(sec.title)}</h2><p class="ch-meta">대사 ${spoken}줄 · <code>${esc(sec.file)}.cs</code> 순서 · 글은 <code>${esc(sec.file)}.txt</code></p></header>${scenes}</article>`;
+    }).join("");
+    markEdited();
+    applyFilter();
+  }
+
+  // ── 찾기와 안내 글 보이기 ──
+  function applyFilter() {
+    const term = $("q").value.trim().toLowerCase();
+    const showText = $("show-text").checked;
+    $("script").classList.toggle("hide-text", !showText);
+    let hits = 0;
+    for (const ln of document.querySelectorAll("#script .ln")) {
+      const item = ROWS[ln.dataset.r];
+      const sp = item.ln.who ? (DATA.speakers[item.ln.who] || {}).name || item.ln.who : "";
+      const hay = (rowText(item) + " " + sp + " " + (item.ln.name || "")).toLowerCase();
+      const ok = !term || hay.includes(term);
+      ln.hidden = !ok;
+      if (ok && (showText || item.ln.s !== "text")) hits++;
+    }
+    for (const block of document.querySelectorAll("#script .block")) {
+      block.hidden = !!term && !block.querySelector(".ln:not([hidden])" + (showText ? "" : ":not(.text)"));
+    }
+    for (const ch of document.querySelectorAll("#script .chapter")) {
+      ch.hidden = !!term && !ch.querySelector(".block:not([hidden])");
+    }
+    $("result").textContent = term ? `${hits}줄` : "";
+    $("empty").hidden = !(term && hits === 0);
+  }
+  $("q").addEventListener("input", applyFilter);
+  $("show-text").addEventListener("change", applyFilter);
+
+  // ── 편집 ──
+  function markEdited() {
+    for (const ln of document.querySelectorAll("#script .ln[data-id]")) ln.classList.toggle("edited", state.edits.has(ln.dataset.id));
+    $("edit-count").textContent = String(state.edits.size);
+    if (!$("panel").hidden) renderPanel();
+  }
+  function setEditing(on) {
+    state.editing = on;
+    document.body.classList.toggle("editing", on);
+    $("edit-toggle").setAttribute("aria-pressed", String(on));
+    $("edit-toggle").textContent = on ? "편집 끝내기" : "편집 모드";
+    for (const t of document.querySelectorAll("#script .ln[data-id] .say .t")) {
+      if (on) { t.setAttribute("contenteditable", "plaintext-only"); if (t.contentEditable !== "plaintext-only") t.setAttribute("contenteditable", "true"); t.setAttribute("spellcheck", "false"); }
+      else t.removeAttribute("contenteditable");
+    }
+    setStatus(on ? "고칠 대사를 누르세요. 칸 안의 Enter는 게임 대화창의 줄바꿈이에요." : "");
+  }
+  $("edit-toggle").addEventListener("click", () => setEditing(!state.editing));
+
+  document.addEventListener("focusin", (e) => {
+    const t = e.target.closest && e.target.closest("#script .say .t[contenteditable]");
+    if (!t) return;
+    const id = t.closest(".ln").dataset.id;
+    t.textContent = editable(currentText(id));
+  });
+  document.addEventListener("focusout", (e) => {
+    const t = e.target.closest && e.target.closest("#script .say .t[contenteditable]");
+    if (!t) return;
+    const id = t.closest(".ln").dataset.id;
+    const next = stored(t.innerText);
+    const item = lineIndex.get(id);
+    const before = currentText(id);
+    t.innerHTML = shown(next || before);
+    if (!next || next === before) return;
+    saveEdit(id, item, next);
+  });
+  document.addEventListener("keydown", (e) => {
+    const t = e.target.closest && e.target.closest("#script .say .t[contenteditable]");
+    if (!t) return;
+    if (e.key === "Escape") { const id = t.closest(".ln").dataset.id; t.textContent = editable(currentText(id)); t.blur(); }
+  });
+
+  async function saveEdit(id, item, text) {
+    if (!state.db) { setStatus("저장할 수 없는 보기예요.", true); return; }
+    const ref = state.db.collection("edits").doc(id);
+    try {
+      if (text === item.ln.text) {
+        state.edits.delete(id);
+        markEdited();
+        await ref.delete();
+        setStatus("원래 대사로 되돌렸어요");
+      } else {
+        const body = { file: item.sec.file, key: item.ln.key, index: item.ln.i || 0, who: item.ln.who || "", original: item.ln.text, text, at: new Date().toISOString() };
+        state.edits.set(id, body);
+        markEdited();
+        await ref.set(body);
+        setStatus("저장했어요");
+      }
+    } catch (err) {
+      setStatus("저장하지 못했어요" + (err && err.code ? ` (${err.code})` : "") + ". 다시 고쳐 보세요.", true);
+    }
+  }
+
+  // ── 고친 줄 목록 ──
+  function renderPanel() {
+    const items = [...state.edits.entries()].filter(([id]) => lineIndex.has(id));
+    const stale = [...state.edits.keys()].filter((id) => !lineIndex.has(id));
+    let html = '<p class="panel-help">이 페이지에서 고친 줄이에요. 「대본 고친 것 게임에 반영해 줘」라고 하면 Claude가 게임 대사 파일에 넣고, 넣은 줄은 여기서 사라져요.</p>';
+    if (!items.length && !stale.length) html += '<p class="panel-help">아직 고친 줄이 없어요.</p>';
+    for (const [id, e] of items) {
+      const { sec, ln } = lineIndex.get(id);
+      const sp = ln.who ? (DATA.speakers[ln.who] || {}).name || ln.who : "글";
+      html += `<div class="edit-item"><span class="edit-where">${esc(sec.label)} · ${esc(e.key)} · ${esc(sp)}</span><del>${esc(editable(e.original))}</del><ins>${esc(editable(e.text))}</ins>` +
+        `<span class="edit-acts"><button type="button" class="linkbtn" data-go="${esc(id)}">그 줄로 가기</button><button type="button" class="linkbtn" data-revert="${esc(id)}">되돌리기</button></span></div>`;
+    }
+    if (stale.length) html += `<p class="panel-help">게임 대사 파일에서 자리가 바뀐 줄 ${stale.length}개가 남아 있어요. Claude에게 확인해 달라고 해 주세요.</p>`;
+    $("panel-body").innerHTML = html;
+  }
+  function openPanel(on) {
+    $("panel").hidden = !on;
+    $("edits-open").setAttribute("aria-expanded", String(on));
+    if (on) { renderPanel(); $("panel-close").focus(); }
+  }
+  $("edits-open").addEventListener("click", () => openPanel($("panel").hidden));
+  $("panel-close").addEventListener("click", () => { openPanel(false); $("edits-open").focus(); });
+  $("panel-body").addEventListener("click", (e) => {
+    const go = e.target.closest("[data-go]");
+    if (go) {
+      $("q").value = ""; $("show-text").checked = $("show-text").checked || lineIndex.get(go.dataset.go).ln.s === "text"; applyFilter();
+      const el = document.querySelector(`#script .ln[data-id="${CSS.escape(go.dataset.go)}"]`);
+      if (el) el.scrollIntoView({ block: "center" });
+      return;
+    }
+    const rv = e.target.closest("[data-revert]");
+    if (rv) {
+      const id = rv.dataset.revert;
+      const item = lineIndex.get(id);
+      if (item) { saveEdit(id, item, item.ln.text).then(() => { const t = document.querySelector(`#script .ln[data-id="${CSS.escape(id)}"] .t`); if (t) t.innerHTML = shown(item.ln.text); }); }
+      else if (state.db) { state.edits.delete(id); markEdited(); state.db.collection("edits").doc(id).delete().catch(() => {}); }
+    }
+  });
+
+  function setStatus(text, bad) {
+    $("status").textContent = text;
+    $("status").classList.toggle("bad", !!bad);
+  }
+
+  render();
+
+  // ── 저장소: 고친 줄 ──
+  (async () => {
+    const db = await claude.use("db");
+    if (!db) { setStatus("이 보기에서는 고친 줄을 불러올 수 없어요."); return; }
+    state.db = db;
+    let loaded = false;
+    const timer = setTimeout(() => { if (!loaded) setStatus("고친 줄을 아직 불러오지 못했어요.", true); }, 10000);
+    db.collection("edits").onSnapshot((snap) => {
+      state.edits.clear();
+      for (const d of snap.docs) state.edits.set(d.id, { ...d.data() });
+      if (!snap.metadata.fromCache && !loaded) { loaded = true; clearTimeout(timer); }
+      // 고치고 있는 칸은 건드리지 않고, 나머지 줄의 글과 표시만 맞춘다.
+      for (const ln of document.querySelectorAll("#script .ln[data-id]")) {
+        const t = ln.querySelector(".t");
+        if (t !== document.activeElement) t.innerHTML = shown(currentText(ln.dataset.id));
+      }
+      markEdited();
+    }, (err) => { clearTimeout(timer); setStatus("고친 줄을 불러오지 못했어요 (" + err.code + ")", true); });
+    let canWrite = true;
+    try {
+      const user = await claude.use("user");
+      if (user) { const c = await user.can("data.write"); if (c === false) canWrite = false; }
+    } catch (e) { canWrite = true; }
+    state.canWrite = canWrite;
+    $("edit-toggle").hidden = !canWrite;
+  })();
+})();
+</script>
