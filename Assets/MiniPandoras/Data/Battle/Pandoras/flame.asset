@@ -28,3 +28,4 @@ MonoBehaviour:
   glyph: flame
   lightColor: {r: 1, g: 0.8627451, b: 0.5803922, a: 1}
   darkColor: {r: 0.3529412, g: 0.078431375, b: 0.015686275, a: 1}
+  rivalPattern: {fileID: 11400000, guid: 878adceed5fadd34ab8725090efa8206, type: 2}

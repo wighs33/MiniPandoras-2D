@@ -1,0 +1,41 @@
+# Duel
+# 타이틀의 1:1 대전·프로필 글. 말투 / 화자 / 이름표 / 글. 칸은 탭으로 나눈다.
+
+== profile.defaultNickname
+text			모험가
+
+== profile.recordEmpty
+text			0승 0패
+
+== profile.record
+text			{0}승 {1}패 · 승률 {2}%
+
+== profile.recent
+text			{0}   {1}   {2}
+
+== duel.win
+text			승리
+
+== duel.lose
+text			패배
+
+== duel.total
+text			통산 {0}
+
+== duel.rivalNames
+text			모래바람
+text			검은손톱
+text			새벽별
+text			차원여행자
+text			불꽃놀이
+text			뱀성지기
+text			고목요정
+text			은빛날개
+text			판도라헌터
+text			노을빛
+text			바람개비
+text			별똥별
+text			떠돌이검객
+text			밤하늘
+text			무쇠주먹
+text			파도타기

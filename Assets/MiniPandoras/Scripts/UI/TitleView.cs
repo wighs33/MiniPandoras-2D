@@ -10,9 +10,12 @@ namespace MiniPandoras.UI
 {
     /// <summary>
     /// 타이틀 화면. 저장된 장이 속한 부의 풍경(<see cref="TitleScenery"/>, 1부는 정류장의 뱀열차, 2부는 밤 사막) 위 하늘에 로고를, 엄지가 닿는 화면 아래에 메뉴를 둔다.
-    /// 저장이 있으면 「이어 하기」(저장된 장)가 주 버튼이고, 「새 게임」은 저장을 덮어쓰므로 저장이 있을 때 한 번 묻는다.
-    /// 「챕터 선택」(부는 화면에 CHAPTER로 보인다)은 부마다 카드를 세운 줄(<see cref="PartPicker"/>, 음반 고르기처럼 가운데 카드가 크다)을 연다. 줄을 넘기면 뒤 풍경이 가운데 온 부의 것으로 바뀐다.
-    /// 장 선택(장 목록 창)은 테스트하기 쉽게 남긴 것이라 챕터 선택 창에서 개발 빌드에서만 연다. 무엇을 고르든 장 번호 하나로 알린다(새 게임은 0).
+    /// 메뉴는 이야기 셋(이어 하기·처음부터·지난 스토리)과 1:1 대전·프로필·설정이다(2026-11-13 사용자 결정).
+    /// 저장이 있으면 「이어 하기」(저장된 장)가 주 버튼이고, 「처음부터」는 저장을 덮어쓰므로 저장이 있을 때 한 번 묻는다.
+    /// 「지난 스토리」는 부마다 카드를 세운 줄(<see cref="PartPicker"/>, 음반 고르기처럼 가운데 카드가 크다)을 연다.
+    /// 줄을 넘기면 뒤 풍경이 가운데 온 부의 것으로 바뀐다. 저장된 부는 이어 하고, 다른 부나 그 부의 「처음부터」는 저장을 지우므로 한 번 묻는다.
+    /// 대전·프로필·설정은 알리기만 하고, 그 창은 받는 쪽(이야기의 대전, 앱의 타이틀 창들)이 연다.
+    /// 장 선택(장 목록 창)은 테스트하기 쉽게 남긴 것이라 챕터 선택 창에서 개발 빌드에서만 연다. 무엇을 고르든 장 번호 하나로 알린다.
     /// </summary>
     public sealed class TitleView : MonoBehaviour
     {
@@ -41,9 +44,12 @@ namespace MiniPandoras.UI
         [SerializeField] private Button newGameButton;
         [SerializeField] private TMP_Text newGameLabel;
         [SerializeField] private Button partsButton;
-        [Tooltip("주 버튼(저장이 있으면 이어 하기, 없으면 새 게임)의 글 색")]
+        [Tooltip("주 버튼(저장이 있으면 이어 하기, 없으면 처음부터)의 글 색")]
         [SerializeField] private Color primaryColor = Color.yellow;
         [SerializeField] private Color secondaryColor = Color.white;
+        [SerializeField] private Button duelButton;
+        [SerializeField] private Button profileButton;
+        [SerializeField] private Button settingsButton;
         [Header("챕터 선택(부)")]
         [SerializeField] private PartPicker partPicker;
         [Header("저장을 지우기 전 확인")]
@@ -73,7 +79,7 @@ namespace MiniPandoras.UI
         private int savedChapter = -1;
         private int savedPart = 1;
         private int shownPart;
-        // 확인 창에서 「처음부터」를 누르면 시작할 장(새 게임은 0, 챕터 선택은 그 부의 첫 장).
+        // 확인 창에서 「처음부터」를 누르면 시작할 장(처음부터는 0, 지난 스토리는 고른 부의 첫 장).
         private int chapterToConfirm;
         private Sequence intro;
         private Sequence homeFade;
@@ -81,6 +87,15 @@ namespace MiniPandoras.UI
 
         /// <summary>장을 골랐다(장 번호, 0은 프롤로그).</summary>
         public event Action<int> ChapterPicked;
+
+        /// <summary>「1:1 대전」을 눌렀다.</summary>
+        public event Action DuelRequested;
+
+        /// <summary>「프로필」을 눌렀다.</summary>
+        public event Action ProfileRequested;
+
+        /// <summary>「설정」을 눌렀다.</summary>
+        public event Action SettingsRequested;
 
         public bool IsOpen => screen.activeSelf;
 
@@ -275,6 +290,12 @@ namespace MiniPandoras.UI
             }
         }
 
+        /// <summary>저장을 이어 하는 부를 첫 장부터 새로 한다. 저장이 지워지므로 먼저 묻는다.</summary>
+        private void RestartPart(StoryPart part)
+        {
+            AskBeforeStarting(part.FirstChapter, T("titleView.confirmPart", chapterLines[savedChapter], part.FirstLine));
+        }
+
         private void AskBeforeStarting(int chapter, string question)
         {
             chapterToConfirm = chapter;
@@ -292,8 +313,12 @@ namespace MiniPandoras.UI
             continueButton.onClick.AddListener(Continue);
             newGameButton.onClick.AddListener(StartNewGame);
             partsButton.onClick.AddListener(OpenParts);
+            duelButton.onClick.AddListener(() => DuelRequested?.Invoke());
+            profileButton.onClick.AddListener(() => ProfileRequested?.Invoke());
+            settingsButton.onClick.AddListener(() => SettingsRequested?.Invoke());
             partPicker.FrontChanged += ShowFrontScenery;
             partPicker.Picked += StartPart;
+            partPicker.RestartPicked += RestartPart;
             partPicker.Closed += CloseParts;
             partPicker.ChaptersRequested += chaptersWindow.Open;
             chaptersClose.onClick.AddListener(chaptersWindow.Close);

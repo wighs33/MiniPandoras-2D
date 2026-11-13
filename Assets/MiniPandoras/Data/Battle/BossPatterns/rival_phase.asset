@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf2b382a3f169df4b94016115b3b9941, type: 3}
+  m_Name: rival_phase
+  m_EditorClassIdentifier: MiniPandoras::MiniPandoras.Combat.BossPatternDefinition
+  calm:
+  - name: "\uACF5\uAC04\uB3C4\uC57D"
+    kind: 1
+    power: 1.3
+    count: 1
+    reach: 200
+    look: 2
+  - name: "\uCC28\uC6D0\uCC38"
+    kind: 0
+    power: 1.4
+    count: 1
+    reach: 70
+    look: 2
+  enraged:
+  - name: "\uACF5\uAC04\uB3C4\uC57D"
+    kind: 1
+    power: 1.3
+    count: 2
+    reach: 220
+    look: 2
+  - name: "\uCC28\uC6D0\uCC38"
+    kind: 4
+    power: 1.2
+    count: 8
+    reach: 150
+    look: 2
+  enrageCall: "\uCC28\uC6D0\uC758 \uD2C8\uC774 \uBC8C\uC5B4\uC84C\uB2E4!"
+  restFrames: 90
+  ascends: 0

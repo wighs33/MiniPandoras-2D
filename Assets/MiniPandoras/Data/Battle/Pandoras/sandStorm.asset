@@ -28,3 +28,4 @@ MonoBehaviour:
   glyph: sand
   lightColor: {r: 1, g: 0.94509804, b: 0.76862746, a: 1}
   darkColor: {r: 0.2901961, g: 0.1882353, b: 0.03137255, a: 1}
+  rivalPattern: {fileID: 11400000, guid: d6c8b3fb596991c4bb71d6d90bb5658d, type: 2}

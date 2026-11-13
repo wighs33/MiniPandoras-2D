@@ -50,5 +50,18 @@ namespace MiniPandoras.Combat
         public BossPatternDefinition BossPattern => bossPattern;
         /// <summary>쓰러뜨리면 얻는 경험치(웹게임에 없다). 강한 적일수록 많이 주도록 체력으로 정한다.</summary>
         public int Experience => Mathf.Max(1, hp / GameBalance.Current.HpPerExperience);
+
+        /// <summary>
+        /// 이 정의를 틀로 삼은 대전 상대 한 명(능력치는 틀 그대로, 이름·그림·기술 순서만 그 판의 것). 판마다 만드는 것이라 에셋으로 저장하지 않는다.
+        /// </summary>
+        public EnemyDefinition AsRival(string name, string sheet, BossPatternDefinition pattern)
+        {
+            EnemyDefinition rival = Instantiate(this);
+            rival.displayName = name;
+            rival.sheetId = sheet;
+            rival.bossPattern = pattern;
+            rival.name = id;
+            return rival;
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace MiniPandoras.App
     /// 대화·연출 건너뛰기(웹게임 updateSkip). 화면 오른쪽 위 「▶▶ 건너뛰기」를 누르면 켜진다.
     /// 켜면 대사·알림을 곧바로 넘기고(<see cref="Conversation.Skipping"/>) 연출을 8배로 빨리 돌리다가(시간 배율),
     /// 플레이어가 다시 움직일 수 있게 되거나 선택지·이름 입력이 뜨면 저절로 멈춘다. 한 번 더 누르면 바로 멈춘다.
-    /// 타이틀과 글라이더에서는 쓸 수 없다(웹게임 noSkip). 메뉴를 열면 GameMenu가 이것을 먼저 멈춘 뒤 게임을 멈춘다.
+    /// 타이틀과 글라이더, 1:1 대전의 화면(매칭·VS·결과)에서는 쓸 수 없다(웹게임 noSkip). 메뉴를 열면 GameMenu가 이것을 먼저 멈춘 뒤 게임을 멈춘다.
     /// </summary>
     public sealed class CutsceneSkip : MonoBehaviour
     {
@@ -22,6 +22,7 @@ namespace MiniPandoras.App
         [SerializeField] private Conversation conversation;
         [SerializeField] private PlayerControls controls;
         [SerializeField] private TitleView title;
+        [SerializeField] private DuelView duel;
 
         private float skippableFor;
         private float scaleBeforeSkip = 1f;
@@ -85,7 +86,7 @@ namespace MiniPandoras.App
         /// <summary>플레이어가 조종할 수 없는 동안(연출·대화·말 걸기)에만, 직접 답할 것(선택지·이름 입력)이 없을 때 건너뛴다(웹게임 canSkip).</summary>
         private bool CanSkip()
         {
-            return !title.IsOpen && !controls.HasControl && !conversation.AwaitsPlayer;
+            return !title.IsOpen && !duel.IsShown && !controls.HasControl && !conversation.AwaitsPlayer;
         }
     }
 }

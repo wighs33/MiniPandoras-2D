@@ -18,7 +18,8 @@ namespace MiniPandoras.Tests
         private const string ScriptsFolder = "Assets/MiniPandoras/Scripts";
         private const string TextFolder = "Assets/MiniPandoras/Data/Resources/Text";
 
-        private static readonly Regex TextId = new Regex(@"\b(?:T|Lines)\(""([^""]+)""");
+        // T("id")는 글 하나, Lines("id")는 대사 덩어리, Block("id")는 여러 줄 목록(대전 AI 상대 이름)이다.
+        private static readonly Regex TextId = new Regex(@"\b(?:T|Lines|Block)\(""([^""]+)""");
 
         [Test]
         public void EveryIdInTheCodeIsInTheScript()

@@ -26,6 +26,9 @@ namespace MiniPandoras.Combat
         [SerializeField] private string glyph;
         [SerializeField] private Color lightColor;
         [SerializeField] private Color darkColor;
+        [Header("1:1 대전")]
+        [Tooltip("AI 상대가 이 판도라를 들었을 때 쓰는 기술 순서. 대전에 쓰는 판도라만 채운다")]
+        [SerializeField] private BossPatternDefinition rivalPattern;
 
         public string Id => id;
         public string PandoraName => pandoraName;
@@ -60,5 +63,6 @@ namespace MiniPandoras.Combat
         public string Glyph => glyph;
         public Color LightColor => lightColor;
         public Color DarkColor => darkColor;
+        public BossPatternDefinition RivalPattern => rivalPattern;
     }
 }

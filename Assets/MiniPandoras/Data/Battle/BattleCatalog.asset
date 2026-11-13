@@ -200,6 +200,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8c3f1e0c9711a6e4f8ff09c6e0c5f7d6, type: 2}
   - {fileID: 11400000, guid: 59006c7227fd5a744b08f75411c3a47d, type: 2}
   - {fileID: 11400000, guid: 18ed03d9c540a6b47927aff5f8ab4fef, type: 2}
+  - {fileID: 11400000, guid: de57cb403f5f83a44b3aa02bef121923, type: 2}
   bestiary:
   - {fileID: 11400000, guid: 5c0f2798950070b49863d5a6b279e217, type: 2}
   - {fileID: 11400000, guid: ab7a4a7039c51694ca93f2bf2eadd8c1, type: 2}
@@ -295,3 +296,17 @@ MonoBehaviour:
   huntPandoras:
   - flame
   - snake
+  duelPandoras:
+  - phase
+  - darkPower
+  - flame
+  - sandStorm
+  rivalTemplate: {fileID: 11400000, guid: de57cb403f5f83a44b3aa02bef121923, type: 2}
+  rivalLooks:
+  - diel
+  - largo
+  - isabel
+  - aurora
+  - kyle
+  - ruga
+  - kate

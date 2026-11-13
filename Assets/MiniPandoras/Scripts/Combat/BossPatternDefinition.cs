@@ -74,5 +74,28 @@ namespace MiniPandoras.Combat
         public string EnrageCall => enrageCall;
         public int RestFrames => restFrames;
         public bool Ascends => ascends;
+
+        /// <summary>
+        /// 여러 순서를 이어 붙인 새 순서(대전 AI 상대가 고른 판도라 셋의 기술을 모두 돌려 쓴다). 분노할 때 글과 쉬는 시간은 첫 순서를 따른다.
+        /// 판마다 만드는 것이라 에셋으로 저장하지 않는다.
+        /// </summary>
+        public static BossPatternDefinition Combine(IReadOnlyList<BossPatternDefinition> parts)
+        {
+            var combined = CreateInstance<BossPatternDefinition>();
+            var calmMoves = new List<BossMove>();
+            var enragedMoves = new List<BossMove>();
+            foreach (BossPatternDefinition part in parts)
+            {
+                calmMoves.AddRange(part.calm);
+                enragedMoves.AddRange(part.enraged);
+            }
+
+            combined.calm = calmMoves.ToArray();
+            combined.enraged = enragedMoves.ToArray();
+            combined.enrageCall = parts[0].enrageCall;
+            combined.restFrames = parts[0].restFrames;
+            combined.name = "Combined Pattern";
+            return combined;
+        }
     }
 }

@@ -7,7 +7,13 @@ namespace MiniPandoras.Story
     public sealed class BattleConfig
     {
         /// <summary>나오는 적의 id. 같은 id나 같은 그림의 인물이 근처에 서 있으면 그 인물이 싸운다.</summary>
-        public IReadOnlyList<string> Enemies { get; set; }
+        public IReadOnlyList<string> Enemies { get; set; } = System.Array.Empty<string>();
+
+        /// <summary>목록(BattleCatalog)에 없이 그 자리에서 만든 적(1:1 대전의 상대). <see cref="Enemies"/> 뒤에 선다.</summary>
+        public IReadOnlyList<EnemyDefinition> MadeEnemies { get; set; } = System.Array.Empty<EnemyDefinition>();
+
+        /// <summary>쓰러지면 사망 화면 없이 진 것으로 끝난다(1:1 대전).</summary>
+        public bool DownedLoses { get; set; }
 
         /// <summary>싸우는 파티. 비우면 지금 파티다.</summary>
         public IReadOnlyList<string> Party { get; set; }

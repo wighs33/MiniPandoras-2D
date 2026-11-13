@@ -51,7 +51,13 @@ namespace MiniPandoras.Combat
 
         public EnemyFighter MakeEnemy(CharacterBody body, string key, string enemyId)
         {
-            return new EnemyFighter(body, key, combat.Catalog.Enemy(enemyId), null, true);
+            return MakeEnemy(body, key, combat.Catalog.Enemy(enemyId));
+        }
+
+        /// <summary>목록에 없는, 그 자리에서 만든 정의(대전 상대)로 적을 세운다.</summary>
+        public EnemyFighter MakeEnemy(CharacterBody body, string key, EnemyDefinition definition)
+        {
+            return new EnemyFighter(body, key, definition, null, true);
         }
 
         /// <summary>그 자리에서 이야기 전투를 시작한다. 플레이어는 체력을 가득 채우고, 적은 곧바로 덤빈다.</summary>

@@ -28,3 +28,4 @@ MonoBehaviour:
   glyph: horns
   lightColor: {r: 1, g: 0.7137255, b: 0.85490197, a: 1}
   darkColor: {r: 0.22745098, g: 0.039215688, b: 0.14901961, a: 1}
+  rivalPattern: {fileID: 11400000, guid: 55b2e8ca6bc776d4e8fb7b8a918e7347, type: 2}

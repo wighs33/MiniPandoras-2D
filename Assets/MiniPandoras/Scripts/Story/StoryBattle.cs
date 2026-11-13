@@ -88,6 +88,13 @@ namespace MiniPandoras.Story
                     break;
                 }
 
+                if (director.Combat.IsDowned && config.DownedLoses)
+                {
+                    yield return director.Wait(40f);
+                    outcome = BattleOutcome.Lose;
+                    break;
+                }
+
                 if (director.Combat.IsDowned)
                 {
                     // 사망 화면에서 고른다. 이 싸움의 마지막 체크포인트는 싸움의 처음이다.
@@ -154,10 +161,17 @@ namespace MiniPandoras.Story
         {
             var used = new HashSet<CharacterBody> { player };
             var fighters = new List<EnemyFighter>();
-            for (int i = 0; i < config.Enemies.Count; i++)
+            var definitions = new List<EnemyDefinition>();
+            foreach (string enemy in config.Enemies)
             {
-                string id = config.Enemies[i];
-                EnemyDefinition definition = director.Combat.Catalog.Enemy(id);
+                definitions.Add(director.Combat.Catalog.Enemy(enemy));
+            }
+
+            definitions.AddRange(config.MadeEnemies);
+            for (int i = 0; i < definitions.Count; i++)
+            {
+                EnemyDefinition definition = definitions[i];
+                string id = definition.Id;
                 CharacterBody actor = FindStandingActor(id, definition, player, used);
                 bool isNew = actor == null;
                 if (isNew)
@@ -173,7 +187,7 @@ namespace MiniPandoras.Story
                 actor.Shade = null;
                 actor.SetPose(BodyPose.Stand);
                 actor.Face(FacingRules.From(player.Position - actor.Position));
-                EnemyFighter fighter = director.Combat.Encounters.MakeEnemy(actor, "e" + i, id);
+                EnemyFighter fighter = director.Combat.Encounters.MakeEnemy(actor, "e" + i, definition);
                 bool falls = config.EnemiesThatFall != null && ContainsId(config.EnemiesThatFall, id);
                 bool stands = config.EnemiesThatStand != null && ContainsId(config.EnemiesThatStand, id);
                 fighter.NoDeath = stands || (config.NoDeath && !falls);

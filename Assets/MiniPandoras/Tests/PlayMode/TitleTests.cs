@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 타이틀: 메뉴와 장 선택 창의 버튼 자리를 누르면 그 버튼이 누름을 받는지(그 뒤 그림으로 빠지지 않는지), 옮긴 장만 누를 수 있는지,
+    /// 타이틀: 메뉴(이어 하기·처음부터·지난 스토리, 윗줄 1:1 대전·프로필·설정)와 장 선택 창의 버튼 자리를 누르면 그 버튼이 누름을 받는지(그 뒤 그림으로 빠지지 않는지), 옮긴 장만 누를 수 있는지,
     /// 저장이 있으면 이어 하기가 그 장을 보이고 새 게임은 먼저 묻는지, 저장된 장이 속한 부의 풍경과 표시가 뜨는지 본다.
     /// 챕터 선택(부): 가운데 카드가 가장 크고 멀수록 작아지며 사라지는지, 화살표와 끌기로 넘어가고 줄 끝에서 멈추는지, 가운데 온 부의 풍경으로 바뀌는지, 나오지 않은 부는 COMING SOON이고
     /// 시작할 수 없는지, 저장된 부는 이어 하고 다른 부는 먼저 묻는지 본다.
@@ -50,6 +50,13 @@ namespace MiniPandoras.Tests
             foreach (string item in new[] { "New Game", "Parts" })
             {
                 var button = menu.Find(item).GetComponent<Button>();
+                Assert.That(StoryDriver.PressedAt(button.transform as RectTransform), Is.EqualTo(button.gameObject), $"{item} 자리를 누르면 그 버튼이 받는다");
+            }
+
+            Transform modes = title.transform.Find("Screen/Safe Area/Modes");
+            foreach (string item in new[] { "Duel", "Profile", "Settings" })
+            {
+                var button = modes.Find(item).GetComponent<Button>();
                 Assert.That(StoryDriver.PressedAt(button.transform as RectTransform), Is.EqualTo(button.gameObject), $"{item} 자리를 누르면 그 버튼이 받는다");
             }
 
