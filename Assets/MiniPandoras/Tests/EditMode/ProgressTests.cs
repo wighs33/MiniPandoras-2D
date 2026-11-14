@@ -57,9 +57,11 @@ namespace MiniPandoras.Tests
         public void BuildingInteriorsSitAtTheirBuildingOnTheWorldMap()
         {
             var atlas = AssetDatabase.LoadAssetAtPath<WorldAtlas>(AtlasPath);
-            Assert.That(atlas.TryGetPlace("castle", out WorldPlace castle), Is.True);
+            Assert.That(atlas.TryGetPlace("town", out WorldPlace town), Is.True);
+            Assert.That(atlas.TryGetPlace("adventurersGuild", out WorldPlace guild), Is.True);
+            Assert.That(guild.Position, Is.EqualTo(town.Position), "모험가 길드 안은 마을 자리에 핀이 선다");
             Assert.That(atlas.TryGetPlace("castleRoof", out WorldPlace roof), Is.True);
-            Assert.That(roof.Position, Is.EqualTo(castle.Position));
+            Assert.That(roof.MapId, Is.EqualTo("castleRoof"), "뱀성은 층마다 제 점이 있다(세계지도 배치판, 2026-11-09)");
             Assert.That(atlas.TryGetPlace("ship", out _), Is.False, "배 위는 지도에 없다");
         }
 
