@@ -32,16 +32,31 @@ namespace MiniPandoras.Progress
         }
 
         /// <summary>
-        /// 저장된 프로필을 바로 쓸 수 있게 채워서 읽는다: 빈 판도라 칸은 pool(대전에 고를 수 있는 판도라) 앞쪽으로,
+        /// 저장된 프로필을 바로 쓸 수 있게 채워서 읽는다: 판도라 칸은 이야기에서 활성화한 판도라(<see cref="UnlockedPandoras"/>)로,
         /// 빈 닉네임은 이야기에서 정한 주인공 이름으로(없으면 기본 닉네임) 채운다.
         /// </summary>
-        public static PlayerProfile ReadFor(IReadOnlyList<string> pool)
+        public static PlayerProfile ReadFor()
         {
             PlayerProfile profile = Read();
-            string heroName = SaveStore.Read()?.HeroName;
+            SaveData save = SaveStore.Read();
+            string heroName = save?.HeroName;
             bool named = !string.IsNullOrEmpty(heroName) && heroName != UnnamedHero;
-            profile.Fill(pool, named ? heroName : T("profile.defaultNickname"));
+            profile.Fill(UnlockedIn(save), named ? heroName : T("profile.defaultNickname"));
             return profile;
+        }
+
+        /// <summary>
+        /// 대전에 들고 갈 수 있는 판도라: 이야기 저장에서 봉인서로 활성화한 판도라(봉인서 순서). 이야기를 처음부터 하면 다시 잠긴다.
+        /// 저장이 없으면 비어 있다.
+        /// </summary>
+        public static IReadOnlyList<string> UnlockedPandoras()
+        {
+            return UnlockedIn(SaveStore.Read());
+        }
+
+        private static IReadOnlyList<string> UnlockedIn(SaveData save)
+        {
+            return save != null ? save.Pandoras : System.Array.Empty<string>();
         }
 
         public static void Write(PlayerProfile profile)

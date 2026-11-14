@@ -24,11 +24,10 @@ namespace MiniPandoras.UI
     /// <summary>프로필 창에 보일 것. 앱(타이틀 창들)이 프로필과 전투 목록을 보고 만든다.</summary>
     public readonly struct ProfileSheet
     {
-        public ProfileSheet(string nickname, IReadOnlyList<ProfilePandora> slots, IReadOnlyList<ProfilePandora> pool, string record, IReadOnlyList<string> recent, IReadOnlyList<bool> recentWon)
+        public ProfileSheet(string nickname, IReadOnlyList<ProfilePandora> slots, string record, IReadOnlyList<string> recent, IReadOnlyList<bool> recentWon)
         {
             Nickname = nickname;
             Slots = slots;
-            Pool = pool;
             Record = record;
             Recent = recent;
             RecentWon = recentWon;
@@ -36,11 +35,8 @@ namespace MiniPandoras.UI
 
         public string Nickname { get; }
 
-        /// <summary>대전에 드는 판도라 셋(칸 순서).</summary>
+        /// <summary>대전에 드는 판도라 세 칸(칸 순서). 빈 칸은 id가 빈 문자열이고 이름 자리에 「비어 있음」이 온다.</summary>
         public IReadOnlyList<ProfilePandora> Slots { get; }
-
-        /// <summary>대전에 고를 수 있는 판도라.</summary>
-        public IReadOnlyList<ProfilePandora> Pool { get; }
 
         /// <summary>통산 전적 한 줄(「12승 3패 · 승률 80%」).</summary>
         public string Record { get; }
@@ -53,7 +49,8 @@ namespace MiniPandoras.UI
 
     /// <summary>
     /// 타이틀의 「프로필」 창: 닉네임, 대전에 들고 가는 판도라 세 칸, 전적과 「전적 초기화」.
-    /// 판도라는 칸을 눌러 고른 뒤 아래 목록에서 누르면 그 칸에 든다(이미 다른 칸에 있으면 맞바뀐다). 바꾼 것은 알리기만 하고 저장은 받는 쪽이 한다.
+    /// 판도라 칸이나 「판도라 봉인서」를 누르면 봉인서를 열어 그 칸에 넣을 판도라를 고른다(2026-11-14 사용자 요청: 봉인서에서 활성화한 판도라만 쓴다).
+    /// 바꾼 것은 알리기만 하고 봉인서를 여는 일과 저장은 받는 쪽이 한다.
     /// </summary>
     public sealed class ProfileView : MonoBehaviour
     {
@@ -63,43 +60,16 @@ namespace MiniPandoras.UI
             [SerializeField] private Button button;
             [SerializeField] private Image icon;
             [SerializeField] private TMP_Text name;
-            [Tooltip("고른 칸 테두리")]
-            [SerializeField] private GameObject focus;
 
             public Button Button => button;
 
-            public void Show(Sprite sprite, string label, bool focused)
+            public void Show(Sprite sprite, string label)
             {
                 icon.sprite = sprite;
                 icon.enabled = sprite != null;
                 name.text = label;
-                focus.SetActive(focused);
-            }
-        }
-
-        [Serializable]
-        private sealed class PoolRow
-        {
-            [SerializeField] private Button button;
-            [SerializeField] private Image icon;
-            [SerializeField] private TMP_Text name;
-            [Tooltip("이 판도라가 든 칸 번호(1~3). 들지 않았으면 숨긴다")]
-            [SerializeField] private TMP_Text slotNumber;
-
-            public Button Button => button;
-
-            public void Show(bool exists, Sprite sprite, string label, int slot)
-            {
-                button.gameObject.SetActive(exists);
-                if (!exists)
-                {
-                    return;
-                }
-
-                icon.sprite = sprite;
-                name.text = label;
-                slotNumber.gameObject.SetActive(slot >= 0);
-                slotNumber.text = (slot + 1).ToString();
+                // 빈 칸의 「비어 있음」은 옅게 둔다.
+                name.alpha = sprite != null ? 1f : 0.5f;
             }
         }
 
@@ -111,7 +81,8 @@ namespace MiniPandoras.UI
         [SerializeField] private TMP_InputField nickname;
         [Header("대전 판도라")]
         [SerializeField] private Slot[] slots = Array.Empty<Slot>();
-        [SerializeField] private PoolRow[] pool = Array.Empty<PoolRow>();
+        [Tooltip("「판도라 봉인서」: 첫 빈 칸(없으면 첫 칸)을 고르러 봉인서를 연다")]
+        [SerializeField] private Button bookButton;
         [SerializeField] private PandoraIcon[] icons = Array.Empty<PandoraIcon>();
         [Header("전적")]
         [SerializeField] private TMP_Text record;
@@ -129,13 +100,12 @@ namespace MiniPandoras.UI
         [SerializeField] private Button confirmShade;
 
         private ProfileSheet sheet;
-        private int focusedSlot;
 
         /// <summary>닉네임 칸에서 입력을 마쳤다(다듬기 전 글).</summary>
         public event Action<string> NicknameSubmitted;
 
-        /// <summary>그 칸에 그 판도라를 넣으려 한다.</summary>
-        public event Action<int, string> PandoraPlaced;
+        /// <summary>그 칸에 넣을 판도라를 봉인서에서 고르려 한다.</summary>
+        public event Action<int> BookRequested;
 
         /// <summary>전적 초기화를 확인했다.</summary>
         public event Action ResetConfirmed;
@@ -144,16 +114,14 @@ namespace MiniPandoras.UI
 
         public bool IsOpen => window.IsOpen;
 
-        /// <summary>창을 연다. 첫 칸을 골라 둔다.</summary>
         public void Open(ProfileSheet profile)
         {
-            focusedSlot = 0;
             confirmWindow.CloseInstantly();
             window.Open();
             Show(profile);
         }
 
-        /// <summary>열린 창의 내용을 바꾼다(고른 칸은 그대로).</summary>
+        /// <summary>열린 창의 내용을 바꾼다.</summary>
         public void Show(ProfileSheet profile)
         {
             sheet = profile;
@@ -161,13 +129,7 @@ namespace MiniPandoras.UI
             for (int i = 0; i < slots.Length; i++)
             {
                 bool has = i < profile.Slots.Count;
-                slots[i].Show(has ? IconOf(profile.Slots[i].Id) : null, has ? profile.Slots[i].Name : string.Empty, i == focusedSlot);
-            }
-
-            for (int i = 0; i < pool.Length; i++)
-            {
-                bool exists = i < profile.Pool.Count;
-                pool[i].Show(exists, exists ? IconOf(profile.Pool[i].Id) : null, exists ? profile.Pool[i].Name : string.Empty, exists ? SlotOf(profile.Pool[i].Id) : -1);
+                slots[i].Show(has ? IconOf(profile.Slots[i].Id) : null, has ? profile.Slots[i].Name : string.Empty);
             }
 
             record.text = profile.Record;
@@ -185,17 +147,18 @@ namespace MiniPandoras.UI
             }
         }
 
-        private int SlotOf(string id)
+        /// <summary>「판도라 봉인서」가 채울 칸: 첫 빈 칸, 빈 칸이 없으면 첫 칸.</summary>
+        private int FirstEmptySlot()
         {
             for (int i = 0; i < sheet.Slots.Count; i++)
             {
-                if (sheet.Slots[i].Id == id)
+                if (string.IsNullOrEmpty(sheet.Slots[i].Id))
                 {
                     return i;
                 }
             }
 
-            return -1;
+            return 0;
         }
 
         private Sprite IconOf(string id)
@@ -211,15 +174,9 @@ namespace MiniPandoras.UI
             return null;
         }
 
-        private void Focus(int slot)
+        private void OpenBook(int slot)
         {
-            focusedSlot = slot;
-            Show(sheet);
-        }
-
-        private void PickFromPool(int row)
-        {
-            PandoraPlaced?.Invoke(focusedSlot, sheet.Pool[row].Id);
+            BookRequested?.Invoke(slot);
         }
 
         private void SubmitNickname(string text)
@@ -246,14 +203,10 @@ namespace MiniPandoras.UI
             for (int i = 0; i < slots.Length; i++)
             {
                 int slot = i;
-                slots[i].Button.onClick.AddListener(() => Focus(slot));
+                slots[i].Button.onClick.AddListener(() => OpenBook(slot));
             }
 
-            for (int i = 0; i < pool.Length; i++)
-            {
-                int row = i;
-                pool[i].Button.onClick.AddListener(() => PickFromPool(row));
-            }
+            bookButton.onClick.AddListener(() => OpenBook(FirstEmptySlot()));
 
             nickname.characterLimit = PlayerProfile.NicknameLimit;
             nickname.onEndEdit.AddListener(SubmitNickname);

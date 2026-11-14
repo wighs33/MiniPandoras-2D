@@ -50,7 +50,8 @@ namespace MiniPandoras.App
                 SkillDefinition skill = pandora.SkillAt(slot);
                 if (skill != null)
                 {
-                    lines.Add(new SkillLine(skill.DisplayName, skill.Cost, skill.Description, PandoraBook.LockedUntil(state, pandora.Id, slot)));
+                    lines.Add(new SkillLine(skill.DisplayName, skill.Cost, skill.Description, PandoraBook.LockedUntil(state, pandora.Id, slot),
+                        slot == PandoraDefinition.UltimateSlot));
                 }
             }
 

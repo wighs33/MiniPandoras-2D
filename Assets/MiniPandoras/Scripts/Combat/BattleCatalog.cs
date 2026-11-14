@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MiniPandoras.Combat
 {
@@ -27,8 +28,9 @@ namespace MiniPandoras.Combat
         [Tooltip("짐승을 쓰러뜨려 더스트를 모으는 판도라(웹게임 HUNT_PANDORAS)")]
         [SerializeField] private List<string> huntPandoras = new List<string>();
         [Header("1:1 대전")]
-        [Tooltip("대전에 들고 갈 수 있는 판도라(스킬 네 칸이 다 찬 것). 프로필에서 이 가운데 셋을 고른다")]
-        [SerializeField] private List<string> duelPandoras = new List<string>();
+        [Tooltip("AI 상대가 고르는 판도라(상대 패턴 rivalPattern이 있는 것). 플레이어는 이야기에서 활성화한 판도라를 고른다")]
+        [FormerlySerializedAs("duelPandoras")]
+        [SerializeField] private List<string> rivalPandoras = new List<string>();
         [Tooltip("AI 상대의 능력치 틀. 이름·그림·기술은 판마다 정한다")]
         [SerializeField] private EnemyDefinition rivalTemplate;
         [Tooltip("AI 상대가 쓰는 인물 시트")]
@@ -39,7 +41,7 @@ namespace MiniPandoras.Combat
         public IReadOnlyList<string> BookOrder => bookOrder;
         public IReadOnlyList<string> AutoEquip => autoEquip;
         public IReadOnlyList<string> HuntPandoras => huntPandoras;
-        public IReadOnlyList<string> DuelPandoras => duelPandoras;
+        public IReadOnlyList<string> RivalPandoras => rivalPandoras;
         public EnemyDefinition RivalTemplate => rivalTemplate;
         public IReadOnlyList<string> RivalLooks => rivalLooks;
         public IReadOnlyList<EnemyDefinition> Enemies => enemies;

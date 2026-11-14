@@ -13,7 +13,6 @@ namespace MiniPandoras.Combat
         public const int MaxEquipped = 3;
         public const int FullDust = 100;
         private const int ThirdSkillSlot = 2;
-        private const int UltimateSlot = 3;
 
         /// <summary>이야기가 판도라를 준다: 더스트를 채우고 활성화한다.</summary>
         public static void Grant(GameState state, BattleCatalog catalog, IEnumerable<string> ids)
@@ -82,7 +81,7 @@ namespace MiniPandoras.Combat
         public static int LockedUntil(GameState state, string id, int slot)
         {
             GameBalance balance = GameBalance.Current;
-            int needed = slot == UltimateSlot ? balance.UltimateLevel : slot == ThirdSkillSlot ? balance.ThirdSkillLevel : 1;
+            int needed = slot == PandoraDefinition.UltimateSlot ? balance.UltimateLevel : slot == ThirdSkillSlot ? balance.ThirdSkillLevel : 1;
             return state.PandoraLevel(id) >= needed ? 0 : needed;
         }
 

@@ -120,6 +120,8 @@ namespace MiniPandoras.Combat
         public bool PassesThroughEnemies => Gate.HasValue || (Dash.HasValue && Dash.Value.Slices);
         public Knockback? Knock { get; set; }
         public FrameTimers<SkillDefinition> Cooldowns { get; private set; } = new FrameTimers<SkillDefinition>();
+        /// <summary>궁극기 게이지. 판도라를 바꿔 들어도 그대로다.</summary>
+        public UltimateGauge Ultimate { get; private set; } = new UltimateGauge();
         /// <summary>마지막으로 맞거나 스킬을 쓴 뒤 흐른 프레임. 오래 가만있으면 체력이 찬다.</summary>
         public int Calm { get; set; }
         public int DpTick { get; set; }
@@ -133,7 +135,7 @@ namespace MiniPandoras.Combat
         public int PandoraCount => IsHero ? pandoras.Count : 0;
 
         /// <summary>
-        /// 능력치가 바뀌어 다시 만들 때 싸우던 상태(판도라 칸, 쿨다운, 무적, 경직, 콤보, 휘두르기, 움직임)를 이어받는다.
+        /// 능력치가 바뀌어 다시 만들 때 싸우던 상태(판도라 칸, 쿨다운, 궁극기 게이지, 무적, 경직, 콤보, 휘두르기, 움직임)를 이어받는다.
         /// 체력과 마나는 새 최대치에 맞춰 부른 쪽이 정한다.
         /// </summary>
         public void TakeOverFrom(PlayerFighter previous)
@@ -154,6 +156,7 @@ namespace MiniPandoras.Combat
             Gate = previous.Gate;
             Knock = previous.Knock;
             Cooldowns = previous.Cooldowns;
+            Ultimate = previous.Ultimate;
             Calm = previous.Calm;
             DpTick = previous.DpTick;
             HintCooldown = previous.HintCooldown;

@@ -21,7 +21,7 @@ MonoBehaviour:
   target: 0
   power: 1.8
   fx: fire
-  cooldown: 420
+  cooldown: 960
   palette:
   - {r: 1, g: 0.41568628, b: 0.11764706, a: 1}
   - {r: 1, g: 0.78431374, b: 0.2901961, a: 1}

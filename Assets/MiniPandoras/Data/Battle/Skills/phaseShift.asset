@@ -21,7 +21,7 @@ MonoBehaviour:
   target: 2
   power: 0
   fx: phase
-  cooldown: 300
+  cooldown: 540
   palette:
   - {r: 0.49019608, g: 0.42352942, b: 1, a: 1}
   - {r: 0.8666667, g: 0.8392157, b: 1, a: 1}

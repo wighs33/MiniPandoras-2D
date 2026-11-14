@@ -37,6 +37,8 @@ namespace MiniPandoras.Combat
         public SkillDefinition ThirdSkill => thirdSkill;
         /// <summary>스킬 칸 수(Q, W, E, 궁극기).</summary>
         public const int SkillSlots = 4;
+        /// <summary>궁극기 칸(넷째). 재사용 대기와 마나 대신 궁극기 게이지(<see cref="UltimateGauge"/>)로 쓴다.</summary>
+        public const int UltimateSlot = 3;
         public Color Color => color;
 
         /// <summary>스킬 칸(0부터)에 든 스킬. 칸을 벗어나면 null.</summary>

@@ -13,6 +13,12 @@ text			{0}승 {1}패 · 승률 {2}%
 == profile.recent
 text			{0}   {1}   {2}
 
+== profile.emptySlot
+text			비어 있음
+
+== duel.noPandora
+text			대전에 들고 갈 판도라가 없어요.\n이야기에서 판도라를 활성화하면 대전할 수 있어요.
+
 == duel.win
 text			승리
 

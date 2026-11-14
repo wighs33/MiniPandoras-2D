@@ -19,6 +19,9 @@ MonoBehaviour:
   regenDelay: 200
   pandoraSwapFrames: 180
   summonCooldown: 600
+  ultimatePercentPerPower: 0.5
+  ultimatePercentPerSecond: 0.5
+  ultimateQuietFrames: 480
   respawnFrames: 1800
   beastDust: 1
   pandoraMaxLevel: 10

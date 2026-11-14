@@ -125,6 +125,12 @@ namespace MiniPandoras.UI
             for (int i = 0; i < skillSlots.Length; i++)
             {
                 SkillDefinition skill = p.SkillIn(i);
+                if (i == PandoraDefinition.UltimateSlot)
+                {
+                    skillSlots[i].ShowUltimate(skill, p.Ultimate.Charge, combat.LockedUntilLevel(i));
+                    continue;
+                }
+
                 skillSlots[i].Show(skill, skill != null ? p.Cooldowns.Get(skill) : 0, skill != null && p.Dp < skill.Cost, combat.LockedUntilLevel(i));
             }
 

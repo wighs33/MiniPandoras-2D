@@ -87,6 +87,33 @@ namespace MiniPandoras.Tests
             }
         }
 
+        /// <summary>
+        /// 판도라를 바꿔 들 까닭이 있게(2026-11-15 사용자 요청) 스킬은 판도라 교체 대기보다 훨씬 오래 기다린다.
+        /// 궁극기는 재사용 대기와 마나 없이 궁극기 게이지로만 쓴다.
+        /// </summary>
+        [Test]
+        public void PandoraSkillsWaitLongEnoughToSwapAndUltimatesUseTheGauge()
+        {
+            const int MinimumWaitFrames = 7 * 60;
+            foreach (string id in catalog.BookOrder)
+            {
+                PandoraDefinition pandora = catalog.Pandora(id);
+                for (int slot = 0; slot < PandoraDefinition.UltimateSlot; slot++)
+                {
+                    SkillDefinition skill = pandora.SkillAt(slot);
+                    Assert.That(skill.Cooldown, Is.GreaterThanOrEqualTo(MinimumWaitFrames), skill.Id);
+                    Assert.That(skill.Cooldown, Is.GreaterThan(GameBalance.Current.PandoraSwapFrames * 2), skill.Id);
+                }
+
+                SkillDefinition ultimate = pandora.SkillAt(PandoraDefinition.UltimateSlot);
+                if (ultimate != null)
+                {
+                    Assert.That(ultimate.Cost, Is.Zero, ultimate.Id);
+                    Assert.That(ultimate.Cooldown, Is.Zero, ultimate.Id);
+                }
+            }
+        }
+
         [Test]
         public void EveryBossHasMovesInBothPhases()
         {

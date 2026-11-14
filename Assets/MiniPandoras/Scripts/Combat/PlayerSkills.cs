@@ -525,6 +525,8 @@ namespace MiniPandoras.Combat
             }
 
             e.SetHp(Mathf.Max(0, e.Hp - damage));
+            // 맞힌 일격의 위력만큼 궁극기 게이지가 찬다(동료의 공격도 파티의 공격이라 센다).
+            combat.Player?.Ultimate.AddHit(power);
             e.HpShown = 90;
             e.Body.Flash(10f);
             combat.Effects.AddNumber(FieldCombat.OverHead(e), damage, critical ? CriticalColor : Color.white, critical ? 10f : 8f);

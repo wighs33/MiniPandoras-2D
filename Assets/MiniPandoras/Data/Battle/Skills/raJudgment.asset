@@ -17,11 +17,11 @@ MonoBehaviour:
   description: "\uB458\uB808 \uC801\uC744 \uBB36\uC5C8\uB2E4\uAC00 \uD130\uB728\uB9B0\uB2E4."
   icon: {fileID: 21300000, guid: 64681196c26111b459f90e20ce51ff8d, type: 3}
   look: 3
-  cost: 20
+  cost: 0
   target: 0
   power: 3
   fx: sand
-  cooldown: 1500
+  cooldown: 0
   palette:
   - {r: 0.8784314, g: 0.78431374, b: 0.5647059, a: 1}
   - {r: 0.78431374, g: 0.65882355, b: 0.40784314, a: 1}

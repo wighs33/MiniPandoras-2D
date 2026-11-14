@@ -21,7 +21,7 @@ MonoBehaviour:
   target: 0
   power: 2
   fx: ice
-  cooldown: 55
+  cooldown: 420
   palette:
   - {r: 0.30980393, g: 0.72156864, b: 1, a: 1}
   - {r: 0.7490196, g: 0.91764706, b: 1, a: 1}

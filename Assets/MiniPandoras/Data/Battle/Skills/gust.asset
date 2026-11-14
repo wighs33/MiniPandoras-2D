@@ -21,7 +21,7 @@ MonoBehaviour:
   target: 1
   power: 1.2
   fx: windWave
-  cooldown: 55
+  cooldown: 420
   palette:
   - {r: 0.24705882, g: 0.8117647, b: 0.5568628, a: 1}
   - {r: 0.83137256, g: 1, b: 0.91764706, a: 1}

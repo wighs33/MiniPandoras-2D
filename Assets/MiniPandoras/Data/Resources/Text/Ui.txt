@@ -55,6 +55,9 @@ text			마나가 모자라다
 == fieldCombat.pressSkill.5
 text			근처에 적이 없다
 
+== fieldCombat.pressSkill.6
+text			궁극기 게이지가 아직 다 차지 않았다
+
 == fieldCombat.damagePlayer.1
 text			흘려보냄
 
@@ -198,6 +201,33 @@ text			다음 레벨까지 더스트 {0}/{1}
 
 == sealBookView.growthNote.2
 text			최고 레벨
+
+== sealBookView.ultimateCost
+text			궁극기 게이지
+
+== sealBookView.duelTitle
+text			대전 {0}번 칸에 넣을 판도라
+
+== sealBookView.duelMark
+text			대전 {0}
+
+== sealBookView.duelPlace
+text			{0}번 칸에 넣기
+
+== sealBookView.duelInSlot
+text			대전 {0}번 칸
+
+== sealBookView.duelReady
+text			활성화 · 대전에 쓸 수 있다
+
+== sealBookView.duelNote
+text			대전에서는 모든 스킬을 쓴다
+
+== sealBookView.duelHelp
+text			활성화한 판도라를 골라 「{0}번 칸에 넣기」를 누른다 · 책 밖을 누르면 닫힌다
+
+== sealBookView.duelLocked
+text			봉인서에서 활성화해야 대전에 쓸 수 있다
 
 == skipButtonView.paint.1
 text			건너뛰는 중

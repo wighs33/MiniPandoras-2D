@@ -54,5 +54,11 @@ namespace MiniPandoras.Tests
             SaveStore.Write(new SaveData(chapter, heroName, Array.Empty<Count>(), Array.Empty<Count>(),
                 Array.Empty<string>(), Array.Empty<string>(), null, cleared));
         }
+
+        /// <summary>이야기에서 그 판도라들을 봉인서로 활성화한 저장을 써 둔다(1:1 대전에 들고 갈 수 있는 판도라). 이름은 아직 정하지 않았다.</summary>
+        public static void Unlocked(params string[] pandoras)
+        {
+            SaveStore.Write(new SaveData(5, "???", Array.Empty<Count>(), Array.Empty<Count>(), pandoras, Array.Empty<string>(), null, false));
+        }
     }
 }

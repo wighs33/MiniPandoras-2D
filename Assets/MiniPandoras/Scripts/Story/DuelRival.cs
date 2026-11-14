@@ -35,14 +35,14 @@ namespace MiniPandoras.Story
         public EnemyDefinition Fighter { get; }
 
         /// <summary>
-        /// AI 상대를 하나 고른다: 이름 목록(대사 파일)에서 내 닉네임과 다른 이름, 대전 판도라 가운데 셋, 그림 하나.
-        /// 전적은 매칭된 상대처럼 보이도록 그럴듯하게 정한다.
+        /// AI 상대를 하나 고른다: 이름 목록(대사 파일)에서 내 닉네임과 다른 이름, 상대 판도라(<see cref="BattleCatalog.RivalPandoras"/>) 가운데 count개, 그림 하나.
+        /// 판도라 수는 내 수와 맞춘다(활성화한 판도라가 셋보다 적은 플레이어도 고르게 싸운다). 전적은 매칭된 상대처럼 보이도록 그럴듯하게 정한다.
         /// </summary>
-        public static DuelRival PickAi(BattleCatalog catalog, string myName)
+        public static DuelRival PickAi(BattleCatalog catalog, string myName, int count)
         {
             string nickname = PickName(myName);
-            List<string> pandoras = Shuffled(catalog.DuelPandoras);
-            pandoras.RemoveRange(3, pandoras.Count - 3);
+            List<string> pandoras = Shuffled(catalog.RivalPandoras);
+            pandoras.RemoveRange(count, pandoras.Count - count);
             var patterns = new List<BossPatternDefinition>();
             foreach (string id in pandoras)
             {

@@ -31,6 +31,14 @@ namespace MiniPandoras.Progress
         [Tooltip("불러낸 동료를 다시 부를 때까지 프레임(웹게임 SUMMON_COOLDOWN)")]
         [SerializeField] private int summonCooldown;
 
+        [Header("궁극기 게이지")]
+        [Tooltip("적을 맞힌 일격의 위력 1마다 차는 양(%). 기본 공격은 위력 1, 스킬은 그 스킬의 위력이다")]
+        [SerializeField] private float ultimatePercentPerPower = 0.5f;
+        [Tooltip("싸우는 동안 1초마다 저절로 차는 양(%)")]
+        [SerializeField] private float ultimatePercentPerSecond = 0.5f;
+        [Tooltip("궁극기를 쓴 뒤 게이지가 차지 않는 프레임. 궁극기가 남긴 장판의 피해로 곧바로 다시 차지 않게 가장 긴 궁극기만큼 둔다")]
+        [SerializeField] private int ultimateQuietFrames = 480;
+
         [Header("사냥")]
         [Tooltip("쓰러뜨린 무리가 제자리에 돌아올 때까지 프레임")]
         [SerializeField] private int respawnFrames;
@@ -73,6 +81,9 @@ namespace MiniPandoras.Progress
         public int RegenDelay => regenDelay;
         public int PandoraSwapFrames => pandoraSwapFrames;
         public int SummonCooldown => summonCooldown;
+        public float UltimatePercentPerPower => ultimatePercentPerPower;
+        public float UltimatePercentPerSecond => ultimatePercentPerSecond;
+        public int UltimateQuietFrames => ultimateQuietFrames;
         public int RespawnFrames => respawnFrames;
         public int BeastDust => beastDust;
         public int PandoraMaxLevel => pandoraMaxLevel;

@@ -52,11 +52,13 @@ namespace MiniPandoras.UI
         [SerializeField] private Button settingsButton;
         [Header("챕터 선택(부)")]
         [SerializeField] private PartPicker partPicker;
-        [Header("저장을 지우기 전 확인")]
+        [Header("저장을 지우기 전 확인, 알림")]
         [SerializeField] private WindowMotion confirmWindow;
         [SerializeField] private TMP_Text confirmText;
         [SerializeField] private Button confirmYes;
         [SerializeField] private Button confirmNo;
+        [Tooltip("알림(Tell)일 때만 보이는 「확인」")]
+        [SerializeField] private Button confirmOk;
         [Tooltip("창 바깥(어둠)을 누르면 취소")]
         [SerializeField] private Button confirmShade;
         [Header("장 선택(개발 빌드)")]
@@ -151,6 +153,14 @@ namespace MiniPandoras.UI
             SetHomeShown(true, false);
             screen.SetActive(true);
             PlayIntro();
+        }
+
+        /// <summary>확인 창에 알림 한 줄을 띄운다(버튼은 「확인」 하나). 예: 대전에 들고 갈 판도라가 없을 때.</summary>
+        public void Tell(string message)
+        {
+            confirmText.text = message;
+            SetConfirmButtons(asking: false);
+            confirmWindow.Open();
         }
 
         public void Hide()
@@ -300,12 +310,20 @@ namespace MiniPandoras.UI
         {
             chapterToConfirm = chapter;
             confirmText.text = question;
+            SetConfirmButtons(asking: true);
             confirmWindow.Open();
         }
 
         private void Confirm()
         {
             Pick(chapterToConfirm);
+        }
+
+        private void SetConfirmButtons(bool asking)
+        {
+            confirmYes.gameObject.SetActive(asking);
+            confirmNo.gameObject.SetActive(asking);
+            confirmOk.gameObject.SetActive(!asking);
         }
 
         private void Awake()
@@ -325,6 +343,7 @@ namespace MiniPandoras.UI
             chaptersShade.onClick.AddListener(chaptersWindow.Close);
             confirmYes.onClick.AddListener(Confirm);
             confirmNo.onClick.AddListener(confirmWindow.Close);
+            confirmOk.onClick.AddListener(confirmWindow.Close);
             confirmShade.onClick.AddListener(confirmWindow.Close);
             for (int i = 0; i < rows.Length; i++)
             {

@@ -9,8 +9,8 @@ using UnityEngine;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 1:1 대전의 프로필 규칙(닉네임 다듬기, 판도라 셋 맞바꾸기와 채우기, 전적 쌓기와 초기화, 저장 형식)과
-    /// 대전 데이터(고를 판도라마다 AI 기술 순서, AI 상대 틀과 그림)를 본다.
+    /// 1:1 대전의 프로필 규칙(닉네임 다듬기, 판도라 셋 맞바꾸기와 채우기, 활성화한 판도라가 모자라면 빈 칸, 전적 쌓기와 초기화, 저장 형식)과
+    /// 대전 데이터(AI 상대가 고르는 판도라마다 기술 순서, AI 상대 틀과 그림)를 본다.
     /// </summary>
     public sealed class DuelProfileTests
     {
@@ -35,6 +35,28 @@ namespace MiniPandoras.Tests
             profile.Fill(Pool, "모험가");
             Assert.That(profile.DuelPandoras, Is.EqualTo(new[] { "phase", "darkPower", "flame" }));
             Assert.That(profile.Nickname, Is.EqualTo("모험가"));
+        }
+
+        [Test]
+        public void FewerUnlockedPandorasLeaveEmptySlots()
+        {
+            var profile = new PlayerProfile();
+            profile.Fill(new[] { "phase" }, "모험가");
+            Assert.That(profile.DuelPandoras, Is.EqualTo(new[] { "phase", string.Empty, string.Empty }));
+            Assert.That(profile.ChosenPandoras, Is.EqualTo(new[] { "phase" }), "빈 칸은 들고 가지 않는다");
+
+            profile.Fill(new[] { "phase", "darkPower" }, "모험가");
+            Assert.That(profile.ChosenPandoras, Is.EqualTo(new[] { "phase", "darkPower" }), "새로 활성화한 판도라가 빈 칸을 채운다");
+        }
+
+        [Test]
+        public void APandoraThatIsLockedAgainLeavesItsSlot()
+        {
+            var profile = new PlayerProfile();
+            profile.Fill(Pool, "모험가");
+            // 이야기를 처음부터 해서 차원만 다시 활성화한 판.
+            profile.Fill(new[] { "phase" }, "모험가");
+            Assert.That(profile.ChosenPandoras, Is.EqualTo(new[] { "phase" }));
         }
 
         [Test]
@@ -84,11 +106,11 @@ namespace MiniPandoras.Tests
         }
 
         [Test]
-        public void EveryDuelPandoraHasARivalPatternAndTheRivalHasLooks()
+        public void EveryRivalPandoraHasARivalPatternAndTheRivalHasLooks()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>("Assets/MiniPandoras/Data/Battle/BattleCatalog.asset");
-            Assert.That(catalog.DuelPandoras.Count, Is.GreaterThanOrEqualTo(PlayerProfile.PandoraSlots));
-            foreach (string id in catalog.DuelPandoras)
+            Assert.That(catalog.RivalPandoras.Count, Is.GreaterThanOrEqualTo(PlayerProfile.PandoraSlots));
+            foreach (string id in catalog.RivalPandoras)
             {
                 BossPatternDefinition pattern = catalog.Pandora(id).RivalPattern;
                 Assert.That(pattern, Is.Not.Null, id);
@@ -105,7 +127,7 @@ namespace MiniPandoras.Tests
         public void ARivalCombinesTheMovesOfItsPandoras()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<BattleCatalog>("Assets/MiniPandoras/Data/Battle/BattleCatalog.asset");
-            BossPatternDefinition[] parts = catalog.DuelPandoras.Take(3).Select(id => catalog.Pandora(id).RivalPattern).ToArray();
+            BossPatternDefinition[] parts = catalog.RivalPandoras.Take(3).Select(id => catalog.Pandora(id).RivalPattern).ToArray();
             BossPatternDefinition combined = BossPatternDefinition.Combine(parts);
             EnemyDefinition rival = catalog.RivalTemplate.AsRival("노을빛", "kyle", combined);
             try

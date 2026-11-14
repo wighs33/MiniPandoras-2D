@@ -21,7 +21,7 @@ MonoBehaviour:
   target: 0
   power: 2.4
   fx: sand
-  cooldown: 420
+  cooldown: 900
   palette:
   - {r: 0.8784314, g: 0.78431374, b: 0.5647059, a: 1}
   - {r: 0.78431374, g: 0.65882355, b: 0.40784314, a: 1}

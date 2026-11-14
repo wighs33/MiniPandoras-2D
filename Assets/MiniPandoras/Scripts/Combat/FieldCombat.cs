@@ -321,6 +321,9 @@ namespace MiniPandoras.Combat
                 case CastBlock.NoMana:
                     Hint(p, T("fieldCombat.pressSkill.4"), ManaColor);
                     return;
+                case CastBlock.Charging:
+                    Hint(p, T("fieldCombat.pressSkill.6"));
+                    return;
             }
 
             SkillDefinition skill = p.SkillIn(slot);
@@ -328,6 +331,11 @@ namespace MiniPandoras.Combat
             {
                 Hint(p, T("fieldCombat.pressSkill.5"));
                 return;
+            }
+
+            if (slot == PandoraDefinition.UltimateSlot)
+            {
+                p.Ultimate.Spend();
             }
 
             IEnumerator scripted = Encounters.SkillHook(p, skill);
@@ -370,6 +378,12 @@ namespace MiniPandoras.Combat
             if (LockedUntilLevel(slot) > 0)
             {
                 return CastBlock.Locked;
+            }
+
+            // 궁극기는 재사용 대기와 마나 없이 게이지만 본다(라르고처럼 판도라 없이 네 스킬을 가진 인물도 넷째 칸은 궁극기다).
+            if (slot == PandoraDefinition.UltimateSlot)
+            {
+                return Player.Ultimate.IsReady ? CastBlock.None : CastBlock.Charging;
             }
 
             if (Player.Cooldowns.Get(skill) > 0)
@@ -744,10 +758,12 @@ namespace MiniPandoras.Combat
                 p.Dp = Mathf.Min(p.MaxDp, p.Dp + 1);
             }
 
-            // 체험 중에는 마나를 걱정하지 않고 스킬을 써 본다.
+            // 체험 중에는 마나와 궁극기 게이지를 걱정하지 않고 스킬을 써 본다.
+            p.Ultimate.Tick(AnyEnemyAggro() || Encounters.Current != null);
             if (SkillTrial.InTrial)
             {
                 p.Dp = p.MaxDp;
+                p.Ultimate.FillUp();
             }
 
             // 싸움 밖에서 한동안 맞지 않으면 체력이 조금씩 찬다.
@@ -1030,6 +1046,8 @@ namespace MiniPandoras.Combat
             Locked,
             Cooldown,
             NoMana,
+            /// <summary>궁극기 게이지가 아직 다 차지 않았다.</summary>
+            Charging,
         }
 
         private bool AnyEnemyAlive()

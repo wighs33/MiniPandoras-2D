@@ -22,7 +22,7 @@ MonoBehaviour:
   target: 1
   power: 1.4
   fx: sandWave
-  cooldown: 280
+  cooldown: 900
   palette:
   - {r: 0.30980393, g: 0.72156864, b: 1, a: 1}
   - {r: 0.7490196, g: 0.91764706, b: 1, a: 1}

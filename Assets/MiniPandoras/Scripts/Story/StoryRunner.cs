@@ -6,6 +6,7 @@ using MiniPandoras.UI;
 using MiniPandoras.World;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.Story
 {
@@ -111,7 +112,18 @@ namespace MiniPandoras.Story
             pickedChapter = -1;
             duelPicked = false;
             Action<int> pick = chapter => pickedChapter = chapter;
-            Action duel = () => duelPicked = true;
+            // 이야기에서 활성화한 판도라가 없으면 대전에 들고 갈 것이 없어 타이틀에서 알리고 기다린다.
+            Action duel = () =>
+            {
+                if (Duel.CanStart)
+                {
+                    duelPicked = true;
+                }
+                else
+                {
+                    title.Tell(T("duel.noPandora"));
+                }
+            };
             title.ChapterPicked += pick;
             title.DuelRequested += duel;
             // 타이틀은 저장된 장이 속한 부의 풍경을 보인다. 끝까지 본 판이면 마지막 부다.

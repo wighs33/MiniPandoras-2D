@@ -132,6 +132,24 @@ namespace MiniPandoras.Tests
 
 
         [UnityTest]
+        public IEnumerator UltimateWaitsForAFullGaugeAndEmptiesIt()
+        {
+            yield return FaceAThug("darkPower", 10, 4, spawned => { });
+            UltimateGauge gauge = combat.Player.Ultimate;
+            int dp = combat.Player.Dp;
+            gauge.Spend();
+
+            combat.PressSkill(3);
+            Assert.That(combat.Effects.Zones, Is.Empty, "게이지가 덜 찼으면 나가지 않는다");
+
+            gauge.FillUp();
+            combat.PressSkill(3);
+            Assert.That(combat.Effects.Zones.Count, Is.EqualTo(1), "가득 차면 나간다");
+            Assert.That(gauge.Charge, Is.Zero, "쓰면 비운다");
+            Assert.That(combat.Player.Dp, Is.EqualTo(dp), "궁극기는 마나를 쓰지 않는다");
+        }
+
+        [UnityTest]
         public IEnumerator PhaseShiftGivesBackItsWaitOnceWhenItDodges()
         {
             EnemyFighter thug = null;
@@ -328,7 +346,8 @@ namespace MiniPandoras.Tests
                 yield return Waits.CombatTicks(combat, 30);
             }
 
-            Assert.That(combat.Player.Cooldowns.Get(combat.Player.SkillIn(3)), Is.GreaterThan(0), "잠긴 칸 없이 궁극기가 나간다");
+            Assert.That(combat.Effects.Zones.Any(zone => zone.Skill.Id == "seaOfFire"), Is.True, "잠긴 칸 없이, 게이지를 채우지 않아도 궁극기가 나간다");
+            Assert.That(combat.Player.Ultimate.IsReady, Is.True, "체험 중에는 게이지가 늘 차 있다");
             Assert.That(dummy.Dead, Is.False, "허수아비는 쓰러지지 않는다");
             Assert.That(dummy.Aggro, Is.False, "허수아비는 덤비지 않는다");
             Assert.That(combat.Player.Dp, Is.EqualTo(combat.Player.MaxDp), "마나가 줄지 않는다");
@@ -375,6 +394,8 @@ namespace MiniPandoras.Tests
             hero.Face(Facing.Right);
             yield return Waits.Until(() => combat.Player != null && combat.ShowsHud, 3f, "전투 화면이 뜬다");
             Assert.That(combat.Player.ActivePandora.Id, Is.EqualTo(pandora));
+            // 궁극기 시험이 게이지를 채우느라 기다리지 않게 채워 둔다.
+            combat.Player.Ultimate.FillUp();
             spawned(group.Enemies[0]);
         }
     }

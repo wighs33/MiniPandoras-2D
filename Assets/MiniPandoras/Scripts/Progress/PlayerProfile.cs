@@ -5,8 +5,9 @@ using UnityEngine;
 namespace MiniPandoras.Progress
 {
     /// <summary>
-    /// 1:1 대전에 쓰는 플레이어 정보: 닉네임, 대전에 들고 가는 판도라 셋, 전적.
+    /// 1:1 대전에 쓰는 플레이어 정보: 닉네임, 대전에 들고 가는 판도라 세 칸, 전적.
     /// 이야기 저장(<see cref="SaveData"/>)과 따로 이 기기에만 둔다(<see cref="ProfileStore"/>). 전적을 지워도 이야기는 그대로다.
+    /// 판도라 칸에는 이야기에서 활성화한 판도라만 든다(2026-11-14 사용자 결정). 활성화한 판도라가 셋보다 적으면 남는 칸은 빈다(빈 문자열).
     /// </summary>
     [Serializable]
     public sealed class PlayerProfile
@@ -23,7 +24,26 @@ namespace MiniPandoras.Progress
 
         public string Nickname => nickname;
 
+        /// <summary>판도라 세 칸(칸 순서). 빈 칸은 빈 문자열이다.</summary>
         public IReadOnlyList<string> DuelPandoras => duelPandoras;
+
+        /// <summary>빈 칸을 뺀, 대전에 실제로 들고 가는 판도라(칸 순서).</summary>
+        public IReadOnlyList<string> ChosenPandoras
+        {
+            get
+            {
+                var chosen = new List<string>(PandoraSlots);
+                foreach (string id in duelPandoras)
+                {
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        chosen.Add(id);
+                    }
+                }
+
+                return chosen;
+            }
+        }
 
         public int Wins => wins;
 
@@ -63,8 +83,8 @@ namespace MiniPandoras.Progress
         }
 
         /// <summary>
-        /// 처음 열었거나 고를 수 없게 된 판도라가 있으면 pool 앞쪽의 판도라로 채운다. 이름이 비어 있으면 fallbackName을 쓴다.
-        /// pool은 대전에서 고를 수 있는 판도라다(셋 이상).
+        /// 빈 칸과 고를 수 없게 된 판도라(이야기를 처음부터 해서 다시 잠긴 것)의 칸을 pool 앞쪽의 쓰지 않은 판도라로 채운다. pool이 모자라면 칸이 빈다.
+        /// pool은 대전에서 고를 수 있는 판도라(이야기에서 활성화한 판도라)다. 이름이 비어 있으면 fallbackName을 쓴다.
         /// </summary>
         public void Fill(IReadOnlyList<string> pool, string fallbackName)
         {

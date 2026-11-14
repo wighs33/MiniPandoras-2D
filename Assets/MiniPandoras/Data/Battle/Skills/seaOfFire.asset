@@ -17,11 +17,11 @@ MonoBehaviour:
   description: "\uB113\uC740 \uBD88\uBC14\uB2E4\uB97C 8\uCD08 \uB0A8\uAE34\uB2E4."
   icon: {fileID: 21300000, guid: f625dc551fc7b82499f21d05e21c4562, type: 3}
   look: 2
-  cost: 22
+  cost: 0
   target: 0
   power: 1.6
   fx: fire
-  cooldown: 1800
+  cooldown: 0
   palette:
   - {r: 1, g: 0.41568628, b: 0.11764706, a: 1}
   - {r: 1, g: 0.78431374, b: 0.2901961, a: 1}
