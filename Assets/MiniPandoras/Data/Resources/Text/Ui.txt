@@ -238,6 +238,12 @@ text			건너뛰기
 == titleView.show.1
 text			  · 준비 중
 
+== titleView.continue
+text			이어 하기
+
+== titleView.newGame
+text			처음부터
+
 == titleView.confirmNewGame
 text			저장된 「{0}」 진행이 지워져요.\n처음부터 시작할까요?
 

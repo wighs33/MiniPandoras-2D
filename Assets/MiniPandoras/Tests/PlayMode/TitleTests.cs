@@ -46,22 +46,16 @@ namespace MiniPandoras.Tests
         public IEnumerator ChapterButtonsTakeTheirOwnPresses()
         {
             Assert.That(title.IsOpen, Is.True, "장면을 열면 타이틀이 뜬다");
+            // 메뉴는 왼쪽 아래 한 덩어리: 윗줄은 주 버튼과 프로필·설정 아이콘, 아랫줄은 보조 버튼(저장이 없으면 「처음부터」는 숨는다).
             Transform menu = title.transform.Find("Screen/Safe Area/Menu");
-            foreach (string item in new[] { "New Game", "Parts" })
+            foreach (string item in new[] { "Continue", "Profile", "Settings", "Secondary/Parts", "Secondary/Duel" })
             {
                 var button = menu.Find(item).GetComponent<Button>();
                 Assert.That(StoryDriver.PressedAt(button.transform as RectTransform), Is.EqualTo(button.gameObject), $"{item} 자리를 누르면 그 버튼이 받는다");
             }
 
-            Transform modes = title.transform.Find("Screen/Safe Area/Modes");
-            foreach (string item in new[] { "Duel", "Profile", "Settings" })
-            {
-                var button = modes.Find(item).GetComponent<Button>();
-                Assert.That(StoryDriver.PressedAt(button.transform as RectTransform), Is.EqualTo(button.gameObject), $"{item} 자리를 누르면 그 버튼이 받는다");
-            }
-
             // 장 선택은 테스트용이라 챕터 선택 창 구석에서 연다(에디터는 개발 빌드다).
-            menu.Find("Parts").GetComponent<Button>().onClick.Invoke();
+            menu.Find("Secondary/Parts").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.3f);
             var chapters = title.transform.Find("Screen/Part Window/Safe Area/Chapters").GetComponent<Button>();
             Assert.That(chapters.gameObject.activeInHierarchy, Is.True, "개발 빌드에서는 챕터 선택 창에 장 선택이 보인다");
@@ -91,9 +85,10 @@ namespace MiniPandoras.Tests
             int picked = -1;
             title.ChapterPicked += chapter => picked = chapter;
             Transform menu = title.transform.Find("Screen/Safe Area/Menu");
-            Assert.That(menu.Find("Continue").gameObject.activeSelf, Is.False, "저장이 없으면 이어 하기가 없다");
-            menu.Find("New Game").GetComponent<Button>().onClick.Invoke();
-            Assert.That(picked, Is.EqualTo(0), "저장이 없으면 새 게임은 묻지 않고 프롤로그를 고른다");
+            Assert.That(menu.Find("Continue/Label").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("처음부터"), "저장이 없으면 주 버튼이 「처음부터」다");
+            Assert.That(menu.Find("Secondary/New Game").gameObject.activeSelf, Is.False, "아랫줄의 「처음부터」는 저장이 있을 때만 보인다");
+            menu.Find("Continue").GetComponent<Button>().onClick.Invoke();
+            Assert.That(picked, Is.EqualTo(0), "저장이 없으면 주 버튼은 묻지 않고 프롤로그를 고른다");
             // 이야기가 프롤로그의 시작 저장을 남긴 뒤에 끝내야, 정리(TestSaves.Restore)가 되돌린 사용자 저장을 덮어쓰지 않는다.
             yield return Waits.UntilReal(() => SaveStore.Read()?.Chapter == 0, "프롤로그가 시작되어 저장이 남는다");
         }
@@ -108,17 +103,19 @@ namespace MiniPandoras.Tests
             int picked = -1;
             title.ChapterPicked += chapter => picked = chapter;
             Transform menu = title.transform.Find("Screen/Safe Area/Menu");
-            Assert.That(menu.Find("Continue").gameObject.activeSelf, Is.True, "저장이 있으면 이어 하기가 보인다");
+            Assert.That(menu.Find("Continue/Label").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("이어 하기"), "저장이 있으면 주 버튼이 「이어 하기」다");
             Assert.That(menu.Find("Continue/Detail").GetComponent<TMPro.TMP_Text>().text, Does.StartWith("3장"), "이어 할 장이 보인다");
 
-            menu.Find("New Game").GetComponent<Button>().onClick.Invoke();
+            Transform newGame = menu.Find("Secondary/New Game");
+            Assert.That(newGame.gameObject.activeSelf, Is.True, "저장이 있으면 아랫줄에 「처음부터」가 보인다");
+            newGame.GetComponent<Button>().onClick.Invoke();
             Transform confirm = title.transform.Find("Screen/Confirm Window");
             Assert.That(picked, Is.EqualTo(-1), "저장이 있으면 새 게임은 먼저 묻는다");
             Assert.That(confirm.gameObject.activeSelf, Is.True, "확인 창이 뜬다");
             confirm.Find("Frame/No").GetComponent<Button>().onClick.Invoke();
             Assert.That(picked, Is.EqualTo(-1), "취소하면 아무것도 고르지 않는다");
 
-            menu.Find("New Game").GetComponent<Button>().onClick.Invoke();
+            newGame.GetComponent<Button>().onClick.Invoke();
             confirm.Find("Frame/Yes").GetComponent<Button>().onClick.Invoke();
             Assert.That(picked, Is.EqualTo(0), "「처음부터」를 누르면 프롤로그를 고른다");
             yield return Waits.UntilReal(() => SaveStore.Read()?.Chapter == 0, "프롤로그가 시작되어 저장을 덮어쓴다");
@@ -130,7 +127,7 @@ namespace MiniPandoras.Tests
             int picked = -1;
             title.ChapterPicked += chapter => picked = chapter;
             Transform screen = title.transform.Find("Screen");
-            screen.Find("Safe Area/Menu/Parts").GetComponent<Button>().onClick.Invoke();
+            screen.Find("Safe Area/Menu/Secondary/Parts").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.3f);
 
             Transform window = screen.Find("Part Window/Safe Area");
@@ -211,7 +208,7 @@ namespace MiniPandoras.Tests
             yield return null;
             int picked = -1;
             title.ChapterPicked += chapter => picked = chapter;
-            title.transform.Find("Screen/Safe Area/Menu/Parts").GetComponent<Button>().onClick.Invoke();
+            title.transform.Find("Screen/Safe Area/Menu/Secondary/Parts").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.3f);
 
             Transform window = title.transform.Find("Screen/Part Window/Safe Area");

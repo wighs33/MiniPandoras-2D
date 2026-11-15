@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static MiniPandoras.Dialogue.GameText;
 
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 타이틀 화면. 저장된 장이 속한 부의 풍경(<see cref="TitleScenery"/>, 1부는 정류장의 뱀열차, 2부는 밤 사막) 위 하늘에 로고를, 엄지가 닿는 화면 아래에 메뉴를 둔다.
-    /// 메뉴는 이야기 셋(이어 하기·처음부터·지난 스토리)과 1:1 대전·프로필·설정이다(2026-11-13 사용자 결정).
-    /// 저장이 있으면 「이어 하기」(저장된 장)가 주 버튼이고, 「처음부터」는 저장을 덮어쓰므로 저장이 있을 때 한 번 묻는다.
+    /// 타이틀 화면. 저장된 장이 속한 부의 풍경(<see cref="TitleScenery"/>, 1부는 정류장의 뱀열차, 2부는 밤 사막) 위 하늘에 로고(「MINI 판도라즈」 그림)를,
+    /// 엄지가 닿는 왼쪽 아래에 메뉴를 한 덩어리로 둔다(2026-11-15 다시 짬).
+    /// 윗줄은 주 버튼 하나와 프로필·설정 아이콘, 아랫줄은 처음부터·지난 스토리·1:1 대전이다.
+    /// 주 버튼은 저장이 있으면 「이어 하기」(저장된 장), 없으면 「처음부터」(프롤로그)다.
+    /// 아랫줄의 「처음부터」는 저장을 덮어쓰므로 저장이 있을 때만 보이고, 누르면 한 번 묻는다.
     /// 「지난 스토리」는 부마다 카드를 세운 줄(<see cref="PartPicker"/>, 음반 고르기처럼 가운데 카드가 크다)을 연다.
     /// 줄을 넘기면 뒤 풍경이 가운데 온 부의 것으로 바뀐다. 저장된 부는 이어 하고, 다른 부나 그 부의 「처음부터」는 저장을 지우므로 한 번 묻는다.
     /// 대전·프로필·설정은 알리기만 하고, 그 창은 받는 쪽(이야기의 대전, 앱의 타이틀 창들)이 연다.
@@ -28,7 +31,7 @@ namespace MiniPandoras.UI
         [SerializeField] private GameObject screen;
         [Tooltip("부마다의 풍경(1부, 2부 순서). 보이는 부의 것만 켠다")]
         [SerializeField] private CanvasGroup[] sceneries = Array.Empty<CanvasGroup>();
-        [Tooltip("챕터 선택을 여는 동안 숨기는 첫 화면(로고 뒤 어둠, 로고와 메뉴)")]
+        [Tooltip("챕터 선택을 여는 동안 숨기는 첫 화면(로고와 메뉴)")]
         [SerializeField] private CanvasGroup[] home = Array.Empty<CanvasGroup>();
         [Header("로고")]
         [SerializeField] private CanvasGroup logo;
@@ -38,15 +41,16 @@ namespace MiniPandoras.UI
         [Tooltip("이야기를 끝까지(2부 엔딩까지) 본 판이면 로고 아래 부 표시 자리에 뜨는 표시(「CHAPTER 2 클리어」)")]
         [SerializeField] private GameObject clearedMark;
         [Header("메뉴")]
-        [SerializeField] private Button continueButton;
-        [Tooltip("이어 할 장(「8장  사막의 가짜 왕」)")]
-        [SerializeField] private TMP_Text continueDetail;
+        [Tooltip("주 버튼: 저장이 있으면 이어 하기, 없으면 처음부터")]
+        [FormerlySerializedAs("continueButton")]
+        [SerializeField] private Button playButton;
+        [SerializeField] private TMP_Text playLabel;
+        [Tooltip("주 버튼이 들어갈 장(「8장  사막의 가짜 왕」)")]
+        [FormerlySerializedAs("continueDetail")]
+        [SerializeField] private TMP_Text playDetail;
+        [Tooltip("저장이 있을 때만 보이는 「처음부터」")]
         [SerializeField] private Button newGameButton;
-        [SerializeField] private TMP_Text newGameLabel;
         [SerializeField] private Button partsButton;
-        [Tooltip("주 버튼(저장이 있으면 이어 하기, 없으면 처음부터)의 글 색")]
-        [SerializeField] private Color primaryColor = Color.yellow;
-        [SerializeField] private Color secondaryColor = Color.white;
         [SerializeField] private Button duelButton;
         [SerializeField] private Button profileButton;
         [SerializeField] private Button settingsButton;
@@ -125,12 +129,10 @@ namespace MiniPandoras.UI
                 partHeaders[i].text = parts[i].Label;
             }
 
-            continueButton.gameObject.SetActive(last >= 0);
-            newGameLabel.color = last >= 0 ? secondaryColor : primaryColor;
-            if (last >= 0)
-            {
-                continueDetail.text = chapters[last];
-            }
+            bool saved = last >= 0;
+            playLabel.text = saved ? T("titleView.continue") : T("titleView.newGame");
+            playDetail.text = chapters[saved ? last : 0];
+            newGameButton.gameObject.SetActive(saved);
 
             for (int i = 0; i < rows.Length; i++)
             {
@@ -249,9 +251,10 @@ namespace MiniPandoras.UI
             }
         }
 
-        private void Continue()
+        /// <summary>주 버튼: 저장된 장을 이어 하고, 저장이 없으면 프롤로그부터 시작한다(지울 저장이 없으니 묻지 않는다).</summary>
+        private void Play()
         {
-            Pick(savedChapter);
+            Pick(savedChapter >= 0 ? savedChapter : 0);
         }
 
         private void StartNewGame()
@@ -328,7 +331,7 @@ namespace MiniPandoras.UI
 
         private void Awake()
         {
-            continueButton.onClick.AddListener(Continue);
+            playButton.onClick.AddListener(Play);
             newGameButton.onClick.AddListener(StartNewGame);
             partsButton.onClick.AddListener(OpenParts);
             duelButton.onClick.AddListener(() => DuelRequested?.Invoke());

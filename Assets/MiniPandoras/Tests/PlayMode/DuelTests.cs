@@ -100,7 +100,7 @@ namespace MiniPandoras.Tests
         public IEnumerator WithoutAnActivatedPandoraTheTitleOnlyTells()
         {
             Assert.That(title.IsOpen, Is.True);
-            title.transform.Find("Screen/Safe Area/Modes/Duel").GetComponent<Button>().onClick.Invoke();
+            title.transform.Find("Screen/Safe Area/Menu/Secondary/Duel").GetComponent<Button>().onClick.Invoke();
             for (int i = 0; i < 10; i++)
             {
                 yield return null;
@@ -118,7 +118,7 @@ namespace MiniPandoras.Tests
         public IEnumerator TheSealBookPutsOnlyActivatedPandorasInDuelSlots()
         {
             TestSaves.Unlocked("phase", "darkPower");
-            title.transform.Find("Screen/Safe Area/Modes/Profile").GetComponent<Button>().onClick.Invoke();
+            title.transform.Find("Screen/Safe Area/Menu/Profile").GetComponent<Button>().onClick.Invoke();
             yield return null;
             Transform frame = title.transform.Find("Screen/Profile Window/Frame");
             Assert.That(frame.Find("Slot 3/Name").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo(Dialogue.GameText.T("profile.emptySlot")),
@@ -147,7 +147,7 @@ namespace MiniPandoras.Tests
         private IEnumerator StartDuel()
         {
             Assert.That(title.IsOpen, Is.True);
-            title.transform.Find("Screen/Safe Area/Modes/Duel").GetComponent<Button>().onClick.Invoke();
+            title.transform.Find("Screen/Safe Area/Menu/Secondary/Duel").GetComponent<Button>().onClick.Invoke();
             yield return WaitUntil(() => view.transform.Find("Screen/Matching").gameObject.activeSelf, "상대를 찾는다");
             yield return WaitUntil(() => view.transform.Find("Screen/Versus").gameObject.activeSelf, "VS 화면이 뜬다");
         }

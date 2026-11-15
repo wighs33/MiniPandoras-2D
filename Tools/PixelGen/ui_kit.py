@@ -17,6 +17,8 @@
   Assets/MiniPandoras/Art/PixelGen/UI/Kit/icon_mana.png  마나 아이콘(5 px). 푸른 마름모
   Assets/MiniPandoras/Art/PixelGen/UI/Kit/menu.png    메뉴 아이콘(12 px). 가로줄 셋
   Assets/MiniPandoras/Art/PixelGen/UI/Kit/skip.png    건너뛰기 아이콘(12 px). 오른쪽을 가리키는 겹 세모
+  Assets/MiniPandoras/Art/PixelGen/UI/Kit/profile.png 프로필 아이콘(12 px). 머리와 어깨
+  Assets/MiniPandoras/Art/PixelGen/UI/Kit/settings.png 설정 아이콘(12 px). 톱니바퀴
   Docs/ArtUpgrade/PixelGen/vitals_preview.png         체력 칸 미리보기(판, 얼굴 자리, 두 막대, 아이콘. 네 배)
 
 사용: python Tools/PixelGen/ui_kit.py <프로젝트 루트>
@@ -168,6 +170,47 @@ def skip_icon():
     return icon(ink)
 
 
+def ink_rows(rows):
+    """글자 그림(#가 칠할 칸)을 아이콘 모양으로."""
+    return np.array([[key == "#" for key in row] for row in rows], bool)
+
+
+def profile_icon():
+    """프로필 아이콘 12×12 px: 머리와 어깨. 「프로필」 글자 버튼 대신 쓴다."""
+    return icon(ink_rows([
+        "............",
+        "....####....",
+        "...######...",
+        "...######...",
+        "...######...",
+        "....####....",
+        "............",
+        "...######...",
+        "..########..",
+        "..########..",
+        "..########..",
+        "............",
+    ]))
+
+
+def settings_icon():
+    """설정 아이콘 12×12 px: 이 여덟 개의 톱니바퀴, 가운데가 뚫렸다. 「설정」 글자 버튼 대신 쓴다."""
+    return icon(ink_rows([
+        "............",
+        ".....##.....",
+        "..#.####.#..",
+        "..########..",
+        "..###..###..",
+        ".###....###.",
+        ".###....###.",
+        "..###..###..",
+        "..########..",
+        "..#.####.#..",
+        ".....##.....",
+        "............",
+    ]))
+
+
 def hud_plate():
     """작은 판 16×16 px, 테두리 4 px. 창 틀처럼 깎은 모서리와 밝은 윗선·어두운 아랫선이고, 안쪽 2 px 자리에 가는 선을 한 번 더 두른다.
     맵 위에 늘 떠 있으니 반투명이 아니라 불투명한 판이다(지침 2장: 어두운 유리판을 쓰지 않는다)."""
@@ -294,6 +337,8 @@ def main(root):
         "icon_mana.png": icon_mana(),
         "menu.png": menu_icon(),
         "skip.png": skip_icon(),
+        "profile.png": profile_icon(),
+        "settings.png": settings_icon(),
     }
     for name, rgba in outputs.items():
         Image.fromarray(rgba, "RGBA").save(kit / name)
