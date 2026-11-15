@@ -113,8 +113,9 @@ namespace MiniPandoras.Story
                 (GiantTree.Hall, () => s.Field.LockWarp("roots", T("chapter10.upTheGiantTree.2"))),
                 (GiantTree.Branches, () =>
                 {
-                    Vector2Int spot = s.Field.Point("warpSpot");
-                    s.Field.Trigger("kateTree", TriggerKind.Step, cell => StoryField.IsWithin(cell, spot, 1), once: true, ends: true);
+                    // 꼭대기로 가는 길은 맨 윗단 계단 하나뿐이라, 그 단에 올라서면 누구나 사다리 앞을 막아선 케이트를 만난다.
+                    Vector2Int ledge = s.Field.Point("topLedge");
+                    s.Field.Trigger("kateTree", TriggerKind.Step, cell => cell.y <= ledge.y, once: true, ends: true);
                 }));
             s.Field.RunMapSetup();
             s.Field.Hint(T("chapter10.upTheGiantTree.3"), 300f);
@@ -141,6 +142,8 @@ namespace MiniPandoras.Story
         {
             s.Cinema(true);
             s.Actors.Spawn("kate", "kate", "kate", Facing.Down);
+            yield return s.Stage.WarpIn("kate");
+            s.Actors.FaceToward("hero", "kate");
             yield return s.Lines("chapter10.kateInTheTree.1");
             s.Stage.SpaceRift(s.Actors.Actor("hero").Cell, 80f);
             s.Shake(3f, 40f);

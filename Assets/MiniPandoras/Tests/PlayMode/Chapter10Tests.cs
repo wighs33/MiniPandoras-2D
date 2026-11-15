@@ -63,12 +63,12 @@ namespace MiniPandoras.Tests
             Assert.That(story.Lines, Has.Member("그것도 말 못 해.\n하지만 네 적은 아니야.\n그건 약속할게."));
             yield return story.StandOn(story.Director.Field.Point("treeGate"));
 
-            // 거대고목을 층층이 올라 5층 가지 회랑에서 케이트 → 판도라의 정원.
+            // 거대고목을 층층이 올라 5층 가지 회랑 맨 윗단(꼭대기 사다리로 가는 길)에서 케이트 → 판도라의 정원.
             yield return story.UntilExploring("treeHall", "고목 1층 뿌리 홀");
             Assert.That(story.Director.Actors.HasActor("receptionist"), Is.True, "1층 홀에 접수 요정이 있다");
             Assert.That(story.Exploration.IsLocked("roots"), Is.True, "뿌리 계단은 아직 막혀 있다");
             yield return Walk("up", "treeHall", "treeMarket", "treeRooms", "treeLibrary", "giantTree");
-            yield return story.StandOn(story.Director.Field.Point("warpSpot"));
+            yield return story.StandOn(story.Director.Field.Point("topLedge"));
             yield return story.Until(() =>
             {
                 story.Fight();

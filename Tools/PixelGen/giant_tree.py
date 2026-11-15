@@ -3,7 +3,8 @@
 
   등반로(giantTree, 나무 기둥을 보여 주지 않고 거대한 나무의 등산 경로처럼, 뱀성처럼 단면으로 보인다):
      줄기를 세로로 보여 주지 않고, 뱀성 앞 산처럼 양 끝이 휘어 오르는 나무껍질 절벽 세 단을 지그재그로 오른다.
-     단 위는 이끼 낀 넓은 턱이고, 단마다 뿌리 계단이 있다. 오른쪽 가지 끝 전망대에 케이트가 나타나고, 왼쪽 가지 끝에 등불이 있다.
+     단 위는 이끼 낀 넓은 턱이고, 단마다 뿌리 계단이 있다. 오른쪽 가지 끝은 전망대, 왼쪽 가지 끝에 등불이 있다.
+     케이트는 맨 윗단, 꼭대기 사다리로 가는 길 위에 나타난다(곁가지에 두면 어디로 가야 할지 모른다, 2026-11-15 사용자).
      가장자리는 잎 덩이가 막고 그 너머는 노을 하늘과 구름이다. 맨 아래 사다리가 서고로(down), 맨 위 사다리가 꼭대기로(up) 이어진다.
   꼭대기 잎 덮개(treeCrown): 잎 덩이로 둘러싼 넓은 이끼 덮개(촌장·케이트, 11장 나리온 정거장), 꽃과 빛나는 버섯.
      가운데 남쪽의 사다리 구멍(down)으로 등반로에 내려간다.
@@ -283,8 +284,8 @@ def branches():
         m.stand(f"glow_patch_{i}", fp.glow_shrooms(np.random.default_rng(260 + i)), x, ground)
     m.point("up", (LADDER_X, 0))
     m.point("down", (LADDER_X, HEIGHT - 1))
-    m.point("warpSpot", (37, 19))
-    m.point("kate", (37, 16))
+    m.point("topLedge", (27, 11))                  # 맨 윗단 계단을 막 올라선 칸
+    m.point("kate", (23, 7))                       # 꼭대기 사다리로 가는 길 위
     m.warp("up", "treeCrown", "down", "up")
     m.warp("down", "treeLibrary", "up", "down")
     return m
@@ -337,7 +338,7 @@ def main(project):
         origin = m.points["down"][0]
         for name, cells in m.points.items():
             for cell in cells:
-                if name != "kate" and not m.reachable(origin, [cell]):
+                if not m.reachable(origin, [cell]):
                     print(f"{m.id}: {name} {cell}에 닿지 못한다")
         print(m.publish(project))
 
