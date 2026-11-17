@@ -23,6 +23,8 @@ namespace MiniPandoras.Minigames
     /// <summary>
     /// 뱀성 탈출 글라이더(웹게임 scenes/glider.ts). 뒤에서 날아오는 화살을 피하며 20초를 난다.
     /// 화살을 세 번 맞으면 떨어진다(웹게임은 실패가 없다). 끝까지 버티면 마지막 일제 사격에서 랑이 주인공을 감싸는 연출로 끝난다.
+    /// 보통 화살은 처지며 날아와 화면 오른쪽 위 구석에 닿지 못한다. 그래서 글라이더가 화면 오른쪽 절반에 있으면 세 발에 한 발은
+    /// 화면 위를 넘겨 쏘는 곡사 화살이다(웹게임에 없음, 2026-11-18 사용자 지적: 오른쪽 위에 숨으면 하나도 맞지 않았다).
     /// 자리는 가상 화면(384×216, 아래로 +y)의 px, 시간은 웹게임처럼 60fps 프레임으로 센다. 그리기는 GliderView가 한다.
     /// </summary>
     public sealed class GliderFlight : MonoBehaviour
@@ -42,6 +44,10 @@ namespace MiniPandoras.Minigames
         private const int LastArrowInterval = 26;
         private const float ArrowAimSpread = 30f;
         private const int ArrowWarning = 32;
+        private const int LobEvery = 3;
+        private const float LobSpread = 6f;
+        // 곡사 화살은 알림까지 4초 가까이 날므로, 끝나기 이만큼 전부터는 쏘지 않는다(일제 사격 중에 떨어지지 않게).
+        private const int LobLastFrames = 240;
         // 일제 사격은 랑이 뛰어오르는 때에 맞춘 연출이라, 글라이더가 어디 있든 이 자리로 돌아와서 맞는다.
         private const float VolleyX = 150f;
 
@@ -52,6 +58,7 @@ namespace MiniPandoras.Minigames
         private float tickClock;
         private float velocity;
         private int crashLeft;
+        private int shots;
 
         /// <summary>실제로 보이는 가상 화면의 너비. 16:9보다 넓은 화면은 오른쪽으로 넓어진다(CanvasScaler Expand).</summary>
         public static float VisibleWidth => Mathf.Max(ViewWidth, ViewHeight * Screen.width / Screen.height);
@@ -138,6 +145,7 @@ namespace MiniPandoras.Minigames
             Shout = null;
             ShoutTime = 0;
             tickClock = 0f;
+            shots = 0;
             arrows.Clear();
             for (int i = 0; i < CloudCount; i++)
             {
@@ -232,7 +240,16 @@ namespace MiniPandoras.Minigames
             int interval = Mathf.RoundToInt(Mathf.Lerp(FirstArrowInterval, LastArrowInterval, Progress));
             if (PhaseTime % interval == 0 && PhaseTime < PlayFrames - 60)
             {
-                SpawnArrow(false, Mathf.Clamp(Y + Random.Range(-ArrowAimSpread, ArrowAimSpread), 30f, ViewHeight - 24f));
+                shots += 1;
+                bool lob = shots % LobEvery == 0 && X > VisibleWidth / 2f && PhaseTime < PlayFrames - LobLastFrames;
+                if (lob)
+                {
+                    arrows.Add(Arrow.Lob(new Vector2(X, Y - 4f + Random.Range(-LobSpread, LobSpread)), ArrowWarning));
+                }
+                else
+                {
+                    SpawnArrow(false, Mathf.Clamp(Y + Random.Range(-ArrowAimSpread, ArrowAimSpread), 30f, ViewHeight - 24f));
+                }
             }
 
             if (PhaseTime == 120)
@@ -258,7 +275,7 @@ namespace MiniPandoras.Minigames
                     continue;
                 }
 
-                if (Mathf.Abs(arrow.X - X) < 10f && Mathf.Abs(arrow.Y - (Y - 4f)) < 9f)
+                if (arrow.Touches(X, Y))
                 {
                     arrows[i] = arrow.Broken();
                     TakeArrow();
@@ -356,7 +373,7 @@ namespace MiniPandoras.Minigames
         private void SpawnArrow(bool scripted, float y)
         {
             float speed = scripted ? Random.Range(3.4f, 4.2f) : Random.Range(3.8f, 4.8f);
-            arrows.Add(new Arrow(-12f, y + 12f, speed, -0.35f, scripted ? 0 : ArrowWarning, scripted));
+            arrows.Add(new Arrow(Arrow.StartX, y + 12f, speed, -0.35f, scripted ? 0 : ArrowWarning, scripted));
         }
 
         private void EnterPhase(GliderPhase phase)
@@ -374,6 +391,15 @@ namespace MiniPandoras.Minigames
         /// <summary>화살 하나(웹게임 Arrow). 「!」 알림이 끝나면 조금씩 처지며 날아간다.</summary>
         public readonly struct Arrow
         {
+            /// <summary>화살은 왼쪽 화면 밖에서 나온다.</summary>
+            public const float StartX = -12f;
+
+            /// <summary>한 프레임마다 아래로 빨라지는 정도.</summary>
+            public const float Gravity = 0.015f;
+
+            // 곡사 화살은 맞힐 자리보다 이만큼 아래에서 쏘아 이만큼 위까지 솟는다. 오른쪽 위 구석(y 30)을 노리면 화면 위(y −10)를 넘는다.
+            private const float LobRise = 40f;
+
             public Arrow(float x, float y, float vx, float vy, int warning, bool scripted, bool dead = false)
             {
                 X = x;
@@ -393,6 +419,21 @@ namespace MiniPandoras.Minigames
             public bool Scripted { get; }
             public bool Dead { get; }
 
+            /// <summary>
+            /// 곡사 화살: 맞힐 자리의 아래 왼쪽에서 높이 쏘아, 솟았다가 내려오는 길에 target을 지나게 한다.
+            /// 위로 쏘는 빠르기는 솟을 높이로 정하고, 옆으로 가는 빠르기는 target 높이로 내려올 때까지의 프레임으로 정한다.
+            /// </summary>
+            public static Arrow Lob(Vector2 target, int warning)
+            {
+                float startY = Mathf.Min(target.y + LobRise, ViewHeight - 24f);
+                float peakY = target.y - LobRise;
+                float vy = -Mathf.Sqrt(2f * Gravity * (startY - peakY));
+                // n 프레임 뒤의 높이 y0 + n·vy + g·n(n−1)/2 = target.y를 n에 대해 푼 큰 근(내려오는 쪽).
+                float b = vy - Gravity / 2f;
+                float frames = (-b + Mathf.Sqrt(b * b - 2f * Gravity * (startY - target.y))) / Gravity;
+                return new Arrow(StartX, startY, (target.x - StartX) / frames, vy, warning, false);
+            }
+
             public Arrow Flown()
             {
                 if (Warning > 0)
@@ -400,7 +441,13 @@ namespace MiniPandoras.Minigames
                     return new Arrow(X, Y, VelocityX, VelocityY, Warning - 1, Scripted, Dead);
                 }
 
-                return new Arrow(X + VelocityX, Y + VelocityY, VelocityX, VelocityY + 0.015f, 0, Scripted, Dead);
+                return new Arrow(X + VelocityX, Y + VelocityY, VelocityX, VelocityY + Gravity, 0, Scripted, Dead);
+            }
+
+            /// <summary>자리 (gliderX, gliderY)의 글라이더에 닿았는지. 몸 가운데는 글라이더 자리보다 4 위다.</summary>
+            public bool Touches(float gliderX, float gliderY)
+            {
+                return Mathf.Abs(X - gliderX) < 10f && Mathf.Abs(Y - (gliderY - 4f)) < 9f;
             }
 
             public Arrow Broken()
