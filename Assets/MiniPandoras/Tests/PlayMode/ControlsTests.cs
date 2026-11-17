@@ -169,6 +169,48 @@ namespace MiniPandoras.Tests
         }
 
         [UnityTest]
+        public IEnumerator MovePadFloatsUnderTheFingerAndLetsGoWhenHidden()
+        {
+            var movePad = touch.GetComponentInChildren<MovePad>();
+            var area = (RectTransform)movePad.transform;
+            var padRect = (RectTransform)area.Find("Pad");
+            var knob = (RectTransform)padRect.Find("Knob");
+            Vector2 rest = padRect.anchoredPosition;
+
+            // 패드에서 떨어진 자리를 누르면 패드가 그 손가락 밑으로 온다.
+            Vector2 pressAt = new Vector2(area.rect.width * 0.7f, area.rect.height * 0.6f);
+            var finger = new PointerEventData(EventSystem.current) { pointerId = 1, position = ScreenPoint(area, pressAt) };
+            movePad.OnPointerDown(finger);
+            Assert.That(Vector2.Distance(padRect.anchoredPosition, pressAt), Is.LessThan(0.5f), "누른 자리에 패드가 생긴다");
+
+            finger.position = ScreenPoint(area, pressAt + new Vector2(40f, 0f));
+            movePad.OnDrag(finger);
+            yield return null;
+            Assert.That(input.Move.x, Is.GreaterThan(0.9f), "오른쪽으로 끝까지 밀면 오른쪽으로 걷는다");
+
+            var other = new PointerEventData(EventSystem.current) { pointerId = 2, position = ScreenPoint(area, pressAt - new Vector2(40f, 0f)) };
+            movePad.OnPointerDown(other);
+            movePad.OnDrag(other);
+            yield return null;
+            Assert.That(input.Move.x, Is.GreaterThan(0.9f), "둘째 손가락은 조이스틱을 움직이지 않는다");
+
+            // 손을 떼지 않은 채 연출로 숨겨진다.
+            controls.SetMode(ControlMode.Cutscene);
+            yield return null;
+            Assert.That(knob.anchoredPosition, Is.EqualTo(Vector2.zero), "숨겨지면 손잡이가 가운데로 돌아간다");
+            Assert.That(padRect.anchoredPosition, Is.EqualTo(rest), "숨겨지면 패드가 제자리로 돌아간다");
+
+            // 다시 나타난 뒤에는 누르고 있던 손가락을 끌어도 걷지 않는다(새로 눌러야 한다).
+            controls.SetMode(ControlMode.Field);
+            yield return null;
+            Assert.That(movePad.isActiveAndEnabled, Is.True, "필드로 돌아오면 조이스틱이 보인다");
+            movePad.OnDrag(finger);
+            yield return null;
+            Assert.That(knob.anchoredPosition, Is.EqualTo(Vector2.zero), "연출 전에 누르던 손가락은 따라가지 않는다");
+            Assert.That(input.Move, Is.EqualTo(Vector2.zero), "연출이 끝나자마자 저절로 걷지 않는다");
+        }
+
+        [UnityTest]
         public IEnumerator HoldingTwoPandoraButtonsDoesNotOpenUnitysDebugPanel()
         {
             // 판도라 2·3번 칸은 가상 게임패드의 두 스틱 누름이고, Unity 렌더링 디버거는 오른쪽 스틱을 누른 채 왼쪽 스틱을 누르면 열린다.
@@ -191,6 +233,11 @@ namespace MiniPandoras.Tests
             yield return null;
             InputSystem.QueueStateEvent(device, default(TState));
             yield return null;
+        }
+
+        private static Vector2 ScreenPoint(RectTransform area, Vector2 local)
+        {
+            return RectTransformUtility.WorldToScreenPoint(null, area.TransformPoint(local));
         }
 
         private Vector2Int HeroCell()

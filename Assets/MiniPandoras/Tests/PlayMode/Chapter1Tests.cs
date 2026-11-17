@@ -10,7 +10,6 @@ using MiniPandoras.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.OnScreen;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
@@ -27,7 +26,7 @@ namespace MiniPandoras.Tests
         private readonly List<string> shownLines = new List<string>();
         private readonly List<string> notices = new List<string>();
         private Conversation conversation;
-        private OnScreenStick stick;
+        private MovePad stick;
         private bool stickShownInCutscenes;
         private bool foughtInChapter1;
 
@@ -109,7 +108,7 @@ namespace MiniPandoras.Tests
         private void AnswerConversation(Scene scene, LoadSceneMode mode)
         {
             conversation = Object.FindFirstObjectByType<Conversation>();
-            stick = Object.FindFirstObjectByType<OnScreenStick>(FindObjectsInactive.Include);
+            stick = Object.FindFirstObjectByType<MovePad>(FindObjectsInactive.Include);
 
             // 플레이어 대신 읽자마자 넘기고, 선택지는 첫째를, 이름은 「하늘」을 넣는다.
             conversation.LineShown += line =>
