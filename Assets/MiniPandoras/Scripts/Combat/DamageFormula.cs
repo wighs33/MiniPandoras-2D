@@ -6,6 +6,7 @@ namespace MiniPandoras.Combat
     /// <summary>
     /// 웹게임 battle/data.ts의 computeDamage. 장면 없이 시험할 수 있게 MonoBehaviour 밖에 둔다.
     /// 피해 = (공격 × 위력 − 방어 × 0.55) × (0.9 ~ 1.1), 반올림하고 적어도 1.
+    /// 온라인 대전 서버(Server/src/DuelServer)도 이 파일을 그대로 컴파일해 같은 피해를 낸다. 그래서 UnityEngine을 쓰지 않는다.
     /// </summary>
     public static class DamageFormula
     {

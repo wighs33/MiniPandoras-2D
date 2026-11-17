@@ -2,7 +2,7 @@ using System;
 
 namespace MiniPandoras.World
 {
-    /// <summary>웹게임(JavaScript)과 수치를 맞추는 계산.</summary>
+    /// <summary>웹게임(JavaScript)과 수치를 맞추는 계산. 온라인 대전 서버도 피해 공식과 함께 이 파일을 컴파일한다(UnityEngine을 쓰지 않는다).</summary>
     public static class JsMath
     {
         /// <summary>

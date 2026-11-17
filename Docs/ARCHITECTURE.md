@@ -10,6 +10,7 @@
 |---|---|---|
 | 1 | `MiniPandoras.Input` | Input System과 게임 코드의 경계. 기기를 의도로만 바꾼다(`PlayerInputReader`: 이동, 행동, 스킬 둘, 판도라 칸 셋, 동료 부르기 다섯) |
 | 1 | `MiniPandoras.World` | 맵(`GameMap`: 지점, 밤빛·날씨·배경, 빛, 물 칸), 포탈(`Portal`, 잠금), 움직이는 타일(`TileAnimator`: 불꽃·물 반짝임·빛 떨림), 나무 반투명(`SeeThroughProps`), 밤빛(`AmbientLight`), 회상 색(`MemoryTint`), 맵 밖 배경(`MapBackdrop`: 차원공간), 카메라(`FollowCamera`: 따라가기·팬·흔들림·작은 맵 올려 보기), 연출 효과(`StageEffects`, `EffectSprites`: 빛의 기둥·봉인진·빛의 검·판도라 더스트·치유의 빛·핏자국·신호탄·모래벽·저주의 안개), 맵에 세우는 큰 그림(`StageImage`: 군함·청룡, 그 위에 그림을 바꿔 끼우는 나리온 `GiantBird`: 탄 사람 수마다 앉은 그림·날갯짓·탑승), pixelfx 효과 한 벌(`EffectSheet`), 바라보는 방향(`Facing`, `FacingRules`), 웹게임 좌표 변환(`MapCoordinates`), 막힌 곳 피해 걷기(`FootMover`, `MapLayers`), 알갱이(`ParticleBurst`) |
+| 0 | `MiniPandoras.Protocol` | 온라인 대전 패킷(`Packet`: 머리말과 패킷 경계 자르기, `PacketWriter`·`PacketReader`, 패킷 구조체들). 따로 된 어셈블리(`MiniPandoras.Protocol`, 엔진 참조 없음)이고 서버(`Server/`)도 같은 파일을 컴파일한다. 아래 「온라인 대전」 |
 | 0 | `MiniPandoras.Dialogue` | 게임에 보이는 글(`GameText`: 대본 파일을 읽어 id로 찾는다), 대화의 진행 상태(`Conversation`: 대사·선택지·이름 묻기·알림을 이벤트로 알리고 응답을 기다림, 건너뛰는 중이면 대사·알림을 곧바로 넘김), 대사 한 줄(`DialogueLine`), 이름 자리와 조사(`NameFill`) |
 | 1 | `MiniPandoras.Progress` | 진행 상태(`GameState`: 주인공 이름, 장, 장 레벨, 파티, 물건, 이야기 깃발, 판도라 더스트·활성화·정착, 장착한 무기와 장착·장착 해제 규칙)와 그것을 장면에 두는 `GameSession`, 저장 한 벌(`SaveData`, 형식 버전)과 기기 저장(`SaveStore`), 물건(`ItemDefinition` 에셋, 목록 `ItemCatalog`, id로 찾는 `Items`), 메인 임무(`Goals`), 의뢰(`Missions`), 1:1 대전 프로필(`PlayerProfile`: 닉네임, 대전 판도라 세 칸(이야기에서 활성화한 판도라만, `ProfileStore.UnlockedPandoras`), 승패와 최근 20판 `DuelResult`, 기기 저장 `ProfileStore`, 전적 한 줄 `DuelRecords`), 게임 설정(`GameSettings`: 음량 넷, `SettingsStore`). 프로필·설정은 이야기 저장과 따로 둔다 |
 | 2 | `MiniPandoras.Characters` | 인물의 몸(`CharacterBody`: 자리, 방향, 걷기, 자세(서기·쓰러짐·무릎 꿇기·납작해짐), 날개, 기운, 그림 어긋남, 투명도, 번쩍임, 무기 휘두르기 그림, 칸 단위 걷기), 그림 고르기(`CharacterAnimator`: 자세·날개·기운 알갱이도 그린다), 시트(`CharacterSheet`: 방향마다 걷기 그림, 있으면 휘두르기 그림 세 장), 감정 아이콘(`EmoteBalloon`), 인물 세우기(`ActorFactory`) |
@@ -284,6 +285,14 @@ Unity 렌더링 디버거는 게임 시작 때 끈다(`App/RenderingDebuggerSetu
   - 화로 불꽃은 웹게임 fire 타일(`MapLayout.fire`)이라 맵 들여오기가 움직이는 불꽃과 흔들리는 빛을 얹는다.
 - 들여온 인물: 웹게임 시트 49개 모두(주인공·동료·연출 인물·적). 화자는 47명 모두 들여왔고, 일러스트는 넷(`player`, `extra-soldier`, `rang`, `rang-beast`)이다.
 
+## 온라인 대전
+
+설계는 `Docs/DESIGN_OnlineDuel.md`다. 지금은 0단계(2026-11-16)까지 들어가 있다: 서버와 클라이언트가 함께 쓰는 패킷, 서버가 읽는 규칙 파일, 규칙을 읽고 뜨는 서버.
+
+- **함께 쓰는 코드**: `Scripts/Protocol`(어셈블리 `MiniPandoras.Protocol`, `noEngineReferences`)과 `Combat/DamageFormula.cs`·`World/JsMath.cs`는 서버 프로젝트가 같은 파일을 링크해서 컴파일한다(`Server/src/DuelServer/DuelServer.csproj`). 그래서 이 파일들은 UnityEngine을 쓰지 않고 Unity의 C# 9 문법만 쓴다. 쓰면 서버 빌드가 깨진다.
+- **규칙 파일**: 메뉴 `MiniPandoras/Export Duel Rules`(`Editor/Online/DuelRulesExporter`)가 대전 능력치(장 레벨 7, 방망이), 봉인서의 판도라, 그 스킬 수치를 `Server/rules/duel_rules.json`에 쓴다. 정본은 그대로 `Data/` 에셋이고, 어긋나면 `DuelRulesTests`가 다시 뽑으라고 알린다.
+- **서버**: `Server/MiniPandoras.Server.slnx`(.NET 10). `DuelServer`는 규칙을 읽고 `/health`(프로토콜 버전, 판도라·스킬 수)만 연다. 테스트는 `dotnet test Server/MiniPandoras.Server.slnx`(xUnit: 패킷 왕복, 쪼개지거나 붙어 온 바이트 자르기, 잘못된 머리말·본문, 규칙 파일 읽기, Unity와 같은 기대값으로 피해 공식).
+
 ## 테스트
 
 | 어셈블리 | 내용 |
@@ -292,6 +301,7 @@ Unity 렌더링 디버거는 게임 시작 때 끈다(`App/RenderingDebuggerSetu
 | | `StoryTextTests`: 이름 자리의 조사(받침, ㄹ+으로, 한글이 아닌 이름, 숫자), 걸음 표기, 부 나누기와 부 표시, 챕터 선택 카드의 장 범위와 나올 부(CHAPTER 3) |
 | | `CombatFormulaTests`: 피해량 35건과 동료 능력치 160건이 웹게임 계산과 같은지, JavaScript식 반올림 |
 | | `NamespaceLayerTests`: 네임스페이스 층 |
+| | `DuelRulesTests`: 서버가 읽는 대전 규칙 파일(`Server/rules/duel_rules.json`)이 지금 에셋으로 뽑은 것과 같음 |
 | | `ConversationTests`: 건너뛰는 중에도 선택지는 고를 때까지 기다리고, 그동안 건너뛰기를 멈추라고 알림 |
 | | `ProgressTests`: 판도라 더스트·활성화·자동 정착(가득 차면 직접 정착한 것과 바꿈)·사냥 대상, 무기 장착·장착 해제(장착해도 가방에 그대로, 공격력, 없는 물건은 장착하지 못함, 퀵슬롯이 열리기 전에는 무기만 장착), 저장 한 벌 왕복(장착한 무기는 저장, 깃발은 저장하지 않음), 1판 저장은 맨손으로 읽힘 |
 | | `BreathingFramesTests`: 구운 숨쉬는 그림이 서 있는 그림과 겹치고 머리를 건드리지 않음 |

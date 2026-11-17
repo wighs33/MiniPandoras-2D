@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DuelServer/DuelServer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DuelServer.Tests/DuelServer.Tests.csproj" />
+  </Folder>
+</Solution>

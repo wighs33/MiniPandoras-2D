@@ -22,9 +22,9 @@ namespace MiniPandoras.Story
         private const string Arena = "arena";
         private const string PlayerPoint = "player";
         private const string RivalPoint = "rival";
-        // 대전은 이야기 끝(11장)의 장 레벨과 모든 스킬이 열린 판도라로 공정하게 싸운다.
-        private const int PartyLevel = 7;
-        private const int PandoraLevel = 10;
+        // 대전은 이야기 끝(11장)의 장 레벨과 모든 스킬이 열린 판도라로 공정하게 싸운다. 온라인 서버도 이 값을 쓴다(Export Duel Rules).
+        public const int PartyLevel = 7;
+        public const int PandoraLevel = 10;
         private const float VersusSeconds = 2.4f;
 
         /// <summary>장면을 다시 열 때 타이틀을 거치지 않고 곧바로 다음 상대를 찾는다(결과 화면의 「다시 대전」). 한 번 쓰면 꺼진다.</summary>

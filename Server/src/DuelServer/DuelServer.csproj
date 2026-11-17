@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>MiniPandoras.Server</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    Unity와 같은 파일을 함께 컴파일한다. 패킷 모양과 피해 공식이 서버와 클라이언트에서 어긋날 수 없게 하려는 것이다.
+    이 파일들은 UnityEngine을 쓰지 않고 Unity의 C# 9 문법만 쓴다(Docs/DESIGN_OnlineDuel.md 3.1).
+  -->
+  <ItemGroup>
+    <Compile Include="../../../Assets/MiniPandoras/Scripts/Protocol/**/*.cs" Link="Shared/Protocol/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../../../Assets/MiniPandoras/Scripts/Combat/DamageFormula.cs" Link="Shared/DamageFormula.cs" />
+    <Compile Include="../../../Assets/MiniPandoras/Scripts/World/JsMath.cs" Link="Shared/JsMath.cs" />
+  </ItemGroup>
+
+  <!-- Unity 메뉴 MiniPandoras/Export Duel Rules가 Data/ 에셋에서 뽑은 대전 규칙. -->
+  <ItemGroup>
+    <None Include="../../rules/duel_rules.json" Link="rules/duel_rules.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

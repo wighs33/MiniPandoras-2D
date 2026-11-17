@@ -18,6 +18,8 @@ namespace MiniPandoras.Tests
         {
             // 바닥: 글과 대화는 아무것도 모른다. 게임에 보이는 글은 모든 층이 쓴다.
             { "Dialogue", 0 },
+            // 온라인 대전 패킷. 서버도 같은 파일을 컴파일하므로 게임의 어떤 층도 몰라야 한다.
+            { "Protocol", 0 },
 
             { "Input", 1 },
             { "World", 1 },

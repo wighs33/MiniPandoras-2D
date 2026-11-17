@@ -3,6 +3,7 @@
     "rootNamespace": "MiniPandoras.Tests",
     "references": [
         "MiniPandoras",
+        "MiniPandoras.Editor",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

@@ -1,0 +1,14 @@
+{
+    "name": "MiniPandoras.Protocol",
+    "rootNamespace": "MiniPandoras.Protocol",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

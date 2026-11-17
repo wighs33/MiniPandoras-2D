@@ -1,0 +1,931 @@
+{
+    "partyLevel": 7,
+    "pandoraLevel": 10,
+    "pandoraPowerScale": 1.45,
+    "hero": {
+        "hp": 212,
+        "mana": 66,
+        "attack": 29,
+        "defense": 17,
+        "speed": 15,
+        "critPercent": 8.0,
+        "evadePercent": 0.0
+    },
+    "pandoras": [
+        {
+            "id": "phase",
+            "skills": [
+                "phaseShift",
+                "spaceLeap",
+                "dimensionCut"
+            ],
+            "ultimate": "dimensionGate"
+        },
+        {
+            "id": "darkPower",
+            "skills": [
+                "darkHand",
+                "spikeTrap",
+                "spikeForest"
+            ],
+            "ultimate": "blackWings"
+        },
+        {
+            "id": "flame",
+            "skills": [
+                "emberShot",
+                "flameDive",
+                "flameCircle"
+            ],
+            "ultimate": "seaOfFire"
+        },
+        {
+            "id": "sandStorm",
+            "skills": [
+                "sandGrasp",
+                "quicksand",
+                "heatWave"
+            ],
+            "ultimate": "raJudgment"
+        },
+        {
+            "id": "snake",
+            "skills": [
+                "snake",
+                "snakeShadow",
+                "venomFang"
+            ],
+            "ultimate": ""
+        },
+        {
+            "id": "frost",
+            "skills": [
+                "frost",
+                "frostVeil",
+                "blizzard"
+            ],
+            "ultimate": ""
+        },
+        {
+            "id": "gust",
+            "skills": [
+                "gust",
+                "tornado",
+                "galeRush"
+            ],
+            "ultimate": ""
+        }
+    ],
+    "skills": [
+        {
+            "id": "blackWings",
+            "cost": 0,
+            "power": 2.0,
+            "cooldown": 0,
+            "shape": {
+                "kind": "Zone",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 0.0,
+                "radius": 64.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 12,
+                "interval": 30,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": true,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 40,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "blizzard",
+            "cost": 11,
+            "power": 1.4,
+            "cooldown": 900,
+            "shape": {
+                "kind": "Wave",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 10.0,
+                "distance": 0.0,
+                "radius": 0.0,
+                "speed": 3.2,
+                "range": 0.0,
+                "pierce": false,
+                "length": 140.0,
+                "width": 44.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 120,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "darkHand",
+            "cost": 6,
+            "power": 1.6,
+            "cooldown": 480,
+            "shape": {
+                "kind": "Grab",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 0.0,
+                "radius": 7.0,
+                "speed": 9.0,
+                "range": 120.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "dimensionCut",
+            "cost": 8,
+            "power": 2.1,
+            "cooldown": 840,
+            "shape": {
+                "kind": "Warp",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 8.0,
+                "distance": 0.0,
+                "radius": 0.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "dimensionGate",
+            "cost": 0,
+            "power": 0.0,
+            "cooldown": 0,
+            "shape": {
+                "kind": "Gate",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 0.0,
+                "radius": 0.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 300,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "emberShot",
+            "cost": 5,
+            "power": 2.0,
+            "cooldown": 420,
+            "shape": {
+                "kind": "Projectile",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 5.0,
+                "distance": 0.0,
+                "radius": 14.0,
+                "speed": 3.4,
+                "range": 150.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.02
+            }
+        },
+        {
+            "id": "flameCircle",
+            "cost": 13,
+            "power": 1.8,
+            "cooldown": 960,
+            "shape": {
+                "kind": "Zone",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 0.0,
+                "radius": 72.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 8,
+                "interval": 30,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 40,
+                "band": 12.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.02
+            }
+        },
+        {
+            "id": "flameDive",
+            "cost": 10,
+            "power": 2.4,
+            "cooldown": 660,
+            "shape": {
+                "kind": "Leap",
+                "reach": 0.0,
+                "size": 38.0,
+                "knock": 7.0,
+                "distance": 70.0,
+                "radius": 32.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 6,
+                "interval": 30,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 20,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.02
+            }
+        },
+        {
+            "id": "frost",
+            "cost": 7,
+            "power": 2.0,
+            "cooldown": 420,
+            "shape": {
+                "kind": "Projectile",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 3.0,
+                "distance": 0.0,
+                "radius": 10.0,
+                "speed": 3.6,
+                "range": 150.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 150,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "frostVeil",
+            "cost": 12,
+            "power": 1.4,
+            "cooldown": 720,
+            "shape": {
+                "kind": "Nova",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 2.0,
+                "distance": 0.0,
+                "radius": 40.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 100,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "galeRush",
+            "cost": 8,
+            "power": 1.9,
+            "cooldown": 840,
+            "shape": {
+                "kind": "Dash",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 30.0,
+                "radius": 0.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": true,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "gust",
+            "cost": 9,
+            "power": 1.2,
+            "cooldown": 420,
+            "shape": {
+                "kind": "Projectile",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 14.0,
+                "distance": 0.0,
+                "radius": 11.0,
+                "speed": 4.0,
+                "range": 160.0,
+                "pierce": true,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "heatWave",
+            "cost": 13,
+            "power": 2.4,
+            "cooldown": 900,
+            "shape": {
+                "kind": "Wave",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 10.0,
+                "distance": 0.0,
+                "radius": 0.0,
+                "speed": 3.4,
+                "range": 0.0,
+                "pierce": false,
+                "length": 160.0,
+                "width": 40.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "phaseShift",
+            "cost": 4,
+            "power": 0.0,
+            "cooldown": 540,
+            "shape": {
+                "kind": "Phase",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 0.0,
+                "radius": 0.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 110,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "quicksand",
+            "cost": 9,
+            "power": 1.0,
+            "cooldown": 720,
+            "shape": {
+                "kind": "Zone",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 60.0,
+                "radius": 56.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 8,
+                "interval": 30,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.5
+            },
+            "status": {
+                "slow": 60,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "raJudgment",
+            "cost": 0,
+            "power": 3.0,
+            "cooldown": 0,
+            "shape": {
+                "kind": "Trap",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 8.0,
+                "distance": 0.0,
+                "radius": 100.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 48,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 60,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "sandGrasp",
+            "cost": 6,
+            "power": 1.4,
+            "cooldown": 480,
+            "shape": {
+                "kind": "Burst",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 50.0,
+                "radius": 22.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 90,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "seaOfFire",
+            "cost": 0,
+            "power": 1.6,
+            "cooldown": 0,
+            "shape": {
+                "kind": "Zone",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 0.0,
+                "radius": 150.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 16,
+                "interval": 30,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.02
+            }
+        },
+        {
+            "id": "snake",
+            "cost": 7,
+            "power": 2.0,
+            "cooldown": 420,
+            "shape": {
+                "kind": "Dash",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 30.0,
+                "radius": 0.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": true,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.015
+            }
+        },
+        {
+            "id": "snakeShadow",
+            "cost": 11,
+            "power": 1.6,
+            "cooldown": 720,
+            "shape": {
+                "kind": "Wave",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 3.0,
+                "distance": 0.0,
+                "radius": 0.0,
+                "speed": 2.6,
+                "range": 0.0,
+                "pierce": false,
+                "length": 150.0,
+                "width": 20.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.02
+            }
+        },
+        {
+            "id": "spaceLeap",
+            "cost": 6,
+            "power": 1.6,
+            "cooldown": 600,
+            "shape": {
+                "kind": "Dash",
+                "reach": 0.0,
+                "size": 14.0,
+                "knock": 3.0,
+                "distance": 72.0,
+                "radius": 0.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": true,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "spikeForest",
+            "cost": 14,
+            "power": 1.3,
+            "cooldown": 960,
+            "shape": {
+                "kind": "Thorns",
+                "reach": 0.0,
+                "size": 15.0,
+                "knock": 3.0,
+                "distance": 0.0,
+                "radius": 84.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 3,
+                "interval": 10,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "spikeTrap",
+            "cost": 9,
+            "power": 2.6,
+            "cooldown": 660,
+            "shape": {
+                "kind": "Trap",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 4.0,
+                "distance": 50.0,
+                "radius": 30.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 48,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 60,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "tornado",
+            "cost": 12,
+            "power": 0.6,
+            "cooldown": 720,
+            "shape": {
+                "kind": "Zone",
+                "reach": 0.0,
+                "size": 0.0,
+                "knock": 0.0,
+                "distance": 20.0,
+                "radius": 22.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 9,
+                "interval": 12,
+                "drift": 1.1,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.0
+            }
+        },
+        {
+            "id": "venomFang",
+            "cost": 6,
+            "power": 1.8,
+            "cooldown": 840,
+            "shape": {
+                "kind": "Melee",
+                "reach": 16.0,
+                "size": 16.0,
+                "knock": 4.0,
+                "distance": 0.0,
+                "radius": 0.0,
+                "speed": 0.0,
+                "range": 0.0,
+                "pierce": false,
+                "length": 0.0,
+                "width": 0.0,
+                "ticks": 0,
+                "interval": 0,
+                "drift": 0.0,
+                "strike": false,
+                "frames": 0,
+                "ratio": 0.0,
+                "follow": false,
+                "growFrames": 0,
+                "band": 0.0,
+                "pull": 0.0
+            },
+            "status": {
+                "slow": 0,
+                "freeze": 0,
+                "dot": 0.3
+            }
+        }
+    ]
+}
