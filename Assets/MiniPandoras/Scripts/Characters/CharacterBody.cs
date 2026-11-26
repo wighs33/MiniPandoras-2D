@@ -170,6 +170,36 @@ namespace MiniPandoras.Characters
         }
 
         /// <summary>
+        /// 풀에서 다시 꺼낸 몸을 처음 만든 몸과 같게 되돌린다(<see cref="ActorFactory"/>).
+        /// 그림은 CharacterAnimator가 매 프레임 이 상태에서 다시 고르므로, 상태만 되돌리면 그림도 따라온다.
+        /// </summary>
+        internal void ResetForReuse()
+        {
+            StepStarted = null;
+            Facing = Facing.Down;
+            IsWalking = false;
+            Pose = BodyPose.Stand;
+            SetWings(WingKind.None, 0f);
+            Aura = AuraKind.None;
+            Floating = false;
+            CastsShadow = true;
+            Alpha = 1f;
+            Shade = null;
+            SwingFrame = null;
+            Move = null;
+            MoveProgress = 0f;
+            flashFrames = 0f;
+            SetOffset(Vector2.zero);
+            SetVisible(true);
+            // 적이 알아챌 때 띄운 「!」가 남아 있으면 다음에 선 인물의 머리 위에 뜬다.
+            EmoteBalloon balloon = GetComponentInChildren<EmoteBalloon>(true);
+            if (balloon != null)
+            {
+                balloon.Hide();
+            }
+        }
+
+        /// <summary>
         /// 정해진 방향을 차례로 한 칸씩 걷는다. 연출 걸음이라 충돌을 무시한다(웹게임과 같다).
         /// </summary>
         public IEnumerator Walk(IReadOnlyList<Facing> steps, float stepFrames, Facing? finalFacing)

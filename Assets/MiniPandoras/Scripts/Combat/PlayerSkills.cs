@@ -709,7 +709,7 @@ namespace MiniPandoras.Combat
 
                 if (s.Frame >= SummonGoneFrame)
                 {
-                    UnityEngine.Object.Destroy(body.gameObject);
+                    combat.Actors.Release(body);
                     summons.RemoveAt(i);
                 }
             }
@@ -769,9 +769,10 @@ namespace MiniPandoras.Combat
         {
             foreach (Summon s in summons)
             {
+                // 맵을 바꾸면 맵 아래의 몸은 맵과 함께 지워져 돌려줄 것이 없다.
                 if (s.Body != null)
                 {
-                    UnityEngine.Object.Destroy(s.Body.gameObject);
+                    combat.Actors.Release(s.Body);
                 }
             }
 

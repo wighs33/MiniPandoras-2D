@@ -203,7 +203,7 @@ namespace MiniPandoras.Combat
             foreach (EnemyFighter dead in group.Enemies)
             {
                 enemies.Remove(dead);
-                UnityEngine.Object.Destroy(dead.Body.gameObject);
+                combat.Actors.Release(dead.Body);
             }
 
             foreach (EnemyFighter enemy in SpawnGroup(options).Enemies)

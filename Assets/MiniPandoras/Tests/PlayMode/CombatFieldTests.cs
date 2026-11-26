@@ -193,17 +193,22 @@ namespace MiniPandoras.Tests
             Vector2Int home = hero.Cell + new Vector2Int(3, 0);
             MonsterGroup group = combat.EnemyAi.SpawnGroup(new GroupOptions { Id = "test", Enemies = new[] { "thug1" }, At = home, RespawnFrames = 30 });
             EnemyFighter thug = group.Enemies[0];
+            CharacterBody fallenBody = thug.Body;
             hero.Face(Facing.Right);
             yield return Waits.Until(() => { combat.PressAttack(); return thug.Dead; }, 20f, "공격으로 쓰러뜨린다");
 
             yield return Waits.CombatTicks(combat, 90);
             Assert.That(combat.EnemyAi.Enemies.Any(e => !e.Dead), Is.False, "주인공이 곁에 있는 동안은 나타나지 않는다");
+            Assert.That(fallenBody.IsVisible, Is.False, "쓰러진 몸은 사라진 채 기다린다");
 
             hero.PlaceAt(MapCoordinates.CellFoot(home - new Vector2Int(9, 0)));
             yield return Waits.Until(() => combat.EnemyAi.Enemies.Any(e => !e.Dead), 3f, "멀어지면 제자리에 돌아온다");
             Assert.That(combat.EnemyAi.Enemies.Count, Is.EqualTo(1), "쓰러진 몸은 남지 않는다");
+            CharacterBody returned = combat.EnemyAi.Enemies[0].Body;
+            Assert.That(returned, Is.SameAs(fallenBody), "쓰러진 몸을 지우지 않고 풀에서 다시 꺼내 쓴다");
+            Assert.That(returned.IsVisible && returned.Alpha == 1f && returned.Pose == BodyPose.Stand, Is.True, "다시 꺼낸 몸은 처음 세운 몸처럼 보인다");
             Assert.That(combat.EnemyAi.Enemies[0].Group.Done, Is.False);
-            Assert.That(combat.EnemyAi.Enemies[0].Body.Cell, Is.EqualTo(home));
+            Assert.That(returned.Cell, Is.EqualTo(home));
         }
 
 

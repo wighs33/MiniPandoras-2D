@@ -278,7 +278,7 @@ namespace MiniPandoras.Combat
             {
                 if (body != null)
                 {
-                    UnityEngine.Object.Destroy(body.gameObject);
+                    combat.Actors.Release(body);
                 }
             }
 
