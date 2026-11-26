@@ -36,6 +36,11 @@ namespace MiniPandoras.Story
         {
             (new Vector2Int(43, 8), "L10"), (new Vector2Int(45, 8), "L11 U1"), (new Vector2Int(43, 14), "L10"), (new Vector2Int(45, 14), "L12 D1"),
         };
+        // 바다는 갑판보다 이만큼(논리 px) 낮다(Tools/PixelGen/ship.py의 바깥 뱃전 50점). 청룡은 거기서 다섯 칸 잠겨 있다가 솟는다.
+        private const float SeaBelowDeck = 25f;
+        private const float DragonDive = 5f * Tile;
+        // 열 칸 높이의 청룡이 뿔까지 다 보이는 카메라 자리(맵 밖 북쪽 바다까지 비춘다).
+        private static readonly Vector2Int DragonView = new Vector2Int(37, 7);
         private const float KyleFlightHeight = -34f;
 
         public static IEnumerator Play(StoryDirector s)
@@ -122,17 +127,17 @@ namespace MiniPandoras.Story
             s.Shake(3f, 40f);
             yield return s.Wait(40f);
             // 케이트가 연 길로 군함이 동쪽 바다에서 달려와 뉴웨이브 호의 뱃머리를 들이받는다(그림은 뱃머리가 왼쪽을 본다).
-            StageImage warship = s.Stage.ShowImage("warship", WarshipRammed + WarshipSailsIn, 0f);
+            StageModel warship = s.Stage.ShowModel("warship", WarshipRammed + WarshipSailsIn);
             yield return s.Stage.Pan(39, 11, 0.08f);
             yield return warship.MoveTo(WarshipRammed, 110f);
             s.Flash(Color.white, 0.5f);
             s.Shake(6f, 50f);
             yield return s.Lines("chapter9.theWarship.1");
             // 널다리를 걸치고 병사들이 넘어온다.
-            var planks = new StageImage[Planks.Length];
+            var planks = new StageModel[Planks.Length];
             for (int i = 0; i < Planks.Length; i++)
             {
-                planks[i] = s.Stage.ShowImage("warship_plank", Planks[i], 0f);
+                planks[i] = s.Stage.ShowModel("warship_plank", Planks[i]);
                 s.Shake(2f, 12f);
                 yield return s.Wait(16f);
             }
@@ -171,9 +176,9 @@ namespace MiniPandoras.Story
 
             // 바다를 가르고 청룡이 솟아올라 뱃머리를 부순다. 웹게임보다 세 칸 아래(뱃머리 남쪽 바다)에서 솟아, 몸의 고리가 뱃머리를 뚫고 나온다.
             // 카메라는 청룡과 군함이 다 보이게 뱃머리 쪽으로 더 옮겼다가, 부서진 뒤 라르고에게 돌아온다.
-            yield return s.Stage.Pan(36, 9, 0.08f);
-            var rise = new Vector2((sea.x - 2) * Tile, (sea.y + 9) * Tile);
-            StageImage dragon = s.Stage.ShowImage("sea_dragon", rise, (sea.y + 6) * Tile);
+            yield return s.Stage.Pan(DragonView.x, DragonView.y, 0.08f, beyond: true);
+            var surface = new Vector2((sea.x - 2) * Tile, (sea.y + 4) * Tile - SeaBelowDeck);
+            StageModel dragon = s.Stage.ShowModel("sea_dragon", surface, -SeaBelowDeck - DragonDive);
             dragon.Alpha = 0f;
             s.Shake(5f, 90f);
             for (int i = 0; i <= 30; i++)
@@ -182,12 +187,12 @@ namespace MiniPandoras.Story
                 yield return s.Wait(1f);
             }
 
-            yield return dragon.MoveTo(new Vector2(rise.x, (sea.y + 4) * Tile), 50f);
+            yield return dragon.RiseTo(-SeaBelowDeck, 50f);
             s.Flash(DragonFlash, 0.8f);
             s.Field.SetMapLook("ship", "broken");
             s.Actors.SetAura("raco", AuraKind.None);
             // 널다리는 부서진 뱃머리와 함께 떨어져 나간다.
-            foreach (StageImage plank in planks)
+            foreach (StageModel plank in planks)
             {
                 plank.Alpha = 0f;
             }

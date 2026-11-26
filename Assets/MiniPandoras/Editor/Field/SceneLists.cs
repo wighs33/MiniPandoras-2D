@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using MiniPandoras.Characters;
 using MiniPandoras.Editor.WebGame;
-using MiniPandoras.Field;
 using MiniPandoras.Story;
-using MiniPandoras.World;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -13,12 +11,11 @@ namespace MiniPandoras.Editor.Field
 {
     /// <summary>
     /// 장면이 들고 있는 에셋 목록을 폴더 내용에 맞춘다. 장면과 UI 프리팹은 손으로 고치는 정본이고,
-    /// 이 메뉴는 새로 들여온 맵, 인물 시트, 화자, 그림을 목록에 더할 뿐 배치는 건드리지 않는다.
+    /// 이 메뉴는 새로 들여온 인물 시트, 화자, 그림을 목록에 더할 뿐 배치는 건드리지 않는다. 맵은 장면에 두지 않고 들어갈 때 불러온다(MapTravel).
     /// </summary>
     internal static class SceneLists
     {
         private const string ScenePath = "Assets/MiniPandoras/Scenes/Field.unity";
-        private const string MapPrefabFolder = "Assets/MiniPandoras/Prefabs/Maps";
         private const string DroppedItemsFolder = "Assets/MiniPandoras/Art/PixelGen/Items";
 
         [MenuItem("MiniPandoras/Refresh Scene Lists")]
@@ -26,7 +23,6 @@ namespace MiniPandoras.Editor.Field
         {
             var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
             WorldAtlasImporter.Save(WorldAtlasImporter.Read());
-            SerializedFields.Set(Object.FindFirstObjectByType<MapTravel>(FindObjectsInactive.Include), ("maps", MapPrefabs()));
             SerializedFields.Set(Object.FindFirstObjectByType<ActorFactory>(FindObjectsInactive.Include),
                 ("sheets", WebGameImporter.LoadAll<CharacterSheet>(WebGameImporter.SheetFolder)));
             SerializedFields.Set(Object.FindFirstObjectByType<StoryDirector>(FindObjectsInactive.Include),
@@ -48,21 +44,6 @@ namespace MiniPandoras.Editor.Field
             }
 
             return images;
-        }
-
-        private static List<GameMap> MapPrefabs()
-        {
-            var maps = new List<GameMap>();
-            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { MapPrefabFolder }))
-            {
-                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
-                if (prefab.TryGetComponent(out GameMap map))
-                {
-                    maps.Add(map);
-                }
-            }
-
-            return maps;
         }
     }
 }

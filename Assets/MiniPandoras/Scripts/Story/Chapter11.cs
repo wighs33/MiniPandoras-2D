@@ -32,9 +32,6 @@ namespace MiniPandoras.Story
         private static readonly Color Dawn = new Color32(0x3a, 0x34, 0x56, 0xff);
         private static readonly Color ExecShade = new Color32(0x1c, 0x16, 0x26, 0xff);
         private static readonly Color[] Petals = { new Color32(0xf2, 0xb8, 0xd6, 0xff), Color.white, new Color32(0xf6, 0xe2, 0x7a, 0xff) };
-        // 하늘길 컷인의 나리온: 웹게임처럼 화면 가운데, 위에서 24px(그림 288×136).
-        private static readonly Vector2 SkyRideBirdFoot = new Vector2(192f, 160f);
-        private const float SkyRideBirdHeight = 136f;
 
         public static IEnumerator Play(StoryDirector s)
         {
@@ -293,7 +290,7 @@ namespace MiniPandoras.Story
             s.Cinema(true);
             Vector2Int top = s.Field.Point("top");
             yield return s.Actors.WalkTo("hero", top.x, top.y + 1, 12f, Facing.Up);
-            yield return s.Stage.Pan(top.x, top.y - 3);
+            yield return s.Stage.Pan(top.x, top.y - 2);
             yield return s.Lines("chapter11.theStation.1");
             // 일행이 나리온의 등에 오르자, 나리온이 날개를 펼치고 고목 꼭대기를 박차 오른다.
             foreach (string id in Riders)
@@ -315,7 +312,7 @@ namespace MiniPandoras.Story
             yield return s.Wait(30f);
             nari.Flying = true;
             s.Shake(2f, 20f);
-            yield return nari.MoveTo(nari.Position + new Vector2(220f, -170f), 110f);
+            yield return nari.FlyOff(220f, 170f, 110f);
             yield return s.FadeOut(40f);
         }
 
@@ -323,11 +320,12 @@ namespace MiniPandoras.Story
 
         private static IEnumerator SkyRide(StoryDirector s)
         {
-            s.Scenes.BeginCutIn("skyRide", SkyRideBirdFoot, SkyRideBirdHeight);
-            s.StartCoroutine(s.Scenes.CutInHover(3f));
+            s.Scenes.BeginCutIn("skyRide");
+            Coroutine flight = s.StartCoroutine(s.Scenes.CutInMove(1200f));
             yield return s.FadeIn(40f);
             yield return s.Lines("chapter11.skyRide.1");
             yield return s.FadeOut(60f);
+            s.StopCoroutine(flight);
             s.Scenes.EndCutIn();
         }
 

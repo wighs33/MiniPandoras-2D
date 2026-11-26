@@ -21,11 +21,6 @@ namespace MiniPandoras.Story
         private static readonly Color HolyLight = new Color32(0xff, 0xf8, 0xe0, 0xff);
         private static readonly Color SealLight = new Color32(0xb0, 0xff, 0xf0, 0xff);
         private static readonly string[] Troops = { "t1", "t2", "t3", "t4" };
-        // 카일이 내려오는 컷인 그림(cutin_descent.py) 안 자리(가상 화면 384×216 px)
-        private static readonly Vector2 DescentFoot = new Vector2(150f, 186f);
-        private static readonly Vector2 DescentCloseUp = new Vector2(198f, 108f);
-        private const float DescentHeight = 96f;
-        private const float DescentFallsFrom = 250f;
         private const float SwordsReachJamie = 86f;
         private const float StrikeOnChildFrames = 24f;
 
@@ -141,15 +136,15 @@ namespace MiniPandoras.Story
 
             yield return s.Wait(60f);
             yield return s.FadeOut(24f, HolyLight);
-            s.Scenes.BeginCutIn("descent", DescentFoot, DescentHeight);
-            Coroutine descent = s.StartCoroutine(s.Scenes.CutInDescend(DescentFallsFrom, 200f));
-            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInZoom(DescentCloseUp, 1.06f, 260f));
+            s.Scenes.BeginCutIn("descent");
+            Coroutine descent = s.StartCoroutine(s.Scenes.CutInDescend(200f));
+            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInMove(300f));
             yield return s.FadeIn(30f);
             yield return descent;
             yield return s.Wait(16f);
             s.Flash(HolyLight, 0.7f);
             s.Shake(3f, 30f);
-            s.Scenes.CutInPlayOver();
+            s.Scenes.CutInReveal();
             yield return s.Scenes.CutInGlow(0.7f, 40f);
             yield return s.Wait(50f);
             s.StopCoroutine(closeUp);

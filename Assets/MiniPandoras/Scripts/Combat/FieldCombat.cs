@@ -291,7 +291,7 @@ namespace MiniPandoras.Combat
 
             p.PandoraIndex = slot;
             p.SwapCooldown = GameBalance.Current.PandoraSwapFrames;
-            Effects.AddPopup(Up(p.Body.Position, 30f), T("fieldCombat.pressPandora.2") + p.ActivePandora.PandoraName, SwapColor, 7f);
+            Effects.AddPopup(Raise(p.Body.Position, 30f), T("fieldCombat.pressPandora.2") + p.ActivePandora.PandoraName, SwapColor, 7f);
             p.Body.Flash(8f);
         }
 
@@ -639,7 +639,7 @@ namespace MiniPandoras.Combat
             // 무기 그림이 없는 인물(디엘·라르고)은 그대로 남긴다.
             if (!HoldsWeapon(p))
             {
-                Effects.AddArc(center, d, Pixels(finisher ? 15f : 12f), finisher ? FinisherColor : Color.white);
+                Effects.AddArc(new Raised(p.Body.Position + new Vector2(d.x * Pixels(13f), d.y * Pixels(11f)), Pixels(PlayerFighter.ChestPixels)), d, Pixels(finisher ? 15f : 12f), finisher ? FinisherColor : Color.white);
             }
 
             bool any = false;
@@ -651,7 +651,7 @@ namespace MiniPandoras.Combat
                     if (landed && HoldsWeapon(p))
                     {
                         // 무기 타격 이펙트는 웹게임에 없다. 맞은 적의 친 쪽 몸 앞에서 터진다.
-                        Effects.AddImpact(e.Chest - d * (e.Radius * 0.5f), d, finisher ? 1.4f : 1f);
+                        Effects.AddImpact(new Raised(e.Position - d * (e.Radius * 0.5f), e.ChestHeight), d, finisher ? 1.4f : 1f);
                     }
 
                     any = true;
@@ -681,7 +681,7 @@ namespace MiniPandoras.Combat
             Vector2 facing = FacingRules.Step(p.Body.Facing);
             EnemyFighter target = PlayerSkills.AimTarget(p.Body.Position, facing, AimRange);
             PlayerSkills.Execute(new CastSource(p.Body.Position, facing, p.Attack, p), skill, PandoraBook.PowerOf(session.State, p.ActivePandora, skill), target, false);
-            Effects.AddPopup(Up(p.Body.Position, 28f), skill.DisplayName, skill.AccentColor, 7f);
+            Effects.AddPopup(Raise(p.Body.Position, 28f), skill.DisplayName, skill.AccentColor, 7f);
             Encounters.AfterAction(p);
         }
 
@@ -843,7 +843,7 @@ namespace MiniPandoras.Combat
 
             if (dash.Slices)
             {
-                Effects.AddSpriteFx(FxSheet.Shard, Up(p.Body.Position, 9f), DimensionSkills.ShardFxFrames, 1.6f);
+                Effects.AddSpriteFx(FxSheet.Shard, Raise(p.Body.Position, 9f), DimensionSkills.ShardFxFrames, 1.6f);
             }
 
             if (!dash.Strike)
@@ -854,7 +854,7 @@ namespace MiniPandoras.Combat
             // 뛰어든 끝에서 문다.
             Vector2 facing = FacingRules.Step(p.Body.Facing);
             Vector2 center = p.Body.Position + new Vector2(facing.x * Pixels(12f), Pixels(PlayerFighter.ChestPixels) + facing.y * Pixels(10f));
-            Effects.AddArc(center, facing, Pixels(14f), dash.Skill.MainColor);
+            Effects.AddArc(new Raised(p.Body.Position + new Vector2(facing.x * Pixels(12f), facing.y * Pixels(10f)), Pixels(PlayerFighter.ChestPixels)), facing, Pixels(14f), dash.Skill.MainColor);
             foreach (EnemyFighter e in EnemyAi.EnemyList)
             {
                 if (e.IsAlive && Vector2.Distance(e.Chest, center) <= Pixels(16f) + e.Radius)
@@ -882,7 +882,7 @@ namespace MiniPandoras.Combat
 
             if (p.PhaseFrames > 0)
             {
-                Effects.AddPopup(Up(p.Body.Position, 28f), T("fieldCombat.damagePlayer.1"), PhaseColor, 7f);
+                Effects.AddPopup(Raise(p.Body.Position, 28f), T("fieldCombat.damagePlayer.1"), PhaseColor, 7f);
                 DimensionSkills.RefundPhase(p);
                 return;
             }
@@ -894,7 +894,7 @@ namespace MiniPandoras.Combat
 
             if (!spare && p.EvadeChance > 0f && UnityEngine.Random.value < p.EvadeChance)
             {
-                Effects.AddPopup(Up(p.Body.Position, 28f), T("fieldCombat.damagePlayer.2"), MissColor, 7f);
+                Effects.AddPopup(Raise(p.Body.Position, 28f), T("fieldCombat.damagePlayer.2"), MissColor, 7f);
                 return;
             }
 
@@ -915,7 +915,7 @@ namespace MiniPandoras.Combat
             p.Knock = new Knockback { Velocity = away * Pixels(knock / 6f), FramesLeft = 6 };
             p.Body.Flash(12f);
             followCamera.Shake(2f, 8f);
-            Effects.AddNumber(Up(p.Body.Position, 28f), damage, HurtColor, 8f);
+            Effects.AddNumber(Raise(p.Body.Position, 28f), damage, HurtColor, 8f);
             if (p.Hp <= 0)
             {
                 PlayerDown();
@@ -991,7 +991,7 @@ namespace MiniPandoras.Combat
             }
 
             p.HintCooldown = 40;
-            Effects.AddPopup(Up(p.Body.Position, 30f), text, color ?? HintColor, 6.5f);
+            Effects.AddPopup(Raise(p.Body.Position, 30f), text, color ?? HintColor, 6.5f);
         }
 
         // ── 도우미 ───────────────────────────────────────────────
@@ -1024,15 +1024,21 @@ namespace MiniPandoras.Combat
             return length > 0.0001f ? v / length : Vector2.down;
         }
 
-        /// <summary>발에서 그만큼(논리 px) 위.</summary>
+        /// <summary>발에서 그만큼(논리 px) 위. 2D 게임 규칙의 한 점이다(높이를 화면 위쪽에 더한다).</summary>
         internal static Vector2 Up(Vector2 feet, float pixels)
         {
             return feet + new Vector2(0f, Pixels(pixels));
         }
 
-        internal static Vector2 OverHead(EnemyFighter e, float extraPixels = 0f)
+        /// <summary>발에서 그만큼(논리 px) 위의 효과 자리. HD-2D 화면은 세운 판을 따라 그만큼 올라간 곳에 그린다.</summary>
+        internal static Raised Raise(Vector2 feet, float pixels)
         {
-            return Up(e.Position, e.Body.Sheet.Size.y + extraPixels);
+            return new Raised(feet, Pixels(pixels));
+        }
+
+        internal static Raised OverHead(EnemyFighter e, float extraPixels = 0f)
+        {
+            return Raise(e.Position, e.Body.Sheet.Size.y + extraPixels);
         }
 
         private enum CastBlock

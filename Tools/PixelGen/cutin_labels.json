@@ -1,0 +1,20 @@
+{
+  "labels": [
+    { "id": "pandora", "name": "판도라", "role": "축복신" },
+    { "id": "baal", "name": "바알", "role": "마신" },
+    { "id": "monia", "name": "모니아", "role": "대지신" },
+    { "id": "michael", "name": "미카엘", "role": "천신" },
+    { "id": "kata", "name": "카타", "role": "창조신" },
+    { "id": "divine", "name": "디바인", "role": "차원신" },
+    { "id": "hetos", "name": "헤토스", "role": "거신" },
+    { "id": "aqua", "name": "아쿠아", "role": "해신" },
+    { "id": "calypse", "name": "칼립스", "role": "재앙신" },
+    { "id": "death", "name": "데스", "role": "사신" },
+    { "id": "godslayer", "name": "갓슬레이어", "role": "" },
+    { "id": "perni", "name": "페르니", "role": "에라드 관리자" },
+    { "id": "eradion", "name": "에라디온", "role": "" },
+    { "id": "gods", "name": "신들", "role": "" },
+    { "id": "lords", "name": "십이장", "role": "" },
+    { "id": "erad", "name": "에라드", "role": "" }
+  ]
+}

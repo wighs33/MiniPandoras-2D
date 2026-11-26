@@ -10,10 +10,14 @@ import numpy as np
 
 import castle
 import pixelgen as pg
+import relief
 import serpent_sculpture
 from houses import Canvas, IRON, WOOD, WARM, outline
 
 T = pg.TILE
+# HD-2D 필드에서 둥근 벽의 두께(점, 그림의 벽 윗면 띠)와 카메라 쪽 벽을 낮게 자른 높이(점)
+RIM = 18
+FRONT = 8
 FLOOR = pg.hexes("#2a2624", "#3e3834", "#544c45", "#6a6157", "#80766a", "#968b7d")
 VOID = pg.hexes("#0b0a0d")[0]
 CARPET = pg.hexes("#3a0e12", "#5c1a1c", "#7e2a26", "#a03c30", "#c8a050")
@@ -40,6 +44,10 @@ class RoundRoom:
         self.floor = self.distance <= self.r
         self.c.image[..., :3] = VOID
         self.c.image[..., 3] = 255
+        # 높이(relief)에서 바닥으로 두는 문지방, 벽면을 뚫고 오르는 아치 계단(점 마스크, 아래 끝), 바닥에 뚫린 계단 구멍(점 네모)
+        self.sills = np.zeros_like(self.floor)
+        self.climbs = []
+        self.pits = []
 
     # ── 기본 틀 ──
 
@@ -187,6 +195,7 @@ class RoundRoom:
         c.paint(frame & (c.xx < cx - 26), castle.STONE[6])
         c.paint(c.rect(cx - 5, top - 8, cx + 5, top + 2), castle.STONE[6])
         hole = c.arch(cx - 24, top, cx + 24, bottom)
+        self.climbs.append((hole & ~self.floor, bottom))
         for y in range(top, bottom):
             depth = (bottom - y) / (bottom - top)
             row = hole & (c.yy == y)
@@ -204,6 +213,7 @@ class RoundRoom:
         c.paint(rail, castle.STONE[4])
         c.paint(rail & (c.yy < y0 - 2), castle.STONE[6])
         hole = c.rect(x0, y0, x0 + 2 * T, y0 + 2 * T)
+        self.pits.append((hole, y0))
         for k in range(0, 2 * T, 6):
             band = hole & (c.yy >= y0 + k) & (c.yy < y0 + k + 6)
             level = max(0, 4 - k // 12)
@@ -217,6 +227,7 @@ class RoundRoom:
         cx = x * T
         bottom = int(self.cy + self.r)
         sill = c.rect(cx - 30, bottom - 10, cx + 30, bottom + 20)
+        self.sills |= sill
         c.paint(sill, castle.STONE[4])
         c.paint(sill & (c.yy % 6 == 0), castle.STONE[2])
         for px in (cx - 34, cx + 28):
@@ -274,6 +285,26 @@ class RoundRoom:
 
     def ground(self):
         return self.c.image[..., :3].copy()
+
+    def relief(self):
+        """
+        HD-2D 필드의 높이(relief.py): 바닥은 0, 북쪽 반원의 벽면은 벽 높이까지 서고, 둥근 벽 윗면 띠(RIM)는 그 높이다.
+        카메라 쪽 벽은 FRONT점으로 낮게 자르고, 벽 밖 어둠은 바닥 높이에 둔다(어둠 속에 선 탑 한 층).
+        위층 아치 계단은 벽면을 뚫고 오르는 비탈, 아래층 계단 구멍은 바닥 아래로 내려가는 비탈, 1층 문지방은 바닥이다.
+        """
+        floor = self.floor | self.sills
+        ring = ~floor & (self.distance <= self.r + RIM)
+        heights = relief.Relief(*floor.shape)
+        heights.flat(ring, self.face)
+        heights.flat(ring & relief.in_front(floor), FRONT)
+        faces = relief.faces_above(self.floor, self.face)
+        heights.face(faces > 0, faces)
+        yy = self.c.yy
+        for hole, bottom in self.climbs:
+            heights.slope(hole, (bottom - yy) / 2)
+        for hole, top in self.pits:
+            heights.slope(hole, -(yy - top) / 2)
+        return heights
 
     def blocked_cells(self, margin=0.45):
         """바닥 둥근 가장자리 밖(가장자리에서 margin칸 안쪽까지)의 칸."""

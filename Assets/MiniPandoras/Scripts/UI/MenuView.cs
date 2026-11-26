@@ -5,11 +5,13 @@ using UnityEngine.UI;
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 게임 화면의 메뉴. 게임 중 언제든 타이틀로 돌아가 다른 장으로 갈 수 있다. 오른쪽 위 「메뉴」 버튼을 누르면 창이 열리고,
+    /// 게임 화면의 메뉴. 게임 중 언제든 타이틀로 돌아가 다른 장으로 갈 수 있다. 오른쪽 위 톱니바퀴 아이콘을 누르면 창이 열리고,
     /// 「계속하기」로 닫거나, 「가방」, 「임무」, 「몬스터 도감」(모험가 길드에서 받은 뒤에만 보인다), 「동료」(동료가 있을 때만 보인다), 「지도」(2장에서 받은 뒤에만 보인다), 「판도라 정착」(10장에서 익힌 뒤에만 보인다),
     /// 「판도라 봉인서」(봉인서를 얻은 뒤에만 보인다), 「타이틀로」를 고른다.
     /// 창이 열린 동안은 화면 전체를 덮어 아래 화면(화면 조작·대화창)이 눌리지 않는다.
     /// 무엇을 할지(게임 멈춤, 봉인서 열기, 타이틀로 돌아가기)는 알림을 받는 쪽이 정한다.
+    /// 톱니바퀴 왼쪽에는 판 없이 떠 있는 봉인서·지도 바로 가기 아이콘이 있다(2026-11-22 참고 그림의 HUD). 누르면 메뉴를 연 채 그 창을 바로 띄워,
+    /// 메뉴에서 고른 것과 똑같이 게임이 멈추고 창을 닫으면 메뉴도 닫힌다.
     /// </summary>
     public sealed class MenuView : MonoBehaviour
     {
@@ -25,6 +27,9 @@ namespace MiniPandoras.UI
         [SerializeField] private Button loadoutButton;
         [SerializeField] private Button bookButton;
         [SerializeField] private Button titleButton;
+        [Header("HUD 바로 가기")]
+        [SerializeField] private Button bookShortcut;
+        [SerializeField] private Button worldMapShortcut;
 
         public event Action Opened;
         public event Action Closed;
@@ -87,6 +92,20 @@ namespace MiniPandoras.UI
             loadoutButton.gameObject.SetActive(shown);
         }
 
+        /// <summary>HUD의 봉인서·지도 바로 가기를 보일지. 메뉴 안의 같은 버튼과 같은 규칙이다.</summary>
+        public void SetShortcutsShown(bool book, bool worldMap)
+        {
+            if (bookShortcut.gameObject.activeSelf != book)
+            {
+                bookShortcut.gameObject.SetActive(book);
+            }
+
+            if (worldMapShortcut.gameObject.activeSelf != worldMap)
+            {
+                worldMapShortcut.gameObject.SetActive(worldMap);
+            }
+        }
+
         public void Close()
         {
             if (!IsOpen)
@@ -115,6 +134,8 @@ namespace MiniPandoras.UI
             loadoutButton.onClick.AddListener(RequestLoadout);
             bookButton.onClick.AddListener(RequestBook);
             titleButton.onClick.AddListener(RequestTitle);
+            bookShortcut.onClick.AddListener(OpenToBook);
+            worldMapShortcut.onClick.AddListener(OpenToWorldMap);
         }
 
         private void OnDisable()
@@ -129,6 +150,20 @@ namespace MiniPandoras.UI
             loadoutButton.onClick.RemoveListener(RequestLoadout);
             bookButton.onClick.RemoveListener(RequestBook);
             titleButton.onClick.RemoveListener(RequestTitle);
+            bookShortcut.onClick.RemoveListener(OpenToBook);
+            worldMapShortcut.onClick.RemoveListener(OpenToWorldMap);
+        }
+
+        private void OpenToBook()
+        {
+            Open();
+            RequestBook();
+        }
+
+        private void OpenToWorldMap()
+        {
+            Open();
+            RequestWorldMap();
         }
 
         private void RequestInventory()

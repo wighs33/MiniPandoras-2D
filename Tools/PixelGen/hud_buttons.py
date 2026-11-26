@@ -1,4 +1,7 @@
-"""화면 조작의 둥근 버튼 그림(모바일 게임처럼 공격 버튼 둘레에 둥근 버튼, 교체도 네모가 아닌 아이콘으로)과 왼쪽 아래 이동 패드.
+"""화면 조작의 버튼 그림과 왼쪽 아래 이동 패드.
+
+버튼은 마름모다(2026-11-23 사용자 요청 「공격·조사·스킬·판도라 교체 버튼도 참고 그림처럼 마름모로」). 큰 행동 버튼 둘레에 작은 마름모들이
+변을 맞대고 맞물린다. 테두리는 바깥 밤색 선과 굵은 선이고, 행동 버튼은 그 안에 가는 선을 한 겹 더 둘러 금빛이 번진다.
 
 그림은 가상 px의 두 배 점으로 그린다. 고리는 회색조라서 게임이 스킬 색으로 물들인다.
 이동 패드는 버튼 고리와 같은 금속 재료에 지침(Docs/UI_UX_GUIDE.md 3장)의 색을 바로 칠한다. 손을 대면 게임이 패드를 또렷하게 한다(MovePadView).
@@ -6,6 +9,12 @@
   Assets/MiniPandoras/Art/PixelGen/UI/Hud/disc.png, disc_large.png(흰 원판. 버튼 바탕, 다시 쓸 때까지의 원형 덮개)
   Assets/MiniPandoras/Art/PixelGen/UI/Hud/ring.png, ring_large.png(회색조 금속 고리)
   Assets/MiniPandoras/Art/PixelGen/UI/Hud/swap.png(교체 아이콘: 서로 쫓는 화살표 둘)
+  Assets/MiniPandoras/Art/PixelGen/UI/Hud/diamond.png, diamond_large.png(흰 마름모. 버튼 바탕, 다시 쓸 때까지의 시계 덮개)
+  Assets/MiniPandoras/Art/PixelGen/UI/Hud/diamond_frame.png, diamond_large_frame.png(회색조 테두리. 게임이 스킬 색·금빛으로 물들인다)
+  Assets/MiniPandoras/Art/PixelGen/UI/Hud/diamond_large_glow.png(행동 버튼 둘레에 번지는 금빛, 버튼보다 사방으로 6 px 크다)
+  Assets/MiniPandoras/Art/PixelGen/UI/Hud/action_attack.png, action_inspect.png, action_talk.png(행동 버튼 글자 뒤에 옅게 까는 칼·돋보기·말풍선)
+  Assets/MiniPandoras/Art/PixelGen/UI/Hud/swap_arrows.png(마름모 교체 버튼 안의 화살표 둘, 판 없음)
+  Docs/ArtUpgrade/PixelGen/hud_diamonds_preview.png(게임과 같은 자리로 맞물린 버튼 무리)
   Assets/MiniPandoras/Art/PixelGen/UI/Hud/pad_base.png(이동 패드 바탕 60 px: 금속 고리, 옅은 밤색 안쪽, 다이얼 홈, 네 방향 꺾쇠)
   Assets/MiniPandoras/Art/PixelGen/UI/Hud/pad_knob.png(이동 패드 손잡이 28 px: 금속 테의 달빛 돌단추와 오른쪽 아래 그림자)
   Docs/ArtUpgrade/PixelGen/hud_buttons_preview.png, move_pad_preview.png(손을 대지 않은 패드와 오른쪽으로 민 패드)
@@ -29,6 +38,15 @@ ARROW_LIGHT = (255, 233, 160, 255)
 ARROW_DARK = (201, 150, 58, 255)
 INK = (10, 13, 28, 255)
 BACK = (14, 19, 40, 235)
+
+# 마름모 버튼(가상 px). 작은 칸은 대각선 26이고 28 간격의 마름모 격자에 놓인다. 행동 버튼은 작은 칸 두 개 폭(28 × 2 − 2)이다.
+DIAMOND = 26
+DIAMOND_LARGE = 54
+GLOW = 6                           # 행동 버튼 둘레로 금빛이 번지는 폭
+GLOW_GOLD = (255, 210, 120)
+# 테두리 띠의 폭(마름모 가장자리에서 안쪽으로 잰 L1 거리, 점): 바깥 밤색 선, 굵은 선, 틈, 가는 선.
+# 작은 칸은 스킬 아이콘이 꽉 차서 가는 선이 그림을 가로지르므로 한 겹만 두른다.
+FRAME_BANDS = {DIAMOND: (2, 3, 0, 0), DIAMOND_LARGE: (2, 4, 4, 2)}
 
 # 이동 패드(가상 px). Unity의 Joystick(60)과 Knob(28)이 같은 크기다.
 PAD = 60
@@ -199,6 +217,127 @@ def pad_arrow():
     return rgba
 
 
+def diamond_field(size):
+    """그림 좌표와, 마름모 가장자리에서 안쪽으로 잰 L1 거리(점). 가장자리 점이 0이고 밖은 음수다."""
+    x, y, _ = field(size)
+    return x, y, size * D / 2 - (np.abs(x) + np.abs(y))
+
+
+def diamond(size):
+    _, _, inside = diamond_field(size)
+    rgba = np.zeros((*inside.shape, 4), np.uint8)
+    rgba[inside >= 0] = (255, 255, 255, 255)
+    return rgba
+
+
+def diamond_frame(size):
+    """두 겹 테두리. 굵은 선은 왼쪽 위 두 변이 밝고 오른쪽 아래 두 변이 조금 어둡다(빛이 왼쪽 위에서 온다)."""
+    x, y, inside = diamond_field(size)
+    edge, main, gap, thin = FRAME_BANDS[size]
+    rgba = np.zeros((*inside.shape, 4), np.uint8)
+    rgba[(inside >= 0) & (inside < edge)] = (*NIGHT_SKY, 255)
+    band = (inside >= edge) & (inside < edge + main)
+    lit = (x + y) < 0
+    rgba[band & lit] = (255, 255, 255, 255)
+    rgba[band & ~lit] = (205, 205, 205, 255)
+    start = edge + main + gap
+    rgba[(inside >= start) & (inside < start + thin)] = (175, 175, 175, 255)
+    return rgba
+
+
+def diamond_glow():
+    """행동 버튼 둘레로 계단처럼 옅어지는 금빛. 그림은 버튼보다 사방으로 GLOW만큼 크다."""
+    _, _, inside = diamond_field(DIAMOND_LARGE + GLOW * 2)
+    outside = GLOW * D - inside
+    rgba = np.zeros((*inside.shape, 4), np.uint8)
+    for start, alpha in ((0, 160), (3, 105), (6, 60), (9, 28)):
+        rgba[(outside >= start) & (outside < start + 3)] = (*GLOW_GOLD, alpha)
+    return rgba
+
+
+def action_icon(draw):
+    """행동 버튼 글자 뒤에 옅게 까는 그림(30 px, 달빛 한 색). 게임이 Image 알파로 옅게 한다."""
+    n = 30 * D
+    canvas = Image.new("L", (n, n), 0)
+    draw(ImageDraw.Draw(canvas), n)
+    mask = np.array(canvas) > 127
+    rgba = np.zeros((n, n, 4), np.uint8)
+    rgba[mask] = (*MOON, 255)
+    return rgba
+
+
+def draw_sword(pen, n):
+    """오른쪽 위를 겨눈 칼: 날, 칼끝, 코등이, 손잡이, 손잡이 끝."""
+    pen.line([(13, n - 13), (n - 12, 12)], fill=255, width=7)
+    pen.polygon([(n - 16, 8), (n - 6, 6), (n - 8, 16)], fill=255)
+    pen.line([(8, n - 30), (30, n - 8)], fill=255, width=6)
+    pen.line([(4, n - 4), (14, n - 14)], fill=255, width=6)
+    pen.ellipse([0, n - 8, 8, n], fill=255)
+
+
+def draw_magnifier(pen, n):
+    """돋보기: 굵은 테의 알과 오른쪽 아래로 뻗은 손잡이."""
+    pen.ellipse([6, 6, 40, 40], outline=255, width=7)
+    pen.line([(36, 36), (n - 6, n - 6)], fill=255, width=10)
+
+
+def draw_bubble(pen, n):
+    """말풍선: 둥근 몸, 왼쪽 아래 꼬리, 가운데 점 셋(뚫린 자리)."""
+    pen.rounded_rectangle([4, 8, n - 4, n - 18], radius=12, fill=255)
+    pen.polygon([(14, n - 22), (28, n - 22), (10, n - 4)], fill=255)
+    for cx in (18, 30, 42):
+        pen.ellipse([cx - 4, 22, cx + 4, 30], fill=0)
+
+
+def swap_arrows():
+    """마름모 교체 버튼 안의 서로 쫓는 화살표 둘(16 px, 판 없음). 왼쪽 위가 밝다."""
+    size = 16
+    x, y, _ = field(size)
+    arrows = arrow_mask(size, 8.5, 3.5, -170, 140) | arrow_mask(size, 8.5, 3.5, 10, 140)
+    grown = arrows.copy()
+    grown[1:, :] |= arrows[:-1, :]
+    grown[:-1, :] |= arrows[1:, :]
+    grown[:, 1:] |= arrows[:, :-1]
+    grown[:, :-1] |= arrows[:, 1:]
+    rgba = np.zeros((*x.shape, 4), np.uint8)
+    rgba[grown & ~arrows] = INK
+    rgba[arrows] = ARROW_DARK
+    rgba[arrows & (x + y < 0)] = ARROW_LIGHT
+    return rgba
+
+
+def tinted(rgba, rgb, alpha=1.0):
+    out = rgba.astype(float)
+    out[..., :3] *= np.array(rgb) / 255
+    out[..., 3] *= alpha
+    return Image.fromarray(out.astype(np.uint8), "RGBA")
+
+
+def diamond_preview(images, path):
+    """풀밭 위에 게임과 같은 자리(TouchControls 프리팹, 오른쪽 아래가 원점)로 버튼 무리를 짜 맞춰 네 배로 보인다."""
+    width, height = 110, 90
+    sheet = Image.new("RGBA", (width * D, height * D), (84, 120, 62, 255))
+    back = (10, 9, 18)
+
+    def place(image, centre_x, centre_y):
+        left = int(round((width + centre_x) * D - image.width / 2))
+        top = int(round((height - centre_y) * D - image.height / 2))
+        sheet.alpha_composite(image, (left, top))
+
+    small = [(-47, 61, (120, 200, 255)), (-61, 47, (255, 150, 90)), (-61, 19, (110, 110, 120)), (-75, 33, (110, 110, 120))]
+    for cx, cy, tint in small:
+        place(tinted(images["diamond"], back, 0.78), cx, cy)
+        place(tinted(images["diamond_frame"], tint), cx, cy)
+    place(tinted(images["diamond"], back, 0.78), -19, 61)
+    place(tinted(images["diamond_frame"], (255, 233, 160)), -19, 61)
+    place(Image.fromarray(images["swap_arrows"], "RGBA"), -19, 61)
+    place(Image.fromarray(images["diamond_large_glow"], "RGBA"), -33, 33)
+    place(tinted(images["diamond_large"], back, 0.55), -33, 33)
+    place(tinted(images["action_attack"], (255, 255, 255), 0.3), -33, 33)
+    place(tinted(images["diamond_large_frame"], (255, 233, 160)), -33, 33)
+    sheet.resize((sheet.width * 2, sheet.height * 2), Image.NEAREST).save(path)
+
+
 def pad_preview(base, knob, path):
     """풀밭 위에 손을 대지 않은 패드(게임에서 옅게 보인다)와 오른쪽으로 민 패드를 네 배로 보인다."""
     sheet = Image.new("RGBA", (PAD * D * 2 + 48, PAD * D + 32), (84, 120, 62, 255))
@@ -243,6 +382,15 @@ def main():
         "ring": ring(SLOT, 3),
         "ring_large": ring(LARGE, 4),
         "swap": swap_icon(),
+        "diamond": diamond(DIAMOND),
+        "diamond_large": diamond(DIAMOND_LARGE),
+        "diamond_frame": diamond_frame(DIAMOND),
+        "diamond_large_frame": diamond_frame(DIAMOND_LARGE),
+        "diamond_large_glow": diamond_glow(),
+        "action_attack": action_icon(draw_sword),
+        "action_inspect": action_icon(draw_magnifier),
+        "action_talk": action_icon(draw_bubble),
+        "swap_arrows": swap_arrows(),
         "pad_base": pad_base(),
         "pad_knob": pad_knob(),
     }
@@ -252,6 +400,7 @@ def main():
     preview([(images["ring"], (120, 220, 170)), (images["ring_large"], (255, 233, 160)), (images["swap"], (255, 255, 255))],
              root / "Docs/ArtUpgrade/PixelGen/hud_buttons_preview.png")
     pad_preview(images["pad_base"], images["pad_knob"], root / "Docs/ArtUpgrade/PixelGen/move_pad_preview.png")
+    diamond_preview(images, root / "Docs/ArtUpgrade/PixelGen/hud_diamonds_preview.png")
 
 
 if __name__ == "__main__":

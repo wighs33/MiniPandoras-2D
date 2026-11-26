@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+import picture_model
 import pixelgen as pg
 import serpent_sculpture
 from houses import Canvas, IRON, WARM, GLASS, WOOD, cover, door, outline, window, Design
@@ -471,6 +472,64 @@ def glider(rng):
     c.line(cx - 12, ground - 4, cx + 12, ground - 4, WOOD[3], 2)
     c.line(cx + 12, ground - 4, cx + 30, ground, pg.hexes("#c8b88a")[0], 1)
     return outline(c.image), (cx, ground)
+
+
+def glider_model(pivot, rng):
+    """
+    글라이더의 HD-2D 모형: 코를 남쪽(뛰어내릴 주둥이 끝)으로 두고 손잡이 틀 위에 얹힌 세모 날개.
+    날개는 위에서 본 그림을 기울여 얹고, 틀은 나무 막대다. 좌표는 발밑 기준점이 (pivot)인 그림 점이다.
+    """
+    cx, ground = pivot
+    wing = wing_picture()
+    m = picture_model.Model(foot=tuple(pivot), pivot=tuple(pivot))
+    cloth = m.panel(wing, crop=False)
+    plumb = picture_model.plumb
+    nose, tail = (cx, ground + 34, 20), (cx, ground - 26, 42)
+    u, v = wing.shape[1] / 2, wing.shape[0]
+    for side in (-1, 1):
+        tip = (cx + side * 62, ground - 20, 30)
+        middle = (cx + side * 26, ground - 24, 36)
+        m.face(cloth, [(*plumb(*tip), u + side * (u - 2), 8), (*plumb(*middle), u + side * 26, 4), (*plumb(*nose), u, v - 2)])
+        m.face(cloth, [(*plumb(*middle), u + side * 26, 4), (*plumb(*tail), u, 2), (*plumb(*nose), u, v - 2)])
+    wood = np.zeros((12, 12, 4), dtype=np.uint8)
+    wood[..., 3] = 255
+    wood[..., :3] = WOOD[2]
+    wood[:, 8:, :3] = WOOD[1]
+    wood[:, :3, :3] = WOOD[3]
+    bar = m.panel(wood, crop=False)
+
+    def rod(a, b, thick=3):
+        """두 점 사이의 막대(카메라를 보는 얇은 판 하나와 위에서 보이는 판 하나)."""
+        for dx, dy in ((thick, 0), (0, thick)):
+            m.face(bar, [(*plumb(a[0] - dx / 2, a[1] - dy / 2, a[2]), 1, 1), (*plumb(a[0] + dx / 2, a[1] + dy / 2, a[2]), 11, 1),
+                         (*plumb(b[0] + dx / 2, b[1] + dy / 2, b[2]), 11, 11), (*plumb(b[0] - dx / 2, b[1] - dy / 2, b[2]), 1, 11)])
+
+    for side in (-1, 1):
+        rod((cx + side * 18, ground + 4, 0), (cx, ground - 4, 28))
+    rod((cx - 18, ground + 4, 2), (cx + 18, ground + 4, 2))
+    rod((cx, ground + 34, 16), (cx, ground - 26, 38))
+    return m
+
+
+def wing_picture():
+    """위에서 본 세모 날개(너비 128, 높이 64): 가운데 뼈대에서 갈라진 천 폭, 기운 자국, 앞 가장자리 나무 테."""
+    c = Canvas(128, 64)
+    cx = 64
+    cloth = pg.hexes("#5a4a30", "#8a7450", "#b49c70", "#d8c49a", "#ecdcb4")
+    c.paint(c.rect(0, 0, 128, 64), cloth[2])
+    for k in range(4):
+        band = (np.abs(c.xx - cx) // 16).astype(int) == k
+        c.paint(band, cloth[3 - (k % 2)])
+        c.paint(band & (c.xx > cx), cloth[2 - (k % 2)])
+    for px, py in ((34, 14), (84, 20), (58, 34)):
+        c.paint(c.rect(px, py, px + 12, py + 9), cloth[1])
+        c.paint(c.rect(px, py, px + 12, py + 1), cloth[0])
+    for k in range(-3, 4):
+        c.line(cx + k * 18, 0, cx, 64, cloth[0], 1)
+    c.line(cx, 0, cx, 64, WOOD[1], 3)
+    c.line(2, 6, cx, 64, WOOD[2], 4)
+    c.line(126, 6, cx, 64, WOOD[2], 4)
+    return c.image
 
 
 def brazier(rng):

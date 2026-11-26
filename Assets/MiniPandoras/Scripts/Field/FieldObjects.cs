@@ -43,7 +43,7 @@ namespace MiniPandoras.Field
             var image = new GameObject("Image").AddComponent<SpriteRenderer>();
             image.transform.SetParent(root.transform, false);
             image.sprite = sprite;
-            image.spriteSortPoint = SpriteSortPoint.Pivot;
+            Upright.StandUp(image, exploration.ObjectMaterial);
             if (solid)
             {
                 root.layer = LayerMask.NameToLayer(MapLayers.SolidName);
@@ -87,13 +87,13 @@ namespace MiniPandoras.Field
             }
         }
 
-        /// <summary>맵에 놓은 물건을 칸에 매이지 않은 자리로 옮긴다(건네는 물건이 손에서 손으로 날아갈 때).</summary>
-        public void MoveObject(string id, Vector2 position)
+        /// <summary>맵에 놓은 물건을 칸에 매이지 않은 자리로, 땅에서 그 높이만큼 띄워 옮긴다(건네는 물건이 손에서 손으로 날아갈 때).</summary>
+        public void MoveObject(string id, Raised position)
         {
             FieldObject found = objects.Find(item => item.Id == id);
             if (found != null)
             {
-                found.Root.transform.position = position;
+                found.Root.transform.position = position.World;
             }
         }
 
@@ -113,7 +113,7 @@ namespace MiniPandoras.Field
             {
                 if (item.Floating)
                 {
-                    item.Image.transform.localPosition = new Vector3(0f, -MapCoordinates.Pixels(bob), 0f);
+                    item.Image.transform.localPosition = Upright.Above(Vector2.zero, -MapCoordinates.Pixels(bob));
                 }
             }
         }

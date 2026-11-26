@@ -31,6 +31,10 @@ namespace MiniPandoras.World
         private const float ArrowBob = 4f;
         private const float ArrowBobSpeed = 5f;
 
+        // 물건과 같은 판에 겹치면 깜빡이므로 테두리·빛은 물건 뒤로, 반짝임은 앞으로 조금 민다(그림은 −z가 카메라 쪽이다).
+        private static readonly Vector3 Behind = Vector3.forward * 0.02f;
+        private static readonly Vector3 InFront = Vector3.back * 0.02f;
+
         private readonly SpriteRenderer[] rims = new SpriteRenderer[4];
         private SpriteRenderer item;
         private SpriteRenderer glow;
@@ -49,21 +53,22 @@ namespace MiniPandoras.World
             Bounds bounds = item.sprite.bounds;
             glow = Layer(item, "Glow", EffectSprites.Glow, item.sortingOrder - 2);
             glow.sharedMaterial = additive;
-            glow.transform.localPosition = bounds.center;
+            glow.transform.localPosition = bounds.center + Behind;
             glow.transform.localScale = new Vector3(GlowSize.x, GlowSize.y, 1f);
             for (int i = 0; i < rims.Length; i++)
             {
                 rims[i] = Layer(item, "Rim", shape, item.sortingOrder - 1);
                 rims[i].sharedMaterial = silhouette;
-                rims[i].transform.localPosition = RimOffsets[i] * Dot;
+                rims[i].transform.localPosition = (Vector3)(RimOffsets[i] * Dot) + Behind;
             }
 
             shine = Layer(item, "Shine", shape, item.sortingOrder + 1);
             shine.sharedMaterial = silhouette;
+            shine.transform.localPosition = InFront;
 
             // 별빛은 물건 위쪽 오른편 끝에서 반짝인다.
             sparkle = Layer(item, "Sparkle", sparkleSprite, item.sortingOrder + 2);
-            sparkle.transform.localPosition = new Vector2(bounds.max.x - Dot * 4f, bounds.max.y - Dot);
+            sparkle.transform.localPosition = new Vector3(bounds.max.x - Dot * 4f, bounds.max.y - Dot, 0f) + InFront;
             Update();
         }
 
@@ -100,7 +105,7 @@ namespace MiniPandoras.World
             {
                 float bob = ArrowBob * Mathf.Abs(Mathf.Sin(Time.time * ArrowBobSpeed));
                 float bottom = item.sprite.bounds.max.y + Dot * (ArrowGap + bob);
-                arrow.transform.localPosition = new Vector2(item.sprite.bounds.center.x, bottom + arrow.sprite.bounds.extents.y);
+                arrow.transform.localPosition = new Vector3(item.sprite.bounds.center.x, bottom + arrow.sprite.bounds.extents.y, 0f) + InFront;
             }
         }
 

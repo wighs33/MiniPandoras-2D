@@ -9,6 +9,7 @@ from collections import Counter
 import numpy as np
 
 import pixelgen as pg
+import relief
 import props
 
 T = pg.TILE
@@ -417,8 +418,11 @@ def stairs(image, area, rng):
 
 # ── 맵 한 장 ───────────────────────────────────────────
 
-def draw_outdoor(tiles, seed):
-    """바깥 맵(웹게임 테마 outdoor)의 바닥을 그린다. 돌려주는 값은 점 격자 RGB."""
+def draw_outdoor(tiles, seed, heights=None):
+    """
+    바깥 맵(웹게임 테마 outdoor)의 바닥을 그린다. 돌려주는 값은 점 격자 RGB.
+    heights(relief.Relief)를 주면 그린 절벽의 높이를 적는다(HD-2D 필드에서 절벽을 세운다).
+    """
     rng = np.random.default_rng(seed)
     kinds = np.array(tiles, dtype=object)
     rows, cols = kinds.shape
@@ -446,7 +450,10 @@ def draw_outdoor(tiles, seed):
     # 다리는 물 위에 놓이므로 다리 칸도 물로 칠한 뒤 판자를 얹는다.
     water(image, region(np.isin(kinds, ("water", "bridge")), wobble, 0.5), rng)
     bridge(image, cell_field(kinds == "bridge") > 0.5, rng)
-    cliff(image, region(kinds == "cliff", wobble, 0.25), rng)
+    cliffs = region(kinds == "cliff", wobble, 0.25)
+    cliff(image, cliffs, rng)
+    if heights is not None:
+        heights.cliffs(cliffs)
     stairs(image, cell_field(kinds == "stairs") > 0.5, rng)
 
     # 칸에 놓는 작은 것(웹게임 stamp): 덤불, 바위, 표지판. 위쪽 칸부터 그려 아래 것이 앞에 온다.
@@ -491,10 +498,11 @@ def magic_circle(height, width, cx, cy, radius, flatten):
     return carved
 
 
-def draw_void(tiles, seed):
+def draw_void(tiles, seed, heights=None):
     """
     차원공간(웹게임 테마 void): 허공에 뜬 보랏빛 돌섬. 윗면은 돌판과 은은히 빛나는 마법진, 앞쪽은 돌섬의 두께,
     그 아래로 뾰족하게 매달린 바위와 박힌 수정. 돌섬 밖은 투명해 맵 배경(MapBackdrop)이 비친다. 돌려주는 값은 점 격자 RGBA.
+    heights(relief.Relief)를 주면 돌섬의 높이를 적는다(HD-2D 필드에서 매달린 바위가 섬 아래로 늘어진다).
     """
     rng = np.random.default_rng(seed)
     kinds = np.array(tiles)
@@ -586,7 +594,11 @@ def draw_void(tiles, seed):
                 image[fy + y, fx + x, :3] = ARCANE[4] if y < 0 else ISLAND_ROCK[3 if u < 0 else 2]
                 image[fy + y, fx + x, 3] = 255
 
-    return pg.outline(image, ISLAND_ROCK[0])
+    image = pg.outline(image, ISLAND_ROCK[0])
+    if heights is not None:
+        hanging = relief.island(top, image[..., 3] > 0)
+        heights.top[:], heights.drop[:] = hanging.top, hanging.drop
+    return image
 
 
 # ── 끝없이 잇는 무늬와 모서리 타일(시범 장면) ───────────────

@@ -39,11 +39,12 @@ ROUTES = {
 
 
 def new_floor(map_id, name, seed):
-    m = MapLayout(map_id, name, SIZE, SIZE, theme="castle", music="castle", seed=seed)
+    m = MapLayout(map_id, name, SIZE, SIZE, theme="castle", indoors=True, music="castle", seed=seed)
     room = RoundRoom(SIZE, SIZE, CENTER, RADIUS, seed=seed)
     room.paint_floor()
     room.paint_walls()
     m.paint_ground = room.ground
+    m.paint_relief = room.relief
     return m, room
 
 

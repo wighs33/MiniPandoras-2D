@@ -1,5 +1,6 @@
 using System;
 using MiniPandoras.Combat;
+using MiniPandoras.World;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -24,7 +25,7 @@ namespace MiniPandoras.UI
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            Picked?.Invoke(worldCamera.ScreenToWorldPoint(eventData.position));
+            Picked?.Invoke(Upright.GroundAt(worldCamera, eventData.position));
         }
 
         private void LateUpdate()

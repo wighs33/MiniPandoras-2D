@@ -136,6 +136,7 @@ def carve(m, rooms, lanes, torches, rng):
     for x in torches:
         cave.torch_bracket(m, image, face_height, x, rng)
     m.paint_ground = lambda: image
+    m.paint_relief = lambda: cave.cave_relief(floor)
     return floor
 
 
@@ -279,7 +280,7 @@ def fairy_road():
 
 def iron_cave():
     width, height = 34, 26
-    m = MapLayout("ironCave", "철갑 동굴 통로", width, height, theme="cave", music="castle", ambient=CAVE_AMBIENT, seed=401)
+    m = MapLayout("ironCave", "철갑 동굴 통로", width, height, theme="cave", indoors=True, music="castle", ambient=CAVE_AMBIENT, seed=401)
     rng = np.random.default_rng(402)
     rooms = [(9, 19, 6.5, 4.4), (20, 13, 7.5, 4.4), (27, 5.6, 5.2, 3.6)]
     lanes = [([(9, height + 2), (9, 20)], 2.0), ([(10, 18), (19, 14)], 1.8), ([(21, 12), (27, 6)], 1.8), ([(27, 6), (27, -2)], 2.0)]
@@ -298,7 +299,7 @@ def iron_cave():
 
 def iron_depths():
     width, height = 32, 24
-    m = MapLayout("ironDepths", "철갑 동굴 깊은 곳", width, height, theme="cave", music="castle", ambient=CAVE_AMBIENT, seed=411)
+    m = MapLayout("ironDepths", "철갑 동굴 깊은 곳", width, height, theme="cave", indoors=True, music="castle", ambient=CAVE_AMBIENT, seed=411)
     rng = np.random.default_rng(412)
     rooms = [(16, 11, 12.5, 7.4), (16, 5, 6.5, 3.4)]
     lanes = [([(16, height + 2), (16, 16)], 2.2)]

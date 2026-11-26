@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using MiniPandoras.World;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.Tilemaps;
 
 namespace MiniPandoras.Editor.WebGame
@@ -77,7 +76,7 @@ namespace MiniPandoras.Editor.WebGame
             }
         }
 
-        internal static void FillMap(GameMap map, MapData data, Light2D[] lights, Dictionary<string, Transform> looks)
+        internal static void FillMap(GameMap map, MapData data, Light[] lights, Dictionary<string, Transform> looks)
         {
             var serialized = new SerializedObject(map);
             serialized.FindProperty("id").stringValue = data.id;
@@ -107,6 +106,8 @@ namespace MiniPandoras.Editor.WebGame
             serialized.FindProperty("ambient").colorValue = ambient;
             serialized.FindProperty("background").enumValueIndex = (int)ParseOrDefault(data.background, MapBackground.Black, "background");
             serialized.FindProperty("weather").enumValueIndex = (int)ParseOrDefault(data.weather, MapWeather.None, "weather");
+            serialized.FindProperty("indoors").boolValue = data.indoors;
+            serialized.FindProperty("openAround").boolValue = data.below.Length > 0;
             SerializedProperty water = serialized.FindProperty("waterCells");
             var waterCells = Array.FindAll(data.animated, tile => tile.kind == "water");
             water.arraySize = waterCells.Length;

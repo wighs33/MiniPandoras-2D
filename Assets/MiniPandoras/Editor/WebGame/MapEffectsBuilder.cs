@@ -4,7 +4,6 @@ using System.IO;
 using MiniPandoras.World;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace MiniPandoras.Editor.WebGame
 {
@@ -24,28 +23,29 @@ namespace MiniPandoras.Editor.WebGame
         /// 웹게임 맵의 빛(횃불 타일, 등불 소품). 어두운 맵에서만 켜지므로 모든 맵에 만들어 두고 AmbientLight가 켜고 끈다.
         /// 모습에 붙은 빛은 그 모습 묶음 아래에 두어, 모습이 꺼져 있으면 켜져도 비치지 않는다.
         /// </summary>
-        internal static Light2D[] AddLights(Transform root, MapData data, Dictionary<string, Transform> looks, out TileAnimator.FlickerLight[] flickers)
+        internal static Light[] AddLights(Transform root, MapData data, Dictionary<string, Transform> looks, MapRelief relief, out TileAnimator.FlickerLight[] flickers)
         {
             Transform parent = WebGameImporter.Child(root, "Lights");
-            var lights = new List<Light2D>();
+            var lights = new List<Light>();
             var flickering = new List<TileAnimator.FlickerLight>();
             foreach (LightData source in data.lights)
             {
                 Transform owner = MapImporter.IsShared(source.look) ? parent : looks[source.look];
                 Transform child = WebGameImporter.Child(owner, $"Light ({source.x}, {source.y})");
-                child.localPosition = WebPixels(source.x, source.y);
-                var light = child.gameObject.AddComponent<Light2D>();
-                light.lightType = Light2D.LightType.Point;
+                // 바닥의 빛은 사람 키 높이에 걸고, 벽면·벽 위의 빛(벽 횃불)은 그 자리에서 조금 앞으로 낸다.
+                Vector2 at = WebPixels(source.x, source.y);
+                child.localPosition = relief.Lift(at) + (relief.IsGround(at) ? Upright.Up * AmbientLight.LightHeight : MapImporter.OffFace * 8f);
+                var light = child.gameObject.AddComponent<Light>();
+                light.type = LightType.Point;
                 ColorUtility.TryParseHtmlString(source.color, out Color color);
                 light.color = Color.Lerp(Color.white, color, AmbientLight.LightColorShare);
-                light.pointLightInnerRadius = 0f;
-                light.pointLightOuterRadius = MapCoordinates.Pixels(source.radius);
-                light.falloffIntensity = 0.5f;
+                light.range = MapCoordinates.Pixels(source.radius);
+                light.shadows = LightShadows.None;
                 light.enabled = false;
                 lights.Add(light);
                 if (source.flicker)
                 {
-                    flickering.Add(new TileAnimator.FlickerLight(light, light.pointLightOuterRadius));
+                    flickering.Add(new TileAnimator.FlickerLight(light, light.range));
                 }
             }
 
@@ -54,7 +54,7 @@ namespace MiniPandoras.Editor.WebGame
         }
 
         /// <summary>불꽃·물 반짝임·빛 떨림. 모습에 붙은 불꽃(회상 속 벽난로 …)은 그 모습 묶음 아래에 둔다.</summary>
-        internal static void AddAnimatedTiles(Transform root, MapData data, Dictionary<string, Transform> looks, Sprite glint, Dictionary<string, Sprite[]> flames, TileAnimator.FlickerLight[] flickers)
+        internal static void AddAnimatedTiles(Transform root, MapData data, Dictionary<string, Transform> looks, MapRelief relief, Sprite glint, Dictionary<string, Sprite[]> flames, TileAnimator.FlickerLight[] flickers)
         {
             Transform parent = WebGameImporter.Child(root, "Animated Tiles");
             var flameList = new List<TileAnimator.Flame>();
@@ -67,11 +67,12 @@ namespace MiniPandoras.Editor.WebGame
                 {
                     Vector2 at = new Vector2(tile.x * MapCoordinates.LogicalPixelsPerTile + offset.x, tile.y * MapCoordinates.LogicalPixelsPerTile + offset.y);
                     Transform child = WebGameImporter.Child(owner, $"Flame ({tile.x}, {tile.y})");
-                    child.localPosition = WebPixels(at.x, at.y);
+                    Vector2 foot = WebPixels(at.x, at.y);
+                    child.localPosition = relief.Lift(foot) + (relief.IsOnFace(foot) ? MapImporter.OffFace : Vector3.zero);
                     var renderer = child.gameObject.AddComponent<SpriteRenderer>();
                     Sprite[] shapes = flames[FlameKey(size)];
                     renderer.sprite = shapes[0];
-                    renderer.spriteSortPoint = SpriteSortPoint.Pivot;
+                    child.localRotation = Upright.Stand;
                     flameList.Add(new TileAnimator.Flame(renderer, shapes, at.x));
                 }
             }
@@ -80,7 +81,7 @@ namespace MiniPandoras.Editor.WebGame
             {
                 Transform child = WebGameImporter.Child(parent, $"Glint ({spot.x}, {spot.y})");
                 // 반짝임 그림은 웹게임 fillRect 두 개(본 줄과 그 위 한 점)를 담고, 왼쪽 위가 (x, y − 0.5)다.
-                child.localPosition = WebPixels(spot.x, spot.y - 0.5f);
+                child.localPosition = relief.Lift(WebPixels(spot.x, spot.y - 0.5f));
                 var renderer = child.gameObject.AddComponent<SpriteRenderer>();
                 renderer.sprite = glint;
                 renderer.color = GlintColor;

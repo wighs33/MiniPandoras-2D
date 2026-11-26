@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MiniPandoras.World;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace MiniPandoras.Characters
 {
@@ -45,8 +46,6 @@ namespace MiniPandoras.Characters
         [SerializeField] private Transform shadows;
         [Tooltip("발밑의 옅은 타원")]
         [SerializeField] private SpriteRenderer shadow;
-        [Tooltip("몸 그림을 땅에 눕혀 흐리게 그리는 그림자")]
-        [SerializeField] private SpriteRenderer castShadow;
         [Tooltip("번쩍임·얼어붙음에 쓰는 한 색 실루엣 재질(MiniPandoras/Sprite Silhouette)")]
         [SerializeField] private Material silhouette;
         [Header("날개·기운")]
@@ -65,7 +64,6 @@ namespace MiniPandoras.Characters
         private int bodyOrder;
         private int wingOrder;
         private float shadowAlpha;
-        private float castShadowAlpha;
         private float walkClock;
         private float breathClock;
         private float auraClock;
@@ -85,7 +83,6 @@ namespace MiniPandoras.Characters
             bodyOrder = spriteRenderer.sortingOrder;
             wingOrder = wings != null ? wings.sortingOrder : 0;
             shadowAlpha = shadow != null ? shadow.color.a : 0f;
-            castShadowAlpha = castShadow != null ? castShadow.color.a : 0f;
             // 모여 선 인물들이 한꺼번에 숨쉬지 않게 시작 박자를 흩뜨린다.
             breathClock = Random.value * CharacterSheet.BreathCycleSeconds;
         }
@@ -305,11 +302,8 @@ namespace MiniPandoras.Characters
             shadows.localPosition = new Vector3(0f, body.OffsetY / MapCoordinates.LogicalPixelsPerTile, 0f);
             shadow.enabled = body.CastsShadow;
             shadow.color = WithAlpha(shadow.color, shadowAlpha * body.Alpha);
-            // 누운 그림은 이미 땅에 있어서 또 눕히면 서 있는 사람의 그림자가 된다.
-            castShadow.enabled = body.CastsShadow && body.Pose != BodyPose.Lie && body.Pose != BodyPose.LieInBed;
-            castShadow.sprite = spriteRenderer.sprite;
-            castShadow.flipX = spriteRenderer.flipX;
-            castShadow.color = WithAlpha(castShadow.color, castShadowAlpha * body.Alpha);
+            // 세운 몸 그림이 해 그림자를 드리운다(HD-2D). 그림자가 없는 몸(유령, 하늘에 뜬 연출)은 드리우지 않는다.
+            spriteRenderer.shadowCastingMode = body.CastsShadow ? ShadowCastingMode.On : ShadowCastingMode.Off;
         }
 
         private static Color WithAlpha(Color color, float alpha)

@@ -190,7 +190,7 @@ namespace MiniPandoras.Editor.WebGame
             }
         }
 
-        internal static Sprite ImportSprite(string path, Vector2 pivot, int maxSize, FilterMode filter)
+        internal static Sprite ImportSprite(string path, Vector2 pivot, int maxSize, FilterMode filter, float pixelsPerUnit = PixelsPerUnit)
         {
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if (importer == null)
@@ -209,7 +209,7 @@ namespace MiniPandoras.Editor.WebGame
             importer.ReadTextureSettings(settings);
             // 같은 그림을 빌드 한 번에 여러 번 부르므로, 설정이 이미 같으면 다시 임포트하지 않는다.
             bool unchanged = importer.textureType == TextureImporterType.Sprite && importer.spriteImportMode == SpriteImportMode.Single
-                && Mathf.Approximately(importer.spritePixelsPerUnit, PixelsPerUnit) && !importer.mipmapEnabled && importer.filterMode == filter
+                && Mathf.Approximately(importer.spritePixelsPerUnit, pixelsPerUnit) && !importer.mipmapEnabled && importer.filterMode == filter
                 && importer.wrapMode == TextureWrapMode.Clamp && importer.textureCompression == TextureImporterCompression.Uncompressed
                 && importer.alphaIsTransparency && importer.maxTextureSize == maxSize
                 && settings.spriteAlignment == (int)SpriteAlignment.Custom && settings.spritePivot == pivot && settings.spriteMeshType == SpriteMeshType.FullRect;
@@ -217,7 +217,7 @@ namespace MiniPandoras.Editor.WebGame
             {
                 importer.textureType = TextureImporterType.Sprite;
                 importer.spriteImportMode = SpriteImportMode.Single;
-                importer.spritePixelsPerUnit = PixelsPerUnit;
+                importer.spritePixelsPerUnit = pixelsPerUnit;
                 importer.mipmapEnabled = false;
                 importer.filterMode = filter;
                 importer.wrapMode = TextureWrapMode.Clamp;

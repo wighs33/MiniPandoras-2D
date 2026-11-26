@@ -5,7 +5,10 @@
 홈을 판 비늘판이 입체로 보인다. 눈구멍에는 붉게 빛나는 보석을 박고, 다문 위턱 아래로 엄니 둘이 내려온다.
 
   head_front(width, rng) → (RGBA 점 그림, 기준점: 아래 가운데)
+  head_top(width, height, rng) → HeadTop(위에서 본 머리: 그림, 걸을 수 있는 곳, 솟은 높이, 눈 자리)
 """
+from dataclasses import dataclass
+
 import numpy as np
 
 import pixelgen as pg
@@ -110,33 +113,60 @@ def head_plates(u, v, rng):
     return plate, groove
 
 
+@dataclass
+class HeadTop:
+    """위에서 내려다본 돌뱀 머리(점 단위)."""
+    image: np.ndarray      # RGBA, 윤곽 밖도 색이 이어진다(옆면과 만나는 가장자리를 메시가 자른다)
+    walk: np.ndarray       # 걸을 수 있는 윗면
+    rise: np.ndarray       # 윗면에서 솟은 높이(눈두덩, 보석 눈)
+    eyes: list             # 눈 자리 [(x, y, 반지름)]
+
+
+SNOUT, TIP = 0.7, 0.96     # 주둥이가 둥글어지기 시작하는 곳과 끝(v)
+EYE = (0.62, 0.1)          # 보석 눈 자리(오른쪽, u·v)
+
+
+def head_half(v):
+    """위에서 본 머리의 반너비(너비의 반을 1로). 위(v = −1)는 목으로 이어지고, 아래는 둥근 주둥이다."""
+    v = np.asarray(v, dtype=float)
+    back = np.sqrt(np.clip(1 - ((v + 0.45) / 0.55) ** 2, 0, 1))
+    taper = 1 - 0.55 * np.clip((v + 0.45) / 1.4, 0, 1) ** 1.3
+    half = np.where(v < -0.45, np.maximum(back, 0.5), taper) * 0.92
+    snout = np.clip((v - SNOUT) / (TIP - SNOUT), 0, 1)
+    return half * np.sqrt(np.clip(1 - snout ** 2, 0, 1))
+
+
 def head_top(width, height, rng=None):
     """
     위에서 내려다본 돌뱀 머리(뱀성 꼭대기, 경비대장과 싸우는 자리). 위(북쪽)는 목으로 이어지고, 아래(남쪽)는 둥근 주둥이.
-    정수리 방패판·눈 위 판·콧등 판 같은 큰 비늘판을 좌우 대칭으로 새기고, 양옆에 튀어나온 눈두덩과 보석 눈,
-    주둥이 끝에 콧구멍. 남쪽 가장자리 아래로는 머리 옆면이 보인다.
-    돌려주는 값: (RGBA, 걸을 수 있는 윗면 마스크, 눈 자리 [(x, y, 반지름)] 점 단위).
+    정수리 방패판·눈 위 판·콧등 판 같은 큰 비늘판을 좌우 대칭으로 새기고, 양옆에 튀어나온 눈두덩과 보석 눈, 주둥이 끝에 콧구멍.
     """
     rng = rng or np.random.default_rng(11)
     yy, xx = np.mgrid[0:height, 0:width]
     u = (xx + 0.5 - width / 2) / (width / 2)
     v = (yy + 0.5) / height * 2 - 1
-    back = np.sqrt(np.clip(1 - ((v + 0.45) / 0.55) ** 2, 0, 1))
-    taper = 1 - 0.55 * np.clip((v + 0.45) / 1.4, 0, 1) ** 1.3
-    half = np.where(v < -0.45, np.maximum(back, 0.5), taper) * 0.92
-    snout = np.clip((v - 0.7) / 0.26, 0, 1)
-    half = half * np.sqrt(np.clip(1 - snout ** 2, 0, 1))
-    top = (np.abs(u) < half) & (v < 0.96)
+    half = head_half(v)
+    top = (np.abs(u) < half) & (v < TIP)
 
-    eye_u, eye_v = 0.7, 0.12
+    eye_u, eye_v = EYE
     t = np.clip(u / np.maximum(half, 1e-3), -1, 1)
-    z = np.sqrt(np.clip(1 - t ** 2, 0, 1))
+    # 걷는 윗면은 거의 평평하고 가장자리에서만 살짝 굽는다(옆얼굴은 모형이 이어 받는다)
+    z = 0.22 * (1 - t ** 6)
+    rise = np.zeros(z.shape)
     eye_zone = np.zeros_like(top)
     for side in (-1, 1):
-        z += 0.3 * ridge(u, v, (side * 0.42, -0.06), (side * 0.74, 0.0), 0.06)
-        z += 0.25 * gauss(u, v, side * eye_u, eye_v, 0.09, 0.12)
-        eye_zone |= gauss(u, v, side * eye_u, eye_v, 0.11, 0.15) > 0.35
+        du, dv = (u - side * eye_u) / 0.095, (v - eye_v) / 0.14
+        ring = np.hypot(du, dv)
+        # 눈구멍을 두른 돌 테. 안쪽 뒤(노려보는 눈썹)가 가장 높고 바깥 앞으로 갈수록 낮아진다
+        toward_brow = np.clip((-side * du * 0.7 - dv * 0.72) / np.maximum(ring, 1e-3), -1, 1)
+        crest = np.exp(-((ring - 1.12) / 0.26) ** 2) * (10 + 26 * np.clip(toward_brow, 0, 1))
+        gem = 4 + 20 * np.sqrt(np.clip(1 - (ring / 0.8) ** 2, 0, 1))
+        z += 0.22 * np.exp(-((ring - 1.12) / 0.26) ** 2) * (0.3 + np.clip(toward_brow, 0, 1))
         z -= 0.25 * gauss(u, v, side * 0.16, 0.86, 0.04, 0.03)
+        eye_zone |= ring < 1.45
+        rise = np.maximum(rise, np.where(crest > 1, crest, 0))
+        rise = np.where(ring < 0.8, gem, rise)
+    rise *= np.clip((half - np.abs(u)) / 0.04, 0, 1)
     plate, groove = head_plates(u, v, rng)
     z = z - 0.08 * (groove & ~eye_zone)
     dz_dy, dz_dx = np.gradient(z * width * 0.5)
@@ -157,24 +187,14 @@ def head_top(width, height, rng=None):
     moss = (pg.noise(height, width, 11, rng) > 0.86) & (plate < 0) & top & ~eye_zone
     rgb[moss] = MOSS[1]
 
-    image = np.zeros((height, width, 4), dtype=np.uint8)
-    # 남쪽 가장자리 아래로 보이는 머리 옆면(아래로 갈수록 어둡다)
-    for k in range(1, 24):
-        shifted = np.zeros_like(top)
-        shifted[k:] = top[:-k]
-        face = shifted & ~top & (v > -0.5) & (image[..., 3] == 0)
-        image[face, :3] = STONE[max(0, 3 - k // 8)]
-        image[face, 3] = 255
-    image[top, :3] = rgb[top]
-    image[top, 3] = 255
+    image = np.dstack([rgb, np.full(top.shape, 255, dtype=np.uint8)]).astype(np.uint8)
     eyes = []
     for side in (-1, 1):
-        gem_eye(image, u, v, side * eye_u, eye_v, 0.065, 0.1, tilt=side * 0.3)
+        gem_eye(image, u, v, side * eye_u, eye_v, 0.065, 0.1, tilt=side * 0.3, lid=False)
         eyes.append((width / 2 + side * eye_u * width / 2, (eye_v + 1) / 2 * height, 0.1 * width / 2))
         pit = (gauss(u, v, side * 0.16, 0.86, 0.03, 0.022) > 0.5) & top
         image[pit, :3] = STONE[0]
-    walk = top & ~eye_zone
-    return pg.outline(image), walk, eyes
+    return HeadTop(image, top & (rise < 2), rise, eyes)
 
 
 def head_front(width=232, rng=None):

@@ -42,14 +42,6 @@ namespace MiniPandoras.Story
             T("chapter7.readonly.10"),
         };
         private static readonly Color[] BookLight = { new Color32(0xff, 0xf0, 0xb0, 0xff), new Color32(0x8f, 0xf0, 0xe8, 0xff), Color.white };
-        // 루가의 설명 컷인(Tools/PixelGen/cutin_ruga.py)에서 카메라가 천천히 다가갈 곳(가상 px).
-        private static readonly Vector2 Warlords = new Vector2(192f, 110f);
-        private static readonly Vector2 Perni = new Vector2(192f, 100f);
-        private static readonly Vector2 ThreePowers = new Vector2(192f, 104f);
-        // 호빗 마차 컷인(cutin_carriage.py): 장면 아래 가운데, 장면 높이, 수레와 호빗이 가운데 오는 자리(가상 px)
-        private static readonly Vector2 CarriageFoot = new Vector2(192f, 216f);
-        private const float CutInHeight = 216f;
-        private static readonly Vector2 CartView = new Vector2(196f, 108f);
 
         public static IEnumerator Play(StoryDirector s)
         {
@@ -132,12 +124,12 @@ namespace MiniPandoras.Story
             yield return s.Lines("chapter7.theHobbitCarriage.1");
             // 웹게임 마차 그림 대신, 산길과 길가 숲이 흘러가는 컷인에서 호빗 둘이 일행을 실은 수레를 끈다.
             yield return s.FadeOut(30f);
-            // 수레 그림은 장면 한 장 크기라 장면 아래 가운데를 발밑으로, 장면 높이를 키로 준다. 수레 쪽으로 조금 당겨 본다.
-            s.Scenes.BeginCutIn("carriage", CarriageFoot, CutInHeight);
-            yield return s.Scenes.CutInZoom(CartView, 1.3f, 1f);
+            s.Scenes.BeginCutIn("carriage");
+            Coroutine ride = s.StartCoroutine(s.Scenes.CutInMove(900f));
             yield return s.FadeIn(30f);
             yield return s.Lines("chapter7.theHobbitCarriage.2");
             yield return s.FadeOut(40f);
+            s.StopCoroutine(ride);
             s.Scenes.EndCutIn();
         }
 
@@ -283,14 +275,14 @@ namespace MiniPandoras.Story
         /// <summary>설명 컷인: 루가의 이야기(웹게임은 설명 그림). 십이장·에라드·거신은 정확한 모습 대신 실루엣이다.</summary>
         private static IEnumerator RugaExplains(StoryDirector s)
         {
-            yield return s.Scenes.ExplainInCutIn("twelve", Warlords,
+            yield return s.Scenes.ExplainInCutIn("twelve",
                 () => s.Lines("chapter7.rugaExplains.1"),
                 () => s.Lines("chapter7.rugaExplains.2"));
-            yield return s.Scenes.ExplainInCutIn("ruga", "chaos", Warlords,
+            yield return s.Scenes.ExplainInCutIn("ruga", "chaos",
                 T("chapter7.rugaExplains.5"));
-            yield return s.Scenes.ExplainInCutIn("ruga", "erad", Perni,
+            yield return s.Scenes.ExplainInCutIn("ruga", "erad",
                 T("chapter7.rugaExplains.6"));
-            yield return s.Scenes.ExplainInCutIn("threePowers", ThreePowers,
+            yield return s.Scenes.ExplainInCutIn("threePowers",
                 () => s.Lines("chapter7.rugaExplains.3"),
                 () => s.Lines("chapter7.rugaExplains.4"));
             yield return s.Scenes.EndExplainCutIn();

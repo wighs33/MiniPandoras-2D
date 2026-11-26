@@ -126,8 +126,8 @@ namespace MiniPandoras.Story
             };
             title.ChapterPicked += pick;
             title.DuelRequested += duel;
-            // 타이틀은 저장된 장이 속한 부의 풍경을 보인다. 끝까지 본 판이면 마지막 부다.
-            int part = save == null ? 1 : save.Cleared ? ChapterTitles.PartCount : ChapterTitles.PartOf(save.Chapter);
+            // 타이틀은 저장된 장이 속한 부의 무대를 보인다. 끝까지 본 판이면 마지막 부다.
+            int part = save == null ? 0 : save.Cleared ? ChapterTitles.LastPart : ChapterTitles.PartOf(save.Chapter);
             title.Show(ChapterTitles.Lines, PlayableChapters, save != null ? save.Chapter : -1, save != null && save.Cleared, part, PartsFor(save));
             while (pickedChapter < 0 && !duelPicked)
             {
@@ -138,7 +138,9 @@ namespace MiniPandoras.Story
             title.DuelRequested -= duel;
             if (!duelPicked)
             {
+                yield return title.Enter();
                 title.Hide();
+                director.ArriveOnNextFadeIn();
             }
         }
 
@@ -150,12 +152,12 @@ namespace MiniPandoras.Story
         {
             IReadOnlyList<string> upcoming = ChapterTitles.UpcomingPartLabels;
             var parts = new StoryPart[ChapterTitles.PartCount + upcoming.Count];
-            for (int part = 1; part <= ChapterTitles.PartCount; part++)
+            for (int part = 0; part < ChapterTitles.PartCount; part++)
             {
                 bool continues = save != null && ChapterTitles.PartOf(save.Chapter) == part;
                 int first = ChapterTitles.FirstChapterOf(part);
                 int start = continues ? save.Chapter : first;
-                parts[part - 1] = StoryPart.Released(ChapterTitles.PartLabels[part - 1], ChapterTitles.ChaptersOf(part), start, ChapterTitles.Lines[start], continues, first, ChapterTitles.Lines[first]);
+                parts[part] = StoryPart.Released(ChapterTitles.PartLabels[part], ChapterTitles.ChaptersOf(part), start, ChapterTitles.Lines[start], continues, first, ChapterTitles.Lines[first]);
             }
 
             for (int i = 0; i < upcoming.Count; i++)

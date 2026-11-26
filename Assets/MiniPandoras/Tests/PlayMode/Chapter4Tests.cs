@@ -3,6 +3,7 @@ using MiniPandoras.UI;
 using MiniPandoras.World;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
@@ -97,6 +98,8 @@ namespace MiniPandoras.Tests
 
             // 회상이 끝나면 색이 걷히고, 5장이 시작해 주인공이 아지트에서 깨어난다.
             Assert.That(tint.Strength, Is.Zero, "회상이 끝나면 회상 색이 걷힌다");
+            Assert.That(Camera.main.GetComponent<UniversalAdditionalCameraData>().renderPostProcessing, Is.True,
+                "회상 색이 걷혀도 필드 분위기 후처리(FieldLook: 위아래 흐림·블룸·색)는 켜져 있다");
             yield return story.Until(() => story.Travel.CurrentMap.Id == "hideout" && story.Mover.Character.IsVisible, 30f, "5장은 아지트에서 깨어난다");
         }
     }

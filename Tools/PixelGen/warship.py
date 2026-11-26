@@ -79,7 +79,18 @@ def cannon(c, x, y, facing):
 
 
 def topdown():
-    """뉴웨이브 호와 같은 선체를 군함 빛깔로 그린다. 돌려주는 값은 좌우를 뒤집은 RGBA(뱃머리가 왼쪽)."""
+    """뉴웨이브 호와 같은 선체를 군함 빛깔로 그린 한 장(뱃머리가 왼쪽)."""
+    sprite, masts = layers()
+    for image, left, top, _ in masts:
+        overlay(sprite, image, left, top)
+    return sprite
+
+
+def layers():
+    """
+    군함을 이루는 층(좌우를 뒤집어 뱃머리가 왼쪽): 돛대 없는 배 RGBA와 돛대들 [(그림, 왼쪽, 위, 갑판에 닿는 줄)].
+    HD-2D 모형(stage_models)은 돛대를 갑판 위에 따로 세운다.
+    """
     saved = ship.DECK, ship.HULL, ship.PAINT, ship.CREAM, ship.WOOD
     ship.DECK, ship.HULL, ship.PAINT, ship.CREAM, ship.WOOD = TOP_DECK, TOP_HULL, TOP_PAINT, TOP_CREAM, TOP_WOOD
     rng = np.random.default_rng(71)
@@ -103,12 +114,13 @@ def topdown():
     emblem[emblem[..., :3].any(axis=2), 3] = 255
     emblem = emblem.repeat(2, axis=0).repeat(2, axis=1)
     overlay(sprite, emblem, 30 * t - W, 11 * t - H)
-    # 돛대 셋(남쪽에서 본 모습이라 뒤집은 그림 위에 얹는다)
+    # 돛대 셋(남쪽에서 본 모습)
+    masts = []
     for x, ground, height, boom, nest in ((12, 13, 236, 150, False), (24, 13, 260, 170, True), (36, 13, 220, 150, False)):
         (image, pivot), _ = ship.mast(rng, height, boom, nest=nest, flag=True, lantern_at=66)
-        overlay(sprite, image[:, ::-1], int(x * t - (image.shape[1] - 1 - pivot[0])), int(ground * t - pivot[1]))
+        masts.append((image[:, ::-1].copy(), int(x * t - (image.shape[1] - 1 - pivot[0])), int(ground * t - pivot[1]), ground * t))
     ship.DECK, ship.HULL, ship.PAINT, ship.CREAM, ship.WOOD = saved
-    return sprite
+    return sprite, masts
 
 
 def plank():

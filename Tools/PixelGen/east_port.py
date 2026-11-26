@@ -23,6 +23,7 @@ import harbor_props as hp
 import houses
 import objects
 import pixelgen as pg
+import prop_models
 import ship
 import station
 import web_map
@@ -133,8 +134,8 @@ def build():
     m.decal("gangway", hp.gangway(40, 30), 33 * T - 4, 35.9 * T)
 
     # ── 배 ──
-    for name, piece, x, ground in SHIPS:
-        m.stand(name, piece, x, ground)
+    for name, (image, pivot, layers), x, ground in SHIPS:
+        m.stand(name, (image, pivot), x, ground, model=prop_models.build_ship(layers, pivot))
     for k, (x, ground, paint, upright) in enumerate(SKIFFS):
         m.stand(f"skiff_{k}", hp.skiff(810 + k, paint, upright), x, ground)
 

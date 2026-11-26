@@ -51,6 +51,8 @@ namespace MiniPandoras.Field
         [SerializeField] private FieldCombat combat;
         [SerializeField] private Conversation conversation;
         [Header("주울 수 있는 물건")]
+        [Tooltip("맵에 놓는 물건(상자·떨어진 물건)의 재질(Sprite Lit 3D)")]
+        [SerializeField] private Material objectMaterial;
         [Tooltip("물건 둘레의 금빛 테두리를 칠하는 한 색 재질(MiniPandoras/Sprite Silhouette)")]
         [SerializeField] private Material pickupRim;
         [Tooltip("물건 뒤 빛무리를 빛처럼 더해 그리는 재질(MiniPandoras/Sprite Additive)")]
@@ -75,6 +77,7 @@ namespace MiniPandoras.Field
 
         internal MapTravel MapTravel => mapTravel;
         internal TopDownMover Hero => hero;
+        internal Material ObjectMaterial => objectMaterial;
         internal Material PickupRim => pickupRim;
         internal Material PickupGlow => pickupGlow;
         internal Sprite PickupSparkle => pickupSparkle;
@@ -127,6 +130,22 @@ namespace MiniPandoras.Field
         public void RemoveTrigger(string id)
         {
             triggers.RemoveAll(trigger => trigger.Id == id);
+        }
+
+        /// <summary>이 맵에서 걸어서 닿을 목적지(StoryField.ArriveAt) 중 아직 닿지 않은 첫 칸. 미니맵이 「!」로 보인다.</summary>
+        public bool TryGetDestination(out Vector2Int cell)
+        {
+            foreach (FieldTrigger trigger in triggers)
+            {
+                if (trigger.Spot.HasValue && !(trigger.Once && trigger.Fired))
+                {
+                    cell = trigger.Spot.Value;
+                    return true;
+                }
+            }
+
+            cell = default;
+            return false;
         }
 
         /// <summary>

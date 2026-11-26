@@ -111,7 +111,7 @@ namespace MiniPandoras.Tests
             bool partOneEnded = false;
             yield return story.Until(() =>
             {
-                partOneEnded |= IsShowingCard(ChapterTitles.PartLabels[0], ChapterTitles.PartEnd);
+                partOneEnded |= IsShowingCard(ChapterTitles.PartLabels[1], ChapterTitles.PartEnd);
                 return story.Lines.Contains("아까 말한 뉴웨이브요.\n어떤 길드였어요?");
             }, 60f, "6장이 뱀열차 객실에서 시작한다");
             Assert.That(partOneEnded, Is.True, "열차가 떠나면 「CHAPTER 1 / 끝」 카드가 뜬다");

@@ -84,7 +84,7 @@ def futon(rng, quilt):
 
 
 def build():
-    m = MapLayout("treeInn", "고목의 쉼터", WIDTH, HEIGHT, theme="interior", music="hope",
+    m = MapLayout("treeInn", "고목의 쉼터", WIDTH, HEIGHT, theme="interior", indoors=True, music="hope",
                   ambient={"color": "#0e1430", "alpha": 0.4}, seed=421)
     room = RoomInterior(WIDTH, HEIGHT, [ROOM], seed=421)
     row = ROOM[1]
@@ -96,6 +96,7 @@ def build():
     room.fireplace(HEARTH, row)
     room.entrance(*DOOR)
     m.paint_ground = room.ground
+    m.paint_relief = room.relief
     m.block_where(~room.floor)
     rng = np.random.default_rng(423)
 

@@ -160,7 +160,7 @@ class TreeRoom(RoundRoom):
 
 
 def new_floor(map_id, name, seed, music="field"):
-    m = MapLayout(map_id, name, SIZE, SIZE, theme="castle", music=music, ambient={"color": "#1a1208", "alpha": 0.22}, seed=seed)
+    m = MapLayout(map_id, name, SIZE, SIZE, theme="castle", indoors=True, music=music, ambient={"color": "#1a1208", "alpha": 0.22}, seed=seed)
     room = TreeRoom(SIZE, SIZE, CENTER, RADIUS, seed=seed)
     room.paint_floor()
     room.paint_walls()
@@ -175,6 +175,7 @@ def against_wall(room, x):
 def finish(m, room, rng):
     """둘레를 막고 벽 둘레에 요정 등불과 빛나는 버섯을 둔다."""
     m.paint_ground = room.ground
+    m.paint_relief = room.relief
     m.block_where(room.blocked_cells())
     for i, a in enumerate((200, 250, 290, 340)):
         r = np.radians(a)

@@ -112,7 +112,7 @@ def throne(rng):
 
 
 def build():
-    m = MapLayout("eradTower", "에라드의 탑", WIDTH, HEIGHT, theme="castle", music="boss",
+    m = MapLayout("eradTower", "에라드의 탑", WIDTH, HEIGHT, theme="castle", indoors=True, music="boss",
                   ambient={"color": "#0a0610", "alpha": 0.5}, seed=361)
     rng = np.random.default_rng(362)
     with erad_palette():
@@ -129,6 +129,7 @@ def build():
         entrance = room.entrance(11)
         ground = room.ground()
         m.paint_ground = lambda: ground
+        m.paint_relief = room.relief
         m.block_where(room.blocked_cells())
         for x in (5, 16):
             room.torch(m, x)

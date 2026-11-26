@@ -163,10 +163,10 @@ namespace MiniPandoras.Story
             director.Exploration.AddTrigger(new FieldTrigger(id, kind, test, run, once, ends));
         }
 
-        /// <summary>목적지 근처(맨해튼 거리 radius 안)에 닿으면 탐험을 끝내는 발판(웹게임 arriveAt).</summary>
+        /// <summary>목적지 근처(맨해튼 거리 radius 안)에 닿으면 탐험을 끝내는 발판(웹게임 arriveAt). 미니맵에 목적지로 보인다.</summary>
         public void ArriveAt(string id, Vector2Int target, int radius = 1)
         {
-            Trigger(id, TriggerKind.Step, cell => IsWithin(cell, target, radius), once: true, ends: true);
+            director.Exploration.AddTrigger(new FieldTrigger(id, TriggerKind.Step, cell => IsWithin(cell, target, radius), once: true, ends: true, spot: target));
         }
 
         /// <summary>그 칸이 목적지에서 맨해튼 거리 radius 안이다.</summary>
@@ -315,7 +315,7 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>맵에 놓은 물건을 칸에 매이지 않은 자리로 옮긴다.</summary>
-        public void MoveObject(string id, Vector2 position)
+        public void MoveObject(string id, Raised position)
         {
             director.Exploration.Objects.MoveObject(id, position);
         }

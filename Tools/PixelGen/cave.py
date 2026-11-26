@@ -19,6 +19,7 @@ import numpy as np
 import guild_furniture as gf
 import interior
 import pixelgen as pg
+import relief
 import terrain
 from houses import IRON, WOOD, Canvas, outline
 from layout import SUB, MapLayout
@@ -27,6 +28,10 @@ WIDTH, HEIGHT = 28, 18
 T = pg.TILE
 # 바닥 북쪽 가장자리에 드러난 바위 벽면의 높이(점)
 FACE = 30
+# HD-2D 필드에서 바위 벽은 그린 벽면보다 높이 세운다: 벽면 위 바위 윗면도 RISE점까지 벽으로 일으켜 동굴이 사람 키를 넘게 한다.
+RISE = 34
+# 카메라 쪽 바위의 높이(점). 남쪽 바위까지 높으면 방 앞쪽이 가려진다.
+FRONT = 12
 ROCK = pg.hexes("#141217", "#1d1b22", "#28262e", "#35333c", "#45434d", "#5a5862")
 FLOOR = pg.hexes("#231d1a", "#30282a", "#3d3330", "#4b3f38", "#5a4c42", "#6c5c4e")
 MOSS = pg.hexes("#1a2419", "#26341f")
@@ -324,6 +329,15 @@ def hand_cart(rng):
     return outline(image), (32, ground)
 
 
+def cave_relief(floor):
+    """
+    바닥은 높이 0, 바닥 북쪽 가장자리 위 바위는 FACE + RISE점까지 세운 벽, 나머지 바위는 그 높이의 윗면.
+    카메라 쪽(남쪽) 바위는 바닥을 가리지 않게 FRONT점으로 낮게 자른다.
+    """
+    height = FACE + RISE
+    return relief.walls(floor, relief.faces_above(floor, height), height, front=FRONT)
+
+
 def torch_bracket(m, image, face_height, x, rng):
     """그 칸 열 벽면 가운데쯤에 쇠 횃불 받침을 그리고 움직이는 불꽃(torch)과 흔들리는 빛을 둔다."""
     column = x * T + 16
@@ -342,7 +356,7 @@ def torch_bracket(m, image, face_height, x, rng):
 
 def build():
     m = MapLayout("hobbitCave", "호빗 소굴", WIDTH, HEIGHT, theme="cave", music="castle",
-                  ambient={"color": "#120a06", "alpha": 0.42}, seed=131)
+                  ambient={"color": "#120a06", "alpha": 0.42}, seed=131, indoors=True)
     rng = np.random.default_rng(131)
     floor = cave_floor(rng)
     face, face_height = faces(floor)
@@ -364,6 +378,7 @@ def build():
     for x in (7, 12, 16, 21):
         torch_bracket(m, image, face_height, x, rng)
     m.paint_ground = lambda: image
+    m.paint_relief = lambda: cave_relief(floor)
 
     # ── 북서쪽 짚 잠자리 ──
     for k, (x, y) in enumerate(((2.6, 3.4), (4.6, 5.6))):

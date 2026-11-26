@@ -13,7 +13,9 @@ namespace MiniPandoras.World
     /// - StageEffects.cs: 공용 재질·정렬 순서, 효과를 만들고 돌리는 도우미.
     /// - StageEffects.Sheets.cs: pixelfx 프레임 그림을 트는 효과(빛의 기둥, 차원문, 봉인 사슬, 비틀린 공간의 매듭, 허공 찢김, 모래 손·기둥).
     /// - StageEffects.Painted.cs: 웹게임처럼 코드로 그리는 효과(빛의 검, 판도라 더스트, 치유의 빛, 공간 균열, 저주의 안개, 신호탄, 모래벽, 핏자국).
-    /// - StageEffects.Props.cs: 맵에 세우는 큰 것(뱀열차, 군함·청룡 같은 큰 그림, 나리온).
+    /// - StageEffects.Props.cs: 맵에 세우는 큰 것(뱀열차, 군함·청룡, 나리온).
+    /// HD-2D 필드라 몸 높이에 뜨는 효과(빛의 기둥·사슬·검 …)는 인물처럼 세우고(<see cref="NewStanding"/>),
+    /// 바닥에 붙는 것(차원문·매듭·안개·핏자국)은 땅에서 조금 띄워 눕힌다(<see cref="NewFlat"/>).
     /// </summary>
     public sealed class StageEffects : MonoBehaviour
     {
@@ -29,6 +31,11 @@ namespace MiniPandoras.World
         // 핏자국은 땅(-100)·물빛(-99) 바로 위, 그림자(-50) 아래에 붙는다(웹게임 decals).
         internal const int DecalOrder = -98;
 
+        // 눕힌 효과를 땅에서 이만큼(칸) 띄운다. 같은 높이면 깊이가 겹쳐 깜빡인다.
+        internal const float FlatLift = 0.03f;
+        // 세운 효과를 그 자리에 선 인물보다 이만큼(칸) 카메라 쪽에 그린다.
+        internal const float InFront = 0.25f;
+
         // 차원문은 바닥에 붙어 인물 아래에 그린다(웹게임 field.effects). 땅·핏자국 위, 그림자 아래다.
         internal const int GroundEffectOrder = -90;
 
@@ -38,18 +45,23 @@ namespace MiniPandoras.World
         [SerializeField] private Material unlit;
         [Tooltip("더해 그리는 알갱이(웹게임 glow 알갱이). 느려지지 않고 수명의 뒤 절반에 사라진다")]
         [SerializeField] private ParticleBurst glowParticles;
-        [Tooltip("모래벽 한 칸(Tools/PixelGen/sand_wall.py): 위 한 칸은 벽 윗면, 그 아래는 남쪽 면. 기준점은 아래 가운데")]
-        [SerializeField] private Sprite sandWall;
-        [Tooltip("뱀열차 그림(Tools/PixelGen/snake_train.py): 머리와 하나로 이어진 몸통(기준점은 몸이 땅에 닿는 곳), 날름거리는 혀 네 장(기준점은 혀뿌리)")]
-        [SerializeField] private Sprite trainHead;
+        [Tooltip("세운 그림의 재질(Sprite Lit 3D)")]
+        [SerializeField] private Material lit;
+        [Tooltip("연출 모형의 재질(Tools/PixelGen/stage_models.py, 메뉴 MiniPandoras/Import Stage Models가 채운다)")]
+        [SerializeField] private Material models;
+        [Tooltip("맵에 세우는 큰 모형(군함·널다리·청룡). 이름으로 고른다. 기준점은 아래 가운데")]
+        [SerializeField] private Mesh[] placedModels;
+        [Tooltip("모래벽 한 칸. 기준점은 아래 가운데")]
+        [SerializeField] private Mesh sandWall;
+        [Tooltip("뱀열차(Tools/PixelGen/snake_train.py): 머리 모형, 통에 감는 몸통 그림과 그 재질(기준점은 몸이 땅에 닿는 곳), 날름거리는 혀 네 장(기준점은 혀뿌리)")]
+        [SerializeField] private Mesh trainHead;
         [SerializeField] private Sprite trainBody;
+        [SerializeField] private Material trainBodyMaterial;
         [SerializeField] private Sprite[] trainTongue;
-        [Tooltip("맵에 세우는 큰 그림(Tools/PixelGen/warship.py·sea_dragon.py). 이름으로 고른다. 기준점은 아래 가운데")]
-        [SerializeField] private Sprite[] stageImages;
-        [Tooltip("나리온(Tools/WebGame/narion.py) 앉은 그림: 탄 사람 0명부터 여섯까지. 기준점은 발이 닿는 줄 가운데")]
-        [SerializeField] private Sprite[] narionPerched;
-        [Tooltip("나리온 날갯짓 두 장(여섯이 다 탄 모습). 하늘길·엔딩 컷인도 같은 그림을 쓴다")]
-        [SerializeField] private Sprite[] narionFlying;
+        [Tooltip("나리온(Tools/WebGame/narion.py) 앉은 모양: 탄 사람 0명부터 여섯까지. 기준점은 발이 닿는 줄 가운데")]
+        [SerializeField] private Mesh[] narionPerched;
+        [Tooltip("나리온 날갯짓 두 모양(여섯이 다 탄 모습)")]
+        [SerializeField] private Mesh[] narionFlying;
         [Tooltip("빛의 기둥(pixelfx). 하늘에서 빛이 내려와 표시한 자리에 꽂힌다")]
         [SerializeField] private EffectSheet lightPillar;
         [Tooltip("차원문 세 토막(우리가 pixelfx로 만든 틈): 열림, 되풀이, 닫힘")]
@@ -69,13 +81,16 @@ namespace MiniPandoras.World
 
         internal Material Unlit => unlit;
         internal ParticleBurst GlowParticles => glowParticles;
-        internal Sprite SandWall => sandWall;
-        internal Sprite TrainHead => trainHead;
+        internal Material Lit => lit;
+        internal Material Models => models;
+        internal Mesh[] PlacedModels => placedModels;
+        internal Mesh SandWall => sandWall;
+        internal Mesh TrainHead => trainHead;
         internal Sprite TrainBody => trainBody;
+        internal Material TrainBodyMaterial => trainBodyMaterial;
         internal Sprite[] TrainTongue => trainTongue;
-        internal Sprite[] StageImages => stageImages;
-        internal Sprite[] NarionPerched => narionPerched;
-        internal Sprite[] NarionFlying => narionFlying;
+        internal Mesh[] NarionPerched => narionPerched;
+        internal Mesh[] NarionFlying => narionFlying;
         internal EffectSheet LightPillar => lightPillar;
         internal EffectSheet PortalOpen => portalOpen;
         internal EffectSheet PortalLoop => portalLoop;
@@ -120,12 +135,34 @@ namespace MiniPandoras.World
             }
         }
 
-        internal GameObject NewEffect(string name, Transform map, Vector2 at)
+        /// <summary>땅에 눕는 효과. 자리는 맵 기준 논리 px다.</summary>
+        internal GameObject NewFlat(string name, Transform map, Vector2 at)
+        {
+            GameObject root = NewRoot(name, map);
+            root.transform.localPosition = LocalPixel(at) + Upright.Up * FlatLift;
+            return root;
+        }
+
+        /// <summary>발밑(맵 기준 논리 px)에서 height만큼 올라간 곳에 세운 효과. 자식의 위쪽(+y)이 하늘이고, 그 자리에 선 인물보다 조금 앞에 그린다.</summary>
+        internal GameObject NewStanding(string name, Transform map, Vector2 foot, float height = 0f)
+        {
+            GameObject root = NewRoot(name, map);
+            root.transform.localPosition = Above(foot, height) + Upright.TowardCamera * InFront;
+            root.transform.localRotation = Upright.Stand;
+            return root;
+        }
+
+        internal GameObject NewRoot(string name, Transform map)
         {
             var root = new GameObject(name) { layer = gameObject.layer };
             root.transform.SetParent(map, false);
-            root.transform.localPosition = LocalPixel(at);
             return root;
+        }
+
+        /// <summary>땅의 논리 px 자리(맵 왼쪽 위 기준, 아래가 +)에서 height(논리 px)만큼 올라간 맵 안 자리.</summary>
+        internal static Vector3 Above(Vector2 foot, float height)
+        {
+            return Upright.Above(LocalPixel(foot), MapCoordinates.Pixels(height));
         }
 
         internal Transform AddChild(Transform parent, string name)
@@ -188,19 +225,6 @@ namespace MiniPandoras.World
         internal static Vector2 PixelOffset(float x, float y)
         {
             return new Vector2(MapCoordinates.Pixels(x), -MapCoordinates.Pixels(y));
-        }
-
-        private void OnDestroy()
-        {
-            if (Painted.WallSlices == null)
-            {
-                return;
-            }
-
-            foreach (Sprite slice in Painted.WallSlices)
-            {
-                Destroy(slice);
-            }
         }
     }
 }

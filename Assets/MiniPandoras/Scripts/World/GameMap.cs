@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace MiniPandoras.World
 {
@@ -11,6 +10,8 @@ namespace MiniPandoras.World
     /// </summary>
     public sealed class GameMap : MonoBehaviour
     {
+        private const float OpenMargin = 10f;
+
         [SerializeField] private string id;
         [SerializeField] private string displayName;
         [SerializeField] private Vector2Int sizeInTiles;
@@ -19,29 +20,53 @@ namespace MiniPandoras.World
         [SerializeField] private Color ambient = Color.clear;
         [SerializeField] private MapBackground background;
         [SerializeField] private MapWeather weather;
+        [Tooltip("지붕·천장 아래(방·동굴·탑 안). 해를 머리 위 앞쪽에서 비춘다(AmbientLight)")]
+        [SerializeField] private bool indoors;
+        [Tooltip("둘레까지 풍경을 그린 맵인지(카메라가 맵 밖도 비춘다)")]
+        [SerializeField] private bool openAround;
         [Tooltip("횃불·등불 같은 빛. 어두운 맵에서만 켠다")]
-        [SerializeField] private Light2D[] lights = Array.Empty<Light2D>();
+        [SerializeField] private Light[] lights = Array.Empty<Light>();
         [Tooltip("물 칸. 날아가는 판도라는 막힌 칸이어도 물 위로는 지나간다")]
         [SerializeField] private Vector2Int[] waterCells = Array.Empty<Vector2Int>();
         [Tooltip("이야기에 따라 바뀌는 모습(낡은 아지트 ↔ 회상 속 전성기의 아지트). 처음 것이 기본 모습이다")]
         [SerializeField] private MapLook[] looks = Array.Empty<MapLook>();
+        [Tooltip("위에서 본 맵 그림(에디터의 MinimapBaker가 굽는다). 모습이 있는 맵은 모습마다 그림이 있다")]
+        [SerializeField] private Texture2D minimap;
 
         private HashSet<Vector2Int> water;
         private Portal[] portals;
+        private int shownLook;
 
         public string Id => id;
         public string DisplayName => displayName;
         public Color Ambient => ambient;
         public MapBackground Background => background;
         public MapWeather Weather => weather;
-        public IReadOnlyList<Light2D> Lights => lights;
+        public bool Indoors => indoors;
+        public IReadOnlyList<Light> Lights => lights;
 
         /// <summary>지금 보이는 모습 이름. 모습이 없는 맵은 빈 문자열이다.</summary>
         public string ShownLook { get; private set; } = string.Empty;
 
         public Vector2Int SizeInTiles => sizeInTiles;
 
-        /// <summary>맵이 덮는 월드 사각형. 카메라가 이 밖을 비추지 않는다.</summary>
+        /// <summary>미니맵에 보일 위에서 본 맵 그림. 맵 사각형(<see cref="Bounds"/>)을 그대로 덮는다. 모습이 있는 맵은 지금 모습의 그림이다.</summary>
+        public Texture2D Minimap => looks.Length > 0 ? looks[shownLook].Minimap : minimap;
+
+        /// <summary>
+        /// 카메라가 비출 수 있는 곳. 둘레까지 풍경을 그린 맵(아래로 땅이 내려다보이는 뱀성 꼭대기·고목 꼭대기)은 맵 밖도 얼마쯤 비춘다.
+        /// </summary>
+        public Rect ViewBounds
+        {
+            get
+            {
+                Rect bounds = Bounds;
+                float margin = openAround ? OpenMargin : 0f;
+                return new Rect(bounds.x - margin, bounds.y - margin, bounds.width + margin * 2f, bounds.height + margin * 2f);
+            }
+        }
+
+        /// <summary>맵이 덮는 월드 사각형.</summary>
         public Rect Bounds
         {
             get
@@ -111,14 +136,14 @@ namespace MiniPandoras.World
         /// <summary>그 이름의 모습 하나만 켠다. 이름이 null이거나 없는 모습이면 기본(처음) 모습이다. 모습이 없는 맵은 그대로다.</summary>
         public void ShowLook(string lookName)
         {
-            int shown = Math.Max(0, Array.FindIndex(looks, look => look.Name == lookName));
+            shownLook = Math.Max(0, Array.FindIndex(looks, look => look.Name == lookName));
 
             for (int i = 0; i < looks.Length; i++)
             {
-                looks[i].Root.SetActive(i == shown);
+                looks[i].Root.SetActive(i == shownLook);
             }
 
-            ShownLook = looks.Length > 0 ? looks[shown].Name : string.Empty;
+            ShownLook = looks.Length > 0 ? looks[shownLook].Name : string.Empty;
         }
     }
 
@@ -160,8 +185,11 @@ namespace MiniPandoras.World
     {
         [SerializeField] private string name;
         [SerializeField] private GameObject root;
+        [Tooltip("이 모습일 때 위에서 본 맵 그림")]
+        [SerializeField] private Texture2D minimap;
 
         public string Name => name;
         public GameObject Root => root;
+        public Texture2D Minimap => minimap;
     }
 }

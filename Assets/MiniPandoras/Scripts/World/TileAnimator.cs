@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace MiniPandoras.World
 {
@@ -21,7 +20,7 @@ namespace MiniPandoras.World
             foreach (FlickerLight flicker in flickers)
             {
                 float x = flicker.Light.transform.position.x * MapCoordinates.LogicalPixelsPerTile;
-                flicker.Light.pointLightOuterRadius = flicker.Radius * (0.94f + Mathf.Sin(frame * 0.3f + x) * 0.04f + UnityEngine.Random.value * 0.03f);
+                flicker.Light.range = flicker.Radius * (0.94f + Mathf.Sin(frame * 0.3f + x) * 0.04f + UnityEngine.Random.value * 0.03f);
             }
 
             foreach (Flame flame in flames)
@@ -78,16 +77,16 @@ namespace MiniPandoras.World
         [Serializable]
         public struct FlickerLight
         {
-            [SerializeField] private Light2D light;
+            [SerializeField] private Light light;
             [SerializeField] private float radius;
 
-            public FlickerLight(Light2D light, float radius)
+            public FlickerLight(Light light, float radius)
             {
                 this.light = light;
                 this.radius = radius;
             }
 
-            public Light2D Light => light;
+            public Light Light => light;
             public float Radius => radius;
         }
     }

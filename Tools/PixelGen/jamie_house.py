@@ -29,7 +29,7 @@ LAMP = "#ffc070"
 
 
 def build():
-    m = MapLayout("jamieHouse", "디엘의 어린 시절 집", WIDTH, HEIGHT, theme="interior", music="sorrow", seed=81)
+    m = MapLayout("jamieHouse", "디엘의 어린 시절 집", WIDTH, HEIGHT, theme="interior", indoors=True, music="sorrow", seed=81)
     room = RoomInterior(WIDTH, HEIGHT, [ROOM], seed=81)
     row = ROOM[1]
     room.paint_base()
@@ -37,6 +37,7 @@ def build():
     room.fireplace(HEARTH, row)
     room.entrance(*DOOR)
     m.paint_ground = room.ground
+    m.paint_relief = room.relief
     m.block_where(~room.floor)
     rng = np.random.default_rng(82)
 

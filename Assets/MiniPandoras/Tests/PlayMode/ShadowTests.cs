@@ -3,19 +3,22 @@ using MiniPandoras.Characters;
 using MiniPandoras.World;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.TestTools;
 
 namespace MiniPandoras.Tests
 {
-    /// <summary>인물의 흐린 그림자는 몸 그림을 따라가고 땅에 남는다. 맵의 구운 그림자는 땅 위, 인물 그림자 아래에 깔린다.</summary>
+    /// <summary>
+    /// HD-2D 필드의 그림자: 세운 몸 그림이 해 그림자를 드리우고, 발밑의 옅은 타원은 몸이 떠올라도 땅에 남는다.
+    /// 맵의 바닥 그림은 땅에 누워 그림자를 받기만 하고, 소품은 일으켜 세워져 그림자를 드리운다.
+    /// </summary>
     public sealed class ShadowTests
     {
         private StoryDriver story;
 
         private CharacterBody Hero => story.Mover.Character;
         private CharacterAnimator Animator => Hero.GetComponentInChildren<CharacterAnimator>();
-
-        private SpriteRenderer CastShadow => Named(Hero.transform, "CastShadow");
+        private SpriteRenderer Body => Animator.GetComponent<SpriteRenderer>();
 
         private static SpriteRenderer Named(Transform root, string name)
         {
@@ -42,56 +45,51 @@ namespace MiniPandoras.Tests
         public IEnumerator Restore()
         {
             Hero.OffsetY = 0f;
-            Hero.SetPose(BodyPose.Stand);
+            Hero.CastsShadow = true;
             StoryDriver.Close();
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator CastShadowCopiesTheBodyPicture()
+        public IEnumerator BodyCastsTheSunShadowUnlessItHasNone()
         {
-            Hero.Face(Facing.Left);
             yield return null;
-            Assert.That(CastShadow.enabled, Is.True);
-            Assert.That(CastShadow.sprite, Is.EqualTo(Animator.Shown), "몸 그림을 그대로 베낀다");
-            Assert.That(CastShadow.flipX, Is.EqualTo(Animator.IsFlipped), "왼쪽을 보면 그림자도 뒤집힌다");
+            Assert.That(Body.shadowCastingMode, Is.EqualTo(ShadowCastingMode.On), "세운 몸 그림이 해 그림자를 드리운다");
+
+            Hero.CastsShadow = false;
+            yield return null;
+            Assert.That(Body.shadowCastingMode, Is.EqualTo(ShadowCastingMode.Off));
+            Assert.That(Named(Hero.transform, "Shadow").enabled, Is.False, "발밑 타원도 숨는다");
         }
 
         [UnityTest]
-        public IEnumerator ShadowsStayOnTheGroundWhenTheBodyLeaves()
+        public IEnumerator FootShadowStaysOnTheGroundWhenTheBodyRises()
         {
             yield return null;
-            float ground = CastShadow.transform.position.y;
+            Transform foot = Named(Hero.transform, "Shadow").transform;
+            Vector3 ground = foot.position;
 
             Hero.OffsetY = -30f;
             yield return null;
-            Assert.That(Animator.transform.position.y, Is.GreaterThan(ground), "몸은 떠오른다");
-            Assert.That(CastShadow.transform.position.y, Is.EqualTo(ground).Within(0.001f), "그림자는 땅에 남는다");
+            // 높이는 -Z 쪽이다(World.Upright.Up).
+            Assert.That(Vector3.Dot(Animator.transform.position - ground, Upright.Up), Is.GreaterThan(1f), "몸은 떠오른다");
+            Assert.That(Vector3.Distance(foot.position, ground), Is.LessThan(0.001f), "발밑 타원은 땅에 남는다");
         }
 
         [UnityTest]
-        public IEnumerator LyingBodyDoesNotCastAStandingShadow()
-        {
-            Hero.SetPose(BodyPose.Lie);
-            yield return null;
-            Assert.That(CastShadow.enabled, Is.False);
-            Assert.That(Named(Hero.transform, "Shadow").enabled, Is.True, "발밑 타원은 남는다");
-
-            Hero.SetPose(BodyPose.Stand);
-            yield return null;
-            Assert.That(CastShadow.enabled, Is.True);
-        }
-
-        [UnityTest]
-        public IEnumerator MapShadowLiesBetweenTheGroundAndTheCharacters()
+        public IEnumerator GroundLiesFlatAndPropsStandUp()
         {
             yield return null;
             Transform map = story.Travel.CurrentMap.transform;
-            SpriteRenderer baked = Named(map, "CastShadow");
-            Assert.That(baked, Is.Not.Null, "세운 것이 있는 맵에는 구운 그림자가 있다");
-            Assert.That(baked.sortingOrder, Is.GreaterThan(Named(map, "Ground").sortingOrder));
-            Assert.That(baked.sortingOrder, Is.LessThan(Named(Hero.transform, "Shadow").sortingOrder));
-            Assert.That(baked.bounds.size.x, Is.EqualTo(Named(map, "Ground").bounds.size.x).Within(0.5f), "맵 크기로 늘어난다");
+            SpriteRenderer ground = Named(map, "Ground");
+            Assert.That(ground.transform.rotation, Is.EqualTo(Quaternion.identity), "바닥 그림은 땅(XY)에 눕는다");
+            Assert.That(ground.shadowCastingMode, Is.EqualTo(ShadowCastingMode.Off));
+            Assert.That(ground.receiveShadows, Is.True);
+            Assert.That(Named(map, "CastShadow"), Is.Null, "구운 맵 그림자는 해 그림자로 바뀌었다");
+
+            SpriteRenderer prop = map.Find("Props").GetComponentInChildren<SpriteRenderer>();
+            Assert.That(Quaternion.Angle(prop.transform.rotation, Upright.Stand), Is.LessThan(0.1f), "소품은 발밑을 축으로 선다");
+            Assert.That(prop.shadowCastingMode, Is.EqualTo(ShadowCastingMode.On));
         }
     }
 }

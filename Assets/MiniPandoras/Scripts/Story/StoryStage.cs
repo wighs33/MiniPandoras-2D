@@ -49,10 +49,10 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>카메라를 그 칸 가운데로 옮긴다(웹게임 pan). speed는 한 프레임에 남은 거리의 비율이라 1이면 바로 옮긴다.</summary>
-        public IEnumerator Pan(int x, int y, float speed = 0.05f)
+        public IEnumerator Pan(int x, int y, float speed = 0.05f, bool beyond = false)
         {
             Vector2 at = (Vector2)MapRoot.position + MapCoordinates.CellCenter(new Vector2Int(x, y));
-            return director.FollowCamera.PanTo(at, speed);
+            return director.FollowCamera.PanTo(at, speed, beyond);
         }
 
         // ── 연출 효과(웹게임 stage-fx.ts) ──────────────────────
@@ -201,12 +201,12 @@ namespace MiniPandoras.Story
         }
 
         /// <summary>
-        /// 맵에 큰 그림(군함·청룡)을 세운다(웹게임 new StageImage, field.extras). 자리와 앞뒤 줄은 맵 기준 논리 px(아래가 +)이고,
-        /// 기준점은 그림 아래 가운데다. 맵을 옮기면 사라진다.
+        /// 맵에 큰 모형(군함·청룡)을 세운다(웹게임 new StageImage, field.extras). 땅 자리(아래가 +)와 거기서 올라간 높이는 맵 기준 논리 px이고,
+        /// 기준점은 모형 아래 가운데다. 맵을 옮기면 사라진다.
         /// </summary>
-        public StageImage ShowImage(string imageName, Vector2 at, float? sortY = null)
+        public StageModel ShowModel(string modelName, Vector2 at, float height = 0f)
         {
-            return director.StageEffects.Props.ShowImage(MapRoot, imageName, at, sortY);
+            return director.StageEffects.Props.ShowModel(MapRoot, modelName, at, height);
         }
 
         /// <summary>나리온을 그 칸에 앉힌다(웹게임 field.load의 new GiantBird: 칸 가운데, 칸 아래 끝에서 1 논리 px 위가 발이 닿는 줄).</summary>

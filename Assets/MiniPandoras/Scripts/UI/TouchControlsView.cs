@@ -63,7 +63,8 @@ namespace MiniPandoras.UI
     /// <summary>
     /// 손가락으로 누르는 화면 조작 묶음: 조이스틱, 행동 버튼(대화·조사·공격), 판도라 스킬 세 칸, 교체 버튼과 판도라 세 칸, 왼쪽 동료 칸, 아래 퀵슬롯.
     /// 버튼은 누르면 가상 게임패드 입력을 보내 키보드와 같은 액션으로 들어간다. 무엇을 보일지는 PlayerControls가 정해
-    /// <see cref="Show"/>로 넘기고, 여기서는 보이고 숨기기와 행동 버튼 글자만 바꾼다. 배치는 프리팹(Prefabs/UI/TouchControls)에 있다.
+    /// <see cref="Show"/>로 넘기고, 여기서는 보이고 숨기기와 행동 버튼 글자·그림만 바꾼다. 배치는 프리팹(Prefabs/UI/TouchControls)에 있다.
+    /// 오른쪽 아래 버튼은 마름모다(2026-11-23 참고 그림): 큰 행동 버튼 둘레에 스킬·교체 칸이 변을 맞대고 맞물린다(그림 Tools/PixelGen/hud_buttons.py).
     /// </summary>
     public sealed class TouchControlsView : MonoBehaviour
     {
@@ -73,6 +74,11 @@ namespace MiniPandoras.UI
         [SerializeField] private GameObject stick;
         [SerializeField] private CanvasGroup actionButton;
         [SerializeField] private TMP_Text actionLabel;
+        [Tooltip("행동 버튼 글자 뒤에 옅게 까는 그림: 칼(공격)·돋보기(조사)·말풍선(대화)")]
+        [SerializeField] private Image actionIcon;
+        [SerializeField] private Sprite attackIcon;
+        [SerializeField] private Sprite inspectIcon;
+        [SerializeField] private Sprite talkIcon;
         [Tooltip("동료 칸")]
         [SerializeField] private GameObject battleButtons;
         [Tooltip("판도라 스킬 세 칸과 궁극기 칸")]
@@ -85,6 +91,7 @@ namespace MiniPandoras.UI
         [SerializeField] private Button swapButton;
         [SerializeField] private QuickSlotsView quickSlots;
         [SerializeField] private PlaceNameView placeName;
+        [SerializeField] private MinimapView minimap;
 
         private bool shownOnce;
 
@@ -134,14 +141,16 @@ namespace MiniPandoras.UI
             actionButton.gameObject.SetActive(layout.Action != ActionCaption.Hidden);
             actionButton.alpha = layout.Action == ActionCaption.Idle || layout.Action == ActionCaption.AttackLocked ? IdleAlpha : 1f;
             actionLabel.text = CaptionText(layout.Action);
+            actionIcon.sprite = CaptionIcon(layout.Action);
             battleButtons.SetActive(layout.Battle);
             skillRow.SetActive(layout.Battle && !layout.PickingPandora);
             pandoraButtons.SetActive(layout.Battle && layout.PickingPandora);
             swapButton.gameObject.SetActive(layout.Pandoras);
-            // 글라이더를 탈 때는 행동 버튼이 없다. 퀵슬롯과 지명은 걷고 싸울 때만 보인다.
+            // 글라이더를 탈 때는 행동 버튼이 없다. 퀵슬롯과 지명, 미니맵은 걷고 싸울 때만 보인다.
             bool onFoot = layout.Stick && layout.Action != ActionCaption.Hidden;
             quickSlots.gameObject.SetActive(onFoot);
             placeName.gameObject.SetActive(onFoot);
+            minimap.gameObject.SetActive(onFoot);
         }
 
         private void Awake()
@@ -162,6 +171,21 @@ namespace MiniPandoras.UI
         private void PressSwap()
         {
             SwapPressed?.Invoke();
+        }
+
+        /// <summary>행동 버튼 글자 뒤의 그림. 글자(<see cref="CaptionText"/>)와 같은 갈래다.</summary>
+        private Sprite CaptionIcon(ActionCaption caption)
+        {
+            switch (caption)
+            {
+                case ActionCaption.Talk:
+                    return talkIcon;
+                case ActionCaption.Attack:
+                case ActionCaption.AttackLocked:
+                    return attackIcon;
+                default:
+                    return inspectIcon;
+            }
         }
 
         private static string CaptionText(ActionCaption caption)

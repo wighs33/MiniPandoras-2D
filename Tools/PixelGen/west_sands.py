@@ -44,10 +44,11 @@ HOUSES = [
 
 # ── 바닥 ───────────────────────────────────────────────
 
-def desert(kinds, seed):
+def desert(kinds, seed, heights=None):
     """
     사막 바닥: 온통 모래 위에 언덕 쪽은 바람 물결, 곳곳에 갈라진 마른 흙, 흙길, 광장 돌바닥, 오아시스 풀, 바다와 못, 부두, 사암 절벽.
     풀밭 바닥(draw_outdoor)과 달리 모래가 바탕이라 경계에 풀 테두리를 두르지 않는다.
+    heights(relief.Relief)를 주면 그린 절벽의 높이를 적는다(HD-2D 필드에서 절벽을 세운다).
     """
     rng = np.random.default_rng(seed)
     kinds = np.array(kinds, dtype=object)
@@ -106,6 +107,8 @@ def desert(kinds, seed):
     cliffs = terrain.region(kinds == "cliff", wobble, 0.25)
     stone = image.copy()
     terrain.cliff(stone, cliffs, rng)
+    if heights is not None:
+        heights.cliffs(cliffs)
     tinted = np.clip(stone * SANDSTONE, 0, 255).astype(np.uint8)
     changed = (stone != image).any(axis=2)
     # 절벽 윗면의 이끼(풀빛)는 사막에 없으니 모래로 바꾼다.
@@ -272,7 +275,7 @@ def build():
     m.point("north", (25, 0), (26, 0), (27, 0))
     m.point("northArrive", (26, 1))
     m.warp("north", "dragonRoad", "southArrive", "up")
-    m.paint_ground = lambda: desert(m.kinds.tolist(), m.seed)
+    m.paint_ground = lambda: desert(m.kinds.tolist(), m.seed, m.heights)
     return m
 
 

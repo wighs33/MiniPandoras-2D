@@ -12,16 +12,19 @@ namespace MiniPandoras.Field
     /// 지금 맵 하나만 띄워 두고, 포탈을 밟으면 화면을 어둡게 한 사이에 다음 맵으로 바꾼다(메이플식 맵 이동).
     /// 웹게임의 game.warp와 같은 순서다: 어두워짐 → 맵 바꿈 → 도착 지점에 세움 → 맵 준비 → 카메라 맞춤 → 밝아짐 → 맵 이름 띠.
     /// 맵을 바꾸면 그 맵의 적과 전투 효과도 함께 치운다. 이야기가 모습을 고른 맵은 그 모습으로 연다.
+    /// 맵 프리팹은 들어갈 때 불러오고(Resources/Maps) 떠나면 그 그림까지 내린다. 장면이 모든 맵을 물고 있으면 그림만 1GB 넘게 올라가 휴대폰에서 버티지 못한다.
     /// </summary>
     public sealed class MapTravel : MonoBehaviour
     {
-        [SerializeField] private List<GameMap> maps = new List<GameMap>();
+        private const string MapFolder = "Maps/Map_";
+
         [SerializeField] private TopDownMover player;
         [SerializeField] private FieldCombat combat;
         [SerializeField] private FollowCamera followCamera;
         [SerializeField] private ScreenFade fade;
         [SerializeField] private AmbientLight ambientLight;
         [SerializeField] private MapBackdrop backdrop;
+        [SerializeField] private SunShafts sunShafts;
         [SerializeField] private Exploration exploration;
         [Header("처음 설 곳(이야기가 맵을 정하지 않을 때)")]
         [SerializeField] private bool loadOnStart = true;
@@ -77,13 +80,7 @@ namespace MiniPandoras.Field
         /// <summary>어두워졌다 밝아지며 맵을 옮긴다(웹게임 game.warp). 포탈과 이야기가 같이 쓴다.</summary>
         public IEnumerator Warp(string mapId, string pointName, Facing facing)
         {
-            if (FindMap(mapId) == null)
-            {
-                Debug.LogWarning($"들여오지 않은 맵이라 이동하지 않는다: {mapId}");
-                yield break;
-            }
-
-            yield return Transition(() =>
+            yield return Transition(mapId, () =>
             {
                 Load(mapId, pointName, facing);
                 Warped?.Invoke(current);
@@ -96,7 +93,7 @@ namespace MiniPandoras.Field
         /// </summary>
         public IEnumerator VisitSideMap(string mapId, string pointName, Facing facing, Action arrived)
         {
-            yield return Transition(() =>
+            yield return Transition(mapId, () =>
             {
                 parked = current;
                 parkedFeet = player.Character.Position;
@@ -113,7 +110,7 @@ namespace MiniPandoras.Field
         /// <summary>세워 둔 맵으로 돌아온다. 어두운 동안 arrived를 부른다.</summary>
         public IEnumerator ReturnFromSideMap(Action arrived)
         {
-            yield return Transition(() =>
+            yield return Transition(null, () =>
             {
                 current.gameObject.SetActive(false);
                 Destroy(current.gameObject);
@@ -131,17 +128,27 @@ namespace MiniPandoras.Field
         }
 
         /// <summary>
-        /// 조작을 막고 화면을 어둡게 한 사이에 whileDark를 하고 밝힌 뒤 도착을 알린다.
+        /// 조작을 막고 화면을 어둡게 한 사이에 whileDark를 하고 밝힌 뒤 도착을 알린다. 갈 맵(mapId, 세워 둔 맵이면 null)은 어두워지는 동안 불러온다.
         /// whileDark에서 예외가 나도 조작 막힘과 이동 중 표시는 풀어, 맵 이동 한 번의 오류가 게임 전체를 멈추지 않게 한다.
         /// </summary>
-        private IEnumerator Transition(Action whileDark)
+        private IEnumerator Transition(string mapId, Action whileDark)
         {
             travelling = true;
             player.Block(this);
             try
             {
+                ResourceRequest loading = mapId != null ? Resources.LoadAsync<GameMap>(MapFolder + mapId) : null;
                 yield return fade.FadeOut();
-                whileDark();
+                yield return loading;
+                if (loading != null && loading.asset == null)
+                {
+                    Debug.LogWarning($"들여오지 않은 맵이라 이동하지 않는다: {mapId}");
+                }
+                else
+                {
+                    whileDark();
+                }
+
                 yield return fade.FadeIn();
             }
             finally
@@ -179,7 +186,8 @@ namespace MiniPandoras.Field
             }
 
             exploration.ResetForMap();
-            current = Instantiate(FindMap(mapId));
+            current = Instantiate(Resources.Load<GameMap>(MapFolder + mapId));
+            StartCoroutine(UnloadOldMap());
             current.ShowLook(looks.TryGetValue(mapId, out string look) ? look : null);
             foreach (Portal portal in current.Portals)
             {
@@ -204,12 +212,6 @@ namespace MiniPandoras.Field
                 }
             }
 
-            SeeThroughProps seeThrough = current.GetComponentInChildren<SeeThroughProps>();
-            if (seeThrough != null)
-            {
-                seeThrough.Viewer = player.transform;
-            }
-
             ShowMapSurroundings();
             // 잠깐 다녀오는 맵은 이야기가 모르는 맵이다. 세워 둔 맵의 인물을 잊으면 안 된다.
             if (parked == null)
@@ -220,24 +222,27 @@ namespace MiniPandoras.Field
             AimCameraAtPlayer();
         }
 
-        /// <summary>맵 밖의 분위기: 밤빛과 맵 밖 배경.</summary>
+        /// <summary>맵 둘레의 분위기: 밤빛, 맵 밖 배경, 햇살.</summary>
         private void ShowMapSurroundings()
         {
             ambientLight.Use(current);
             backdrop.Use(current);
+            sunShafts.Use(current);
         }
 
         private void AimCameraAtPlayer()
         {
-            followCamera.SetBounds(current.Bounds);
+            followCamera.SetBounds(current.ViewBounds);
             // 연출이 다른 인물을 따라가게 했더라도 맵을 옮기면 다시 주인공을 따라간다(웹게임 warp·placeParty의 follow(player)).
             followCamera.Follow(player.transform);
             followCamera.SnapToTarget();
         }
 
-        private GameMap FindMap(string mapId)
+        /// <summary>떠난 맵의 그림과 메시를 내린다. 옛 맵은 이 프레임 끝에 지워지므로 다음 프레임에 한다.</summary>
+        private static IEnumerator UnloadOldMap()
         {
-            return maps.Find(map => map != null && map.Id == mapId);
+            yield return null;
+            yield return Resources.UnloadUnusedAssets();
         }
     }
 }

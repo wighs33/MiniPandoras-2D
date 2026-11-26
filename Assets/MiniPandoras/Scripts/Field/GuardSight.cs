@@ -22,6 +22,7 @@ namespace MiniPandoras.Field
         private const float EdgeAlpha = 0.8f;
         // 바닥 그림(-100)과 인물(0) 사이.
         private const int GroundOrder = -40;
+        private const float GroundLift = 0.02f;
         private static readonly float Range = MapCoordinates.Pixels(112f);
         private static readonly float FootHalfWidth = MapCoordinates.Pixels(5f);
         private static readonly float EdgeWidth = MapCoordinates.Pixels(1f);
@@ -45,6 +46,8 @@ namespace MiniPandoras.Field
         {
             var root = new GameObject("Sight");
             root.transform.SetParent(guard.transform, false);
+            // 땅과 같은 높이면 깊이가 겹쳐 깜빡인다.
+            root.transform.localPosition = Upright.Up * GroundLift;
             var sight = root.AddComponent<GuardSight>();
             sight.Build(guard, material);
             return sight;

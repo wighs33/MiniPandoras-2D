@@ -10,6 +10,8 @@ namespace MiniPandoras.UI
     /// <summary>
     /// 전투 효과를 월드에 그린다(웹게임 FieldCombat.renderGround·renderWorld): 바닥의 범위 예고와 남은 자리,
     /// 탄·띠·고리·베기 자국, 무기 타격 이펙트, 적 체력 막대, 떠오르는 글자. 효과 목록은 전투가 가지고, 여기서는 읽어서 그리기만 한다.
+    /// HD-2D 필드라 땅에 붙는 것(범위 예고·남은 자리·고리·덫)은 바닥에 누워 그리고(<see cref="DrawFlat"/>),
+    /// 몸 높이에 뜨는 것(탄·베기 자국·타격·스킬 그림·잔상·체력 막대·글자)은 땅 자리에서 세운 판을 따라 높이만큼 올라간 곳에 세워 그린다(<see cref="DrawStanding"/>).
     /// 그리는 데 쓰는 렌더러는 처음 모자랄 때만 만들고 계속 다시 쓴다(매 프레임 할당하지 않게).
     /// </summary>
     public sealed class CombatEffectsView : MonoBehaviour
@@ -40,6 +42,12 @@ namespace MiniPandoras.UI
         private static readonly Color BarBack = new Color(8f / 255f, 6f / 255f, 12f / 255f, 0.8f);
         private static readonly Color BarHealthy = new Color32(0xe8, 0x58, 0x4a, 0xff);
         private static readonly Color BarLow = new Color32(0xff, 0x9a, 0x4a, 0xff);
+        // 땅에 붙는 효과는 바닥 그림에서 살짝 띄운다(같은 높이면 깜빡인다).
+        private static readonly Vector3 GroundLift = Upright.Up * 0.03f;
+        // 몸 높이 효과는 세운 판에서 카메라 쪽으로 조금 내어, 그 효과가 붙은 몸 그림에 가리지 않게 한다.
+        private static readonly Vector3 TowardCamera = Upright.Stand * Vector3.back * 0.25f;
+        // 움켜쥐는 불길은 몸에서 뻗는 높이(가슴)로 그린다. 자리는 2D 규칙대로 가슴 높이가 더해져 있다.
+        private static readonly float GrabHeight = Pixels(PlayerFighter.ChestPixels);
 
         [SerializeField] private FieldCombat combat;
         [Tooltip("효과를 빛과 상관없이 그대로 그리는 재질(Sprite-Unlit-Default)")]
@@ -144,8 +152,8 @@ namespace MiniPandoras.UI
                     continue;
                 }
 
-                DrawSprite(disc, center, new Vector2(t.Radius * 2f, t.Radius * 1.2f) * progress, 0f, Faded(TelegraphFill, 0.22f + 0.2f * progress), GroundOrder);
-                DrawEllipse(center, t.Radius, t.Radius * 0.6f, 0f, Mathf.PI * 2f, Faded(TelegraphEdge, 0.75f), ThinLine, GroundOrder);
+                DrawFlat(disc, center, new Vector2(t.Radius * 2f, t.Radius * 1.2f) * progress, 0f, Faded(TelegraphFill, 0.22f + 0.2f * progress), GroundOrder);
+                DrawGroundEllipse(center, t.Radius, t.Radius * 0.6f, 0f, Mathf.PI * 2f, Faded(TelegraphEdge, 0.75f), ThinLine, GroundOrder);
             }
         }
 
@@ -157,10 +165,10 @@ namespace MiniPandoras.UI
             Vector2 middle = start + t.Line * 0.5f;
             Vector2 side = new Vector2(-t.Line.y, t.Line.x) / length * t.Radius;
             Color edge = Faded(TelegraphEdge, 0.75f);
-            DrawSprite(pixel, start + t.Line * (progress * 0.5f), new Vector2(length * progress, t.Radius * 2f), degrees, Faded(TelegraphFill, 0.22f + 0.2f * progress), GroundOrder);
-            DrawSprite(pixel, middle + side, new Vector2(length, ThinLine), degrees, edge, GroundOrder);
-            DrawSprite(pixel, middle - side, new Vector2(length, ThinLine), degrees, edge, GroundOrder);
-            DrawSprite(pixel, start + t.Line, new Vector2(ThinLine, t.Radius * 2f), degrees, edge, GroundOrder);
+            DrawFlat(pixel, start + t.Line * (progress * 0.5f), new Vector2(length * progress, t.Radius * 2f), degrees, Faded(TelegraphFill, 0.22f + 0.2f * progress), GroundOrder);
+            DrawFlat(pixel, middle + side, new Vector2(length, ThinLine), degrees, edge, GroundOrder);
+            DrawFlat(pixel, middle - side, new Vector2(length, ThinLine), degrees, edge, GroundOrder);
+            DrawFlat(pixel, start + t.Line, new Vector2(ThinLine, t.Radius * 2f), degrees, edge, GroundOrder);
         }
 
         private void DrawZones(List<Zone> zones)
@@ -170,7 +178,7 @@ namespace MiniPandoras.UI
             {
                 if (z.Skill.Look == SkillLook.Sand)
                 {
-                    DrawLooped(quicksand, z.Center, z.Radius / QuicksandRadius, false, GroundOrder);
+                    DrawLooped(quicksand, z.Center, z.Radius / QuicksandRadius, false, GroundOrder, false);
                     continue;
                 }
 
@@ -182,8 +190,8 @@ namespace MiniPandoras.UI
 
                 IReadOnlyList<Color> palette = z.Skill.Palette;
                 Color fill = palette.Count > 3 ? palette[3] : palette[0];
-                DrawSprite(disc, z.Center, new Vector2(z.Radius * 2f, z.Radius * 1.2f), 0f, Faded(fill, 0.28f), GroundOrder);
-                DrawEllipse(z.Center, z.Radius * 0.8f, z.Radius * 0.48f, spin, spin + 2.2f, Faded(palette[0], 0.6f), ThinLine, GroundOrder);
+                DrawFlat(disc, z.Center, new Vector2(z.Radius * 2f, z.Radius * 1.2f), 0f, Faded(fill, 0.28f), GroundOrder);
+                DrawGroundEllipse(z.Center, z.Radius * 0.8f, z.Radius * 0.48f, spin, spin + 2.2f, Faded(palette[0], 0.6f), ThinLine, GroundOrder);
             }
         }
 
@@ -192,7 +200,7 @@ namespace MiniPandoras.UI
         {
             if (z.Band <= 0f)
             {
-                DrawSprite(disc, z.Center, new Vector2(z.Radius * 2f, z.Radius * 2f * GroundSquash), 0f, Faded(z.Skill.MainColor, 0.16f), GroundOrder);
+                DrawFlat(disc, z.Center, new Vector2(z.Radius * 2f, z.Radius * 2f * GroundSquash), 0f, Faded(z.Skill.MainColor, 0.16f), GroundOrder);
             }
 
             float area = z.Band > 0f ? Mathf.PI * 2f * z.Radius * FlameSpacing : Mathf.PI * z.Radius * z.Radius;
@@ -211,13 +219,13 @@ namespace MiniPandoras.UI
                 float angle = z.Band > 0f ? i * Mathf.PI * 2f / count : i * GoldenAngle;
                 Vector2 at = z.Center + new Vector2(Mathf.Cos(angle) * z.Radius * spot, Mathf.Sin(angle) * z.Radius * spot * GroundSquash);
                 Sprite sprite = frames[(tick + i * 2) % frames.Length];
-                DrawSprite(sprite, at, sprite.bounds.size * (0.7f + i % 3 * 0.15f), 0f, Color.white, GroundOrder);
+                DrawStanding(sprite, at, sprite.bounds.size * (0.7f + i % 3 * 0.15f), 0f, Color.white, GroundOrder);
             }
 
             if (z.Follow != null && z.Skill.Look == SkillLook.Demon)
             {
                 Sprite wing = wingFrames[tick % wingFrames.Length];
-                DrawSprite(wing, z.Center + new Vector2(0f, Pixels(10f)), wing.bounds.size, 0f, Color.white, WingOrder);
+                DrawStanding(wing, new Raised(z.Center, Pixels(10f)), wing.bounds.size, 0f, Color.white, WingOrder);
             }
         }
 
@@ -227,8 +235,8 @@ namespace MiniPandoras.UI
             {
                 float progress = t.Frame / (float)t.Delay;
                 Vector2 full = new Vector2(t.Radius * 2f, t.Radius * 2f * GroundSquash);
-                DrawSprite(disc, t.Center, full * progress, 0f, Faded(t.Skill.MainColor, 0.4f), GroundOrder);
-                DrawEllipse(t.Center, t.Radius, t.Radius * GroundSquash, 0f, Mathf.PI * 2f, Faded(t.Skill.AccentColor, 0.85f), ThinLine, GroundOrder);
+                DrawFlat(disc, t.Center, full * progress, 0f, Faded(t.Skill.MainColor, 0.4f), GroundOrder);
+                DrawGroundEllipse(t.Center, t.Radius, t.Radius * GroundSquash, 0f, Mathf.PI * 2f, Faded(t.Skill.AccentColor, 0.85f), ThinLine, GroundOrder);
             }
         }
 
@@ -243,14 +251,14 @@ namespace MiniPandoras.UI
                 int links = Mathf.FloorToInt(g.Reach / LinkSpacing);
                 for (int k = 0; k < links; k++)
                 {
-                    DrawSprite(link, g.Origin + g.Direction * ((k + 0.5f) * LinkSpacing), link.bounds.size, degrees, Color.white, OverOrder);
+                    DrawStanding(link, AtGrabHeight(g.Origin + g.Direction * ((k + 0.5f) * LinkSpacing)), link.bounds.size, degrees, Color.white, OverOrder);
                 }
 
                 // 마지막 그림이 움켜쥔 손이다.
                 Sprite hand = g.Holds ? handFrames[handFrames.Length - 1] : handFrames[tick % (handFrames.Length - 1)];
                 Vector2 size = hand.bounds.size;
                 // 왼쪽으로 뻗어도 엄지가 아래에 오도록 위아래를 뒤집는다.
-                DrawSprite(hand, g.Tip, new Vector2(size.x, g.Direction.x < 0f ? -size.y : size.y), degrees, Color.white, OverOrder);
+                DrawStanding(hand, AtGrabHeight(g.Tip), new Vector2(size.x, g.Direction.x < 0f ? -size.y : size.y), degrees, Color.white, OverOrder);
             }
         }
 
@@ -267,7 +275,7 @@ namespace MiniPandoras.UI
 
                 Sprite[] frames = FramesOf(fx.Sheet);
                 Sprite sprite = frames[Mathf.Min(frames.Length - 1, fx.Frame * frames.Length / fx.Duration)];
-                DrawSprite(sprite, fx.Position, sprite.bounds.size * fx.Scale, 0f, Color.white, OverOrder);
+                DrawStanding(sprite, fx.Position, sprite.bounds.size * fx.Scale, 0f, Color.white, OverOrder);
             }
         }
 
@@ -275,24 +283,32 @@ namespace MiniPandoras.UI
         private void DrawPixelFx(EffectSheet sheet, SpriteFx fx)
         {
             int index = Mathf.Min(sheet.FrameCount - 1, fx.Frame * sheet.FrameCount / fx.Duration);
-            DrawLayers(sheet, index, fx.Position, fx.Scale, fx.Flipped, OverOrder);
+            DrawLayers(sheet, index, fx.Position, fx.Scale, fx.Flipped, OverOrder, true);
         }
 
-        /// <summary>되풀이하는 pixelfx 효과를 시간에 맞춰 그린다.</summary>
-        private void DrawLooped(EffectSheet sheet, Vector2 at, float scale, bool flipped, int order)
+        /// <summary>되풀이하는 pixelfx 효과를 시간에 맞춰 그린다. standing이 아니면 땅에 눕힌다(모래 늪).</summary>
+        private void DrawLooped(EffectSheet sheet, Vector2 at, float scale, bool flipped, int order, bool standing)
         {
             int index = Mathf.FloorToInt(Time.time * sheet.FramesPerSecond) % sheet.FrameCount;
-            DrawLayers(sheet, index, at, scale, flipped, order);
+            DrawLayers(sheet, index, at, scale, flipped, order, standing);
         }
 
         /// <summary>pixelfx 한 장면: 색 층은 보통으로, 빛 층은 더해서 같은 자리에 겹친다.</summary>
-        private void DrawLayers(EffectSheet sheet, int index, Vector2 at, float scale, bool flipped, int order)
+        private void DrawLayers(EffectSheet sheet, int index, Raised at, float scale, bool flipped, int order, bool standing)
         {
             var mirror = new Vector2(flipped ? -scale : scale, scale);
             Sprite color = sheet.ColorFrames[index];
-            DrawSprite(color, at, Vector2.Scale(color.bounds.size, mirror), 0f, Color.white, order);
             Sprite light = sheet.LightFrames[index];
-            DrawSprite(light, at, Vector2.Scale(light.bounds.size, mirror), 0f, Color.white, order, additive);
+            if (standing)
+            {
+                DrawStanding(color, at, Vector2.Scale(color.bounds.size, mirror), 0f, Color.white, order);
+                DrawStanding(light, at, Vector2.Scale(light.bounds.size, mirror), 0f, Color.white, order, additive);
+            }
+            else
+            {
+                DrawFlat(color, at.Ground, Vector2.Scale(color.bounds.size, mirror), 0f, Color.white, order);
+                DrawFlat(light, at.Ground, Vector2.Scale(light.bounds.size, mirror), 0f, Color.white, order, additive);
+            }
         }
 
         private EffectSheet PixelFxOf(FxSheet sheet)
@@ -369,7 +385,7 @@ namespace MiniPandoras.UI
             {
                 float fade = 1f - g.Frame / (float)Ghost.Duration;
                 Vector2 size = g.Sprite.bounds.size;
-                DrawSprite(g.Sprite, g.Position, new Vector2(g.Flipped ? -size.x : size.x, size.y), 0f, Faded(g.Tint, GhostAlpha * fade), WingOrder, silhouette);
+                DrawStanding(g.Sprite, g.Position, new Vector2(g.Flipped ? -size.x : size.x, size.y), 0f, Faded(g.Tint, GhostAlpha * fade), WingOrder, silhouette);
             }
         }
 
@@ -379,14 +395,14 @@ namespace MiniPandoras.UI
             {
                 if (w.Skill.Look == SkillLook.Sand)
                 {
-                    DrawLooped(sandWave, w.Front, w.Width / SandWaveHeight, w.Direction.x < 0f, OverOrder);
+                    DrawLooped(sandWave, w.Front, w.Width / SandWaveHeight, w.Direction.x < 0f, OverOrder, true);
                     continue;
                 }
 
                 float angle = Mathf.Atan2(w.Direction.y, w.Direction.x) * Mathf.Rad2Deg;
                 float alpha = 0.45f * (1f - w.Travelled / w.Length);
-                DrawSprite(pixel, w.Front, new Vector2(Pixels(16f), w.Width), angle, Faded(w.Skill.MainColor, alpha), OverOrder);
-                DrawSprite(pixel, w.Front, new Vector2(Pixels(5f), w.Width - Pixels(6f)), angle, Faded(w.Skill.AccentColor, alpha), OverOrder);
+                DrawFlat(pixel, w.Front, new Vector2(Pixels(16f), w.Width), angle, Faded(w.Skill.MainColor, alpha), OverOrder);
+                DrawFlat(pixel, w.Front, new Vector2(Pixels(5f), w.Width - Pixels(6f)), angle, Faded(w.Skill.AccentColor, alpha), OverOrder);
             }
         }
 
@@ -397,15 +413,15 @@ namespace MiniPandoras.UI
                 if (s.Skill.Look == SkillLook.Flame)
                 {
                     Sprite ball = emberBallFrames[Mathf.FloorToInt(Time.time * FlameFramesPerSecond) % emberBallFrames.Length];
-                    DrawSprite(ball, s.Position, ball.bounds.size, Mathf.Atan2(s.Velocity.y, s.Velocity.x) * Mathf.Rad2Deg, Color.white, OverOrder);
+                    DrawStanding(ball, s.Spot, ball.bounds.size, Mathf.Atan2(s.Velocity.y, s.Velocity.x) * Mathf.Rad2Deg, Color.white, OverOrder);
                     continue;
                 }
 
                 IReadOnlyList<Color> palette = s.Skill.Palette;
                 float outer = Mathf.Max(Pixels(2f), s.Radius * 0.4f) * 2f;
                 float inner = Mathf.Max(Pixels(1f), s.Radius * 0.2f) * 2f;
-                DrawSprite(disc, s.Position, new Vector2(outer, outer), 0f, Faded(palette[0], 0.9f), OverOrder);
-                DrawSprite(disc, s.Position, new Vector2(inner, inner), 0f, palette.Count > 2 ? palette[2] : Color.white, OverOrder);
+                DrawStanding(disc, s.Spot, new Vector2(outer, outer), 0f, Faded(palette[0], 0.9f), OverOrder);
+                DrawStanding(disc, s.Spot, new Vector2(inner, inner), 0f, palette.Count > 2 ? palette[2] : Color.white, OverOrder);
             }
         }
 
@@ -421,7 +437,7 @@ namespace MiniPandoras.UI
                 // 퍼지면서 옅어진다.
                 float progress = r.Frame / (float)r.Duration;
                 float radius = r.Radius * (0.4f + 0.6f * progress);
-                DrawEllipse(r.Center, radius, radius * 0.62f, 0f, Mathf.PI * 2f, Faded(r.Color, 1f - progress), ThickLine, OverOrder);
+                DrawGroundEllipse(r.Center, radius, radius * 0.62f, 0f, Mathf.PI * 2f, Faded(r.Color, 1f - progress), ThickLine, OverOrder);
             }
         }
 
@@ -431,12 +447,12 @@ namespace MiniPandoras.UI
             {
                 float progress = a.Frame / (float)Arc.Duration;
                 float angle = Mathf.Atan2(a.Direction.y, a.Direction.x);
-                Vector2 center = a.Center - a.Direction * Pixels(6f);
+                var center = new Raised(a.Center.Ground - a.Direction * Pixels(6f), a.Center.Height);
                 float alpha = 1f - progress;
                 float outer = a.Size * (0.7f + progress * 0.4f);
                 float inner = a.Size * (0.55f + progress * 0.4f);
-                DrawEllipse(center, outer, outer, angle - 1.1f, angle + 1.1f, Faded(a.Color, alpha), ThickLine, OverOrder);
-                DrawEllipse(center, inner, inner, angle - 0.8f, angle + 0.8f, Faded(Color.white, alpha), ThinLine, OverOrder);
+                DrawStandingEllipse(center, outer, outer, angle - 1.1f, angle + 1.1f, Faded(a.Color, alpha), ThickLine, OverOrder);
+                DrawStandingEllipse(center, inner, inner, angle - 0.8f, angle + 0.8f, Faded(Color.white, alpha), ThinLine, OverOrder);
             }
         }
 
@@ -450,7 +466,7 @@ namespace MiniPandoras.UI
                 // 왼쪽은 돌리지 않고 뒤집어, 부스러기가 늘 아래로 떨어지게 한다.
                 bool left = impact.Direction.x < 0f;
                 float degrees = left ? 0f : Mathf.Atan2(impact.Direction.y, impact.Direction.x) * Mathf.Rad2Deg;
-                DrawSprite(sprite, impact.Center, new Vector2(left ? -size.x : size.x, size.y), degrees, Color.white, OverOrder);
+                DrawStanding(sprite, impact.Center, new Vector2(left ? -size.x : size.x, size.y), degrees, Color.white, OverOrder);
             }
         }
 
@@ -466,11 +482,13 @@ namespace MiniPandoras.UI
                     continue;
                 }
 
-                Vector2 left = e.Position + new Vector2(-width / 2f, Pixels(e.Body.Sheet.Size.y + 4f));
-                DrawSprite(pixel, left + new Vector2(width / 2f, -Pixels(1f)), new Vector2(width + Pixels(2f), Pixels(4f)), 0f, BarBack, OverOrder);
+                Vector2 left = e.Position + new Vector2(-width / 2f, 0f);
+                float height = Pixels(e.Body.Sheet.Size.y + 4f - 1f);
+                DrawStanding(pixel, new Raised(left + new Vector2(width / 2f, 0f), height), new Vector2(width + Pixels(2f), Pixels(4f)), 0f, BarBack, OverOrder);
                 float ratio = e.Hp / (float)e.MaxHp;
                 float filled = Pixels(Mathf.Round(18f * ratio));
-                DrawSprite(pixel, left + new Vector2(filled / 2f, -Pixels(1f)), new Vector2(filled, Pixels(2f)), 0f, ratio > 0.3f ? BarHealthy : BarLow, OverOrder);
+                // 채운 막대는 바탕보다 카메라 쪽으로 조금 더 내어 바탕에 가리지 않게 한다.
+                DrawStanding(pixel, new Raised(left + new Vector2(filled / 2f, -0.02f), height), new Vector2(filled, Pixels(2f)), 0f, ratio > 0.3f ? BarHealthy : BarLow, OverOrder + 1);
             }
         }
 
@@ -494,13 +512,38 @@ namespace MiniPandoras.UI
                 // 웹게임 글자 크기(px)를 월드 높이로: TextMeshPro는 글자 크기 10이 1유닛이다.
                 text.fontSize = Pixels(p.Size) * 10f;
                 text.color = Faded(p.Color, alpha);
-                text.transform.position = p.Position + new Vector2(0f, rise);
+                text.transform.SetPositionAndRotation(new Raised(p.Position.Ground, p.Position.Height + rise).World + TowardCamera, Upright.Stand);
             }
         }
 
         // ── 렌더러 꺼내 쓰기 ─────────────────────────────────────
 
-        private void DrawSprite(Sprite sprite, Vector2 position, Vector2 size, float degrees, Color color, int order, Material material = null)
+        /// <summary>땅에 붙는 효과: 바닥에 누워 그린다. degrees는 땅 위에서 돌린 각도다.</summary>
+        private void DrawFlat(Sprite sprite, Vector2 ground, Vector2 size, float degrees, Color color, int order, Material material = null)
+        {
+            Place(NextSprite(sprite, color, order, material), (Vector3)ground + GroundLift, Quaternion.Euler(0f, 0f, degrees), size);
+        }
+
+        /// <summary>몸 높이에 뜨는 효과: 땅 자리에서 세운 판을 따라 높이만큼 올라간 곳에 세워 그린다. degrees는 세운 판 안에서 돌린 각도다.</summary>
+        private void DrawStanding(Sprite sprite, Raised at, Vector2 size, float degrees, Color color, int order, Material material = null)
+        {
+            Place(NextSprite(sprite, color, order, material), at.World + TowardCamera, Upright.Stand * Quaternion.Euler(0f, 0f, degrees), size);
+        }
+
+        private static void Place(SpriteRenderer renderer, Vector3 position, Quaternion rotation, Vector2 size)
+        {
+            renderer.transform.SetPositionAndRotation(position, rotation);
+            Vector2 native = renderer.sprite.bounds.size;
+            renderer.transform.localScale = new Vector3(size.x / native.x, size.y / native.y, 1f);
+        }
+
+        /// <summary>움켜쥐는 불길의 한 점(2D 규칙대로 가슴 높이가 더해진 자리)을 땅 자리와 가슴 높이로 나눈다.</summary>
+        private static Raised AtGrabHeight(Vector2 flat)
+        {
+            return new Raised(flat - new Vector2(0f, GrabHeight), GrabHeight);
+        }
+
+        private SpriteRenderer NextSprite(Sprite sprite, Color color, int order, Material material)
         {
             if (spritesUsed == sprites.Count)
             {
@@ -516,15 +559,36 @@ namespace MiniPandoras.UI
             next.sprite = sprite;
             next.color = color;
             next.sortingOrder = order;
-            Transform t = next.transform;
-            t.position = position;
-            t.rotation = Quaternion.Euler(0f, 0f, degrees);
-            Vector2 native = sprite.bounds.size;
-            t.localScale = new Vector3(size.x / native.x, size.y / native.y, 1f);
+            return next;
         }
 
-        /// <summary>타원(또는 그 일부)의 테두리. 각도는 라디안이고 위쪽이 +y다.</summary>
-        private void DrawEllipse(Vector2 center, float radiusX, float radiusY, float from, float to, Color color, float width, int order)
+        /// <summary>땅에 그린 타원(또는 그 일부)의 테두리. 각도는 라디안이고 북쪽이 +y다.</summary>
+        private void DrawGroundEllipse(Vector2 center, float radiusX, float radiusY, float from, float to, Color color, float width, int order)
+        {
+            for (int i = 0; i <= EllipseSegments; i++)
+            {
+                float angle = Mathf.Lerp(from, to, i / (float)EllipseSegments);
+                points[i] = new Vector3(center.x + Mathf.Cos(angle) * radiusX, center.y + Mathf.Sin(angle) * radiusY, 0f) + GroundLift;
+            }
+
+            DrawLine(color, width, order);
+        }
+
+        /// <summary>몸 높이에 세운 타원 일부(휘두른 자국). 각도는 라디안이고 위쪽(높이)이 +y다.</summary>
+        private void DrawStandingEllipse(Raised center, float radiusX, float radiusY, float from, float to, Color color, float width, int order)
+        {
+            for (int i = 0; i <= EllipseSegments; i++)
+            {
+                float angle = Mathf.Lerp(from, to, i / (float)EllipseSegments);
+                var point = new Raised(center.Ground + new Vector2(Mathf.Cos(angle) * radiusX, 0f), center.Height + Mathf.Sin(angle) * radiusY);
+                points[i] = point.World + TowardCamera;
+            }
+
+            DrawLine(color, width, order);
+        }
+
+        /// <summary>points에 채운 꺾은선을 다음 선 렌더러로 그린다.</summary>
+        private void DrawLine(Color color, float width, int order)
         {
             if (linesUsed == lines.Count)
             {
@@ -538,12 +602,6 @@ namespace MiniPandoras.UI
 
             LineRenderer line = lines[linesUsed++];
             line.enabled = true;
-            for (int i = 0; i <= EllipseSegments; i++)
-            {
-                float angle = Mathf.Lerp(from, to, i / (float)EllipseSegments);
-                points[i] = new Vector3(center.x + Mathf.Cos(angle) * radiusX, center.y + Mathf.Sin(angle) * radiusY, 0f);
-            }
-
             line.positionCount = points.Length;
             line.SetPositions(points);
             line.startWidth = width;

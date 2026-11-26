@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MiniPandoras.Characters;
+using MiniPandoras.World;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -8,7 +9,13 @@ namespace MiniPandoras.Combat
     /// <summary>날아가는 탄. 꿰뚫지 않으면 처음 맞힌 적에서 사라진다.</summary>
     public sealed class Shot
     {
+        /// <summary>탄은 발에서 이만큼(논리 px) 위로 난다. 2D 규칙의 자리(<see cref="Position"/>)에는 이 높이가 화면 위쪽으로 더해져 있다.</summary>
+        public const float FlightHeightPixels = 10f;
+
         public Vector2 Position { get; set; }
+
+        /// <summary>HD-2D 화면에 그릴 자리: 땅 자리와 나는 높이.</summary>
+        public Raised Spot => new Raised(Position - new Vector2(0f, MapCoordinates.Pixels(FlightHeightPixels)), MapCoordinates.Pixels(FlightHeightPixels));
         public Vector2 Velocity { get; set; }
         public float Travelled { get; set; }
         public float Range { get; set; }
@@ -153,7 +160,7 @@ namespace MiniPandoras.Combat
     public sealed class SpriteFx
     {
         public FxSheet Sheet { get; set; }
-        public Vector2 Position { get; set; }
+        public Raised Position { get; set; }
         public int Frame { get; set; }
         public int Duration { get; set; }
         public float Scale { get; set; }
@@ -169,7 +176,7 @@ namespace MiniPandoras.Combat
         public const int Duration = 26;
 
         public Sprite Sprite { get; set; }
-        public Vector2 Position { get; set; }
+        public Raised Position { get; set; }
         public Color Tint { get; set; }
         public bool Flipped { get; set; }
         public int Frame { get; set; }
@@ -191,7 +198,7 @@ namespace MiniPandoras.Combat
     {
         public const int Duration = 8;
 
-        public Vector2 Center { get; set; }
+        public Raised Center { get; set; }
         public Vector2 Direction { get; set; }
         public int Frame { get; set; }
         public float Size { get; set; }
@@ -204,7 +211,7 @@ namespace MiniPandoras.Combat
         /// <summary>0.2초. 화면은 이 동안 그림 여섯 장을 고르게 넘긴다.</summary>
         public const int Duration = 12;
 
-        public Vector2 Center { get; set; }
+        public Raised Center { get; set; }
         public Vector2 Direction { get; set; }
         public int Frame { get; set; }
         /// <summary>그림 크기 배율(세 번째 연격은 크다).</summary>
@@ -216,7 +223,7 @@ namespace MiniPandoras.Combat
     {
         public const int Duration = 36;
 
-        public Vector2 Position { get; set; }
+        public Raised Position { get; set; }
         /// <summary>글자. 비어 있으면 <see cref="Number"/>를 쓴다(피해 숫자마다 문자열을 만들지 않으려고).</summary>
         public string Text { get; set; }
         public int Number { get; set; }
@@ -273,7 +280,7 @@ namespace MiniPandoras.Combat
         public Trap NewTrap() => Add(Traps, trapPool);
         public Telegraph NewTelegraph() => Add(Telegraphs, telegraphPool);
 
-        public void AddSpriteFx(FxSheet sheet, Vector2 position, int duration, float scale, bool flipped = false, CharacterBody follow = null)
+        public void AddSpriteFx(FxSheet sheet, Raised position, int duration, float scale, bool flipped = false, CharacterBody follow = null)
         {
             SpriteFx fx = Add(SpriteFxs, spriteFxPool);
             fx.Sheet = sheet;
@@ -285,7 +292,7 @@ namespace MiniPandoras.Combat
             fx.Follow = follow;
         }
 
-        public void AddGhost(Sprite sprite, Vector2 position, bool flipped, Color tint)
+        public void AddGhost(Sprite sprite, Raised position, bool flipped, Color tint)
         {
             Ghost ghost = Add(Ghosts, ghostPool);
             ghost.Sprite = sprite;
@@ -305,7 +312,7 @@ namespace MiniPandoras.Combat
             ring.Frame = startFrame;
         }
 
-        public void AddArc(Vector2 center, Vector2 direction, float size, Color color)
+        public void AddArc(Raised center, Vector2 direction, float size, Color color)
         {
             Arc arc = Add(Arcs, arcPool);
             arc.Center = center;
@@ -315,7 +322,7 @@ namespace MiniPandoras.Combat
             arc.Frame = 0;
         }
 
-        public void AddImpact(Vector2 center, Vector2 direction, float scale)
+        public void AddImpact(Raised center, Vector2 direction, float scale)
         {
             Impact impact = Add(Impacts, impactPool);
             impact.Center = center;
@@ -324,12 +331,12 @@ namespace MiniPandoras.Combat
             impact.Frame = 0;
         }
 
-        public void AddPopup(Vector2 position, string text, Color color, float size)
+        public void AddPopup(Raised position, string text, Color color, float size)
         {
             AddPopup(position, text, 0, color, size);
         }
 
-        public void AddNumber(Vector2 position, int number, Color color, float size)
+        public void AddNumber(Raised position, int number, Color color, float size)
         {
             AddPopup(position, null, number, color, size);
         }
@@ -437,7 +444,7 @@ namespace MiniPandoras.Combat
             ReleaseAll(Popups, popupPool);
         }
 
-        private void AddPopup(Vector2 position, string text, int number, Color color, float size)
+        private void AddPopup(Raised position, string text, int number, Color color, float size)
         {
             Popup popup = Add(Popups, popupPool);
             popup.Position = position;

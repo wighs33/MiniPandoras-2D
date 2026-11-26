@@ -100,12 +100,12 @@ namespace MiniPandoras.Tests
         }
 
         /// <summary>
-        /// 타이틀의 장 선택에서 그 장을 누르고, 타이틀이 닫혀 그 장이 시작될 때까지 기다린다. 써 둔 저장의 장이면 그 저장으로 이어서 한다.
+        /// 타이틀의 장 선택에서 그 장을 누르고, 무대로 뛰어드는 연출이 끝나 타이틀이 닫히고 그 장이 시작될 때까지 기다린다. 써 둔 저장의 장이면 그 저장으로 이어서 한다.
         /// </summary>
         public static IEnumerator PickOnTitle(int chapter)
         {
             var title = Object.FindFirstObjectByType<TitleView>();
-            float realEnd = Time.realtimeSinceStartup + 10f;
+            float realEnd = Time.realtimeSinceStartup + 25f;
             while (!title.IsOpen)
             {
                 Assert.That(Time.realtimeSinceStartup, Is.LessThan(realEnd), "타이틀이 뜬다");

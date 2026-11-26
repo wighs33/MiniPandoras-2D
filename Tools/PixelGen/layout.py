@@ -7,6 +7,9 @@
   Assets/MiniPandoras/Art/PixelGen/Maps/<id>/map.json     맵 데이터(웹게임 형식 + decals: 집터처럼 바닥 위에 까는 그림)
   Assets/MiniPandoras/Art/PixelGen/Maps/<id>/ground.png   바닥(한 칸 64px)
   Assets/MiniPandoras/Art/PixelGen/Maps/<id>/<이름>.png   집·집터·상자 … 그림
+  Assets/MiniPandoras/Art/PixelGen/Maps/<id>/models.png·json   HD-2D 필드에서 그림 대신 세우는 모형(picture_model.py: 아틀라스와 면 목록)
+  Assets/MiniPandoras/Art/PixelGen/Maps/<id>/relief.png   벽·절벽이 있는 맵의 높이(relief.py). HD-2D 필드에서 바닥 그림을 일으켜 세운다
+  Assets/MiniPandoras/Art/PixelGen/Maps/<id>/below_<이름>.png   바닥보다 아래 깊은 곳에 까는 그림(뱀성 꼭대기에서 내려다보이는 땅과 구름)
 
 한 맵이 이야기에 따라 달라 보이면(낡은 아지트 ↔ 회상 속 전성기의 아지트) 모습(look)을 나눈다. 모습 안에서 세운 것·집터·소품·충돌·빛은
 그 모습일 때만 있고, 바닥 그림과 모습 밖에서 놓은 것은 늘 있다. 처음 적은 모습이 기본이고, 다른 모습은 이야기가 고른다.
@@ -20,9 +23,13 @@ from contextlib import contextmanager
 import numpy as np
 from PIL import Image
 
+import house_model
 import houses
 import objects
+import picture_model
 import pixelgen as pg
+import prop_models
+import relief
 import terrain
 from preview_map import compose
 
@@ -34,9 +41,11 @@ LAMP_LIGHT = "#ffc870"
 
 
 class MapLayout:
-    def __init__(self, map_id, name, width, height, theme="outdoor", music="", weather=None, ambient=None, background=None, seed=1):
+    def __init__(self, map_id, name, width, height, theme="outdoor", music="", weather=None, ambient=None, background=None, seed=1, indoors=False):
         self.id, self.name, self.width, self.height = map_id, name, width, height
         self.theme, self.music, self.weather, self.ambient, self.background = theme, music, weather, ambient, background
+        # 지붕·천장 아래(방·동굴·탑 안). HD-2D 필드에서 해를 머리 위 앞쪽에서 비춰 벽이 방바닥에 긴 그림자를 드리우지 않는다.
+        self.indoors = indoors
         self.seed = seed
         self.kinds = np.full((height, width), "grass", dtype=object)
         self.solid = np.zeros((height * SUB, width * SUB), dtype=bool)
@@ -45,9 +54,17 @@ class MapLayout:
         self.fires = []
         # 바닥을 직접 그리는 맵(실내 …)은 여기에 그리는 함수를 둔다. 없으면 칸 종류로 야외 바닥을 그린다.
         self.paint_ground = None
+        # 바닥 그림의 높이(relief.Relief). 절벽을 그리는 바닥 그리기(terrain.draw_outdoor …)가 여기에 적는다.
+        self.heights = relief.Relief(height * pg.TILE, width * pg.TILE)
+        # 방·동굴처럼 바닥을 직접 그리는 맵은 높이를 돌려주는 함수를 둔다. 바닥 그림을 그린 뒤에 부르고, heights 대신 쓴다.
+        self.paint_relief = None
         self.points = {}
         self.blocked_points = set()
         self.images = {}
+        self.models = {}            # 세운 그림 이름 → 그 그림 대신 세우는 모형(picture_model.Model)
+        # 바닥 자체가 조각인 맵(돌뱀 머리 위)은 여기에 바닥 모형을 둔다. 면 좌표는 맵 왼쪽 위에서 잰 점이고, 걷는 곳은 높이 0이다.
+        self.ground_model = None
+        self.below_images, self.below_layers = {}, []
         self.look_solid = {}        # 모습 이름(적은 순서) → 그 모습일 때만 막히는 충돌 칸
         self.drawing_look = None
         yy, xx = np.mgrid[0:height, 0:width]
@@ -125,21 +142,31 @@ class MapLayout:
 
     # ── 세운 것 ─────────────────────────────────────────
 
-    def upright(self, name, image, foot_x_dots, foot_y_dots, pivot, foot_logical):
-        """그림 한 장을 세운다. 발밑(점)에 그림의 기준점을 맞춘다. foot_logical은 인물과 앞뒤를 가르는 줄(논리 px)."""
+    def upright(self, name, image, foot_x_dots, foot_y_dots, pivot, foot_logical, model=None):
+        """
+        그림 한 장을 세운다. 발밑(점)에 그림의 기준점을 맞춘다. foot_logical은 인물과 앞뒤를 가르는 줄(논리 px).
+        HD-2D 필드는 부피가 있는 것이면 그림 대신 모형을 세운다(model을 주지 않으면 prop_models가 이름을 보고 만든다).
+        """
         self.images[name] = image
+        if name not in self.models:
+            model = model or prop_models.build(self.id, name, image, pivot)
+            if model:
+                self.models[name] = model
         self.uprights.append(self.tagged({"image": name, "left": int(round((foot_x_dots - pivot[0]) * pg.SCALE)),
                                           "top": int(round((foot_y_dots - pivot[1]) * pg.SCALE)), "foot": foot_logical}))
+        if name in self.models:
+            self.uprights[-1]["model"] = name
 
     def house(self, design, cx, gy):
         """
         집 한 채와 집터를 세운다. 충돌은 벽 너비 × (벽 높이 + 지붕 절반)이라 지붕 윗부분 뒤로는 걸어 들어가 가려진다.
+        HD-2D 필드는 그림 대신 집 모형(house_model)을 세운다(지붕이 뒤로 접히고 옆벽·뒤 지붕이 있다).
         돌려주는 값: 문 앞 칸.
         """
-        image, pivot = houses.build(design)
+        house = houses.draw(design)
         yard, yard_pivot = houses.plot(design)
         foot_x, foot_y = cx * pg.TILE, gy * pg.TILE
-        self.upright(design.name, image, foot_x, foot_y, pivot, gy * LOGICAL)
+        self.upright(design.name, house.picture, foot_x, foot_y, house.pivot, gy * LOGICAL, house_model.build(house))
         self.images[design.name + "_plot"] = yard
         self.decals.append(self.tagged({"image": design.name + "_plot", "left": int(round((foot_x - yard_pivot[0]) * pg.SCALE)),
                                         "top": int(round((foot_y - yard_pivot[1]) * pg.SCALE))}))
@@ -159,10 +186,10 @@ class MapLayout:
             self.light(cx * LOGICAL, gy * LOGICAL - 24, design.columns * 7, "#ffb45a")
         return int(door_x), gy
 
-    def stand(self, name, piece, x, ground, block=None):
+    def stand(self, name, piece, x, ground, block=None, model=None):
         """소품 (그림, 기준점)을 세운다. x는 가운데(칸), ground는 발밑이 닿는 칸 경계. block은 막을 (너비, 깊이) 칸."""
         image, pivot = piece
-        self.upright(name, image, x * pg.TILE, ground * pg.TILE, pivot, ground * LOGICAL)
+        self.upright(name, image, x * pg.TILE, ground * pg.TILE, pivot, ground * LOGICAL, model)
         if block:
             w, d = block
             self.block(x - w / 2, ground - d, x + w / 2, ground)
@@ -172,6 +199,15 @@ class MapLayout:
         self.images[name] = image
         self.decals.append(self.tagged({"image": name, "left": int(round(left_dots * pg.SCALE)),
                                         "top": int(round(top_dots * pg.SCALE))}))
+
+    def below(self, name, image, depth, left, top, width, height, drift=0.0, span=0.0, opacity=1.0):
+        """
+        바닥보다 depth칸 아래에 눕히는 그림. 자리와 크기는 칸(맵 왼쪽 위가 원점)이고, 맵 밖으로 나가도 된다(원근 카메라에 내려다보이는 만큼 넓게 깐다).
+        drift를 주면 1초에 그만큼(칸) 동쪽으로 흐르고, span칸을 흐르면 처음 자리로 돌아온다(구름).
+        """
+        self.below_images[name] = image
+        self.below_layers.append({"image": f"below_{name}", "depth": depth, "left": left, "top": top, "width": width, "height": height,
+                                  "drift": drift, "span": span, "opacity": opacity})
 
     def tree(self, x, y, kind="tree"):
         self.props.append(self.tagged({"id": kind, "x": x, "y": y}))
@@ -202,7 +238,8 @@ class MapLayout:
         for x, y in cells:
             mask = sum(bit for bit, (dx, dy) in ((1, (-1, 0)), (2, (1, 0)), (4, (0, -1)), (8, (0, 1))) if (x + dx, y + dy) in cell_set)
             image, pivot = objects.fence(mask)
-            self.upright(f"fence_{mask}", image, x * pg.TILE + pg.TILE // 2, (y + 1) * pg.TILE - 1, pivot, (y + 1) * LOGICAL)
+            self.upright(f"fence_{mask}", image, x * pg.TILE + pg.TILE // 2, (y + 1) * pg.TILE - 1, pivot, (y + 1) * LOGICAL,
+                         prop_models.fence(mask, pivot))
             self.block(x, y + 0.5, x + 1, y + 1)
 
     def gate(self, point, opened, foot_x_dots, foot_y_dots, pivot, foot_logical):
@@ -290,11 +327,24 @@ class MapLayout:
     def save(self, project):
         folder = project / f"Assets/MiniPandoras/Art/PixelGen/Maps/{self.id}"
         folder.mkdir(parents=True, exist_ok=True)
-        ground = self.paint_ground() if self.paint_ground else terrain.draw_outdoor(self.kinds.tolist(), seed=self.seed)
+        ground = self.paint_ground() if self.paint_ground else terrain.draw_outdoor(self.kinds.tolist(), seed=self.seed, heights=self.heights)
         # 허공에 뜬 섬처럼 바닥 밖이 투명한 맵은 RGBA로 저장한다(맵 배경이 비친다).
         Image.fromarray(pg.upscale(ground), "RGBA" if ground.shape[2] == 4 else "RGB").save(folder / "ground.png")
+        relief_path = folder / "relief.png"
+        heights = self.paint_relief() if self.paint_relief else self.heights
+        if not heights.is_flat():
+            heights.save(relief_path)
+        elif relief_path.exists():
+            relief_path.unlink()
         for name, image in self.images.items():
             Image.fromarray(pg.upscale(image), "RGBA").save(folder / f"{name}.png")
+        for name, image in self.below_images.items():
+            Image.fromarray(image, "RGBA" if image.shape[2] == 4 else "RGB").save(folder / f"below_{name}.png")
+        models = dict(self.models)
+        if self.ground_model:
+            models[picture_model.GROUND] = self.ground_model
+        if models:
+            picture_model.write(folder, models)
         solid = self.collision()
         rng = np.random.default_rng(self.seed)
         water = [{"x": int(x), "y": int(y), "kind": "water"} for y, x in zip(*np.nonzero(self.kinds == "water"))]
@@ -304,11 +354,11 @@ class MapLayout:
             "id": self.id, "name": self.name, "theme": self.theme, "music": self.music,
             "width": self.width, "height": self.height, "tilePixels": LOGICAL, "artScale": 4, "collisionPerTile": SUB,
             "collision": ["".join("1" if v else "0" for v in row) for row in solid],
-            "props": self.props,
+            "props": self.props, "below": self.below_layers,
             "points": [{"name": name, "cells": [{"x": x, "y": y} for x, y in cells]} for name, cells in self.points.items()],
             "warps": self.warps, "uprights": self.uprights, "decals": self.decals,
             "animated": water + self.fires, "glints": glints, "lights": self.lights,
-            "background": self.background, "ambient": self.ambient, "weather": self.weather,
+            "background": self.background, "ambient": self.ambient, "weather": self.weather, "indoors": self.indoors,
             "looks": [{"name": name, "collision": ["".join("1" if v else "0" for v in row) for row in solid_cells]}
                       for name, solid_cells in self.look_solid.items()],
         }

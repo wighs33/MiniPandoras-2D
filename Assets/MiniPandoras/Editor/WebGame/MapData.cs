@@ -24,6 +24,7 @@ namespace MiniPandoras.Editor.WebGame
         public WarpData[] warps;
         public UprightData[] uprights = Array.Empty<UprightData>();
         public DecalData[] decals = Array.Empty<DecalData>();
+        public BelowData[] below = Array.Empty<BelowData>();
         public AnimatedData[] animated = Array.Empty<AnimatedData>();
         public GlintData[] glints = Array.Empty<GlintData>();
         public LightData[] lights = Array.Empty<LightData>();
@@ -31,6 +32,7 @@ namespace MiniPandoras.Editor.WebGame
         public string background;
         public AmbientData ambient;
         public string weather;
+        public bool indoors;
     }
 
     [Serializable]
@@ -80,6 +82,8 @@ namespace MiniPandoras.Editor.WebGame
         public float foot;
         public string gate;
         public string look;
+        // HD-2D 필드에서 그림 대신 세우는 모형의 이름(맵 폴더의 models.json). 비면 그림 한 장을 세운다.
+        public string model;
     }
 
     [Serializable]
@@ -89,6 +93,24 @@ namespace MiniPandoras.Editor.WebGame
         public int left;
         public int top;
         public string look;
+    }
+
+    /// <summary>
+    /// 바닥보다 depth칸 아래에 눕히는 그림. 자리와 크기는 칸이고 drift(칸/초)로 흐르면 span칸마다 처음 자리로 돌아온다.
+    /// opacity가 1보다 작으면 그만큼만 덮는다(구름 그림자).
+    /// </summary>
+    [Serializable]
+    internal sealed class BelowData
+    {
+        public string image;
+        public float depth;
+        public float left;
+        public float top;
+        public float width;
+        public float height;
+        public float drift;
+        public float span;
+        public float opacity = 1f;
     }
 
     [Serializable]

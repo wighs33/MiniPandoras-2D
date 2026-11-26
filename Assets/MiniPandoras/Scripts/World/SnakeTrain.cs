@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace MiniPandoras.World
 {
@@ -7,7 +6,7 @@ namespace MiniPandoras.World
     /// 뱀열차: 뱀과 열차가 하나로 합쳐진 거대한 짐승. 비늘 몸통에 불 켜진 창과 올라타는 문이 박혀 있다.
     /// 맵 오른쪽 바깥에서 기어 들어와 <see cref="StopAt"/>으로 정한 자리에 서고, <see cref="Depart"/>로 떠나면 점점 빨라지며 왼쪽으로 사라진다.
     /// 진짜 뱀처럼 땅에 놓인 S자 물결(홈)을 따라 미끄러진다: 물결은 땅에 고정되어 있어, 몸의 모든 곳이 머리가 지난 자리를 그대로 지난다.
-    /// 몸통 그림을 세로 띠로 잘라 띠마다 제자리의 물결 높이에 세우므로 몸 전체가 S자로 굽는다.
+    /// 머리는 부풀린 모형이고 몸통은 물결을 따라 휘는 통(<see cref="SnakeTrainBody"/>)이다.
     /// 살아 있는 짐승이라 몇 초마다 갈래 혀를 날름거린다.
     /// 자리는 웹게임처럼 맵 기준 논리 px(아래가 +), 빠르기는 논리 px/프레임이다(들어오고 떠나는 빠르기는 웹게임 SnakeTrain과 같다).
     /// </summary>
@@ -32,16 +31,17 @@ namespace MiniPandoras.World
         private const float FlickPoseFrames = 3f;
 
         private const float TopSpeed = 2f;
-        private static readonly Color ShadowColor = new Color32(10, 8, 20, 64);
         private static readonly Color[] DustColors = { new Color32(0xd8, 0xc8, 0xa0, 0xff), new Color32(0xc0, 0xac, 0x84, 0xff), new Color32(0xe8, 0xdc, 0xc0, 0xff) };
 
+        // 혀는 부풀어 나온 주둥이 안에서 나오므로 카메라 쪽으로 조금 낸다(칸).
+        private const float TongueInFront = 0.15f;
+
         private Transform head;
+        private SnakeTrainBody body;
         private SpriteRenderer tongue;
         private Sprite[] tongueFrames;
         private float untilFlick;
         private float flickFrames = -1f;
-        private Transform[] slices;
-        private Sprite[] sliceSprites;
         private ParticleBurst dust;
         private float groundY;
         private float dustClock;
@@ -60,27 +60,33 @@ namespace MiniPandoras.World
         public float DoorX => HeadX + DoorOffset;
 
         /// <summary>
-        /// 맵에 뱀열차를 세운다. 머리와 몸통 그림의 기준점은 몸이 땅에 닿는 곳이다. 열차 전체는 땅 높이 한 줄로 인물과 앞뒤를 가리고
-        /// (SortingGroup, 승강장에 선 인물이 앞에 그려진다), 그 안에서는 머리가 몸통 위에 그려진다. 혀는 머리 뒤에서 나온다.
+        /// 맵에 뱀열차를 세운다. 머리 모형과 몸통 그림의 기준점은 몸이 땅에 닿는 곳이다. 앞뒤는 실제 자리로 가려진다(승강장에 선 인물이 앞에 온다).
         /// </summary>
-        public static SnakeTrain Create(Transform map, Sprite head, Sprite body, Sprite[] tongue, ParticleBurst dust, float headX, float groundY)
+        public static SnakeTrain Create(Transform map, TrainLook look, ParticleBurst dust, float headX, float groundY)
         {
             var root = new GameObject("Snake Train") { layer = map.gameObject.layer };
             root.transform.SetParent(map, false);
             root.transform.localPosition = new Vector3(0f, -MapCoordinates.Pixels(groundY), 0f);
-            root.AddComponent<SortingGroup>();
             var train = root.AddComponent<SnakeTrain>();
             train.dust = dust;
             train.groundY = groundY;
             train.HeadX = headX;
-            train.head = AddPart(root.transform, "Head", head, 1);
-            AddShadow(train.head);
-            train.tongueFrames = tongue;
-            train.tongue = AddPart(train.head, "Tongue", tongue[0], 0).GetComponent<SpriteRenderer>();
-            train.tongue.transform.localPosition = MapCoordinates.Pixels(1f) * (Vector3)TongueRoot;
+            train.body = new SnakeTrainBody(root.transform, look.Body, look.BodyMaterial);
+
+            var head = new GameObject("Head", typeof(MeshFilter), typeof(MeshRenderer)) { layer = root.layer };
+            head.transform.SetParent(root.transform, false);
+            head.GetComponent<MeshFilter>().sharedMesh = look.Head;
+            head.GetComponent<MeshRenderer>().sharedMaterial = look.HeadMaterial;
+            train.head = head.transform;
+
+            train.tongueFrames = look.Tongue;
+            train.tongue = new GameObject("Tongue") { layer = root.layer }.AddComponent<SpriteRenderer>();
+            train.tongue.transform.SetParent(train.head, false);
+            train.tongue.transform.localPosition = Upright.Above(new Vector2(MapCoordinates.Pixels(TongueRoot.x), 0f), MapCoordinates.Pixels(TongueRoot.y))
+                + Upright.TowardCamera * TongueInFront;
+            Upright.StandUp(train.tongue, look.TongueMaterial);
             train.tongue.enabled = false;
             train.untilFlick = Random.Range(30f, 90f);
-            train.SliceBody(body);
             train.Place();
             return train;
         }
@@ -98,44 +104,6 @@ namespace MiniPandoras.World
             target = null;
             departing = true;
             Speed = 0.4f;
-        }
-
-        private static Transform AddPart(Transform root, string name, Sprite sprite, int order)
-        {
-            var part = new GameObject(name) { layer = root.gameObject.layer }.AddComponent<SpriteRenderer>();
-            part.transform.SetParent(root, false);
-            part.sprite = sprite;
-            part.sortingOrder = order;
-            return part.transform;
-        }
-
-        /// <summary>머리 아래 납작한 그림자. 몸통 그림자는 몸통 그림에 함께 그려져 있다.</summary>
-        private static void AddShadow(Transform part)
-        {
-            var shadow = new GameObject("Shadow") { layer = part.gameObject.layer }.AddComponent<SpriteRenderer>();
-            shadow.transform.SetParent(part, false);
-            shadow.sprite = EffectSprites.Pixel;
-            shadow.color = ShadowColor;
-            shadow.sortingOrder = -1;
-            shadow.transform.localPosition = new Vector3(MapCoordinates.Pixels(4f), MapCoordinates.Pixels(0.5f), 0f);
-            shadow.transform.localScale = new Vector3(MapCoordinates.Pixels(40f), MapCoordinates.Pixels(3f), 1f);
-        }
-
-        /// <summary>몸통 그림을 SliceWidth 너비의 세로 띠로 자른다. 띠는 그림과 같은 기준 높이(땅에 닿는 줄)를 쓴다.</summary>
-        private void SliceBody(Sprite body)
-        {
-            Rect whole = body.rect;
-            float width = SliceWidth * body.pixelsPerUnit / MapCoordinates.LogicalPixelsPerTile;
-            int count = Mathf.CeilToInt(whole.width / width);
-            var pivot = new Vector2(0f, body.pivot.y / whole.height);
-            slices = new Transform[count];
-            sliceSprites = new Sprite[count];
-            for (int i = 0; i < count; i++)
-            {
-                var rect = new Rect(whole.x + i * width, whole.y, Mathf.Min(width, whole.width - i * width), whole.height);
-                sliceSprites[i] = Sprite.Create(body.texture, rect, pivot, body.pixelsPerUnit, 0, SpriteMeshType.FullRect);
-                slices[i] = AddPart(transform, "Body", sliceSprites[i], 0);
-            }
         }
 
         private void Update()
@@ -203,21 +171,11 @@ namespace MiniPandoras.World
             return Mathf.Sin(x * 2f * Mathf.PI / GrooveLength) * GrooveDepth;
         }
 
-        /// <summary>머리는 목 자리의 물결 높이에, 몸통 띠는 저마다 제자리의 물결 높이에 선다.</summary>
+        /// <summary>머리는 목 자리의 물결에, 몸통 마디는 저마다 제자리의 물결에 놓인다.</summary>
         private void Place()
         {
-            float left = Mathf.Round(HeadX);
-            SetPart(head, left, Groove(left + Neck));
-            for (int i = 0; i < slices.Length; i++)
-            {
-                float x = left + BodyStart + i * SliceWidth;
-                SetPart(slices[i], x, Groove(x));
-            }
-        }
-
-        private static void SetPart(Transform part, float x, float groove)
-        {
-            part.localPosition = new Vector3(MapCoordinates.Pixels(x), -MapCoordinates.Pixels(Mathf.Round(groove)), 0f);
+            head.localPosition = new Vector3(MapCoordinates.Pixels(HeadX), -MapCoordinates.Pixels(Groove(HeadX + Neck)), 0f);
+            body.Place(HeadX);
         }
 
         /// <summary>기어가는 동안 3프레임마다 몸이 닿은 땅 몇 곳에서 흙먼지가 인다.</summary>
@@ -242,10 +200,28 @@ namespace MiniPandoras.World
 
         private void OnDestroy()
         {
-            foreach (Sprite slice in sliceSprites)
+            body.Destroy();
+        }
+
+        /// <summary>뱀열차를 이루는 모형과 그림(Tools/PixelGen/snake_train.py, stage_models.py).</summary>
+        public readonly struct TrainLook
+        {
+            public TrainLook(Mesh head, Material headMaterial, Sprite body, Material bodyMaterial, Sprite[] tongue, Material tongueMaterial)
             {
-                Destroy(slice);
+                Head = head;
+                HeadMaterial = headMaterial;
+                Body = body;
+                BodyMaterial = bodyMaterial;
+                Tongue = tongue;
+                TongueMaterial = tongueMaterial;
             }
+
+            public Mesh Head { get; }
+            public Material HeadMaterial { get; }
+            public Sprite Body { get; }
+            public Material BodyMaterial { get; }
+            public Sprite[] Tongue { get; }
+            public Material TongueMaterial { get; }
         }
     }
 }

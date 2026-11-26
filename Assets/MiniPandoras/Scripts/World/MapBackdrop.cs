@@ -15,6 +15,8 @@ namespace MiniPandoras.World
         private const int TwinkleCount = 28;
         // 화면 맨 뒤(땅 -100보다 뒤)
         private const int PictureOrder = -1000;
+        // 카메라에서 이만큼(칸) 떨어진 곳에 세운다. 맵의 가장 먼 땅보다 멀고 카메라의 먼 면보다 가깝다.
+        private const float Distance = 90f;
 
         private static readonly Color[] GlowColors =
         {
@@ -69,8 +71,15 @@ namespace MiniPandoras.World
 
         private void LateUpdate()
         {
+            // 원근 카메라의 먼 곳(맵 뒤)에 웹게임 화면 한 장 크기로 세우고, 그 거리에서 화면을 덮도록 키운다.
+            transform.localPosition = new Vector3(0f, 0f, Distance);
+            transform.localRotation = Quaternion.identity;
+            float viewHeight = 2f * Distance * Mathf.Tan(view.fieldOfView * 0.5f * Mathf.Deg2Rad);
+            float scale = viewHeight / MapCoordinates.Pixels(ViewHeight);
+            transform.localScale = new Vector3(scale, scale, 1f);
+
             // 화면이 더 넓은 기기에서도 빈틈이 없게 그림을 화면을 덮는 크기로 늘린다.
-            float height = view.orthographicSize * 2f;
+            float height = MapCoordinates.Pixels(ViewHeight);
             float width = height * view.aspect;
             Vector2 size = picture.sprite.bounds.size;
             float cover = Mathf.Max(width / size.x, height / size.y);

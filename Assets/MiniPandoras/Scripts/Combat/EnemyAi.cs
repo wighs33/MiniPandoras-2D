@@ -811,7 +811,7 @@ namespace MiniPandoras.Combat
                     e.Body.OffsetX = JsMath.Round(n.x * 3f);
                     e.Body.OffsetY = JsMath.Round(-n.y * 2f);
                     e.LungeFrames = 6;
-                    combat.Effects.AddArc(new Vector2(e.Position.x + n.x * (e.Radius + Pixels(6f)), e.Chest.y + n.y * Pixels(6f)), n, Pixels(11f), EnemySwingColor);
+                    combat.Effects.AddArc(new Raised(new Vector2(e.Position.x + n.x * (e.Radius + Pixels(6f)), e.Position.y + n.y * Pixels(6f)), e.ChestHeight), n, Pixels(11f), EnemySwingColor);
                     if (Vector2.Distance(p.Body.Position, e.Position) <= e.Reach + Pixels(9f))
                     {
                         combat.HitPlayer(e.Definition, e.Position, attack.Power);

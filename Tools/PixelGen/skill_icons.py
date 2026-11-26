@@ -1,6 +1,8 @@
-"""악마·불꽃·차원·모래 판도라의 스킬 아이콘. 판도라 색 원판에 동작을 나타내는 실루엣 하나를 얹는다.
+"""악마·불꽃·차원·모래 판도라의 스킬 아이콘. 판도라 색 마름모 판에 동작을 나타내는 실루엣 하나를 얹는다.
 
-버튼 지름 26가상px = 52점이고, 점 하나 = 2px로 키워 저장한다. 이름 없이도 읽히도록 글리프는 굵게 그린다.
+버튼 대각선 26가상px = 52점이고, 점 하나 = 2px로 키워 저장한다. 이름 없이도 읽히도록 글리프는 굵게 그린다.
+화면 조작 버튼이 마름모가 되어(2026-11-23, hud_buttons.py) 판도 원판에서 마름모로 바꿨다. 버튼 테두리가 판 가장자리를 덮으므로
+원판에 맞춰 그린 글리프를 줄여 안쪽에 둔다.
 
   Assets/MiniPandoras/Art/PixelGen/UI/SkillIcons/<스킬 id>.png, lock.png
   Docs/ArtUpgrade/PixelGen/skill_icons_preview.png
@@ -26,14 +28,33 @@ SAND = pg.hexes("#4a2e10", "#8a5f22", "#fff2c8", "#e3bb62")
 LOCK = pg.hexes("#16141e", "#2c2a38", "#5e5a68", "#46424e")
 
 
-def disc(colours):
+# 글리프를 줄이는 비율. 버튼 테두리(가장자리에서 L1 5점) 안쪽에 대부분 들어간다.
+GLYPH_SCALE = 0.74
+
+
+def diamond_mask():
+    x, y = grid(SIZE, SIZE)
+    return np.abs(x - CENTER) + np.abs(y - CENTER) <= SIZE / 2
+
+
+def plate(colours):
+    """판도라 색 마름모 판. 위로 조금 치우친 밝은 면이 있다(빛이 위에서 온다)."""
     canvas = blank(SIZE, SIZE)
     x, y = grid(SIZE, SIZE)
-    r = np.hypot(x - CENTER, y - CENTER)
-    over(canvas, r <= SIZE / 2 - 0.5, colours[0])
-    # 왼쪽 위가 밝은 둥근 면.
-    over(canvas, np.hypot(x - CENTER + 3, y - CENTER + 3) <= SIZE / 2 - 5, colours[1])
+    over(canvas, diamond_mask(), colours[0])
+    over(canvas, np.abs(x - CENTER) + np.abs(y - CENTER + 3) <= SIZE / 2 - 8, colours[1])
     return canvas
+
+
+def shrink(mask):
+    """원판에 맞춰 그린 글리프를 가운데 기준으로 GLYPH_SCALE만큼 줄인다(가까운 점을 고른다)."""
+    x, y = grid(SIZE, SIZE)
+    source_x = np.round(CENTER + (x - CENTER) / GLYPH_SCALE).astype(int)
+    source_y = np.round(CENTER + (y - CENTER) / GLYPH_SCALE).astype(int)
+    inside = (source_x >= 0) & (source_x < SIZE) & (source_y >= 0) & (source_y < SIZE)
+    shrunk = np.zeros_like(mask)
+    shrunk[inside] = mask[source_y[inside], source_x[inside]]
+    return shrunk
 
 
 def stamp(canvas, mask, colours):
@@ -228,8 +249,9 @@ def main(project):
     out.mkdir(parents=True, exist_ok=True)
     sheet = Image.new("RGBA", (len(ICONS) * (SIZE * 4 + 8) + 8, SIZE * 4 + 16), (46, 74, 44, 255))
     for i, (name, colours, draw) in enumerate(ICONS):
-        canvas = disc(colours)
-        stamp(canvas, draw(), colours)
+        canvas = plate(colours)
+        stamp(canvas, shrink(draw()), colours)
+        canvas[~diamond_mask()] = 0
         Image.fromarray(pg.upscale(canvas), "RGBA").save(out / f"{name}.png")
         big = Image.fromarray(canvas, "RGBA").resize((SIZE * 4, SIZE * 4), Image.NEAREST)
         sheet.alpha_composite(big, (8 + i * (SIZE * 4 + 8), 8))

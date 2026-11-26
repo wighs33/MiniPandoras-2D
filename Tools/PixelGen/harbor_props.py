@@ -201,7 +201,8 @@ def moored_ship(seed, length, beam, masts=2, paint="teal", cabin=True, flip=Fals
     """
     항구에 맨 배(남쪽에서 비스듬히 본 모습). length·beam은 칸이다. 이물이 오른쪽이고 flip이면 왼쪽이다.
     갑판 판자와 뱃전, 남쪽 바깥 뱃전(띠 장식, 현창, 물막이 띠), 고물 선실, 돛대(접은 돛), 이물대, 갑판의 상자.
-    기준점은 물에 닿은 뱃바닥 가운데다.
+    기준점은 물에 닿은 뱃바닥 가운데다. 돌려주는 값: (그림, 기준점, 층). 층은 HD-2D 모형(prop_models.ship)이 쓴다:
+    hull(돛대 없는 배), masts([(돛대 그림, 왼쪽, 위, 갑판에 닿는 줄)]), south(열마다 갑판 남쪽 끝 줄, 배 밖은 None), side(뱃전 높이).
     """
     rng = np.random.default_rng(seed)
     hull = HULLS[paint]
@@ -276,6 +277,8 @@ def moored_ship(seed, length, beam, masts=2, paint="teal", cabin=True, flip=Fals
         c.paint(c.rect(x0 - 3, roof_top, x0 + box_w + 3, roof_top + 3), hull[2])
         c.paint(c.rect(x0 - 3, wall_top, x0 + box_w + 3, wall_top + 2), hull[3])
     image = outline(c.image)
+    layers = {"hull": image.copy(), "masts": [], "side": side,
+              "south": [float(south[x]) if inside[x] else None for x in range(w)]}
 
     # 돛대: 뉴웨이브 호의 돛대 그림을 크기만 바꿔 쓴다.
     if masts:
@@ -293,6 +296,10 @@ def moored_ship(seed, length, beam, masts=2, paint="teal", cabin=True, flip=Fals
             flag.paint(flag.polygon([(pole_x + 1, top_y - 14), (pole_x + 26, top_y - 9), (pole_x + 1, top_y - 3)]), cloth[2])
             flag.paint(flag.polygon([(pole_x + 1, top_y - 14), (pole_x + 26, top_y - 9), (pole_x + 1, top_y - 10)]), hull[3])
             over(image, outline(flag.image), 0, 0)
+            rigged = np.zeros_like(image)
+            over(rigged, mast_image, left + int(span * spot) - base_x, int(center) + 2 - base_y)
+            over(rigged, outline(flag.image), 0, 0)
+            layers["masts"].append((rigged, 0, 0, int(center) + 2))
 
     # 물에 닿는 물거품(뱃바닥을 따라 두 줄)
     for x in range(w):
@@ -306,8 +313,11 @@ def moored_ship(seed, length, beam, masts=2, paint="teal", cabin=True, flip=Fals
                 image[y + 2, x, 3] = 200
     pivot_x = left + span // 2
     if flip:
-        return image[:, ::-1].copy(), (w - 1 - pivot_x, water_y)
-    return image, (pivot_x, water_y)
+        layers["hull"] = layers["hull"][:, ::-1].copy()
+        layers["masts"] = [(mast[:, ::-1].copy(), x, y, deck_row) for mast, x, y, deck_row in layers["masts"]]
+        layers["south"] = layers["south"][::-1]
+        return image[:, ::-1].copy(), (w - 1 - pivot_x, water_y), layers
+    return image, (pivot_x, water_y), layers
 
 
 def skiff(seed, paint="teal", upright=False):

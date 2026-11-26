@@ -104,6 +104,45 @@ namespace MiniPandoras.Tests
             Assert.That(travel.CurrentMap.ShownLook, Is.EqualTo("abandoned"));
         }
 
+        [UnityTest]
+        public IEnumerator SunShaftsStayOutsideWhenTheHeroEntersABuilding()
+        {
+            var travel = UnityEngine.Object.FindFirstObjectByType<MapTravel>();
+            var shafts = UnityEngine.Object.FindFirstObjectByType<SunShafts>();
+            yield return HoldFor(Vector2.zero, 4f);
+            Assert.That(VisibleShafts(shafts), Is.GreaterThan(0), "낮의 숲에는 햇살이 있다");
+            Assert.That(Motes(shafts), Is.GreaterThan(0));
+
+            travel.LoadNow("adventurersGuild", null, Facing.Up);
+            for (int frame = 0; frame < 5; frame++)
+            {
+                yield return null;
+                Assert.That(VisibleShafts(shafts), Is.Zero, $"들어온 지 {frame + 1}프레임째에 햇살이 남아 있다");
+                Assert.That(Motes(shafts), Is.Zero, $"들어온 지 {frame + 1}프레임째에 빛 알갱이가 남아 있다");
+            }
+
+            travel.LoadNow("hillia", "landing", Facing.Down);
+            yield return null;
+            yield return null;
+            Assert.That(VisibleShafts(shafts), Is.GreaterThan(0), "다시 바깥으로 나오면 햇살이 돌아온다");
+        }
+
+        private static int VisibleShafts(SunShafts shafts)
+        {
+            int visible = 0;
+            foreach (MeshRenderer shaft in shafts.GetComponentsInChildren<MeshRenderer>())
+            {
+                visible += shaft.enabled ? 1 : 0;
+            }
+
+            return visible;
+        }
+
+        private static int Motes(SunShafts shafts)
+        {
+            return shafts.GetComponentInChildren<ParticleSystem>().particleCount;
+        }
+
         // 스틱은 손가락으로 누르고 있는 것처럼 매 프레임 다시 넣는다. 한 번만 넣어 두면, 앞 테스트가 남긴 화면 조이스틱의
         // 가상 패드가 다시 잡히며 입력 장치가 바뀔 때 값이 사라져 주인공이 서 버린다.
         private IEnumerator HoldFor(Vector2 stick, float gameSeconds)

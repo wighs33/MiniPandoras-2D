@@ -173,9 +173,10 @@ def lively(m, room, rng):
 
 
 def build():
-    m = MapLayout("hideout", "뉴웨이브 아지트", WIDTH, HEIGHT, theme="interior", music="hope", seed=71)
+    m = MapLayout("hideout", "뉴웨이브 아지트", WIDTH, HEIGHT, theme="interior", music="hope", seed=71, indoors=True)
     room = paint_rooms()
     m.paint_ground = room.ground
+    m.paint_relief = room.relief
     m.block_where(~room.floor)
 
     rng = np.random.default_rng(72)

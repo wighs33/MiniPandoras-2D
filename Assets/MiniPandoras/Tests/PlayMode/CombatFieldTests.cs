@@ -139,7 +139,8 @@ namespace MiniPandoras.Tests
             Assert.That(combat.Effects.Arcs, Is.Empty, "무기 공격에는 웹게임의 반달 자국이 없다");
             Impact impact = combat.Effects.Impacts[0];
             Assert.That(impact.Direction, Is.EqualTo(Vector2.right), "친 방향으로 터진다");
-            Assert.That(impact.Center.x, Is.LessThan(thug.Chest.x), "맞은 적의 친 쪽 몸 앞에서 터진다");
+            Assert.That(impact.Center.Ground.x, Is.LessThan(thug.Position.x), "맞은 적의 친 쪽 몸 앞에서 터진다");
+            Assert.That(impact.Center.Height, Is.EqualTo(thug.ChestHeight), "가슴 높이에서 터진다(HD-2D 화면은 세운 판을 따라 올린다)");
             yield return Waits.Until(() => combat.Effects.Impacts.Count == 0, 2f, "잠깐 뒤 사라진다");
         }
 

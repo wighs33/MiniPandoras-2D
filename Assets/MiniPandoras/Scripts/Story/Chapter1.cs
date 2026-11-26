@@ -20,11 +20,6 @@ namespace MiniPandoras.Story
 
         // 아직 깨어나지 않은 「???」 판도라의 빛(전투 화면이 그 판도라에 쓰는 색과 같다).
         private static readonly Color MysteryGlow = new Color32(0xc8, 0xb8, 0xff, 0xff);
-        // 랑의 설명 컷인에서 카메라가 천천히 다가가는 곳(가상 px, Tools/PixelGen/cutin_gods.py 그림 기준):
-        // 열 신과 에라디온 사이, 신들과 언덕 위 사람들 사이, 판도라와 그 손끝.
-        private static readonly Vector2 GodsAndWorld = new Vector2(192f, 112f);
-        private static readonly Vector2 GodsAndPeople = new Vector2(192f, 118f);
-        private static readonly Vector2 PandorasHand = new Vector2(176f, 112f);
 
         public static IEnumerator Play(StoryDirector s)
         {
@@ -158,11 +153,11 @@ namespace MiniPandoras.Story
             yield return s.Lines("chapter1.rangAppears.2");
 
             // 설명 컷인: 랑의 이야기에 맞춰 생성기로 그린 장면을 띄운다(웹게임은 설명 그림). 신들은 정확한 모습 대신 실루엣이다.
-            yield return s.Scenes.ExplainInCutIn("rang", "creation", GodsAndWorld,
+            yield return s.Scenes.ExplainInCutIn("rang", "creation",
                 T("chapter1.rangAppears.4"));
-            yield return s.Scenes.ExplainInCutIn("rang", "humans", GodsAndPeople,
+            yield return s.Scenes.ExplainInCutIn("rang", "humans",
                 T("chapter1.rangAppears.5"));
-            yield return s.Scenes.ExplainInCutIn("rang", "blessing", PandorasHand,
+            yield return s.Scenes.ExplainInCutIn("rang", "blessing",
                 T("chapter1.rangAppears.6"),
                 T("chapter1.rangAppears.7"));
             yield return s.Scenes.EndExplainCutIn();

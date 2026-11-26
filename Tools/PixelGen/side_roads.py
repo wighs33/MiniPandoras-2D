@@ -267,7 +267,7 @@ def leviathan_den():
 
 
 def desert_ground(m):
-    m.paint_ground = lambda: west_sands.desert(m.kinds.tolist(), m.seed)
+    m.paint_ground = lambda: west_sands.desert(m.kinds.tolist(), m.seed, m.heights)
 
 
 def dragon_road():

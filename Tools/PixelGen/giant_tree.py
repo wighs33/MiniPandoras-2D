@@ -20,6 +20,8 @@ import numpy as np
 import fairy_props as fp
 import hidden_garden
 import pixelgen as pg
+import relief
+import snake_head
 import terrain
 from houses import Canvas, WOOD
 from layout import LOGICAL, MapLayout
@@ -47,12 +49,21 @@ LEFT_END = (5, 29, 3.4)                              # 왼쪽 가지 끝
 ARMS = (([(30, 21), (36, 18)], 2.4), ([(12, 32), (5, 30)], 2.4))
 LANTERNS = ((26.6, 41.0), (31.4, 33.8), (12.6, 28.2), (17.4, 23.0), (24.6, 17.0), (29.4, 12.0), (37.0, 13.2), (5.0, 27.0))
 GLOW_PATCHES = ((9, 33), (33, 30), (12, 20), (31, 21), (17, 8), (30, 8))
-CROWN_W, CROWN_H = 24, 14
+CROWN_W, CROWN_H = 24, 20
 CROWN_CENTER, CROWN_RADII = (12.0, 6.6), (10.6, 5.6)
 SKY = pg.hexes("#1c1838", "#2c2450", "#4a3266", "#6e3e70", "#9a4e6a", "#c86a5e", "#e8925a", "#f6b870")
 CLOUD = pg.hexes("#7a5a8a", "#b47a8a", "#e8a88a", "#f8d0a0")
 HAZE = pg.hexes("#3a3a5a", "#4a4a66", "#5e5a72", "#76687a")
+# 아래로 내려다보이는 노을빛 숲(한 칸에 FAR점, FOREST_DEPTH칸 아래)과 안개, 노을에 물든 구름
+FAR, FOREST_DEPTH = 10, 16
+FOREST = pg.hexes("#1e2a3c", "#2a3c48", "#3a5250", "#506a56", "#6e8460", "#98a070")
+MIST = np.array([214, 150, 124], dtype=float)
+DUSK_CLOUD = pg.hexes("#8a6a8e", "#b8848e", "#e0a58e", "#f4c8a0", "#fce4c4")
+HANGING = 140                    # 허공 쪽 잎·껍질이 아래로 늘어지는 깊이(점)
 LEAF = pg.LEAF
+# HD-2D 필드에서 가장자리 잎 덩이를 이만큼(점) 솟은 덩어리로 세운다. 카메라 쪽 잎 덩이는 FRONT_LEAVES점으로 낮게 둔다.
+LEAF_HEIGHT = 30
+FRONT_LEAVES = 10
 PLANK = pg.hexes("#3a2616", "#5a3c24", "#7a5434", "#966c46", "#b08458")
 ROPE = pg.hexes("#5a4628", "#8a7044", "#b89a64")
 CURSE = pg.hexes("#120a1e", "#2a1240", "#5a2a8a")
@@ -272,9 +283,27 @@ def branches():
         drawn = ladders(np.random.default_rng(231), rungs)
         shown = rungs & (drawn[..., 3] > 0)
         image[shown] = drawn[shown, :3]
-        return image
+        return open_sky(image, solid())
+
+    def solid():
+        """하늘이 아닌 곳: 잎 덩이, 몸체와 가지, 절벽과 계단과 사다리."""
+        return (terrain.region(leaf_cells, wobble, 0.9) | terrain.region(body, wobble, 0.3) | terrain.region(walls, wobble, 0.22)
+                | (terrain.cell_field(stairs) > 0.5) | (terrain.cell_field(ladders_at) > 0.5))
+
+    def heights():
+        """
+        잎 덩이(몸체·사다리 밖)는 솟은 덩어리, 단 절벽은 아래 단에서 솟은 나무껍질 벽면이다(위 단도 걷는 곳이라 높이 0).
+        하늘은 허공이라 그 가장자리의 잎과 나무껍질이 아래로 늘어진다.
+        """
+        leaves = terrain.region(leaf_cells, wobble, 0.9) & ~terrain.region(body, wobble, 0.3) & ~(terrain.cell_field(ladders_at) > 0.5)
+        mass = relief.walls(~leaves, np.zeros(leaves.shape, dtype=int), LEAF_HEIGHT, front=FRONT_LEAVES)
+        bark = terrain.region(walls, wobble, 0.22) & ~(terrain.cell_field(stairs) > 0.5)
+        result = relief.overlay(mass, relief.standing(bark))
+        result.flat(~solid(), -HANGING)
+        return result
 
     m.paint_ground = paint
+    m.paint_relief = heights
     walkable = (body & ~walls & ~leaf_cells) | stairs | ladders_at
     m.block_where(~walkable)
     for i, (x, ground) in enumerate(LANTERNS):
@@ -282,6 +311,7 @@ def branches():
         m.light((x + 0.3) * LOGICAL, ground * LOGICAL - 26, 30, "#7ff0dc")
     for i, (x, ground) in enumerate(GLOW_PATCHES):
         m.stand(f"glow_patch_{i}", fp.glow_shrooms(np.random.default_rng(260 + i)), x, ground)
+    far_below(m, 290)
     m.point("up", (LADDER_X, 0))
     m.point("down", (LADDER_X, HEIGHT - 1))
     m.point("topLedge", (27, 11))                  # 맨 윗단 계단을 막 올라선 칸
@@ -291,13 +321,42 @@ def branches():
     return m
 
 
+def open_sky(image, solid):
+    """노을 하늘(solid 밖)을 비운 바닥 그림. 그 자리에는 까마득히 아래의 숲과 구름(far_below)이 내려다보인다."""
+    return np.dstack([image, np.where(solid, 255, 0)]).astype(np.uint8)
+
+
+def far_below(m, seed):
+    """고목 아래로 내려다보이는 노을빛 숲 우듬지와 그 위를 흐르는 구름을 깐다."""
+    rng = np.random.default_rng(seed)
+    left, top, width, height = -45, -50, m.width + 90, m.height + 80
+    h, w = height * FAR, width * FAR
+    yy, xx = np.mgrid[0:h, 0:w]
+    # 우듬지: 칸마다 둥근 수관 하나, 왼쪽 위가 밝고 오른쪽 아래가 그늘진다
+    owner, seams = terrain.cells(h, w, 13, rng)
+    tone = np.random.default_rng(seed + 1).random(owner.max() + 1)[owner]
+    blob = pg.fractal_noise(h, w, rng, ((40, 0.5), (9, 0.5)))
+    light = 0.3 + 0.3 * tone + 0.35 * (blob - 0.5)
+    light = np.where(seams, light * 0.55, light)
+    forest = pg.quantize(np.clip(light, 0, 0.999), FOREST, dither=0.1).astype(float)
+    misty = np.clip(pg.fractal_noise(h, w, rng, ((120, 0.7), (40, 0.3))) * 1.6 - 0.55, 0, 0.75)[..., None]
+    forest = forest * (1 - misty) + MIST * misty
+    m.below("forest", forest.astype(np.uint8), FOREST_DEPTH, left, top, width, height)
+    shapes = {f"cloud_{k}": snake_head.cloud(*size, seed + k, DUSK_CLOUD) for k, size in enumerate(((20 * FAR, 8 * FAR), (13 * FAR, 6 * FAR), (24 * FAR, 9 * FAR)))}
+    for k in range(16):
+        name = f"cloud_{k % 3}"
+        ch, cw = shapes[name].shape[0] / FAR, shapes[name].shape[1] / FAR
+        x, y = left + 4 + rng.random() * (width - 8), top + 6 + (k + rng.random()) * (height - 16) / 16
+        m.below(name, shapes[name], 6 + rng.random() * 6, round(x, 1), round(y, 1), cw, ch, round(0.35 + rng.random() * 0.4, 2), width + 20)
+
+
 def crown():
     m = MapLayout("treeCrown", "거대고목 꼭대기 · 잎 덮개", CROWN_W, CROWN_H, theme="cave", music="field", background="dusk", seed=231)
     rng = np.random.default_rng(232)
     h, w = CROWN_H * T, CROWN_W * T
     tx, ty = tile_field(CROWN_H, CROWN_W)
     floor_cells = ((tx - CROWN_CENTER[0]) / CROWN_RADII[0]) ** 2 + ((ty - CROWN_CENTER[1]) / CROWN_RADII[1]) ** 2 <= 1
-    rim = ((tx - CROWN_CENTER[0]) / (CROWN_RADII[0] + 2.4)) ** 2 + ((ty - CROWN_CENTER[1]) / (CROWN_RADII[1] + 2.0)) ** 2 <= 1
+    rim = ((tx - CROWN_CENTER[0]) / min(CROWN_RADII[0] + 2.4, 11.4)) ** 2 + ((ty - CROWN_CENTER[1]) / np.where(ty < CROWN_CENTER[1], 6.5, CROWN_RADII[1] + 2.0)) ** 2 <= 1
     leaf_cells = rim & ~floor_cells
     wobble = pg.fractal_noise(h, w, rng, ((12, 0.7), (5, 0.3))) - 0.5
 
@@ -311,9 +370,36 @@ def crown():
         ladder_hole(c, 12, 12)
         drawn = c.image[..., 3] > 0
         image[drawn] = c.image[drawn, :3]
-        return image
+        # 앞(남쪽) 가장자리 아래로 늘어진 잎: 아래로 갈수록 어둡고 끝이 들쭉날쭉하다
+        depth = hanging_depth(leaves)
+        hang = depth > 0
+        under = foliage(np.random.default_rng(236), leaves | hang)[..., :3].astype(float)
+        shade = np.clip(0.82 - depth / HANGING * 0.55, 0.2, 1)[..., None]
+        image[hang] = (under * shade)[hang].astype(np.uint8)
+        return open_sky(image, leaves | hang)
+
+    def hanging_depth(solid):
+        """열마다 잎 덮개의 남쪽 끝에서 잰 깊이(점). 늘어진 잎이 아닌 곳은 0."""
+        rows = np.arange(h)[:, None]
+        bottom = np.where(solid.any(axis=0), h - 1 - np.argmax(solid[::-1], axis=0), h)
+        ragged = HANGING * (0.72 + 0.28 * pg.noise(1, w, 9, np.random.default_rng(237))[0])
+        depth = rows - bottom[None, :]
+        return np.where((depth > 0) & (depth < ragged[None, :]), depth, 0)
+
+    def heights():
+        """덮개를 둘러싼 잎 덩이는 솟은 덩어리고(사다리 구멍 쪽 카메라 쪽은 낮게), 그 바깥은 허공이라 잎이 아래로 늘어진다."""
+        solid = terrain.region(leaf_cells | floor_cells, wobble, 0.9)
+        leaves = solid & ~terrain.region(floor_cells, wobble, 0.6)
+        result = relief.walls(~leaves, np.zeros(leaves.shape, dtype=int), LEAF_HEIGHT, front=FRONT_LEAVES)
+        result.flat(~solid, -HANGING)
+        depth = hanging_depth(solid)
+        bottom = np.where(solid.any(axis=0), h - 1 - np.argmax(solid[::-1], axis=0), 0)
+        edge = result.top[bottom, np.arange(w)]
+        result.face(depth > 0, edge[None, :] - (depth - 1))
+        return result
 
     m.paint_ground = paint
+    m.paint_relief = heights
     m.block_where(~floor_cells)
     m.keep_open(12, 12, 13, 13)
     for i, (x, y) in enumerate(((4.4, 5.6), (19.6, 6.4), (7.2, 10.2), (16.6, 2.8), (9.0, 2.6), (18.2, 10.4))):
@@ -324,6 +410,7 @@ def crown():
         m.light((x + 0.3) * LOGICAL, y * LOGICAL - 26, 30, "#7ff0dc")
     for i, (x, y, cols, rows) in enumerate(((3.6, 4.2, 3, 2), (17.2, 3.4, 3, 2), (6.0, 8.6, 3, 2), (15.6, 8.8, 3, 2))):
         m.decal(f"flower_bed_{i}", hidden_garden.flower_bed(cols, rows, np.random.default_rng(270 + i)), x * T, y * T)
+    far_below(m, 280)
     m.point("elder", (12, 3))
     m.point("top", (12, 7))
     m.point("kateTop", (15, 6))

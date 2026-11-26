@@ -1,280 +1,103 @@
-using System;
-using MiniPandoras.World;
+using MiniPandoras.Stages;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 컷인: 필드 대신 다른 화면에서 한 장면을 크게 보여 주는 짧은 연출(영상 대신). 장면(Shot)마다 배경 한 장과, 있으면 인물과 빛을 둔다.
-    /// 배경·인물·빛은 한 장(가로는 가상 화면 너비 384px, 세로는 그림 비율대로, 왼쪽 위가 원점, 아래로 +y)에 놓여 함께 확대되고,
-    /// 넓은 화면에서는 둘레가 검다. 화면보다 세로로 긴 장면은 카메라를 올리고 내려 비춘다.
-    /// 창이 있는 장면은 배경의 유리 자리를 비워 두고, 그 뒤에서 풍경 몇 겹이 저마다 빠르기로 옆으로 흐른다(열차 창 밖).
-    /// 인물이 여러 장이면(마차를 끄는 호빗의 걸음) 그 장들을 정해진 빠르기로 넘긴다.
-    /// 확대·바라보는 곳·인물이 떨어진 거리·빛과 속도선 진하기는 이야기가 정해 준다(StoryDirector.CutIn…). 이 화면은 받은 대로 그리고,
-    /// 속도선 흔들림, 창 밖 풍경 흐름, 인물 그림 넘기기만 스스로 낸다.
+    /// 컷인: 필드 대신 다른 무대에서 한 장면을 크게 보여 주는 짧은 연출(영상 대신). 장면마다 3D 무대(<see cref="CutInStage"/>, Resources/CutIns) 하나를 세우고,
+    /// 그 카메라의 그림을 화면 전체에 띄운다. 그림을 거쳐 띄우는 까닭은 이 화면보다 아래에 있는 필드 HUD와 날씨를 덮고, 위에 있는 대사창은 그대로 보이게 하기 위해서다.
+    /// 카메라가 움직이는 정도, 빛, 인물의 움직임은 이야기가 정해 준다(StoryScenes.CutIn…).
     /// </summary>
     public sealed class CutInView : MonoBehaviour
     {
-        public static readonly Vector2 Size = new Vector2(384f, 216f);
+        private const string ResourceFolder = "CutIns/CutIn_";
 
-        /// <summary>창 뒤 풍경 한 겹: 가로로 되풀이되는 그림과 왼쪽으로 흐르는 빠르기(가상 px/초, 0이면 멈춘 하늘).</summary>
-        [Serializable]
-        public struct Scenery
-        {
-            [SerializeField] private Texture2D art;
-            [SerializeField] private float speed;
-
-            public Scenery(Texture2D art, float speed)
-            {
-                this.art = art;
-                this.speed = speed;
-            }
-
-            public Texture2D Art => art;
-            public float Speed => speed;
-        }
-
-        /// <summary>컷인 장면 하나: 배경과, 있으면 그 앞의 인물·그 위에 겹치는 빛(배경과 같은 크기의 한 장), 창 자리와 그 뒤 풍경.</summary>
-        [Serializable]
-        public struct Shot
-        {
-            [SerializeField] private string name;
-            [SerializeField] private Sprite back;
-            [SerializeField] private Sprite figure;
-            [SerializeField] private Sprite glow;
-            [Tooltip("배경에서 비워 둔 창 유리 자리(가상 px, 왼쪽 위 기준)")]
-            [SerializeField] private Rect window;
-            [Tooltip("창 뒤 풍경(먼 것부터)")]
-            [SerializeField] private Scenery[] scenery;
-            [Tooltip("인물이 움직이면 넘길 그림들(첫 장이 figure다)")]
-            [SerializeField] private Sprite[] figureFrames;
-            [SerializeField] private float figureFramesPerSecond;
-            [Tooltip("인물 위에 겹쳐 이야기가 부를 때 한 번 재생하는 효과(pixelfx). 첫 장으로 기다렸다가 끝 장에 머문다")]
-            [SerializeField] private EffectSheet over;
-            [Tooltip("효과를 인물 뒤에 그린다(옆모습의 날개)")]
-            [SerializeField] private bool overBehindFigure;
-
-            public Shot(string name, Sprite back, Sprite figure, Sprite glow, EffectSheet over, bool overBehindFigure = false)
-                : this(name, back, figure, glow)
-            {
-                this.over = over;
-                this.overBehindFigure = overBehindFigure;
-            }
-
-            public Shot(string name, Sprite back, Sprite figure, Sprite glow, Rect window = default, Scenery[] scenery = null)
-                : this(name, back, glow, window, scenery, figure == null ? Array.Empty<Sprite>() : new[] { figure }, 0f)
-            {
-            }
-
-            public Shot(string name, Sprite back, Sprite glow, Rect window, Scenery[] scenery, Sprite[] figureFrames, float figureFramesPerSecond)
-            {
-                this.name = name;
-                this.back = back;
-                figure = figureFrames.Length > 0 ? figureFrames[0] : null;
-                this.glow = glow;
-                this.window = window;
-                this.scenery = scenery ?? Array.Empty<Scenery>();
-                this.figureFrames = figureFrames;
-                this.figureFramesPerSecond = figureFramesPerSecond;
-                over = null;
-                overBehindFigure = false;
-            }
-
-            public string Name => name;
-            public Sprite Back => back;
-            public Sprite Figure => figure;
-            public Sprite Glow => glow;
-            public Rect Window => window;
-            public Scenery[] SceneryLayers => scenery ?? Array.Empty<Scenery>();
-            public Sprite[] FigureFrames => figureFrames ?? Array.Empty<Sprite>();
-            public float FigureFramesPerSecond => figureFramesPerSecond;
-            public EffectSheet Over => over;
-            public bool OverBehindFigure => overBehindFigure;
-        }
-
-        [Tooltip("함께 확대되는 한 장(배경·인물·빛). 기준점이 왼쪽 위다")]
-        [SerializeField] private RectTransform frame;
-        [Tooltip("배경 뒤의 창 자리. 장면마다 크기와 자리를 바꾼다")]
-        [SerializeField] private RectTransform window;
-        [Tooltip("창 뒤 풍경을 그리는 겹(먼 것부터). 장면의 풍경 수만큼 켠다")]
-        [SerializeField] private RawImage[] sceneryLayers = Array.Empty<RawImage>();
-        [SerializeField] private Image back;
-        [SerializeField] private Image figure;
-        [Tooltip("인물에 겹치는 효과. 효과의 원점이 인물 발밑에 온다. 크기는 효과 시트의 pixelsPerUnit을 따른다(16이면 점 하나가 가상 1px)")]
-        [SerializeField] private Image over;
-        [SerializeField] private Image glow;
+        [SerializeField] private RawImage picture;
+        [Tooltip("인물이 내리꽂힐 때 겹치는 속도선")]
         [SerializeField] private Image streaks;
-        [SerializeField] private Shot[] shots = Array.Empty<Shot>();
+        [Tooltip("무대가 서는 곳(장면에 있다)")]
+        [SerializeField] private StageRoom room;
 
-        private const float OverPixelsPerUnit = 16f;
-
-        private Vector2 foot;
+        private RenderTexture target;
         private float streakAlpha;
-        private float[] scrollSpeeds;
-        private float[] scrolled;
-        private Sprite[] figureFrames = Array.Empty<Sprite>();
-        private float figureFramesPerSecond;
-        private float figureClock;
-        private EffectSheet overEffect;
-        private float overClock;
-        private bool overPlaying;
 
         /// <summary>지금 띄운 장면 이름.</summary>
         public string ShotName { get; private set; }
 
-        /// <summary>지금 장면 한 장의 크기(가상 px): 가로는 화면 너비, 세로는 그림 비율대로.</summary>
-        public Vector2 ShotSize { get; private set; }
+        /// <summary>지금 선 무대.</summary>
+        public CutInStage Stage { get; private set; }
 
-        /// <param name="shotName">장면 이름</param>
-        /// <param name="figureFoot">인물 발밑(가상 px). 인물이 없는 장면이면 쓰지 않는다</param>
-        /// <param name="figureHeight">인물 키(가상 px)</param>
-        public void Show(string shotName, Vector2 figureFoot, float figureHeight)
+        public void Show(string shotName)
         {
-            Shot shot = Array.Find(shots, candidate => candidate.Name == shotName);
             gameObject.SetActive(true);
             ShotName = shotName;
-            Rect art = shot.Back.rect;
-            ShotSize = new Vector2(Size.x, Size.x * art.height / art.width);
-            frame.sizeDelta = ShotSize;
-            back.sprite = shot.Back;
-            foot = figureFoot;
-            figure.enabled = shot.Figure != null;
-            if (figure.enabled)
-            {
-                figure.sprite = shot.Figure;
-                Rect sprite = shot.Figure.rect;
-                figure.rectTransform.sizeDelta = new Vector2(figureHeight * sprite.width / sprite.height, figureHeight);
-            }
-
-            figureFrames = shot.FigureFrames;
-            figureFramesPerSecond = shot.FigureFramesPerSecond;
-            figureClock = 0f;
-            overEffect = shot.Over;
-            overClock = 0f;
-            overPlaying = false;
-            over.enabled = overEffect != null;
-            if (over.enabled)
-            {
-                ShowOverFrame(0);
-                PutOverBehindFigure(shot.OverBehindFigure);
-            }
-
-            glow.enabled = shot.Glow != null;
-            glow.sprite = shot.Glow;
-            SetGlow(0f);
-            ShowScenery(shot, art.width / Size.x);
-        }
-
-        /// <summary>인물 위에 겹친 효과를 재생한다. 끝 장에 머문다.</summary>
-        public void PlayOver()
-        {
-            overPlaying = true;
+            Stage = room.Show<CutInStage>(ResourceFolder + shotName, true);
+            FitTarget();
+            SetStreaks(0f);
         }
 
         public void Hide()
         {
+            if (Stage == null)
+            {
+                return;
+            }
+
+            Stage.View.targetTexture = null;
+            Stage = null;
+            room.Hide();
+            ReleaseTarget();
             gameObject.SetActive(false);
         }
 
-        /// <param name="zoom">확대(1이면 한 장의 가로가 화면 너비에 맞는다)</param>
-        /// <param name="viewCenter">화면 가운데에 올 자리(가상 px)</param>
-        /// <param name="drop">인물이 발밑에서 아래로 떨어진 거리(px, 위로 뛰어오르면 -)</param>
-        /// <param name="streakStrength">속도선 진하기(0~1)</param>
-        public void SetFrame(float zoom, Vector2 viewCenter, float drop, float streakStrength)
+        /// <summary>속도선의 진하기(0~1).</summary>
+        public void SetStreaks(float strength)
         {
-            frame.localScale = new Vector3(zoom, zoom, 1f);
-            frame.anchoredPosition = new Vector2(-viewCenter.x * zoom, viewCenter.y * zoom);
-            figure.rectTransform.anchoredPosition = new Vector2(foot.x, -(foot.y + drop));
-            over.rectTransform.anchoredPosition = figure.rectTransform.anchoredPosition;
-            streakAlpha = streakStrength;
-        }
-
-        /// <summary>장면에 겹친 빛(돌뱀의 눈빛 등)의 진하기(0~1).</summary>
-        public void SetGlow(float strength)
-        {
-            glow.color = new Color(1f, 1f, 1f, strength);
-        }
-
-        private void ShowOverFrame(int index)
-        {
-            Sprite frameSprite = overEffect.ColorFrames[index];
-            over.sprite = frameSprite;
-            over.rectTransform.sizeDelta = frameSprite.rect.size * (OverPixelsPerUnit / frameSprite.pixelsPerUnit);
-            over.rectTransform.pivot = frameSprite.pivot / frameSprite.rect.size;
-        }
-
-        private void PutOverBehindFigure(bool behind)
-        {
-            int overIndex = over.transform.GetSiblingIndex();
-            int figureIndex = figure.transform.GetSiblingIndex();
-            if (overIndex < figureIndex != behind)
-            {
-                over.transform.SetSiblingIndex(figureIndex);
-                figure.transform.SetSiblingIndex(overIndex);
-            }
-        }
-
-        private void Awake()
-        {
-            scrollSpeeds = new float[sceneryLayers.Length];
-            scrolled = new float[sceneryLayers.Length];
-        }
-
-        /// <param name="artPixelsPerVirtual">장면 그림의 가상 px 하나에 든 그림 px(풍경 그림도 같은 배율로 그린다)</param>
-        private void ShowScenery(Shot shot, float artPixelsPerVirtual)
-        {
-            Scenery[] layers = shot.SceneryLayers;
-            window.gameObject.SetActive(layers.Length > 0);
-            window.anchoredPosition = new Vector2(shot.Window.x, -shot.Window.y);
-            window.sizeDelta = shot.Window.size;
-            for (int i = 0; i < sceneryLayers.Length; i++)
-            {
-                RawImage layer = sceneryLayers[i];
-                layer.enabled = i < layers.Length;
-                if (!layer.enabled)
-                {
-                    continue;
-                }
-
-                // 한 겹의 그림 너비를 1로 보는 uv 단위로 바꿔 둔다. 창에는 그림의 창 너비만큼만 보인다.
-                float artWidth = layers[i].Art.width / artPixelsPerVirtual;
-                scrollSpeeds[i] = layers[i].Speed / artWidth;
-                scrolled[i] = 0f;
-                layer.texture = layers[i].Art;
-                layer.uvRect = new Rect(0f, 0f, shot.Window.width / artWidth, 1f);
-            }
+            streakAlpha = strength;
         }
 
         private void Update()
         {
+            FitTarget();
             streaks.color = new Color(1f, 1f, 1f, streakAlpha);
             // 속도선은 한 장을 매 프레임 위아래로 크게 흔들어 줄이 흘러내리는 것처럼 보이게 한다.
-            streaks.rectTransform.anchoredPosition = streakAlpha > 0f ? new Vector2(0f, UnityEngine.Random.Range(-40f, 40f)) : Vector2.zero;
-            if (figureFrames.Length > 1)
+            streaks.rectTransform.anchoredPosition = streakAlpha > 0f ? new Vector2(0f, Random.Range(-40f, 40f)) : Vector2.zero;
+        }
+
+        /// <summary>화면 크기와 같은 그림에 찍는다(기기를 돌려 화면 크기가 바뀔 수 있다).</summary>
+        private void FitTarget()
+        {
+            if (target == null || target.width != Screen.width || target.height != Screen.height)
             {
-                figureClock += Time.deltaTime;
-                figure.sprite = figureFrames[Mathf.FloorToInt(figureClock * figureFramesPerSecond) % figureFrames.Length];
+                ReleaseTarget();
+                target = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default) { name = "Cut In" };
+                picture.texture = target;
             }
 
-            if (overPlaying)
+            Stage.View.targetTexture = target;
+        }
+
+        private void ReleaseTarget()
+        {
+            if (target == null)
             {
-                overClock += Time.deltaTime;
-                ShowOverFrame(Mathf.Min(overEffect.FrameCount - 1, Mathf.FloorToInt(overClock * overEffect.FramesPerSecond)));
+                return;
             }
 
-            for (int i = 0; i < sceneryLayers.Length; i++)
+            if (Stage != null)
             {
-                if (!sceneryLayers[i].enabled)
-                {
-                    continue;
-                }
-
-                scrolled[i] = (scrolled[i] + scrollSpeeds[i] * Time.deltaTime) % 1f;
-                Rect uv = sceneryLayers[i].uvRect;
-                uv.x = scrolled[i];
-                sceneryLayers[i].uvRect = uv;
+                Stage.View.targetTexture = null;
             }
+
+            target.Release();
+            Destroy(target);
+            target = null;
+        }
+
+        private void OnDestroy()
+        {
+            ReleaseTarget();
         }
     }
 }

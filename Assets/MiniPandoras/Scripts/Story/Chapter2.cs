@@ -19,11 +19,6 @@ namespace MiniPandoras.Story
     /// </summary>
     public static class Chapter2
     {
-        // 컷인 그림(cutin_castle.py) 안 자리(가상 px). 원경은 384×360이라 처음에는 아래(강가)만 보인다.
-        // 주인공과 랑의 발밑과 키, 원경을 올려 비춰 돌뱀 머리가 화면 위쪽에 오는 자리, 근경의 돌뱀 머리.
-        private static readonly Vector2 PartyFoot = new Vector2(118f, 352f);
-        private const float PartyHeight = 64f;
-        private static readonly Vector2 TowerTop = new Vector2(192f, 108f);
         private const string CastleSeenFlag = "castleSeen";
         private const int BridgeApproachRow = 11;
 
@@ -133,14 +128,15 @@ namespace MiniPandoras.Story
         {
             s.Cinema(true);
             yield return s.FadeOut(24f);
-            s.Scenes.BeginCutIn("castleWide", PartyFoot, PartyHeight);
+            s.Scenes.BeginCutIn("castleWide");
             yield return s.Field.Warp("castle", "arrive", Facing.Up);
             yield return s.FadeIn(24f);
             yield return s.Wait(30f);
-            yield return s.Scenes.CutInZoom(TowerTop, 1f, 210f);
+            yield return s.Scenes.CutInMove(240f);
+            yield return s.Scenes.CutInGlow(1f, 14f);
             yield return s.Lines("chapter2.faceTheSnakeCastle.1");
             s.Scenes.BeginCutIn("fallenMap");
-            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInZoom(TowerTop, 1.2f, 120f));
+            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInMove(120f));
             yield return s.Scenes.CutInGlow(1f, 18f);
             yield return s.Scenes.CutInGlow(0.5f, 30f);
             yield return s.Wait(50f);
@@ -361,19 +357,19 @@ namespace MiniPandoras.Story
         /// <summary>루나가 뱀신의 눈을 꺼내 들었다가 주인공 손으로 건넨다. 보석은 주인공이 받을 때까지 맵에 떠 있다.</summary>
         private static IEnumerator HandOverTheEye(StoryDirector s, CharacterBody luna, CharacterBody hero)
         {
-            Vector2 hand = new Vector2(0f, MapCoordinates.Pixels(HandHeight));
+            float hand = MapCoordinates.Pixels(HandHeight);
             s.Field.AddObject("jewel", "jewel", luna.Cell, false, floating: true);
-            s.Field.MoveObject("jewel", luna.Position + hand);
-            s.Stage.Sparkle(luna.Position + hand, LunaSparkleWarm);
-            s.Stage.Sparkle(luna.Position + hand, LunaSparkleCool);
+            s.Field.MoveObject("jewel", new Raised(luna.Position, hand));
+            s.Stage.Sparkle(luna.Position + Vector2.up * hand, LunaSparkleWarm);
+            s.Stage.Sparkle(luna.Position + Vector2.up * hand, LunaSparkleCool);
             yield return s.Wait(HoldOutFrames);
             for (float frame = 0f; frame < HandOverFrames; frame += Time.deltaTime * 60f)
             {
-                s.Field.MoveObject("jewel", Vector2.Lerp(luna.Position, hero.Position, frame / HandOverFrames) + hand);
+                s.Field.MoveObject("jewel", new Raised(Vector2.Lerp(luna.Position, hero.Position, frame / HandOverFrames), hand));
                 yield return null;
             }
 
-            s.Field.MoveObject("jewel", hero.Position + hand);
+            s.Field.MoveObject("jewel", new Raised(hero.Position, hand));
         }
 
         /// <summary>맞부딪친 몸이 바라보는 쪽을 그대로 둔 채 뒤로 밀려난다. 처음이 빠르고 끝으로 갈수록 느려진다.</summary>

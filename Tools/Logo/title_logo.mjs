@@ -1,4 +1,4 @@
-// 타이틀 로고 「미니 판도라즈」를 그린다(2026-11-15).
+// 타이틀 로고 「미니 판도라즈」와, 그 「판」으로 만든 안드로이드 앱 아이콘을 그린다(2026-11-15).
 //
 // 컨셉은 판도라의 상자다. 「판」의 ㅍ이 상자 모양이라 윗획을 뚜껑 삼아 오른쪽을 들어 올리고, 그 틈에서 빛이 새어 나와
 // 일곱 판도라(차원·악마·불꽃·모래·뱀·얼음·바람)의 색 별을 흩뿌리며 글자 위를 흘러간다. 「즈」의 ㅡ는 꼬리가 되어 감겨 오른다.
@@ -12,6 +12,9 @@
 //   node_modules 폴더에는 fontkit, polygon-clipping, playwright-core가 있어야 한다.
 //   --chrome을 비우면 playwright-core가 설치한 Chromium을 쓴다.
 //   → Assets/MiniPandoras/Art/UI/Title/logo.png   (투명 여백을 잘라 내고 가로세로를 4의 배수로 맞춘다)
+//   → Assets/MiniPandoras/Art/UI/AppIcon/icon.png, icon_background.png, icon_foreground.png (1024×1024)
+//     앱 아이콘은 뚜껑이 열린 「판」과 일곱 판도라 빛을 밤하늘에 둔다. 안드로이드 적응형 아이콘은 런처가 바깥을 잘라 내므로
+//     앞 그림(foreground)은 가운데 지름 66% 원 안에 들어가게 작게, 예전 방식 아이콘(icon)은 바탕과 합쳐 크게 그린다.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -266,11 +269,66 @@ for (const [degrees, len, w, opacity] of [[-118, 150, 16, 0.5], [-100, 200, 22, 
   rays += `<path d="M${gap[0] - nx * 0.2} ${gap[1] - ny * 0.2}L${ex - nx} ${ey - ny}L${ex + nx} ${ey + ny}L${gap[0] + nx * 0.2} ${gap[1] + ny * 0.2}Z" fill="url(#ray)" opacity="${opacity}"/>`;
 }
 
+// ---------- 앱 아이콘 ----------
+// 같은 「판」 조각(뚜껑이 열린 상자)을 쓰고, 빛은 아이콘 안에 들어가게 짧게 다시 그린다.
+const ICON_DIR = path.join(projectDir, 'Assets/MiniPandoras/Art/UI/AppIcon');
+const ICON_PX = 1024;
+const panPath = letters['판'].map(toPath).join('');
+const iconArc = [
+  [[gap[0], gap[1]], [gap[0] + 18, gap[1] - 80], [gap[0] + 120, gap[1] - 138], [gap[0] + 196, gap[1] - 92]],
+];
+const iconArcPoints = sampleCurve(iconArc, 3).points;
+const iconSparkles = [0.12, 0.26, 0.4, 0.54, 0.68, 0.82, 0.96].map((t, i) => {
+  const [x, y] = iconArcPoints[Math.round(t * (iconArcPoints.length - 1))];
+  return sparkle(x, y, 17 - i * 0.9, PANDORA_COLORS[i], (i % 2 ? 1 : -1) * 0.15);
+}).join('');
+const iconRibbon = toPath(brush(iconArc, [[0, 3], [0.1, 16], [0.5, 10], [1, 0]]));
+let iconRays = '';
+for (const [degrees, len, w, opacity] of [[-112, 100, 13, 0.55], [-94, 130, 17, 0.75], [-76, 112, 15, 0.6], [-130, 80, 9, 0.4]]) {
+  const a = degrees * Math.PI / 180, ex = gap[0] + Math.cos(a) * len, ey = gap[1] + Math.sin(a) * len;
+  const nx = -Math.sin(a) * w, ny = Math.cos(a) * w;
+  iconRays += `<path d="M${gap[0] - nx * 0.2} ${gap[1] - ny * 0.2}L${ex - nx} ${ey - ny}L${ex + nx} ${ey + ny}L${gap[0] + nx * 0.2} ${gap[1] + ny * 0.2}Z" fill="url(#ray)" opacity="${opacity}"/>`;
+}
+// 아이콘의 가운데: 세로는 「판」과 빛 전체의 가운데, 가로는 「판」을 가운데에 두고 별 줄 쪽으로 조금 민다
+const panBox = letters['판'].map(piece => bbox(piece[0][0])).reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])]);
+const iconTop = Math.min(panBox[1], ...iconArcPoints.map(p => p[1])) - 20;
+const iconCenter = [(panBox[0] + panBox[2]) / 2 + 40, (iconTop + panBox[3]) / 2];
+
+// 밤하늘 바탕: 가운데가 보랏빛으로 밝고 둘레로 어두워지며, 작은 별이 흩어진다(별 자리는 정해진 수열이라 늘 같다).
+function iconBackground(view) {
+  const [vx, vy] = [iconCenter[0] - view / 2, iconCenter[1] - view / 2];
+  let stars = '';
+  for (let i = 0; i < 46; i++) {
+    const x = vx + ((i * 0.754877) % 1) * view, y = vy + ((i * 0.569840 + 0.13) % 1) * view;
+    stars += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(view / 600 * (1 + (i % 3) * 0.7)).toFixed(2)}" fill="#f3e9d8" opacity="${(0.25 + (i % 5) * 0.12).toFixed(2)}"/>`;
+  }
+  return `<radialGradient id="sky" gradientUnits="userSpaceOnUse" cx="${iconCenter[0]}" cy="${iconCenter[1] - view * 0.06}" r="${view * 0.72}">
+      <stop offset="0" stop-color="#3a3478"/><stop offset="0.45" stop-color="#1c2550"/><stop offset="1" stop-color="#081421"/></radialGradient>
+    <rect x="${vx}" y="${vy}" width="${view}" height="${view}" fill="url(#sky)"/>${stars}
+    <circle cx="${iconCenter[0]}" cy="${iconCenter[1]}" r="${view * 0.3}" fill="#6a58f0" opacity="0.22" filter="url(#blur40)"/>`;
+}
+
+function iconForeground() {
+  return `<path d="${iconRibbon}" fill="url(#ribbon)" opacity="0.6"/>
+    <g style="mix-blend-mode:screen" filter="url(#blur3)">${iconRays}</g>
+    <g filter="url(#ink)"><path d="${panPath}" fill="url(#fill)" filter="url(#bevel)"/></g>
+    <path d="${toPath(lidClosed)}" fill="url(#gapLight)" filter="url(#blur3)"/>
+    <path d="${panPath}" fill="url(#fill)" filter="url(#bevel)"/>
+    <ellipse cx="${gap[0]}" cy="${gap[1]}" rx="120" ry="36" fill="url(#gapGlow)" style="mix-blend-mode:screen" opacity="0.9"/>
+    ${iconSparkles}`;
+}
+
+/** view: 아이콘 한 변에 담을 디자인 단위. 클수록 그림이 작아진다. */
+function iconSvg(view, layers) {
+  const vx = iconCenter[0] - view / 2, vy = iconCenter[1] - view / 2;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${ICON_PX}" height="${ICON_PX}" viewBox="${vx} ${vy} ${view} ${view}">${DEFS}
+    ${layers.includes('background') ? iconBackground(view) : ''}${layers.includes('foreground') ? iconForeground() : ''}</svg>`;
+}
+
 // ---------- 그리기 ----------
 const VIEW = { x: -330, y: -170, w: 1700, h: 560 };
 const SCALE = 1.25;
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${VIEW.w * SCALE}" height="${VIEW.h * SCALE}" viewBox="${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}">
-<defs>
+const DEFS = `<defs>
   <linearGradient id="fill" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="340">
     <stop offset="0" stop-color="#ffffff"/><stop offset="0.38" stop-color="#fff3dd"/>
     <stop offset="0.72" stop-color="#f4c98c"/><stop offset="1" stop-color="#d08a45"/>
@@ -308,7 +366,9 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${VIEW.w * SCALE}" h
     <feFlood flood-color="#0a0614" flood-opacity="0.65"/><feComposite in2="dropSoft" operator="in" result="shadow"/>
     <feMerge><feMergeNode in="glow"/><feMergeNode in="shadow"/><feMergeNode in="rim"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
-</defs>
+  <filter id="blur40" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="40"/></filter>
+</defs>`;
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${VIEW.w * SCALE}" height="${VIEW.h * SCALE}" viewBox="${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}">${DEFS}
 <path d="${ribbon}" fill="url(#ribbon)" opacity="0.55" filter="url(#blur10)"/>
 <path d="${ribbon}" fill="url(#ribbon)" opacity="0.5"/>
 <path d="${ribbonCore}" fill="#fffdf4" opacity="0.85"/>
@@ -349,7 +409,20 @@ const trimmed = await page.evaluate(async base64 => {
   out.getContext('2d').drawImage(source, x0, y0, w, h, 0, 0, w, h);
   return out.toDataURL('image/png').split(',')[1];
 }, shot.toString('base64'));
-await browser.close();
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, Buffer.from(trimmed, 'base64'));
 console.log('로고:', OUT);
+
+// 앱 아이콘 셋. 앞 그림은 지름 66% 원 안에 들도록 넓게(view 860), 합친 아이콘은 크게(view 620) 담는다.
+const iconDir = option('--icon-out') ?? ICON_DIR;
+fs.mkdirSync(iconDir, { recursive: true });
+for (const [name, view, layers, transparent] of [
+  ['icon.png', 620, ['background', 'foreground'], false],
+  ['icon_background.png', 860, ['background'], false],
+  ['icon_foreground.png', 860, ['foreground'], true],
+]) {
+  await page.setContent(`<!doctype html><html><body style="margin:0;background:transparent">${iconSvg(view, layers)}</body></html>`);
+  await page.locator('svg').screenshot({ path: path.join(iconDir, name), omitBackground: transparent });
+  console.log('아이콘:', path.join(iconDir, name));
+}
+await browser.close();

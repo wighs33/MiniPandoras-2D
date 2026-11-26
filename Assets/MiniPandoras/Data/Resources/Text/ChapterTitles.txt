@@ -73,6 +73,9 @@ text			11장
 == chapterTitles.readonly.24
 text			다시 모인 파도
 
+== chapterTitles.prologue
+text			PROLOGUE
+
 == chapterTitles.part1
 text			CHAPTER 1
 

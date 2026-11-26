@@ -91,11 +91,40 @@ class Design:
 # ── 그리기 도구 ──────────────────────────────────────────
 
 class Canvas:
-    """점 격자 RGBA에 모양 마스크로 칠하는 작은 화가."""
+    """
+    점 격자 RGBA에 모양 마스크로 칠하는 작은 화가.
+    층(layer)을 나눠 칠할 수 있다: use(이름) 뒤로 칠하는 것은 그 층에 들어가고, image는 지금 층이다. 층은 처음 쓴 차례대로 겹친다(composite).
+    집은 벽·지붕·굴뚝을 층으로 나눠 그려, 겹친 그림은 예전 한 장 그대로이고 HD-2D 집 모형(house_model)은 층마다 다른 면에 붙인다.
+    """
 
-    def __init__(self, width, height):
-        self.image = np.zeros((height, width, 4), dtype=np.uint8)
+    def __init__(self, width, height, layer="main"):
+        self.layers = {}
+        self.current = None
         self.yy, self.xx = np.mgrid[0:height, 0:width]
+        self.use(layer)
+
+    def use(self, name):
+        """이 뒤로 칠하는 것을 그 층에 칠한다. 처음 쓰는 이름이면 빈 층을 맨 위에 만든다."""
+        if name not in self.layers:
+            self.layers[name] = np.zeros(self.yy.shape + (4,), dtype=np.uint8)
+        self.current = name
+
+    @property
+    def image(self):
+        return self.layers[self.current]
+
+    @image.setter
+    def image(self, value):
+        self.layers[self.current] = value
+
+    def composite(self, names=None):
+        """층을 만든 차례대로 겹친 그림. names를 주면 그 층만 겹친다. 층의 점은 불투명하고, 반투명한 점(발밑 그늘)은 빈 곳에만 칠하므로 덮어쓰면 된다."""
+        out = np.zeros(self.yy.shape + (4,), dtype=np.uint8)
+        for name, layer in self.layers.items():
+            if names is None or name in names:
+                painted = layer[..., 3] > 0
+                out[painted] = layer[painted]
+        return out
 
     @property
     def size(self):
@@ -137,8 +166,8 @@ class Canvas:
             self.image[max(0, y):y + width, max(0, x):x + width, 3] = 255
 
     def first_row(self, x):
-        """x 열에서 가장 위에 칠해진 줄."""
-        rows = np.nonzero(self.image[:, x, 3])[0]
+        """x 열에서 가장 위에 칠해진 줄(모든 층을 겹친 그림에서)."""
+        rows = np.nonzero(self.composite()[:, x, 3])[0]
         return int(rows.min()) if len(rows) else self.size[1]
 
 
@@ -591,20 +620,42 @@ def side_gable_roof(c, x0, x1, eave_y, height, material, rng):
     return ridge_y
 
 
-def front_gable_roof(c, x0, x1, eave_y, height, material, rng, wall_kind, ornament="vent", worn=False):
+def front_gable_roof(c, x0, x1, eave_y, height, material, rng, wall_kind, ornament="vent", worn=False, layers=None):
     """
     앞이 세모인 맞배지붕: 앞에 세모 박공벽이 서고, 그 뒤로 지붕 두 면이 물러난다(왼쪽 면은 빛, 오른쪽 면은 그늘).
     박공벽 가운데에는 둥근 환기창이나 길드 문장이 있다. 돌려주는 값: 지붕 꼭대기 y.
+    layers를 주면 (지붕 면 층, 박공벽 층) 이름으로 나눠 칠한다(집 모형에서 지붕 면은 뒤로 물러나고 박공벽은 앞벽과 함께 선다).
     """
-    palette = ROOFS[material]
     cx = (x0 + x1) / 2
     apex = eave_y - height
     back = int(height * 0.5)
-    left_plane = c.polygon([(x0 - EAVE, eave_y), (cx, apex), (cx, apex - back), (x0 - EAVE, eave_y - back)])
-    right_plane = c.polygon([(x1 + EAVE, eave_y), (cx, apex), (cx, apex - back), (x1 + EAVE, eave_y - back)])
-    cover(c, left_plane, material, apex - back, eave_y, rng, side_light=1)
-    cover(c, right_plane, material, apex - back, eave_y, rng, side_light=-1)
+    if layers:
+        c.use(layers[0])
+    gable_planes(c, x0 - EAVE, x1 + EAVE, eave_y, apex, back, material, rng)
+    if layers:
+        c.use(layers[1])
+    gable_face(c, x0, x1, eave_y, height, rng, wall_kind, ornament, worn)
+    return apex - back
+
+
+def gable_planes(c, left, right, eave_y, apex, back, material, rng, lights=(1, -1)):
+    """
+    맞배지붕의 두 면: 처마 끝(left·right, eave_y)에서 꼭대기(가운데, apex)까지 오르는 박공선 위로 back줄만큼 물러난 평행사변형.
+    lights는 왼쪽·오른쪽 면의 밝기(그림에서는 왼쪽이 빛, 오른쪽이 그늘)이고 가운데에 용마루 덮개가 있다.
+    """
+    palette = ROOFS[material]
+    cx = (left + right) / 2
+    left_plane = c.polygon([(left, eave_y), (cx, apex), (cx, apex - back), (left, eave_y - back)])
+    right_plane = c.polygon([(right, eave_y), (cx, apex), (cx, apex - back), (right, eave_y - back)])
+    cover(c, left_plane, material, apex - back, eave_y, rng, side_light=lights[0])
+    cover(c, right_plane, material, apex - back, eave_y, rng, side_light=lights[1])
     c.paint(c.rect(int(cx) - 2, apex - back - 1, int(cx) + 2, apex + 2), palette[6 if material != "thatch" else 2])
+
+
+def gable_face(c, x0, x1, eave_y, height, rng, wall_kind, ornament, worn):
+    """맞배지붕 앞의 세모 박공벽: 벽 무늬, 가운데 환기창이나 문장, 처마 끝에서 꼭대기까지 박공 판자."""
+    cx = (x0 + x1) / 2
+    apex = eave_y - height
     gable = c.polygon([(x0 + 2, eave_y), (x1 - 2, eave_y), (cx, apex + 9)])
     c.paint(gable, wall_texture(wall_kind, c.size[1], c.size[0], rng))
     if wall_kind == "timber":
@@ -628,7 +679,6 @@ def front_gable_roof(c, x0, x1, eave_y, height, material, rng, wall_kind, orname
         c.paint(c.ellipse(cx, vy, 5.5, 5.5) & (np.abs(c.xx + 0.5 - cx) < 1), WOOD[2])
     c.line(x0 - EAVE, eave_y, cx, apex, WOOD[4], 3)
     c.line(x1 + EAVE - 3, eave_y, cx - 1, apex, WOOD[2], 3)
-    return apex - back
 
 
 def dormer(c, cx, base_y, material, design, rng):
@@ -892,8 +942,39 @@ def heights(design):
     return design.stories * STORY, roof_h
 
 
+@dataclass
+class House:
+    """
+    층으로 나눠 그린 집 한 채. picture는 층을 겹친 그림(잘라 낸 것), pivot은 그 그림의 기준점(벽 아래 가운데).
+    canvas의 층과 parts(어느 층이 어떤 면인지와 그 자리, 자르기 전 점 좌표)는 HD-2D 집 모형(house_model)이 쓴다.
+    """
+    design: Design
+    canvas: Canvas
+    parts: list
+    x0: int               # 벽 왼쪽 끝
+    x1: int               # 벽 오른쪽 끝
+    ground: int           # 벽 아래 끝 줄(발밑)
+    wall_top: int
+    crop: int = 0         # 그림을 자른 윗줄 수
+    picture: np.ndarray = None
+
+    @property
+    def pivot(self):
+        return (self.x0 + (self.x1 - self.x0) // 2, self.ground - self.crop)
+
+
 def build(design):
     """설계대로 집 한 채를 그린다. 돌려주는 값: (RGBA 점 그림, 기준점(벽 아래 가운데) 점 좌표)."""
+    house = draw(design)
+    return house.picture, house.pivot
+
+
+def draw(design):
+    """
+    설계대로 집 한 채를 층으로 나눠 그린다(House). 층은 그린 차례대로 겹치며, 겹친 그림은 층을 나누기 전과 같다.
+    층: wall(앞벽과 거기 붙은 것) · roof(지붕) · gable(앞이 세모인 지붕의 박공벽) · wing_roof·wing_gable(입구 위로 나온 세모 지붕) ·
+    dormer<k> · chimney · stack<k>(쇠 굴뚝) · vane(바람개비) · tower(길드 탑) · ladder · shadow(발밑 그늘).
+    """
     rng = np.random.default_rng(design.seed)
     wall_w = design.columns * T
     walls_h, roof_h = heights(design)
@@ -901,10 +982,11 @@ def build(design):
     sign_w = 22 if design.sign else 0
     width = wall_w + EAVE * 2 + 2 + max(tower_w, sign_w)
     height = 120 + roof_h + walls_h + 6
-    c = Canvas(width, height)
+    c = Canvas(width, height, "wall")
     x0, x1 = EAVE + 1, EAVE + 1 + wall_w
     ground = height - 6
     wall_top = ground - walls_h
+    parts = []
 
     for story in range(design.stories):
         kind = design.upper if story > 0 and design.upper else design.walls
@@ -1015,48 +1097,76 @@ def build(design):
     c.image[shade, :3] = (c.image[shade, :3] * factor[shade][:, None]).astype(np.uint8)
 
     upper_walls = design.upper or design.walls
+    eave_y = wall_top + 6
+    c.use("roof")
     if design.roof == "flat":
         flat_roof(c, x0, x1, wall_top, roof_h, design, rng)
+        # 지붕판 앞 두께(wall_top - 2부터 아래)는 앞벽과 함께 서고, 그 위는 벽 꼭대기 높이에 누운 지붕이다.
+        parts.append({"kind": "flat", "layer": "roof", "front": wall_top - 2, "left": x0 - 3, "right": x1 + 3})
         if design.ladder:
+            c.use("ladder")
             ladder(c, x1 - 22, ground - 2, wall_top + 2)
     elif design.roof == "front":
-        front_gable_roof(c, x0, x1, wall_top + 6, roof_h, design.roof_material, rng, upper_walls, design.gable, design.worn)
+        front_gable_roof(c, x0, x1, eave_y, roof_h, design.roof_material, rng, upper_walls, design.gable, design.worn,
+                         layers=("roof", "gable"))
+        parts.append({"kind": "planes", "layer": "roof", "left": x0 - EAVE, "right": x1 + EAVE, "eave": eave_y, "apex": eave_y - roof_h,
+                      "back": int(roof_h * 0.5), "material": design.roof_material})
     else:
-        side_gable_roof(c, x0, x1, wall_top + 6, roof_h, design.roof_material, rng)
+        side_gable_roof(c, x0, x1, eave_y, roof_h, design.roof_material, rng)
+        # 처마 줄(eave_y + 1까지)과 그 아래 외곽선 한 줄 밑이 접히는 줄이다. 지붕 끝 박공은 높이의 1/4만큼 안으로 비스듬하다.
+        parts.append({"kind": "slope", "layer": "roof", "left": x0 - EAVE, "right": x1 + EAVE, "hinge": eave_y + 3,
+                      "ridge": eave_y - roof_h - 5, "lean": roof_h // 4, "material": design.roof_material})
         roof = (c.yy < wall_top + 4) & (c.image[..., 3] > 0)
         if design.worn:
             spots = [(int(x0 + wall_w * fx), int(wall_top + 6 - roof_h * fy)) for fx, fy in ((0.14, 0.5), (0.86, 0.35), (0.76, 0.72))]
             roof_damage(c, roof, ROOFS[design.roof_material], spots, rng)
         if design.roof == "cross":
             wing = int(min(wall_w * 0.46, 6 * T))
-            front_gable_roof(c, door_cx - wing // 2 + EAVE, door_cx + wing // 2 - EAVE, wall_top + 12, int(wing * 0.52),
-                             design.roof_material, rng, upper_walls, design.gable, design.worn)
+            wing_x0, wing_x1, wing_h = door_cx - wing // 2 + EAVE, door_cx + wing // 2 - EAVE, int(wing * 0.52)
+            front_gable_roof(c, wing_x0, wing_x1, wall_top + 12, wing_h, design.roof_material, rng, upper_walls, design.gable, design.worn,
+                             layers=("wing_roof", "wing_gable"))
+            parts.append({"kind": "planes", "layer": "wing_roof", "left": wing_x0 - EAVE, "right": wing_x1 + EAVE, "eave": wall_top + 12,
+                          "apex": wall_top + 12 - wing_h, "back": int(wing_h * 0.5), "material": design.roof_material})
     if design.dormers:
         if design.roof == "cross":
             spots = [0.13, 0.87] if design.dormers == 2 else [0.13]
         else:
             spots = [(k + 1) / (design.dormers + 1) for k in range(design.dormers)]
-        for spot in spots:
-            dormer(c, int(x0 + wall_w * spot), wall_top - roof_h // 2 + 6, design.roof_material, design, rng)
+        for k, spot in enumerate(spots):
+            c.use(f"dormer{k}")
+            dormer_x, base_y = int(x0 + wall_w * spot), wall_top - roof_h // 2 + 6
+            dormer(c, dormer_x, base_y, design.roof_material, design, rng)
+            parts.append({"kind": "dormer", "layer": f"dormer{k}", "x": dormer_x, "base": base_y + 2, "material": design.roof_material})
     if design.chimney_at >= 0:
         chimney_x = int(x0 + wall_w * design.chimney_at)
         surface = c.first_row(chimney_x)
+        c.use("chimney")
         chimney(c, chimney_x, surface - 18, surface + 12)
+        parts.append({"kind": "stack", "layer": "chimney", "x": chimney_x, "body": surface - 14, "base": surface + 12, "half": 8})
     if design.gears:
-        for spot in (0.16, 0.84):
+        for k, spot in enumerate((0.16, 0.84)):
             stack_x = int(x0 + wall_w * spot)
             surface = c.first_row(stack_x)
+            c.use(f"stack{k}")
             smokestack(c, stack_x, surface - 30, surface + 12, design.worn)
-        weathervane(c, door_cx, c.first_row(door_cx), design.worn)
+            parts.append({"kind": "stack", "layer": f"stack{k}", "x": stack_x, "body": surface - 22, "base": surface + 12, "half": 5})
+        vane_top = c.first_row(door_cx)
+        c.use("vane")
+        weathervane(c, door_cx, vane_top, design.worn)
+        parts.append({"kind": "card", "layer": "vane", "x": door_cx, "base": vane_top + 2})
     if design.guild:
+        c.use("tower")
         tower(c, x1 + 4, ground, walls_h + 40, design.roof_material, rng)
+        parts.append({"kind": "tower", "layer": "tower", "left": x1 + 4, "width": 40, "top": ground - walls_h - 40, "cone": 64})
 
-    shadow_band = c.rect(x0 - 8, ground, x1 + 8 + tower_w, ground + 4) & (c.image[..., 3] == 0)
+    c.use("shadow")
+    shadow_band = c.rect(x0 - 8, ground, x1 + 8 + tower_w, ground + 4) & (c.composite()[..., 3] == 0)
     c.image[shadow_band] = [20, 26, 18, 110]
-    image = outline(c.image)
+    image = outline(c.composite())
     rows = np.nonzero(image[..., 3].any(axis=1))[0]
-    image = image[rows.min():]
-    return image, (x0 + wall_w // 2, image.shape[0] - 6)
+    house = House(design, c, parts, x0, x1, ground, wall_top, crop=int(rows.min()))
+    house.picture = image[house.crop:]
+    return house
 
 
 # ── 집터 ───────────────────────────────────────────────

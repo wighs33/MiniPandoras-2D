@@ -43,12 +43,12 @@ namespace MiniPandoras.Tests
             yield return story.Until(() =>
             {
                 story.Fight();
-                StageImage[] images = Object.FindObjectsByType<StageImage>(FindObjectsSortMode.None);
-                sawWarship |= images.Any(image => image.name.Contains("warship"));
-                sawDragon |= images.Any(image => image.name.Contains("sea_dragon"));
+                StageModel[] models = Object.FindObjectsByType<StageModel>(FindObjectsSortMode.None);
+                sawWarship |= models.Any(model => model.name.Contains("warship"));
+                sawDragon |= models.Any(model => model.name.Contains("sea_dragon"));
                 GameMap map = story.Travel.CurrentMap;
                 shipBroke |= map != null && map.Id == "ship" && map.ShownLook == "broken";
-                wallSegments = Mathf.Max(wallSegments, Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None).Count(r => r.name == "Sand Wall"));
+                wallSegments = Mathf.Max(wallSegments, Object.FindObjectsByType<MeshRenderer>(FindObjectsSortMode.None).Count(r => r.name == "Sand Wall"));
                 if (story.Combat.Encounters.InEncounter && story.Lines.Contains("아, 진짜!\n허세 좀 집어치워!"))
                 {
                     foughtNeoAlone = story.Combat.EnemyAi.Enemies.Count(e => e.InEncounter) == 1;

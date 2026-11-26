@@ -32,11 +32,6 @@ namespace MiniPandoras.Story
         private const string LoosenedForest = "loosened";
         private const string StraightForest = "normal";
         private static readonly Color SandFlash = new Color32(0xf0, 0xcc, 0x80, 0xff);
-        // 라코의 수업 컷인(Tools/PixelGen/cutin_lesson.py)에서 카메라가 천천히 다가갈 곳(가상 px).
-        private static readonly Vector2 TenGods = new Vector2(192f, 110f);
-        private static readonly Vector2 TwoGods = new Vector2(192f, 108f);
-        private static readonly Vector2 GodSlayer = new Vector2(192f, 112f);
-        private static readonly Vector2 Cradle = new Vector2(192f, 112f);
         // 갑판에서 말을 거는 선원들. 버디는 처음엔 보이지 않다가 갑판을 걸으면 디엘 눈앞에 불쑥 나타난다.
         private static readonly string[] Crew = { "hass", "luwan", "buddy", "largo" };
         // 케이트가 숲에 비틀어 놓은 매듭 두 곳과, 매듭이 남아 있으면 길이 처음 자리로 접혀 돌아오는 북쪽 길목(웹게임 forest 칸).
@@ -174,13 +169,13 @@ namespace MiniPandoras.Story
             s.Actors.FaceToward("raco", "hero");
             yield return s.Lines("chapter6.racosLesson.1");
             // 설명 컷인: 라코의 수업(웹게임은 설명 그림). 신과 갓슬레이어는 1장처럼 정확한 모습 대신 실루엣이다.
-            yield return s.Scenes.ExplainInCutIn("raco", "tenGods", TenGods,
+            yield return s.Scenes.ExplainInCutIn("raco", "tenGods",
                 T("chapter6.racosLesson.3"));
-            yield return s.Scenes.ExplainInCutIn("raco", "splitPower", TwoGods,
+            yield return s.Scenes.ExplainInCutIn("raco", "splitPower",
                 T("chapter6.racosLesson.4"));
-            yield return s.Scenes.ExplainInCutIn("raco", "war", GodSlayer,
+            yield return s.Scenes.ExplainInCutIn("raco", "war",
                 T("chapter6.racosLesson.5"));
-            yield return s.Scenes.ExplainInCutIn("raco", "dust", Cradle,
+            yield return s.Scenes.ExplainInCutIn("raco", "dust",
                 T("chapter6.racosLesson.6"));
             yield return s.Scenes.EndExplainCutIn();
             yield return s.Lines("chapter6.racosLesson.2");

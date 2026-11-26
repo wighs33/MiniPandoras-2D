@@ -1,7 +1,9 @@
 using System.Collections;
 using MiniPandoras.Progress;
 using MiniPandoras.Story;
+using MiniPandoras.Stages;
 using MiniPandoras.UI;
+using MiniPandoras.World;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -13,9 +15,9 @@ using Object = UnityEngine.Object;
 namespace MiniPandoras.Tests
 {
     /// <summary>
-    /// 타이틀: 메뉴(이어 하기·처음부터·지난 스토리, 윗줄 1:1 대전·프로필·설정)와 장 선택 창의 버튼 자리를 누르면 그 버튼이 누름을 받는지(그 뒤 그림으로 빠지지 않는지), 옮긴 장만 누를 수 있는지,
-    /// 저장이 있으면 이어 하기가 그 장을 보이고 새 게임은 먼저 묻는지, 저장된 장이 속한 부의 풍경과 표시가 뜨는지 본다.
-    /// 챕터 선택(부): 가운데 카드가 가장 크고 멀수록 작아지며 사라지는지, 화살표와 끌기로 넘어가고 줄 끝에서 멈추는지, 가운데 온 부의 풍경으로 바뀌는지, 나오지 않은 부는 COMING SOON이고
+    /// 타이틀: 첫 화면은 아무 데나 누르면 메뉴가 열리는지, 메뉴(이어 하기·처음부터·지난 스토리·1:1 대전·프로필·설정)와 장 선택 창의 버튼 자리를 누르면 그 버튼이 누름을 받는지(그 뒤 그림으로 빠지지 않는지), 옮긴 장만 누를 수 있는지,
+    /// 저장이 있으면 이어 하기가 그 장을 보이고 새 게임은 먼저 묻는지, 저장된 장이 속한 부의 무대와 표시가 뜨는지, 들어가면 무대가 치워지고 카메라가 하늘에서 내려오는지 본다.
+    /// 챕터 선택(부): 가운데 카드가 가장 크고 멀수록 작아지며 사라지는지, 화살표와 끌기로 넘어가고 줄 끝에서 멈추는지, 가운데 온 부의 무대로 바뀌는지, 나오지 않은 부는 COMING SOON이고
     /// 시작할 수 없는지, 저장된 부는 이어 하고 다른 부는 먼저 묻는지 본다.
     /// 게임 메뉴: 열면 게임이 멈추고, 계속하면 흐르고, 「타이틀로」를 고르면 타이틀로 돌아온다.
     /// 장 테스트는 버튼을 거치지 않고 고르므로, 화면을 눌렀을 때 닿는지는 여기서 본다.
@@ -35,6 +37,14 @@ namespace MiniPandoras.Tests
             yield return null;
         }
 
+        /// <summary>첫 화면을 눌러 메뉴를 열고, 메뉴가 다 들어올 때까지 기다린다.</summary>
+        private IEnumerator OpenMenu()
+        {
+            title.transform.Find("Screen/Welcome").GetComponent<Button>().onClick.Invoke();
+            Assert.That(title.IsMenuOpen, Is.True, "누르면 메뉴가 열린다");
+            yield return new WaitForSecondsRealtime(1.4f);
+        }
+
         [UnityTearDown]
         public IEnumerator Restore()
         {
@@ -46,8 +56,12 @@ namespace MiniPandoras.Tests
         public IEnumerator ChapterButtonsTakeTheirOwnPresses()
         {
             Assert.That(title.IsOpen, Is.True, "장면을 열면 타이틀이 뜬다");
-            // 메뉴는 왼쪽 아래 한 덩어리: 윗줄은 주 버튼과 프로필·설정 아이콘, 아랫줄은 보조 버튼(저장이 없으면 「처음부터」는 숨는다).
+            Assert.That(title.IsMenuOpen, Is.False, "처음에는 로고와 무대만 보인다");
             Transform menu = title.transform.Find("Screen/Safe Area/Menu");
+            Transform welcome = title.transform.Find("Screen/Welcome");
+            Assert.That(StoryDriver.PressedAt(menu.Find("Continue") as RectTransform), Is.EqualTo(welcome.gameObject), "첫 화면에서는 어디를 눌러도 메뉴가 열린다");
+            yield return OpenMenu();
+            // 메뉴는 왼쪽에 세로로 선다(저장이 없으면 「처음부터」는 숨는다). 프로필과 설정은 오른쪽 위다.
             foreach (string item in new[] { "Continue", "Profile", "Settings", "Secondary/Parts", "Secondary/Duel" })
             {
                 var button = menu.Find(item).GetComponent<Button>();
@@ -127,6 +141,7 @@ namespace MiniPandoras.Tests
             int picked = -1;
             title.ChapterPicked += chapter => picked = chapter;
             Transform screen = title.transform.Find("Screen");
+            yield return OpenMenu();
             screen.Find("Safe Area/Menu/Secondary/Parts").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.3f);
 
@@ -137,9 +152,10 @@ namespace MiniPandoras.Tests
             Transform cards = window.Find("Carousel/Cards");
             Assert.That(screen.Find("Safe Area").GetComponent<CanvasGroup>().blocksRaycasts, Is.False, "챕터 선택을 여는 동안 첫 화면의 메뉴는 숨는다");
             Assert.That(cards.childCount, Is.EqualTo(ChapterTitles.PartCount + ChapterTitles.UpcomingPartLabels.Count), "챕터마다 카드가 하나씩 생긴다(나올 챕터까지)");
-            Assert.That(carousel.Front, Is.EqualTo(0), "저장이 없으면 CHAPTER 1이 가운데다");
-            Assert.That(info.text, Does.Contain("0장"), "CHAPTER 1은 0장부터 시작한다");
-            Assert.That(cards.Find("Part 1 Card/Content/Chapters").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("0장 ~ 5장"));
+            Assert.That(carousel.Front, Is.EqualTo(0), "저장이 없으면 프롤로그가 가운데다");
+            Assert.That(info.text, Does.Contain("0장"), "프롤로그는 0장이다");
+            Assert.That(cards.Find("Part 1 Card/Content/Label").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("PROLOGUE"));
+            Assert.That(cards.Find("Part 1 Card/Content/Chapters").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("0장"));
 
             // 가운데 카드가 가장 크고, 멀수록 작아지며 흐려진다.
             float Width(string card) => ((RectTransform)cards.Find(card)).rect.width;
@@ -156,46 +172,51 @@ namespace MiniPandoras.Tests
             var front = cards.Find("Part 1 Card");
             Assert.That(StoryDriver.PressedAt(front as RectTransform), Is.EqualTo(front.gameObject), "가운데 카드는 다른 카드에 가리지 않는다");
 
-            // 오른쪽 화살표: CHAPTER 2가 가운데로 와서 커지고, 뒤 풍경이 2부(밤 사막)로 바뀐다.
+            // 오른쪽 화살표: CHAPTER 1이 가운데로 와서 커지고, 뒤 무대가 1부(동틀 녘의 뱀성)로 바뀐다.
+            var stages = Object.FindFirstObjectByType<TitleStages>();
+            Assert.That(stages.Shown, Is.EqualTo(0), "프롤로그의 무대가 서 있다");
             window.Find("Turn Right").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.5f);
             Assert.That(carousel.Front, Is.EqualTo(1));
             Assert.That(Width("Part 2 Card"), Is.GreaterThan(Width("Part 1 Card")), "가운데로 온 카드가 커진다");
             Assert.That(cards.Find("Part 2 Card").GetSiblingIndex(), Is.EqualTo(cards.childCount - 1), "가운데 카드가 맨 위에 그려진다");
-            Assert.That(info.text, Does.Contain("6장"), "CHAPTER 2는 6장부터 시작한다");
-            Assert.That(screen.Find("Scenery Part 2").gameObject.activeSelf, Is.True, "CHAPTER 2가 가운데 오면 2부 풍경이다");
-            Assert.That(screen.Find("Scenery Part 1").gameObject.activeSelf, Is.False, "바뀐 뒤 1부 풍경은 꺼진다");
+            Assert.That(info.text, Does.Contain("1장"), "CHAPTER 1은 1장부터 시작한다");
+            Assert.That(stages.Shown, Is.EqualTo(1), "CHAPTER 1이 가운데 오면 1부 무대다");
+            Assert.That(Object.FindObjectsByType<TitleStage>(FindObjectsSortMode.None).Length, Is.EqualTo(1), "앞 무대는 치워진다");
             Assert.That(window.Find("Turn Left").gameObject.activeSelf, Is.True, "가운데가 아니면 양쪽으로 넘길 수 있다");
 
-            // 한 번 더: 아직 나오지 않은 CHAPTER 3은 COMING SOON이고 시작할 수 없다. 풍경은 2부 그대로다.
+            // 두 번 더: CHAPTER 2를 지나, 아직 나오지 않은 CHAPTER 3은 COMING SOON이고 시작할 수 없다. 무대는 2부 그대로다.
             window.Find("Turn Right").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.5f);
-            Assert.That(carousel.Front, Is.EqualTo(2));
-            Assert.That(cards.Find("Part 3 Card/Content/Coming Soon").gameObject.activeSelf, Is.True, "나오지 않은 챕터의 카드에 COMING SOON이 뜬다");
-            Assert.That(cards.Find("Part 3 Card/Content/Label").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("CHAPTER 3"));
+            Assert.That(info.text, Does.Contain("6장"), "CHAPTER 2는 6장부터 시작한다");
+            Assert.That(stages.Shown, Is.EqualTo(2), "CHAPTER 2가 가운데 오면 2부 무대다");
+            window.Find("Turn Right").GetComponent<Button>().onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.5f);
+            Assert.That(carousel.Front, Is.EqualTo(3));
+            Assert.That(cards.Find("Part 4 Card/Content/Coming Soon").gameObject.activeSelf, Is.True, "나오지 않은 챕터의 카드에 COMING SOON이 뜬다");
+            Assert.That(cards.Find("Part 4 Card/Content/Label").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("CHAPTER 3"));
             Assert.That(start.interactable, Is.False, "나오지 않은 챕터는 시작할 수 없다");
-            Assert.That(screen.Find("Scenery Part 2").gameObject.activeSelf, Is.True, "나오지 않은 챕터는 풍경을 바꾸지 않는다");
-            Assert.That(cards.Find("Part 1 Card").GetComponent<CanvasGroup>().alpha, Is.LessThan(1f), "멀리 넘긴 CHAPTER 1은 작아지며 사라진다");
+            Assert.That(stages.Shown, Is.EqualTo(2), "나오지 않은 챕터는 무대를 바꾸지 않는다");
+            Assert.That(cards.Find("Part 2 Card").GetComponent<CanvasGroup>().alpha, Is.LessThan(1f), "멀리 넘긴 CHAPTER 1은 작아지며 사라진다");
 
             // 줄은 돌고 돌지 않는다: 마지막 챕터에서는 더 가지 않는다. 끌어서 넘겨도 된다(카드 한 칸의 3할만 쓸어도 넘어간다).
             Assert.That(window.Find("Turn Right").gameObject.activeSelf, Is.False, "마지막 챕터에서는 오른쪽으로 넘길 것이 없다");
             carousel.Turn(1);
             yield return new WaitForSecondsRealtime(0.5f);
-            Assert.That(carousel.Front, Is.EqualTo(2), "마지막 챕터 다음으로 가지 않는다");
+            Assert.That(carousel.Front, Is.EqualTo(3), "마지막 챕터 다음으로 가지 않는다");
             var drag = new PointerEventData(EventSystem.current);
             ExecuteEvents.Execute(carousel.gameObject, drag, ExecuteEvents.beginDragHandler);
             drag.delta = new Vector2(30f * carousel.GetComponentInParent<Canvas>().rootCanvas.scaleFactor, 0f);
             ExecuteEvents.Execute(carousel.gameObject, drag, ExecuteEvents.dragHandler);
             ExecuteEvents.Execute(carousel.gameObject, drag, ExecuteEvents.endDragHandler);
             yield return new WaitForSecondsRealtime(0.5f);
-            Assert.That(carousel.Front, Is.EqualTo(1), "오른쪽으로 짧게 쓸면 앞 챕터로 돌아온다");
+            Assert.That(carousel.Front, Is.EqualTo(2), "오른쪽으로 짧게 쓸면 앞 챕터로 돌아온다");
 
-            // 닫으면 첫 화면이 돌아오고 풍경도 저장된 부(1부)로 돌아온다.
+            // 닫으면 메뉴가 돌아오고 무대도 저장된 부(저장이 없으면 프롤로그)로 돌아온다.
             window.Find("Close").GetComponent<Button>().onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.5f);
             Assert.That(screen.Find("Safe Area").GetComponent<CanvasGroup>().blocksRaycasts, Is.True, "닫으면 첫 화면의 메뉴가 다시 눌린다");
-            Assert.That(screen.Find("Scenery Part 1").gameObject.activeSelf, Is.True, "닫으면 저장된 부의 풍경으로 돌아온다");
-            Assert.That(screen.Find("Scenery Part 2").gameObject.activeSelf, Is.False);
+            Assert.That(stages.Shown, Is.EqualTo(0), "닫으면 저장된 부의 무대로 돌아온다");
             Assert.That(picked, Is.EqualTo(-1), "넘겨 보기만 하면 아무것도 고르지 않는다");
         }
 
@@ -214,7 +235,7 @@ namespace MiniPandoras.Tests
             Transform window = title.transform.Find("Screen/Part Window/Safe Area");
             var carousel = window.Find("Carousel").GetComponent<PartCarousel>();
             var start = window.Find("Start").GetComponent<Button>();
-            Assert.That(carousel.Front, Is.EqualTo(0), "저장된 장(3장)이 속한 1부가 맨 앞이다");
+            Assert.That(carousel.Front, Is.EqualTo(1), "저장된 장(3장)이 속한 1부가 가운데다");
             Assert.That(start.transform.Find("Label").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("이어 하기"), "저장된 부는 이어 한다");
             Assert.That(window.Find("Info").GetComponent<TMPro.TMP_Text>().text, Does.Contain("3장"));
 
@@ -237,46 +258,66 @@ namespace MiniPandoras.Tests
         }
 
         [UnityTest]
-        public IEnumerator ShowsTheSceneryOfTheSavedPart()
+        public IEnumerator ShowsTheStageOfTheSavedPart()
         {
-            // 저장이 없으면 1부: 정류장에 선 뱀열차. 처음 몇 초는 승강장 앞에 멈춰 있다.
-            Transform screen = title.transform.Find("Screen");
-            Transform partName = screen.Find("Safe Area/Logo/Part");
-            Assert.That(screen.Find("Scenery Part 1").gameObject.activeSelf, Is.True, "저장이 없으면 1부 풍경이다");
-            Assert.That(screen.Find("Scenery Part 2").gameObject.activeSelf, Is.False);
-            Assert.That(partName.GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("CHAPTER 1"), "부는 이름 없이 「CHAPTER 1」로만 보인다");
-            var stoppedHead = (RectTransform)screen.Find("Scenery Part 1/Train Head");
-            yield return new WaitForSecondsRealtime(0.5f);
-            Assert.That(stoppedHead.anchoredPosition.x, Is.EqualTo(36f), "1부의 뱀열차는 처음에 정류장에 서 있다(문이 디엘과 주인공 사이)");
+            // 저장이 없으면 프롤로그의 무대다. 필드의 카메라와 HUD는 꺼져 있다.
+            Transform partName = title.transform.Find("Screen/Safe Area/Logo/Part");
+            Assert.That(Object.FindFirstObjectByType<TitleStages>().Shown, Is.EqualTo(0), "저장이 없으면 프롤로그 무대다");
+            Assert.That(partName.GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("PROLOGUE"));
+            Assert.That(Object.FindFirstObjectByType<FollowCamera>().GetComponent<Camera>().enabled, Is.False, "무대가 서 있는 동안 필드 카메라는 꺼진다");
+            Assert.That(Object.FindFirstObjectByType<MenuView>().GetComponent<Canvas>().enabled, Is.False, "필드의 메뉴 버튼이 무대 위에 비치지 않는다");
 
-            // 2부(7장) 저장이면 밤 사막 위를 여섯을 태운 나리온이 날아간다. 2부에는 뱀열차가 나오지 않는다.
-            TestSaves.StartAt(7, "시험");
-            yield return SceneManager.LoadSceneAsync("Field");
-            title = Object.FindFirstObjectByType<TitleView>();
-            yield return null;
-            screen = title.transform.Find("Screen");
-            Assert.That(screen.Find("Scenery Part 1").gameObject.activeSelf, Is.False);
-            Assert.That(screen.Find("Scenery Part 2").gameObject.activeSelf, Is.True, "2부의 장이 저장되어 있으면 2부 풍경이다");
-            Assert.That(screen.Find("Safe Area/Logo/Part").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("CHAPTER 2"));
-            Assert.That(screen.Find("Scenery Part 2/Train Head"), Is.Null, "2부 풍경에는 뱀열차가 없다");
-            var narion = (RectTransform)screen.Find("Scenery Part 2/Narion");
-            float narionBefore = narion.anchoredPosition.x;
-            yield return new WaitForSecondsRealtime(0.6f);
-            Assert.That(narion.anchoredPosition.x, Is.GreaterThan(narionBefore), "나리온은 오른쪽으로 날아간다");
+            foreach ((int chapter, int part, string label) in new[] { (3, 1, "CHAPTER 1"), (7, 2, "CHAPTER 2") })
+            {
+                TestSaves.StartAt(chapter, "시험");
+                yield return SceneManager.LoadSceneAsync("Field");
+                title = Object.FindFirstObjectByType<TitleView>();
+                yield return null;
+                Assert.That(Object.FindFirstObjectByType<TitleStages>().Shown, Is.EqualTo(part), $"{chapter}장이 저장되어 있으면 {label} 무대다");
+                Assert.That(title.transform.Find("Screen/Safe Area/Logo/Part").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo(label));
+                Assert.That(title.transform.Find("Screen/Safe Area/Logo/Cleared").gameObject.activeSelf, Is.False, "아직 끝까지 보지 않았다");
+            }
 
-            Transform rows = screen.Find("Chapter Window/Frame/Chapters");
+            Transform rows = title.transform.Find("Screen/Chapter Window/Frame/Chapters");
             Assert.That(rows.Find("Part 1 Header").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("CHAPTER 1"), "장 선택 창의 왼쪽 줄 머리");
             Assert.That(rows.Find("Part 2 Header").GetComponent<TMPro.TMP_Text>().text, Is.EqualTo("CHAPTER 2"), "오른쪽 줄 머리");
 
-            // 끝까지 본 판이면 「2부」 자리에 「2부 클리어」만 뜬다(둘이 겹쳐 보이지 않는다).
-            Assert.That(screen.Find("Safe Area/Logo/Cleared").gameObject.activeSelf, Is.False, "아직 끝까지 보지 않았다");
+            // 끝까지 본 판이면 「CHAPTER 2」 자리에 「CHAPTER 2 클리어」만 뜬다(둘이 겹쳐 보이지 않는다).
             TestSaves.StartAt(11, "시험", cleared: true);
             yield return SceneManager.LoadSceneAsync("Field");
             title = Object.FindFirstObjectByType<TitleView>();
             yield return null;
             Transform logo = title.transform.Find("Screen/Safe Area/Logo");
-            Assert.That(logo.Find("Cleared").gameObject.activeSelf, Is.True, "끝까지 본 판이면 「2부 클리어」가 뜬다");
-            Assert.That(logo.Find("Part").gameObject.activeSelf, Is.False, "그때는 「2부」를 따로 띄우지 않는다");
+            Assert.That(logo.Find("Cleared").gameObject.activeSelf, Is.True, "끝까지 본 판이면 클리어 표시가 뜬다");
+            Assert.That(logo.Find("Part").gameObject.activeSelf, Is.False, "그때는 부 표시를 따로 띄우지 않는다");
+        }
+
+        [UnityTest]
+        public IEnumerator EnteringDivesIntoTheStageAndDescendsIntoTheField()
+        {
+            TestSaves.StartAt(2, "시험");
+            yield return SceneManager.LoadSceneAsync("Field");
+            title = Object.FindFirstObjectByType<TitleView>();
+            yield return null;
+            var stages = Object.FindFirstObjectByType<TitleStages>();
+            Transform view = Object.FindFirstObjectByType<TitleStage>().transform.Find("View");
+            yield return OpenMenu();
+            Vector3 before = view.position;
+            title.transform.Find("Screen/Safe Area/Menu/Continue").GetComponent<Button>().onClick.Invoke();
+            yield return Waits.UntilReal(() => view == null || view.position.y > before.y + 20f, "카메라가 무대 안쪽으로 뛰어든다", 15f);
+            yield return Waits.UntilReal(() => !title.IsOpen, "빛에 덮인 뒤 타이틀이 닫힌다", 15f);
+            Assert.That(stages.Shown, Is.EqualTo(-1), "무대는 치워진다");
+            Camera field = Object.FindFirstObjectByType<FollowCamera>().GetComponent<Camera>();
+            Assert.That(field.enabled, Is.True, "필드 카메라가 다시 켜진다");
+
+            // 2장은 힐리아에서 밝아진다. 카메라가 하늘 높은 곳에서 내려와 늘 서는 높이에 선다(무대의 위는 -Z).
+            float highest = 0f;
+            yield return Waits.UntilReal(() =>
+            {
+                highest = Mathf.Max(highest, -field.transform.position.z);
+                return highest > 24f;
+            }, "밝아질 때 카메라가 하늘에 있다", 25f);
+            yield return Waits.UntilReal(() => -field.transform.position.z < 16f, "주인공에게 내려온다", 15f);
         }
 
         [UnityTest]

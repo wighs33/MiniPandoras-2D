@@ -30,6 +30,14 @@ namespace MiniPandoras.Field
         internal List<Resident> All => residents;
         internal List<Resident> Parked => parkedResidents;
 
+        /// <summary>지금 맵에 선 사람 수. 미니맵이 <see cref="BodyAt"/>와 함께 점을 찍는다.</summary>
+        public int Count => residents.Count;
+
+        public CharacterBody BodyAt(int index)
+        {
+            return residents[index].Body;
+        }
+
         /// <summary>맵에 선 사람으로 둔다. 탐험하는 동안 주인공 길을 막고, 말 걸기·어슬렁거리기·순찰·시야를 줄 수 있다.</summary>
         public void AddResident(CharacterBody body)
         {

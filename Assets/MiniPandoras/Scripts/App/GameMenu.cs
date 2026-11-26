@@ -133,11 +133,27 @@ namespace MiniPandoras.App
             scaleBeforePause = Time.timeScale;
             Time.timeScale = 0f;
             GameState state = session.State;
-            view.SetWorldMapShown(state.Owns(Items.WorldMap) || state.Chapter > ChapterMapIsFound);
+            view.SetWorldMapShown(HasWorldMap(state));
             view.SetMonsterBookShown(state.HasRequest(Missions.MonsterBook));
             view.SetCompanionsShown(state.AvailableCompanions().Count > 0);
             view.SetBookShown(state.HasFlag(StoryFlags.Book));
             view.SetLoadoutShown(state.HasFlag(StoryFlags.Swap));
+        }
+
+        /// <summary>지도는 2장에서 받는다. 3장부터 시작한 판에도 있다.</summary>
+        private static bool HasWorldMap(GameState state)
+        {
+            return state.Owns(Items.WorldMap) || state.Chapter > ChapterMapIsFound;
+        }
+
+        // 봉인서·지도는 이야기 도중에 얻으므로, HUD 바로 가기는 매 프레임 진행 상태를 본다(바뀔 때만 켜고 끈다).
+        private void Update()
+        {
+            GameState state = session.State;
+            if (state != null)
+            {
+                view.SetShortcutsShown(state.HasFlag(StoryFlags.Book), HasWorldMap(state));
+            }
         }
 
         private void Resume()

@@ -76,6 +76,9 @@ namespace MiniPandoras.Editor
                 case Vector2 vector:
                     property.vector2Value = vector;
                     break;
+                case Vector3 vector:
+                    property.vector3Value = vector;
+                    break;
                 case Rect rect:
                     property.rectValue = rect;
                     break;

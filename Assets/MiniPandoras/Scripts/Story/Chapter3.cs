@@ -37,9 +37,6 @@ namespace MiniPandoras.Story
         private static readonly Vector2Int YardDiel = new Vector2Int(32, 18);
         private static readonly Vector2Int DielFront = new Vector2Int(31, 19);
 
-        // 컷인 그림(cutin_wings.py) 안 자리(가상 화면 384×216 px).
-        private static readonly Vector2 WingsFoot = new Vector2(192f, 214f);
-        private const float WingsHeight = 96f;
 
         // 마을 순찰병의 길. 자리는 맵 지점 guard의 칸 순서대로다(셋에서 11명으로 늘렸다가 다리를 건너기 어려워 시야를 늘리고 여섯으로 줄였다).
         // Tools/PixelGen/town.py가 같은 길로 막힌 칸을, town_guards.py가 주인공이 지나갈 틈이 남는지를 검사한다.
@@ -51,11 +48,6 @@ namespace MiniPandoras.Story
         /// <summary>순찰병이 한 칸 걷는 프레임 수. 주인공(12프레임)보다 훨씬 느려서 뒤를 따라가거나 앞질러 갈 수 있다.</summary>
         private const float GuardFramesPerTile = 30f;
 
-        // 컷인 그림(cutin_railing.py) 안 자리(가상 화면 384×216 px): 난간 손잡이 윗면이 y 103이다.
-        // 다리를 꼰 그림(키 96)의 엉덩이가 손잡이에 걸치고 받치는 다리가 난간 앞으로 늘어지게 발밑을 둔다.
-        private static readonly Vector2 PerchFoot = new Vector2(215f, 138f);
-        private const float PerchHeight = 96f;
-        private static readonly Vector2 PerchFace = new Vector2(215f, 62f);
 
         /// <summary>디엘이 주인공 앞으로 떨어질 때 그림을 띄워 두는 높이(논리 px). 화면 위 바깥에서 내리꽂힌다.</summary>
         private const float FallHeight = 180f;
@@ -121,7 +113,7 @@ namespace MiniPandoras.Story
             yield return s.Lines("chapter3.meetTheStranger.2");
             s.Actors.Face("hero", Facing.Up);
             yield return ShowTheManOnTheRailing(s);
-            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInZoom(PerchFace, 1.7f, 240f));
+            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInMove(420f));
             yield return s.Lines("chapter3.meetTheStranger.3");
             yield return s.Say("diel", T("chapter3.meetTheStranger.18"), Stranger);
             yield return s.Lines("chapter3.meetTheStranger.4");
@@ -213,7 +205,7 @@ namespace MiniPandoras.Story
         private static IEnumerator ShowTheManOnTheRailing(StoryDirector s)
         {
             yield return s.FadeOut(10f);
-            s.Scenes.BeginCutIn("railing", PerchFoot, PerchHeight);
+            s.Scenes.BeginCutIn("railing");
             yield return s.FadeIn(16f);
             yield return s.Wait(20f);
         }
@@ -313,16 +305,18 @@ namespace MiniPandoras.Story
         private static IEnumerator ShowTheWingsOpening(StoryDirector s)
         {
             yield return s.FadeOut(10f);
-            s.Scenes.BeginCutIn("wings", WingsFoot, WingsHeight);
+            s.Scenes.BeginCutIn("wings");
             yield return s.FadeIn(14f);
             yield return s.Wait(30f);
             s.Flash(StoryColors.DemonFlash, 0.5f);
             s.Shake(4f, 30f);
-            s.Scenes.CutInPlayOver();
+            s.Scenes.CutInReveal();
+            Coroutine closeUp = s.StartCoroutine(s.Scenes.CutInMove(200f));
             yield return s.Scenes.CutInGlow(0.8f, 18f);
             yield return s.Wait(50f);
             yield return s.Lines("chapter3.showTheWingsOpening.1");
             yield return s.Wait(20f);
+            s.StopCoroutine(closeUp);
             yield return s.FadeOut(10f);
             s.Scenes.EndCutIn();
             s.Actors.SetSheet("diel", "dielDemon");

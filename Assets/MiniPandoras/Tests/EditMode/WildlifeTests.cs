@@ -14,7 +14,7 @@ namespace MiniPandoras.Tests
     {
         private const string CatalogPath = "Assets/MiniPandoras/Data/Battle/BattleCatalog.asset";
         private const string SheetFolder = "Assets/MiniPandoras/Data/Characters";
-        private const string MapFolder = "Assets/MiniPandoras/Prefabs/Maps";
+        private const string MapFolder = "Assets/MiniPandoras/Resources/Maps";
         // 무리가 알아채는 거리(FieldCombat의 AggroRange 78px)에 1칸을 더했다. 맵에 들어서자마자 덤벼들지 않게 한다.
         private const float ArrivalClearance = 78f / MapCoordinates.LogicalPixelsPerTile + 1f;
 

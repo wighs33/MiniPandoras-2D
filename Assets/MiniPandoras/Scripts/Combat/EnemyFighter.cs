@@ -178,6 +178,9 @@ namespace MiniPandoras.Combat
 
         public Vector2 Position => Body.Position;
         public Vector2 Chest => Body.Position + new Vector2(0f, ChestHeight);
+
+        /// <summary>가슴 높이의 효과 자리(HD-2D 화면은 세운 판을 따라 올린다).</summary>
+        public Raised ChestPoint => new Raised(Body.Position, ChestHeight);
         public bool IsAlive => !Dead && Body.IsVisible;
 
         /// <summary>한 프레임 걸음(월드 길이). 느려지면 절반이다.</summary>

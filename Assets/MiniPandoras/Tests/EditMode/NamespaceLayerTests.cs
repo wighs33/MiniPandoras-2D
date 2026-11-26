@@ -28,6 +28,8 @@ namespace MiniPandoras.Tests
             { "Characters", 2 },
 
             { "Combat", 3 },
+            // 타이틀과 컷인의 무대: 인물 그림과 월드의 도구만 쓴다.
+            { "Stages", 3 },
 
             { "Player", 4 },
             { "Minigames", 4 },

@@ -30,7 +30,7 @@ namespace MiniPandoras.World
         /// </summary>
         public DimensionDoor OpenPortal(Transform map, Vector2Int cell)
         {
-            GameObject root = stage.NewEffect("Portal", map, MapCoordinates.LogicalCellFoot(cell, 7));
+            GameObject root = stage.NewFlat("Portal", map, MapCoordinates.LogicalCellFoot(cell, 7));
             // 바닥에 붙은 그림이라 이 컴포넌트의 층이 아니라 맵의 층에 두어 바닥처럼 회상 색을 입는다.
             root.layer = map.gameObject.layer;
             AddSheetLayers(root.transform, out SpriteRenderer color, out SpriteRenderer light);
@@ -68,7 +68,7 @@ namespace MiniPandoras.World
         /// </summary>
         public GameObject SealCircle(Transform map, Vector2Int cell)
         {
-            GameObject root = stage.NewEffect("SealCircle", map, MapCoordinates.LogicalCellFoot(cell, 1));
+            GameObject root = stage.NewStanding("SealCircle", map, MapCoordinates.LogicalCellFoot(cell, 1));
             AddSheetLayers(root.transform, out SpriteRenderer color, out SpriteRenderer light);
             stage.StartCoroutine(PlaySealChains(root, color, light));
             return root;
@@ -86,7 +86,7 @@ namespace MiniPandoras.World
         /// <summary>비틀린 공간의 매듭(6장 숲, pixelfx). 인물 아래 바닥에 그리고, <see cref="Stop"/>할 때까지 남는다.</summary>
         public GameObject RiftKnot(Transform map, Vector2Int cell)
         {
-            GameObject root = stage.NewEffect("RiftKnot", map, MapCoordinates.LogicalCellFoot(cell, 7));
+            GameObject root = stage.NewFlat("RiftKnot", map, MapCoordinates.LogicalCellFoot(cell, 7));
             AddSheetLayers(root.transform, out SpriteRenderer color, out SpriteRenderer light);
             color.sortingOrder = StageEffects.GroundEffectOrder;
             light.sortingOrder = StageEffects.GroundEffectOrder;
@@ -97,7 +97,9 @@ namespace MiniPandoras.World
         /// <summary>매듭이 조여 들었다가 튕겨 끊어진다.</summary>
         public void KnotUntie(Transform map, Vector2Int cell)
         {
-            PlaySheet("KnotUntie", map, stage.KnotUntie, MapCoordinates.LogicalCellFoot(cell, 7));
+            GameObject root = stage.NewFlat("KnotUntie", map, MapCoordinates.LogicalCellFoot(cell, 7));
+            AddSheetLayers(root.transform, out SpriteRenderer color, out SpriteRenderer light);
+            stage.StartCoroutine(PlayOnce(root, stage.KnotUntie, color, light));
         }
 
         /// <summary>허공이 찢어진다. 틈이 사람이 나올 만큼 벌어지기까지의 초를 돌려준다.</summary>
@@ -145,10 +147,10 @@ namespace MiniPandoras.World
             light = stage.AddSprite(root, "Light", null, Color.white);
         }
 
-        /// <summary>프레임 그림 효과를 한 번 튼다. 색 층을 그리고 그 위에 빛 층을 더한다. 자리는 효과의 기준점(보통 발밑)이다.</summary>
+        /// <summary>세운 프레임 그림 효과를 한 번 튼다. 색 층을 그리고 그 위에 빛 층을 더한다. 자리는 효과의 기준점(발밑)이다.</summary>
         private void PlaySheet(string name, Transform map, EffectSheet sheet, Vector2 at)
         {
-            GameObject root = stage.NewEffect(name, map, at);
+            GameObject root = stage.NewStanding(name, map, at);
             AddSheetLayers(root.transform, out SpriteRenderer color, out SpriteRenderer light);
             stage.StartCoroutine(PlayOnce(root, sheet, color, light));
         }

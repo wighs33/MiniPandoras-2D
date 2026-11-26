@@ -26,7 +26,6 @@ namespace MiniPandoras.World
         private const float Desaturation = -82f;
         private static readonly Color SepiaFilter = new Color(0.915f, 0.802f, 0.685f);
 
-        private UniversalAdditionalCameraData cameraData;
         private Volume volume;
         private VolumeProfile profile;
         private float target;
@@ -46,7 +45,6 @@ namespace MiniPandoras.World
 
         private void Awake()
         {
-            cameraData = GetComponent<UniversalAdditionalCameraData>();
             profile = ScriptableObject.CreateInstance<VolumeProfile>();
             var color = profile.Add<ColorAdjustments>();
             color.saturation.Override(Desaturation);
@@ -54,6 +52,8 @@ namespace MiniPandoras.World
 
             volume = gameObject.AddComponent<Volume>();
             volume.isGlobal = true;
+            // 필드 분위기(FieldLook)의 대비·채도 위에 회상 색이 덮이게 한다. 후처리는 FieldLook이 늘 켜 둔다.
+            volume.priority = FieldLook.Priority + 1f;
             volume.sharedProfile = profile;
             Apply(0f);
         }
@@ -77,8 +77,6 @@ namespace MiniPandoras.World
         private void Apply(float strength)
         {
             volume.weight = strength;
-            // 후처리는 모바일에서 비싸므로 회상 색이 보일 때만 켠다.
-            cameraData.renderPostProcessing = strength > Invisible;
         }
     }
 }

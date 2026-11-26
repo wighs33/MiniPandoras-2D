@@ -10,6 +10,7 @@
         Assets/MiniPandoras/Art/PixelGen/Maps/<id>/uprights.json, <이름>.png  맵에 세우는 것(집·상자·통·우물·수반·울타리).
               웹게임 uprights와 같은 형식이다: 왼쪽·위(그림 px), 발밑(논리 px).
         Assets/MiniPandoras/Art/PixelGen/Maps/<id>/trees.json  숲을 다시 심은 맵의 나무(웹게임 나무 대신 쓴다, REPLANT)
+        Assets/MiniPandoras/Art/PixelGen/Maps/<id>/relief.png  절벽·떠 있는 섬의 높이(relief.py, HD-2D 필드에서 절벽을 세운다)
 맵 들여오기(MapImporter)는 다시 그린 바닥이 있는 맵에 이 그림을 쓴다.
 """
 import json
@@ -24,6 +25,7 @@ import forest
 import objects
 import pixelgen as pg
 import props
+import relief
 import terrain
 import trees
 
@@ -135,7 +137,10 @@ def main(project, map_ids):
         kinds = tiles["tiles"]
         if map_id in REPLANT:
             kinds = replant(map_id, kinds, data, art / f"PixelGen/Maps/{map_id}")
-        ground = DRAWERS[theme](kinds, seed=sum(map(ord, map_id)))
+        heights = relief.Relief(len(kinds) * pg.TILE, len(kinds[0]) * pg.TILE)
+        ground = DRAWERS[theme](kinds, seed=sum(map(ord, map_id)), heights=heights)
+        if not heights.is_flat():
+            heights.save(art / f"PixelGen/Maps/{map_id}/relief.png")
         save(ground, art / f"PixelGen/Maps/{map_id}/ground.png")
         stand_objects(tiles["tiles"], map_id, art / f"PixelGen/Maps/{map_id}")
         if map_id in EYE_LEVEL:

@@ -149,7 +149,7 @@ def reception(m, rng):
 
 
 def build():
-    m = MapLayout("adventurersGuild", "모험가 길드", WIDTH, HEIGHT, theme="interior", music="town",
+    m = MapLayout("adventurersGuild", "모험가 길드", WIDTH, HEIGHT, theme="interior", indoors=True, music="town",
                   ambient={"color": "#201018", "alpha": 0.25}, seed=451)
     room = RoomInterior(WIDTH, HEIGHT, [ROOM], seed=451)
     row = ROOM[1]
@@ -159,6 +159,7 @@ def build():
     room.fireplace(HEARTH, row)
     room.entrance(*DOOR)
     m.paint_ground = room.ground
+    m.paint_relief = room.relief
     m.block_where(~room.floor)
     rng = np.random.default_rng(452)
 

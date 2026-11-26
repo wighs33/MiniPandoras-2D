@@ -56,13 +56,14 @@ namespace MiniPandoras.Tests
                 Is.EqualTo(new[] { Facing.Down, Facing.Down, Facing.Left, Facing.Left }));
         }
 
-        [TestCase(0, 1)]
+        [TestCase(0, 0)]
+        [TestCase(1, 1)]
         [TestCase(5, 1)]
         [TestCase(6, 2)]
         [TestCase(11, 2)]
         public void SplitsThePartsWhereTheSnakeTrainLeaves(int chapter, int part)
         {
-            // 1부는 5장 끝에 뱀열차에 오르기까지, 2부는 6장 객실부터 끝까지다.
+            // 0장은 프롤로그, 1부는 5장 끝에 뱀열차에 오르기까지, 2부는 6장 객실부터 끝까지다.
             Assert.That(ChapterTitles.PartOf(chapter), Is.EqualTo(part));
         }
 
@@ -70,15 +71,16 @@ namespace MiniPandoras.Tests
         public void LabelsThePartsWithoutNames()
         {
             // 부는 화면에 CHAPTER로 보이고 따로 이름을 두지 않는다. 장 이름으로 충분하다(사용자 결정 2026-11-09).
-            Assert.That(ChapterTitles.PartLabels, Is.EqualTo(new[] { "CHAPTER 1", "CHAPTER 2" }));
-            Assert.That(ChapterTitles.PartOf(ChapterTitles.Count - 1), Is.EqualTo(ChapterTitles.PartCount), "마지막 장은 마지막 부에 든다");
+            Assert.That(ChapterTitles.PartLabels, Is.EqualTo(new[] { "PROLOGUE", "CHAPTER 1", "CHAPTER 2" }));
+            Assert.That(ChapterTitles.PartOf(ChapterTitles.Count - 1), Is.EqualTo(ChapterTitles.LastPart), "마지막 장은 마지막 부에 든다");
         }
 
         [Test]
         public void PartCardsShowTheirChaptersAndTheComingPart()
         {
             // 타이틀의 챕터 선택 카드: 나온 부는 장 범위를, 나오기로 한 다음 부(CHAPTER 3)는 COMING SOON을 보인다.
-            Assert.That(ChapterTitles.ChaptersOf(1), Is.EqualTo("0장 ~ 5장"));
+            Assert.That(ChapterTitles.ChaptersOf(0), Is.EqualTo("0장"), "장이 하나뿐인 프롤로그는 그 장만 적는다");
+            Assert.That(ChapterTitles.ChaptersOf(1), Is.EqualTo("1장 ~ 5장"));
             Assert.That(ChapterTitles.ChaptersOf(2), Is.EqualTo("6장 ~ 11장"));
             Assert.That(ChapterTitles.UpcomingPartLabels, Is.EqualTo(new[] { "CHAPTER 3" }));
         }

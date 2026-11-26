@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using MiniPandoras.Stages;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -10,27 +12,55 @@ using static MiniPandoras.Dialogue.GameText;
 namespace MiniPandoras.UI
 {
     /// <summary>
-    /// 타이틀 화면. 저장된 장이 속한 부의 풍경(<see cref="TitleScenery"/>, 1부는 정류장의 뱀열차, 2부는 밤 사막) 위 하늘에 로고(「MINI 판도라즈」 그림)를,
-    /// 엄지가 닿는 왼쪽 아래에 메뉴를 한 덩어리로 둔다(2026-11-15 다시 짬).
-    /// 윗줄은 주 버튼 하나와 프로필·설정 아이콘, 아랫줄은 처음부터·지난 스토리·1:1 대전이다.
+    /// 타이틀 화면. 저장된 장이 속한 부의 HD-2D 무대(<see cref="TitleStages"/>, 프롤로그·CHAPTER 1·CHAPTER 2)를 뒤에 세우고, 세 단계로 들어간다(2026-11-25 다시 짬).
+    /// 1. 첫 화면: 로고와 「화면을 눌러 시작」뿐이다. 무대를 가리지 않는다.
+    /// 2. 메뉴: 화면을 누르면 카메라가 돌아 볼거리가 오른쪽으로 비켜서고, 왼쪽에 메뉴가 한 줄씩 미끄러져 들어온다.
+    /// 3. 들어가기(<see cref="Enter"/>): 시작할 장을 고르면 카메라가 무대 안으로 뛰어들고, 빛에 덮인 뒤 게임이 시작된다.
     /// 주 버튼은 저장이 있으면 「이어 하기」(저장된 장), 없으면 「처음부터」(프롤로그)다.
-    /// 아랫줄의 「처음부터」는 저장을 덮어쓰므로 저장이 있을 때만 보이고, 누르면 한 번 묻는다.
+    /// 그 아래의 「처음부터」는 저장을 덮어쓰므로 저장이 있을 때만 보이고, 누르면 한 번 묻는다.
     /// 「지난 스토리」는 부마다 카드를 세운 줄(<see cref="PartPicker"/>, 음반 고르기처럼 가운데 카드가 크다)을 연다.
-    /// 줄을 넘기면 뒤 풍경이 가운데 온 부의 것으로 바뀐다. 저장된 부는 이어 하고, 다른 부나 그 부의 「처음부터」는 저장을 지우므로 한 번 묻는다.
+    /// 줄을 넘기면 뒤 무대가 가운데 온 부의 것으로 바뀐다. 저장된 부는 이어 하고, 다른 부나 그 부의 「처음부터」는 저장을 지우므로 한 번 묻는다.
     /// 대전·프로필·설정은 알리기만 하고, 그 창은 받는 쪽(이야기의 대전, 앱의 타이틀 창들)이 연다.
     /// 장 선택(장 목록 창)은 테스트하기 쉽게 남긴 것이라 챕터 선택 창에서 개발 빌드에서만 연다. 무엇을 고르든 장 번호 하나로 알린다.
     /// </summary>
     public sealed class TitleView : MonoBehaviour
     {
-        private const float LogoFadeSeconds = 0.9f;
-        private const float MenuDelaySeconds = 0.5f;
-        private const float MenuFadeSeconds = 0.6f;
+        private const float CurtainSeconds = 1.1f;
+        private const float LogoDelaySeconds = 0.5f;
+        private const float LogoFadeSeconds = 1.2f;
+        private const float PromptDelaySeconds = 1.4f;
+        private const float PromptFadeSeconds = 0.6f;
+        private const float PromptPulseSeconds = 1.1f;
+        private const float PromptDim = 0.35f;
+        private const float MenuTurnSeconds = 0.9f;
+        private const float MenuItemDelaySeconds = 0.35f;
+        private const float MenuItemStepSeconds = 0.09f;
+        private const float MenuItemSeconds = 0.45f;
+        private const float MenuItemSlide = 22f;
         private const float HomeFadeSeconds = 0.18f;
-        private const float SceneryFadeSeconds = 0.3f;
+        private const float StageChangeSeconds = 0.45f;
+        // 들어가기: 뛰어드는 동안 이만큼 지나서부터 빛에 덮이고, 다 덮이면 어두워진다.
+        private const float LightDelaySeconds = 1.75f;
+        private const float LightSeconds = 0.55f;
+        private const float DarkenSeconds = 0.5f;
 
         [SerializeField] private GameObject screen;
-        [Tooltip("부마다의 풍경(1부, 2부 순서). 보이는 부의 것만 켠다")]
-        [SerializeField] private CanvasGroup[] sceneries = Array.Empty<CanvasGroup>();
+        [Tooltip("뒤에 세우는 무대(장면에 있다)")]
+        [SerializeField] private TitleStages stages;
+        [Tooltip("화면을 덮는 판: 처음 켤 때의 어둠, 들어갈 때의 빛")]
+        [SerializeField] private Image curtain;
+        [SerializeField] private Color night = Color.black;
+        [SerializeField] private Color light = Color.white;
+        [Header("첫 화면")]
+        [Tooltip("화면 아무 데나 누르면 메뉴를 연다")]
+        [SerializeField] private Button welcome;
+        [SerializeField] private CanvasGroup prompt;
+        [Tooltip("메뉴가 열렸을 때 로고가 옮겨 갈 자리")]
+        [SerializeField] private RectTransform logoAtMenu;
+        [Tooltip("메뉴 글이 읽히도록 왼쪽에 깔리는 그늘")]
+        [SerializeField] private CanvasGroup menuShade;
+        [Tooltip("메뉴에 들어오는 차례(주 버튼, 처음부터, 지난 스토리, 1:1 대전, 구석 아이콘)")]
+        [SerializeField] private CanvasGroup[] menuItems = Array.Empty<CanvasGroup>();
         [Tooltip("챕터 선택을 여는 동안 숨기는 첫 화면(로고와 메뉴)")]
         [SerializeField] private CanvasGroup[] home = Array.Empty<CanvasGroup>();
         [Header("로고")]
@@ -83,13 +113,18 @@ namespace MiniPandoras.UI
         private IReadOnlyList<string> chapterLines = Array.Empty<string>();
         private IReadOnlyList<StoryPart> parts = Array.Empty<StoryPart>();
         private int savedChapter = -1;
-        private int savedPart = 1;
-        private int shownPart;
+        private int savedPart;
         // 확인 창에서 「처음부터」를 누르면 시작할 장(처음부터는 0, 지난 스토리는 고른 부의 첫 장).
         private int chapterToConfirm;
+        private RectTransform logoPlace;
+        private Vector2 logoHome;
+        private Vector3 logoHomeScale;
+        private float[] menuItemHomes = Array.Empty<float>();
         private Sequence intro;
+        private Tween pulse;
+        private Sequence menuMotion;
         private Sequence homeFade;
-        private Tween sceneryFade;
+        private Tween curtainFade;
 
         /// <summary>장을 골랐다(장 번호, 0은 프롤로그).</summary>
         public event Action<int> ChapterPicked;
@@ -105,11 +140,14 @@ namespace MiniPandoras.UI
 
         public bool IsOpen => screen.activeSelf;
 
+        /// <summary>메뉴가 열려 있다(아니면 로고만 보이는 첫 화면이다).</summary>
+        public bool IsMenuOpen { get; private set; }
+
         /// <param name="chapters">장마다 보일 글(「6장  뉴웨이브」)</param>
         /// <param name="playable">이 번호보다 앞선 장만 고를 수 있다</param>
         /// <param name="last">저장된 장. 없으면 -1</param>
         /// <param name="cleared">마지막 부를 끝까지 봤는지(「CHAPTER 2 클리어」)</param>
-        /// <param name="part">보일 부(1부터). 그 부의 풍경과 표시가 나오고, 챕터 선택은 그 부를 가운데 두고 연다</param>
+        /// <param name="part">보일 부(0 = 프롤로그). 그 부의 무대와 표시가 나오고, 챕터 선택은 그 부를 가운데 두고 연다</param>
         /// <param name="parts">챕터 선택에 붙일 부(나올 부까지)</param>
         public void Show(IReadOnlyList<string> chapters, int playable, int last, bool cleared, int part, IReadOnlyList<StoryPart> parts)
         {
@@ -117,16 +155,16 @@ namespace MiniPandoras.UI
             this.parts = parts;
             savedChapter = last;
             savedPart = part;
-            shownPart = 0;
-            ShowScenery(part, false);
+            stages.Show(part, false);
 
             // 끝까지 본 판이면 「CHAPTER 2」와 「CHAPTER 2 클리어」가 겹쳐 보이지 않게 클리어 표시만 띄운다.
-            partName.text = parts[part - 1].Label;
+            partName.text = parts[part].Label;
             partName.gameObject.SetActive(!cleared);
             clearedMark.SetActive(cleared);
-            for (int i = 0; i < partHeaders.Length && i < parts.Count; i++)
+            // 장 선택 창의 왼쪽 줄은 1부(프롤로그 포함), 오른쪽 줄은 2부다.
+            for (int i = 0; i < partHeaders.Length && i + 1 < parts.Count; i++)
             {
-                partHeaders[i].text = parts[i].Label;
+                partHeaders[i].text = parts[i + 1].Label;
             }
 
             bool saved = last >= 0;
@@ -167,10 +205,61 @@ namespace MiniPandoras.UI
 
         public void Hide()
         {
-            intro.Stop();
-            homeFade.Stop();
-            sceneryFade.Stop();
+            StopMotions();
             screen.SetActive(false);
+            stages.Hide();
+        }
+
+        /// <summary>첫 화면에서 메뉴를 연다(화면을 누르면 부른다).</summary>
+        internal void OpenMenu()
+        {
+            if (IsMenuOpen)
+            {
+                return;
+            }
+
+            IsMenuOpen = true;
+            intro.Stop();
+            pulse.Stop();
+            menuMotion.Stop();
+            welcome.gameObject.SetActive(false);
+            logo.alpha = 1f;
+            menu.interactable = true;
+            menu.blocksRaycasts = true;
+            stages.ShowMenu(true);
+            menuMotion = Sequence.Create(useUnscaledTime: true)
+                .Group(Tween.Alpha(prompt, 0f, HomeFadeSeconds))
+                .Group(Tween.Alpha(menuShade, 1f, MenuTurnSeconds))
+                .Group(Tween.UIAnchoredPosition(logoPlace, logoAtMenu.anchoredPosition, MenuTurnSeconds, Ease.InOutCubic))
+                .Group(Tween.Scale(logoPlace, logoAtMenu.localScale, MenuTurnSeconds, Ease.InOutCubic));
+            for (int i = 0; i < menuItems.Length; i++)
+            {
+                float delay = MenuItemDelaySeconds + i * MenuItemStepSeconds;
+                var place = (RectTransform)menuItems[i].transform;
+                menuMotion.Group(Tween.Alpha(menuItems[i], 1f, MenuItemSeconds, Ease.OutQuad, startDelay: delay));
+                menuMotion.Group(Tween.UIAnchoredPositionX(place, menuItemHomes[i], MenuItemSeconds, Ease.OutCubic, startDelay: delay));
+            }
+        }
+
+        /// <summary>
+        /// 고른 장으로 들어간다: 로고와 메뉴가 걷히고, 카메라가 무대 안으로 뛰어들고, 화면이 빛에 덮였다가 어두워진다.
+        /// 끝나면 화면이 어두우므로 이어서 이야기가 제 속도로 밝힌다.
+        /// </summary>
+        public IEnumerator Enter()
+        {
+            StopMotions();
+            SetHomeShown(false, true);
+            partPicker.CloseInstantly();
+            confirmWindow.CloseInstantly();
+            chaptersWindow.CloseInstantly();
+            curtain.gameObject.SetActive(true);
+            curtain.color = new Color(light.r, light.g, light.b, 0f);
+            curtainFade = Tween.Alpha(curtain, 1f, LightSeconds, Ease.InCubic, startDelay: LightDelaySeconds);
+            yield return stages.Dive();
+            curtainFade.Stop();
+            curtain.color = light;
+            curtainFade = Tween.Color(curtain, night, DarkenSeconds, Ease.OutQuad);
+            yield return curtainFade.ToYieldInstruction();
         }
 
         /// <summary>그 장을 고른다(메뉴와 장 버튼이 부른다).</summary>
@@ -179,51 +268,67 @@ namespace MiniPandoras.UI
             ChapterPicked?.Invoke(chapter);
         }
 
-        /// <summary>로고가 먼저 떠오르고 메뉴가 뒤따른다.</summary>
+        /// <summary>어둠이 걷히며 무대가 드러나고, 로고가 떠오른 뒤 「화면을 눌러 시작」이 깜빡인다.</summary>
         private void PlayIntro()
         {
-            intro.Stop();
+            StopMotions();
+            IsMenuOpen = false;
+            welcome.gameObject.SetActive(true);
+            menu.interactable = false;
+            menu.blocksRaycasts = false;
+            menuShade.alpha = 0f;
             logo.alpha = 0f;
-            menu.alpha = 0f;
+            prompt.alpha = 0f;
+            logoPlace.anchoredPosition = logoHome;
+            logoPlace.localScale = logoHomeScale;
+            for (int i = 0; i < menuItems.Length; i++)
+            {
+                menuItems[i].alpha = 0f;
+                var place = (RectTransform)menuItems[i].transform;
+                place.anchoredPosition = new Vector2(menuItemHomes[i] - MenuItemSlide, place.anchoredPosition.y);
+            }
+
+            OpenCurtain(CurtainSeconds);
             intro = Sequence.Create(useUnscaledTime: true)
-                .Group(Tween.Alpha(logo, 1f, LogoFadeSeconds, Ease.OutQuad))
-                .Group(Tween.Alpha(menu, 1f, MenuFadeSeconds, Ease.OutQuad, startDelay: MenuDelaySeconds));
+                .Group(Tween.Alpha(logo, 1f, LogoFadeSeconds, Ease.OutQuad, startDelay: LogoDelaySeconds))
+                .Group(Tween.Alpha(prompt, 1f, PromptFadeSeconds, Ease.OutQuad, startDelay: PromptDelaySeconds))
+                .OnComplete(this, view => view.Pulse());
         }
 
-        /// <summary>
-        /// 그 부의 풍경을 보인다. fade면 지금 풍경 위로 새 풍경이 서서히 떠오른 뒤 아래 풍경을 끈다.
-        /// 떠오르는 중에 또 바뀌면 그때 보이던 풍경 위로 다시 떠오른다.
-        /// </summary>
-        private void ShowScenery(int part, bool fade)
+        private void Pulse()
         {
-            if (part == shownPart)
+            pulse = Tween.Alpha(prompt, PromptDim, PromptPulseSeconds, Ease.InOutSine, cycles: -1, cycleMode: CycleMode.Yoyo, useUnscaledTime: true);
+        }
+
+        /// <summary>화면을 덮은 어둠을 걷는다.</summary>
+        private void OpenCurtain(float seconds)
+        {
+            curtainFade.Stop();
+            curtain.gameObject.SetActive(true);
+            curtain.color = night;
+            curtainFade = Tween.Alpha(curtain, 0f, seconds, Ease.InOutQuad, useUnscaledTime: true)
+                .OnComplete(curtain, panel => panel.gameObject.SetActive(false));
+        }
+
+        /// <summary>그 부의 무대로 바꾼다. 바뀌는 순간은 어둠이 덮었다가 걷힌다.</summary>
+        private void ChangeStage(int part)
+        {
+            if (part == stages.Shown)
             {
                 return;
             }
 
-            sceneryFade.Stop();
-            CanvasGroup next = sceneries[part - 1];
-            CanvasGroup under = fade && shownPart > 0 ? sceneries[shownPart - 1] : null;
-            foreach (CanvasGroup scenery in sceneries)
-            {
-                scenery.gameObject.SetActive(scenery == next || scenery == under);
-                scenery.alpha = 1f;
-            }
+            stages.Show(part, true);
+            OpenCurtain(StageChangeSeconds);
+        }
 
-            shownPart = part;
-            if (under == null)
-            {
-                return;
-            }
-
-            if (next.transform.GetSiblingIndex() < under.transform.GetSiblingIndex())
-            {
-                next.transform.SetSiblingIndex(under.transform.GetSiblingIndex());
-            }
-
-            next.alpha = 0f;
-            sceneryFade = Tween.Alpha(next, 1f, SceneryFadeSeconds, Ease.OutQuad, useUnscaledTime: true)
-                .OnComplete(under, scenery => scenery.gameObject.SetActive(false));
+        private void StopMotions()
+        {
+            intro.Stop();
+            pulse.Stop();
+            menuMotion.Stop();
+            homeFade.Stop();
+            curtainFade.Stop();
         }
 
         /// <summary>로고와 메뉴(첫 화면)를 보이거나 숨긴다. 숨긴 동안은 누름도 받지 않는다.</summary>
@@ -272,21 +377,21 @@ namespace MiniPandoras.UI
         private void OpenParts()
         {
             SetHomeShown(false, true);
-            partPicker.Open(parts, shownPart - 1);
+            partPicker.Open(parts, stages.Shown);
         }
 
         private void CloseParts()
         {
-            ShowScenery(savedPart, true);
+            ChangeStage(savedPart);
             SetHomeShown(true, true);
         }
 
-        /// <summary>줄을 넘겨 나온 부가 가운데 오면 그 부의 풍경으로 바꾼다. 나오지 않은 부는 풍경이 없어 그대로 둔다.</summary>
-        private void ShowFrontScenery(int index)
+        /// <summary>줄을 넘겨 나온 부가 가운데 오면 그 부의 무대로 바꾼다. 나오지 않은 부는 무대가 없어 그대로 둔다.</summary>
+        private void ShowFrontStage(int index)
         {
             if (parts[index].IsReleased)
             {
-                ShowScenery(index + 1, true);
+                ChangeStage(index);
             }
         }
 
@@ -331,13 +436,18 @@ namespace MiniPandoras.UI
 
         private void Awake()
         {
+            logoPlace = (RectTransform)logo.transform;
+            logoHome = logoPlace.anchoredPosition;
+            logoHomeScale = logoPlace.localScale;
+            menuItemHomes = Array.ConvertAll(menuItems, item => ((RectTransform)item.transform).anchoredPosition.x);
+            welcome.onClick.AddListener(OpenMenu);
             playButton.onClick.AddListener(Play);
             newGameButton.onClick.AddListener(StartNewGame);
             partsButton.onClick.AddListener(OpenParts);
             duelButton.onClick.AddListener(() => DuelRequested?.Invoke());
             profileButton.onClick.AddListener(() => ProfileRequested?.Invoke());
             settingsButton.onClick.AddListener(() => SettingsRequested?.Invoke());
-            partPicker.FrontChanged += ShowFrontScenery;
+            partPicker.FrontChanged += ShowFrontStage;
             partPicker.Picked += StartPart;
             partPicker.RestartPicked += RestartPart;
             partPicker.Closed += CloseParts;
@@ -359,9 +469,7 @@ namespace MiniPandoras.UI
 
         private void OnDestroy()
         {
-            intro.Stop();
-            homeFade.Stop();
-            sceneryFade.Stop();
+            StopMotions();
         }
     }
 }

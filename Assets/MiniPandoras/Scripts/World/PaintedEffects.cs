@@ -24,12 +24,8 @@ namespace MiniPandoras.World
         private static readonly Color FlareBurst = new Color32(255, 70, 50, 153);
         private static readonly Color FlareEmber = new Color32(255, 220, 180, 255);
         private static readonly Color[] WallDust = { new Color32(0xc9, 0xb0, 0x8a, 0xff), new Color32(0xa8, 0x90, 0x6a, 0xff), new Color32(0xe0, 0xcc, 0xa8, 0xff) };
-        // 모래벽 한 칸을 솟은 높이마다 잘라 둔 그림 수(벽 그림 높이를 이만큼 나눠 세운다).
-        private const int WallSteps = 26;
-
-        private Sprite[] wallSlices;
-
-        internal Sprite[] WallSlices => wallSlices;
+        // 모래벽의 높이(논리 px, Tools/PixelGen/sand_wall.py의 남쪽 면)
+        private const float WallHeight = 36f;
 
         private readonly StageEffects stage;
 
@@ -45,25 +41,30 @@ namespace MiniPandoras.World
         /// </summary>
         public void LightSwords(Transform map, Vector2Int from, Vector2Int to, float frames)
         {
-            GameObject root = stage.NewEffect("LightSwords", map, Vector2.zero);
-            Vector2 start = MapCoordinates.LogicalCellFoot(from, 21);
-            Vector2 target = MapCoordinates.LogicalCellFoot(to, 9);
+            GameObject root = stage.NewRoot("LightSwords", map);
+            Vector2 start = MapCoordinates.LogicalCellFoot(from);
+            Vector2 target = MapCoordinates.LogicalCellFoot(to);
             const int count = 5;
+            const float hoverHeight = 29f;
+            const float targetHeight = 9f;
             var hovers = new Vector2[count];
             var swords = new Transform[count];
             var blades = new SpriteRenderer[count * 2];
             var glows = new SpriteRenderer[count];
             for (int i = 0; i < count; i++)
             {
+                // 인물 둘레의 땅에 둥글게 놓고 그 위에 띄운다.
                 float around = i / (float)count * Mathf.PI * 2f;
-                hovers[i] = start + new Vector2(Mathf.Cos(around) * 16f, Mathf.Sin(around) * 8f - 8f);
-                Vector2 heading = target - hovers[i];
+                hovers[i] = start + new Vector2(Mathf.Cos(around) * 16f, Mathf.Sin(around) * 10f);
+                // 웹게임 화면에서 날아가는 쪽(아래가 +): 땅에서 내려온 만큼에 높이가 줄어든 만큼을 더한다.
+                Vector2 heading = target - hovers[i] + new Vector2(0f, hoverHeight - targetHeight);
                 swords[i] = stage.AddChild(root.transform, "Sword");
-                swords[i].localRotation = Quaternion.Euler(0f, 0f, -Mathf.Atan2(heading.y, heading.x) * Mathf.Rad2Deg);
+                swords[i].localRotation = Upright.Stand * Quaternion.Euler(0f, 0f, -Mathf.Atan2(heading.y, heading.x) * Mathf.Rad2Deg);
                 // 웹게임 칼날 (−7, −1, 12×2)과 손잡이 (−9, −2, 3×4). 칼끝이 날아가는 쪽을 본다.
                 blades[i * 2] = stage.AddPixelRect(swords[i], "Blade", -7f, -1f, 12f, 2f, BladeColor);
                 blades[i * 2 + 1] = stage.AddPixelRect(swords[i], "Hilt", -9f, -2f, 3f, 4f, HiltColor);
                 glows[i] = stage.AddSprite(root.transform, "Glow", EffectSprites.Glow, SwordGlow);
+                glows[i].transform.localRotation = Upright.Stand;
             }
 
             stage.Run(root, frames, (progress, frame) =>
@@ -72,8 +73,9 @@ namespace MiniPandoras.World
                 float fly = Mathf.Max(0f, (progress - 0.55f) / 0.45f);
                 for (int i = 0; i < count; i++)
                 {
-                    Vector2 at = hovers[i] + (target - hovers[i]) * (fly * fly);
-                    swords[i].localPosition = StageEffects.LocalPixel(at.x, at.y);
+                    Vector2 ground = hovers[i] + (target - hovers[i]) * (fly * fly);
+                    float height = Mathf.Lerp(hoverHeight, targetHeight, fly * fly);
+                    swords[i].localPosition = StageEffects.Above(ground, height) + Upright.TowardCamera * StageEffects.InFront;
                     glows[i].transform.localPosition = swords[i].localPosition;
                     blades[i * 2].color = StageEffects.WithAlpha(BladeColor, hover);
                     blades[i * 2 + 1].color = StageEffects.WithAlpha(HiltColor, hover);
@@ -85,7 +87,7 @@ namespace MiniPandoras.World
         /// <summary>쓰러진 판도라즈에게서 푸른 판도라 더스트가 계속 흩날린다(웹게임 pandoraDustDrift). <see cref="Stop"/>할 때까지 남는다.</summary>
         public GameObject DustDrift(Transform map, Vector2Int cell)
         {
-            GameObject root = stage.NewEffect("DustDrift", map, MapCoordinates.LogicalCellFoot(cell, 7));
+            GameObject root = stage.NewFlat("DustDrift", map, MapCoordinates.LogicalCellFoot(cell, 7));
             Vector2 centre = root.transform.position;
             int emitted = 0;
             stage.Run(root, 0f, (progress, frame) =>
@@ -104,8 +106,8 @@ namespace MiniPandoras.World
         /// <summary>흩어지던 판도라 더스트가 빛에 타 사라진다(웹게임 pandoraDustBurn): 가루가 한꺼번에 피어오르고 빛 한 점이 떠올라 꺼진다.</summary>
         public void DustBurn(Transform map, Vector2Int cell)
         {
-            GameObject root = stage.NewEffect("DustBurn", map, MapCoordinates.LogicalCellFoot(cell, 9));
-            Vector2 centre = root.transform.position;
+            GameObject root = stage.NewStanding("DustBurn", map, MapCoordinates.LogicalCellFoot(cell), 9f);
+            Vector2 centre = map.TransformPoint(StageEffects.LocalPixel(MapCoordinates.LogicalCellFoot(cell, 9)));
             for (int i = 0; i < 40; i++)
             {
                 Vector2 at = centre + StageEffects.PixelOffset(Random.Range(-8f, 8f), Random.Range(-6f, 6f));
@@ -127,8 +129,8 @@ namespace MiniPandoras.World
         /// <summary>따뜻한 빛이 상처를 감싸고 빛 알갱이가 피어오른다(웹게임 healGlow).</summary>
         public void HealGlow(Transform map, Vector2Int cell, float frames)
         {
-            GameObject root = stage.NewEffect("HealGlow", map, MapCoordinates.LogicalCellFoot(cell, 5));
-            Vector2 centre = root.transform.position;
+            GameObject root = stage.NewStanding("HealGlow", map, MapCoordinates.LogicalCellFoot(cell), 12f);
+            Vector2 centre = map.TransformPoint(StageEffects.LocalPixel(MapCoordinates.LogicalCellFoot(cell, 5)));
             SpriteRenderer glow = stage.AddSprite(root.transform, "Glow", EffectSprites.Glow, HealGlowColor);
             int emitted = 0;
             stage.Run(root, frames, (progress, frame) =>
@@ -149,7 +151,8 @@ namespace MiniPandoras.World
         /// </summary>
         public void SpaceRift(Transform map, Vector2Int cell, float frames)
         {
-            GameObject root = stage.NewEffect("SpaceRift", map, MapCoordinates.LogicalCellFoot(cell, 7));
+            // 부풀면 반지름이 30px이라 그만큼 떠 있어야 땅에 잠기지 않는다.
+            GameObject root = stage.NewStanding("SpaceRift", map, MapCoordinates.LogicalCellFoot(cell), 26f);
             SpriteRenderer glow = stage.AddSprite(root.transform, "Glow", EffectSprites.Glow, RiftGlow);
             var spins = new Transform[4];
             for (int i = 0; i < spins.Length; i++)
@@ -179,7 +182,7 @@ namespace MiniPandoras.World
         /// </summary>
         public GameObject CurseMist(Transform map, Vector2Int cell, ParticleBurst motes)
         {
-            GameObject root = stage.NewEffect("CurseMist", map, MapCoordinates.LogicalCellFoot(cell, 7));
+            GameObject root = stage.NewFlat("CurseMist", map, MapCoordinates.LogicalCellFoot(cell, 7));
             Vector2 centre = root.transform.position;
             SpriteRenderer glow = stage.AddSprite(root.transform, "Glow", EffectSprites.Glow, CurseGlow);
             glow.sharedMaterial = stage.Unlit;
@@ -202,7 +205,7 @@ namespace MiniPandoras.World
         /// </summary>
         public void Flare(Transform map, Vector2Int cell)
         {
-            GameObject root = stage.NewEffect("Flare", map, MapCoordinates.LogicalCellFoot(cell, 15));
+            GameObject root = stage.NewStanding("Flare", map, MapCoordinates.LogicalCellFoot(cell), 15f);
             SpriteRenderer spark = stage.AddPixelRect(root.transform, "Spark", 0f, 0f, 2f, 4f, FlareSpark);
             SpriteRenderer glow = stage.AddSprite(root.transform, "Glow", EffectSprites.Glow, FlareTrail);
             var embers = new SpriteRenderer[10];
@@ -243,27 +246,20 @@ namespace MiniPandoras.World
         /// </summary>
         public IEnumerator RaiseSandWall(Transform map, int column, int fromRow, int toRow, float frames, ParticleBurst dust)
         {
-            wallSlices ??= CutWallSlices();
-            Sprite[] steps = wallSlices;
-            var segments = new SpriteRenderer[toRow - fromRow + 1];
+            var segments = new Transform[toRow - fromRow + 1];
             for (int i = 0; i < segments.Length; i++)
             {
-                var segment = new GameObject("Sand Wall") { layer = map.gameObject.layer }.AddComponent<SpriteRenderer>();
+                var segment = new GameObject("Sand Wall", typeof(MeshFilter), typeof(MeshRenderer)) { layer = map.gameObject.layer };
                 segment.transform.SetParent(map, false);
-                segment.transform.localPosition = StageEffects.LocalPixel(MapCoordinates.LogicalCellFoot(new Vector2Int(column, fromRow + i)));
-                segment.spriteSortPoint = SpriteSortPoint.Pivot;
-                segments[i] = segment;
+                segment.GetComponent<MeshFilter>().sharedMesh = stage.SandWall;
+                segment.GetComponent<MeshRenderer>().sharedMaterial = stage.Models;
+                segments[i] = segment.transform;
             }
 
             int burst = 0;
             for (float frame = 0f; frame < frames && segments[0] != null; frame += FrameTime.Frames(Time.deltaTime))
             {
-                Sprite step = steps[Mathf.Clamp(Mathf.CeilToInt(frame / frames * WallSteps), 1, WallSteps) - 1];
-                foreach (SpriteRenderer segment in segments)
-                {
-                    segment.sprite = step;
-                }
-
+                Raise(segments, column, fromRow, frame / frames);
                 for (; burst * 4f <= frame; burst++)
                 {
                     Vector2 spot = MapCoordinates.LogicalCellFoot(new Vector2Int(column, Random.Range(fromRow, toRow + 1)), 3);
@@ -273,28 +269,20 @@ namespace MiniPandoras.World
                 yield return null;
             }
 
-            foreach (SpriteRenderer segment in segments)
+            if (segments[0] != null)
             {
-                if (segment != null)
-                {
-                    segment.sprite = steps[WallSteps - 1];
-                }
+                Raise(segments, column, fromRow, 1f);
             }
         }
 
-        /// <summary>모래벽 그림을 위에서부터 솟은 높이만큼 자른 그림들(마지막이 다 솟은 벽). 기준점은 자른 그림의 아래 가운데다.</summary>
-        private Sprite[] CutWallSlices()
+        /// <summary>벽은 땅속에 묻혀 있다가 솟는다. 땅이 아직 묻힌 부분을 가린다.</summary>
+        private static void Raise(Transform[] segments, int column, int fromRow, float risen)
         {
-            Rect full = stage.SandWall.rect;
-            var steps = new Sprite[WallSteps];
-            for (int i = 0; i < WallSteps; i++)
+            for (int i = 0; i < segments.Length; i++)
             {
-                float height = Mathf.Max(1f, Mathf.Round(full.height * (i + 1) / WallSteps));
-                var rect = new Rect(full.x, full.yMax - height, full.width, height);
-                steps[i] = Sprite.Create(stage.SandWall.texture, rect, new Vector2(0.5f, 0f), stage.SandWall.pixelsPerUnit, 0, SpriteMeshType.FullRect);
+                Vector2 foot = MapCoordinates.LogicalCellFoot(new Vector2Int(column, fromRow + i));
+                segments[i].localPosition = StageEffects.Above(foot, (risen - 1f) * WallHeight);
             }
-
-            return steps;
         }
 
         /// <summary>
@@ -305,7 +293,7 @@ namespace MiniPandoras.World
         {
             var root = new GameObject("BloodStain").transform;
             root.SetParent(map, false);
-            root.localPosition = StageEffects.LocalPixel(MapCoordinates.LogicalCellFoot(cell, 5));
+            root.localPosition = StageEffects.LocalPixel(MapCoordinates.LogicalCellFoot(cell, 5)) + Upright.Up * StageEffects.FlatLift;
             long state = seed;
             float Next()
             {

@@ -90,6 +90,7 @@ namespace MiniPandoras.Story
         [SerializeField] private SandStormView sandStorm;
 
         private CharacterBody heroBody;
+        private bool arriving;
         private string shownPanel;
 
         internal GameSession Session => session;
@@ -239,7 +240,7 @@ namespace MiniPandoras.Story
         /// <summary>부가 끝나는 카드: 「1부 / 끝」. 부가 시작할 때는 장 카드만 띄운다.</summary>
         public IEnumerator PartEndCard(int part)
         {
-            return ChapterCard(ChapterTitles.PartLabels[part - 1], ChapterTitles.PartEnd);
+            return ChapterCard(ChapterTitles.PartLabels[part], ChapterTitles.PartEnd);
         }
 
         public IEnumerator Wait(float frames)
@@ -266,7 +267,19 @@ namespace MiniPandoras.Story
 
         public IEnumerator FadeIn(float frames = 30f)
         {
+            if (arriving)
+            {
+                arriving = false;
+                followCamera.Arrive();
+            }
+
             return fade.FadeTo(0f, frames / 60f);
+        }
+
+        /// <summary>타이틀에서 막 들어왔다. 다음에 화면이 밝아질 때 카메라가 하늘에서 내려온다.</summary>
+        public void ArriveOnNextFadeIn()
+        {
+            arriving = true;
         }
 
         /// <summary>화면을 그 짙기까지만 덮는다(웹게임 overlay.fadeTo, 시야가 흐려지는 연출).</summary>

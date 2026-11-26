@@ -13,12 +13,14 @@ namespace MiniPandoras.Story
         public const int NamedFrom = 2;
 
         /// <summary>
-        /// 2부가 시작되는 장. 1부는 뱀열차에 오르기까지(0~5장, 5장 끝에 정류장에서 올라탄다), 2부는 뱀열차에 탄 뒤부터 끝까지(6장 객실~11장)다(사용자 결정 2026-11-09).
+        /// 2부가 시작되는 장. 1부는 뱀열차에 오르기까지(5장 끝에 정류장에서 올라탄다), 2부는 뱀열차에 탄 뒤부터 끝까지(6장 객실~11장)다(사용자 결정 2026-11-09).
+        /// 프롤로그(0장)는 1부 앞의 부로 따로 친다(사용자 결정 2026-11-25, 타이틀도 따로 있다).
         /// </summary>
         public const int SecondPartFrom = 6;
 
         private static readonly string[] Parts =
         {
+            T("chapterTitles.prologue"),
             T("chapterTitles.part1"),
             T("chapterTitles.part2"),
         };
@@ -49,19 +51,23 @@ namespace MiniPandoras.Story
 
         public static int Count => Titles.Length;
 
+        /// <summary>나온 부의 수(프롤로그 포함).</summary>
         public static int PartCount => Parts.Length;
+
+        /// <summary>이야기가 나온 마지막 부.</summary>
+        public static int LastPart => Parts.Length - 1;
 
         /// <summary>부가 끝났다는 카드의 큰 글(「끝」).</summary>
         public static string PartEnd => T("chapterTitles.partEnd");
 
-        /// <summary>그 장이 속한 부(1부터).</summary>
+        /// <summary>그 장이 속한 부(0 = 프롤로그).</summary>
         public static int PartOf(int chapter)
         {
-            return chapter >= SecondPartFrom ? 2 : 1;
+            return chapter >= SecondPartFrom ? 2 : chapter > 0 ? 1 : 0;
         }
 
         /// <summary>
-        /// 부마다의 표시(「CHAPTER 1」, 「CHAPTER 2」). 타이틀의 로고 아래와 챕터 선택 카드, 장 선택 창의 줄 머리, 부가 끝나는 카드에 보인다.
+        /// 부마다의 표시(「PROLOGUE」, 「CHAPTER 1」, 「CHAPTER 2」). 타이틀의 로고 아래와 챕터 선택 카드, 장 선택 창의 줄 머리, 부가 끝나는 카드에 보인다.
         /// 부는 화면에 CHAPTER로 보이고 따로 이름을 두지 않는다(사용자 결정 2026-11-09). 코드의 Chapter는 장이라서 부는 Part로 부른다.
         /// </summary>
         public static IReadOnlyList<string> PartLabels => Parts;
@@ -72,18 +78,23 @@ namespace MiniPandoras.Story
         /// <summary>그 부의 첫 장.</summary>
         public static int FirstChapterOf(int part)
         {
-            return part == 1 ? 0 : SecondPartFrom;
+            return part == 0 ? 0 : part == 1 ? 1 : SecondPartFrom;
         }
 
         /// <summary>그 부의 마지막 장.</summary>
         public static int LastChapterOf(int part)
         {
-            return part == 1 ? SecondPartFrom - 1 : Count - 1;
+            return part == 0 ? 0 : part == 1 ? SecondPartFrom - 1 : Count - 1;
         }
 
-        /// <summary>챕터 선택 카드에 적는 장 범위(「6장 ~ 11장」).</summary>
+        /// <summary>챕터 선택 카드에 적는 장 범위(「6장 ~ 11장」). 장이 하나뿐인 부는 그 장만 적는다(「0장」).</summary>
         public static string ChaptersOf(int part)
         {
+            if (FirstChapterOf(part) == LastChapterOf(part))
+            {
+                return Label(FirstChapterOf(part));
+            }
+
             return T("chapterTitles.partChapters", Label(FirstChapterOf(part)), Label(LastChapterOf(part)));
         }
 

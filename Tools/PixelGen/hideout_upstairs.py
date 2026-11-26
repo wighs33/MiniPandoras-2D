@@ -34,6 +34,8 @@ UPPER_WIDTH, UPPER_HEIGHT = 26, 12
 CORRIDOR = (1, 2, 25, 7)
 STAIRWELL = (17, 7, 20, 11)     # 내려가는 계단 칸(복도 남쪽으로 튀어나온다)
 OVERLOOK = (1, 7, 16, 11)       # 난간 너머로 내려다보이는 강당
+# HD-2D 필드에서 난간 너머 강당을 2층 바닥보다 이만큼(점) 낮게 둔다. 더 깊으면 비스듬한 카메라에서 2층 가장자리에 가려 보이지 않는다.
+OVERLOOK_DEPTH = 24
 DOORS = (5, 12, 20)             # 복도 북쪽 벽의 방문 열. 가운데 문이 hideoutRoom으로 간다
 WINDOWS = (2.5, 8.5, 16.0, 23.5)
 
@@ -201,6 +203,19 @@ def overlook(c, rng):
     c.paint(c.rect(x0, y0 + 4, x1, y0 + 6), WOOD[0])
 
 
+def upper_relief(room):
+    """2층 복도의 높이: 방 높이(RoomInterior.relief)에 난간 너머 강당을 낮게 꺼뜨린다. 그림의 위층 바닥 두께(6점)는 아래로 늘어진 면이다."""
+    heights = room.relief()
+    x0, y0, x1, y1 = (v * T for v in OVERLOOK)
+    lip = np.zeros(room.dots.shape, dtype=bool)
+    lip[y0:y0 + 6, x0:x1] = True
+    heights.face(lip, -(room.c.yy - y0))
+    below = np.zeros_like(lip)
+    below[y0 + 6:y1, x0:x1] = True
+    heights.flat(below, -OVERLOOK_DEPTH)
+    return heights
+
+
 def overlook_rug():
     """난간 너머 강당의 어둡게 가라앉은 양탄자 끝자락."""
     w, h = 7 * T, 2 * T
@@ -274,7 +289,7 @@ def upper_lively(m, rng):
 
 
 def build_upper():
-    m = MapLayout("hideoutUpper", "뉴웨이브 아지트 2층", UPPER_WIDTH, UPPER_HEIGHT, theme="interior", music="hope", seed=75)
+    m = MapLayout("hideoutUpper", "뉴웨이브 아지트 2층", UPPER_WIDTH, UPPER_HEIGHT, theme="interior", indoors=True, music="hope", seed=75)
     room = RoomInterior(UPPER_WIDTH, UPPER_HEIGHT, [CORRIDOR, STAIRWELL], seed=75)
     room.paint_base()
     rng = np.random.default_rng(76)
@@ -285,6 +300,7 @@ def build_upper():
     overlook(room.c, rng)
     down_stairs(room.c)
     m.paint_ground = room.ground
+    m.paint_relief = lambda: upper_relief(room)
     m.block_where(~room.floor)
 
     m.stand("gallery_rail", gallery_rail(OVERLOOK[2] - OVERLOOK[0]), (OVERLOOK[0] + OVERLOOK[2]) / 2, OVERLOOK[1] + 0.15)
@@ -349,7 +365,7 @@ def room_lively(m, rng, bed_left, bed_top):
 
 
 def build_room():
-    m = MapLayout("hideoutRoom", "뉴웨이브 아지트 방", ROOM_WIDTH, ROOM_HEIGHT, theme="interior", music="hope", seed=77)
+    m = MapLayout("hideoutRoom", "뉴웨이브 아지트 방", ROOM_WIDTH, ROOM_HEIGHT, theme="interior", indoors=True, music="hope", seed=77)
     room = RoomInterior(ROOM_WIDTH, ROOM_HEIGHT, [ROOM], seed=77)
     room.paint_base()
     rng = np.random.default_rng(78)
@@ -357,6 +373,7 @@ def build_room():
         room.window(x, ROOM[1])
     room.entrance(*ROOM_DOOR)
     m.paint_ground = room.ground
+    m.paint_relief = room.relief
     m.block_where(~room.floor)
 
     bed_x, bed_y = BED_CELL

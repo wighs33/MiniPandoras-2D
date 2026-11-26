@@ -20,7 +20,8 @@ namespace MiniPandoras.Field
     /// </summary>
     public sealed class FieldTrigger
     {
-        public FieldTrigger(string id, TriggerKind kind, Func<Vector2Int, bool> test, Func<IEnumerator> run = null, bool once = false, bool ends = false)
+        public FieldTrigger(string id, TriggerKind kind, Func<Vector2Int, bool> test, Func<IEnumerator> run = null, bool once = false, bool ends = false,
+            Vector2Int? spot = null)
         {
             Id = id;
             Kind = kind;
@@ -28,6 +29,7 @@ namespace MiniPandoras.Field
             Run = run;
             Once = once;
             Ends = ends;
+            Spot = spot;
         }
 
         public string Id { get; }
@@ -44,6 +46,9 @@ namespace MiniPandoras.Field
 
         /// <summary>일어나면 탐험을 끝낸다. 장 코드는 Explore가 돌려준 id로 무엇이 끝냈는지 안다.</summary>
         public bool Ends { get; }
+
+        /// <summary>미니맵에 목적지로 보일 칸. 칸을 시험하는 함수만으로는 어디인지 알 수 없어, 걸어서 닿을 곳(StoryField.ArriveAt)이 따로 적는다.</summary>
+        public Vector2Int? Spot { get; }
 
         internal bool Fired { get; set; }
     }

@@ -25,6 +25,7 @@ import guild_furniture as gf
 import interior
 import objects
 import pixelgen as pg
+import relief
 from houses import BRASS, IRON, PAPER, WOOD, Canvas, gear, outline
 from layout import LOGICAL, MapLayout
 from room_interior import CAP as CAP_TONES, FACE, RoomInterior, face_decal, floor_decal
@@ -480,6 +481,41 @@ def porthole(c, x, row):
         c.paint(c.ellipse(cx + np.cos(a) * 7.5, cy + np.sin(a) * 7.5, 0.9, 0.9), BRASS[4])
 
 
+def ship_relief(room, hull):
+    """
+    HD-2D 필드의 높이(relief.py): 갑판은 0이고 바다는 남쪽 바깥 뱃전 높이(SIDE)만큼 낮아, 그림의 바깥 뱃전이 갑판 가장자리에서
+    바다까지 늘어진다. 북쪽 뱃전은 갑판에서 솟은 안쪽 면과 그 위 윗면이다. 선실은 방 높이(RoomInterior.relief)를 선실 칸 안에서만 쓰고,
+    갑판에서 보이는 남쪽 바깥벽(deckhouse_walls)은 갑판에서 솟은 낮은 면이다(문간은 열려 있다).
+    """
+    w, h = WIDTH * T, HEIGHT * T
+    north, south, inside = deck_edges(w)
+    yy = np.arange(h)[:, None].astype(float)
+    heights = relief.Relief(h, w)
+    heights.flat(~hull, -SIDE)
+    deck = inside[None, :] & (yy >= north[None, :]) & (yy < south[None, :])
+    rail = dilate(deck, CAP) & ~deck & (yy < MID * T)
+    heights.flat(rail, FACE_H)
+    u = yy - north[None, :]
+    heights.face(deck & (u < FACE_H), np.broadcast_to(FACE_H - np.floor(u), (h, w)))
+    v = yy - south[None, :]
+    side = inside[None, :] & (v >= CAP) & (v < CAP + SIDE)
+    heights.face(side, np.broadcast_to(-(np.floor(v) - CAP), (h, w)))
+
+    x0, y0, x1, y1 = (v * T for v in CABIN_BOX)
+    cabins = room.relief()
+    heights.top[y0:y1, x0:x1] = cabins.top[y0:y1, x0:x1]
+    heights.drop[y0:y1, x0:x1] = cabins.drop[y0:y1, x0:x1]
+    outer = np.zeros((h, w), dtype=bool)
+    outer[y1 - T:y1, x0:x1] = cabins.top[y1 - T:y1, x0:x1] != 0
+    heights.flat(outer, 12)
+    wall = np.zeros((h, w), dtype=bool)
+    wall[y1:y1 + 12, x0:x1] = True
+    for x, _ in DOORS:
+        wall[:, x * T + 4:(x + 1) * T - 4] = False
+    heights.face(wall, np.broadcast_to(y1 + 12 - yy, (h, w)))
+    return heights
+
+
 def deckhouse_walls(c):
     """
     선실 벽: 실내 그림의 짙은 벽 윗면을 배의 나무빛으로 바꾸고, 갑판에서 보이는 남쪽 바깥벽(크림 띠를 두른 판자벽,
@@ -641,7 +677,12 @@ def build(night=False):
         ground[shade & deck] = (ground[shade & deck] * 0.78).astype(np.uint8)
         return ground
 
+    def heights():
+        _, hull = hull_and_deck(Canvas(WIDTH * T, HEIGHT * T), np.random.default_rng(63), name=None)
+        return ship_relief(room, hull)
+
     m.paint_ground = paint
+    m.paint_relief = heights
 
     # ── 충돌: 갑판 밖, 선실 벽(문 빼고) ──
     m.block_where(~walk)

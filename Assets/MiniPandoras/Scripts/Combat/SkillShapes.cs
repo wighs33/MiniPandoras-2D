@@ -74,7 +74,7 @@ namespace MiniPandoras.Combat
                     combat.PlayerSkills.BurstFx(shot.Position, palette, 12);
                     if (shot.Skill.Look == SkillLook.Flame)
                     {
-                        combat.Effects.AddSpriteFx(FxSheet.EmberHit, shot.Position, EmberFxFrames, 1f);
+                        combat.Effects.AddSpriteFx(FxSheet.EmberHit, shot.Spot, EmberFxFrames, 1f);
                     }
                     else
                     {

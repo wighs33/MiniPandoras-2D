@@ -7,10 +7,12 @@
 import numpy as np
 
 import pixelgen as pg
+import relief
 from houses import BRASS, IRON, PLASTER, STONE, WOOD, Canvas
 
 T = pg.TILE
 FACE = 56                       # 북쪽 벽 안쪽 면의 높이(점). 두 칸에서 벽 윗면 몫을 뺐다.
+FRONT = 8                       # HD-2D 필드에서 카메라 쪽(남쪽) 벽을 낮게 자른 높이(점). 방 남쪽이 벽에 가리지 않는다.
 FLOORBOARD = pg.hexes("#2a1b10", "#45301e", "#563b25", "#66472c", "#755234", "#865f3c")
 CAP = pg.hexes("#100a08", "#1e140e", "#2c1e14", "#4a3422")
 GLASS = pg.hexes("#22324a", "#3c5878", "#6a8cae", "#b4cce0")
@@ -34,6 +36,9 @@ class RoomInterior:
         for x0, y0, x1, y1 in areas:
             self.floor[y0:y1, x0:x1] = True
         self.dots = np.kron(self.floor, np.ones((T, T), dtype=bool))
+        # 높이(relief)에서 바닥으로 두는 문지방과, 벽면을 뚫고 오르는 계단 자리(점 x0, x1, 위, 아래)
+        self.sills = np.zeros_like(self.dots)
+        self.climbs = []
 
     def wall_starts(self, x):
         """그 열에서 바닥이 시작하는 줄들(바로 위가 벽인 바닥 줄). 그 위마다 벽면이 선다."""
@@ -230,6 +235,7 @@ class RoomInterior:
         c = self.c
         x0, x1 = x * T, (x + 2) * T
         top, bottom = face_top(y), (y + 2) * T
+        self.climbs.append((x0, x1, top, y * T))
         for k, y_step in enumerate(range(bottom, top, -8)):
             fade = k / max(1, (bottom - top) / 8)
             step = c.rect(x0 + 4, y_step - 8, x1 - 2, y_step)
@@ -245,6 +251,7 @@ class RoomInterior:
         """남쪽 바깥 문: 벽 윗면을 끊고 판자 문지방, 양옆 문기둥. (x, y)는 문지방 칸."""
         c = self.c
         sill = c.rect(x * T, y * T, (x + 1) * T, (y + 1) * T)
+        self.sills |= sill
         c.paint(sill, FLOORBOARD[3])
         c.paint(sill & (c.yy % 8 == 0), FLOORBOARD[0])
         for px in (x * T - 5, (x + 1) * T):
@@ -253,6 +260,20 @@ class RoomInterior:
 
     def ground(self):
         return self.c.image[..., :3].copy()
+
+    def relief(self):
+        """
+        HD-2D 필드의 높이(relief.py): 판자 바닥은 0, 방마다 북쪽 벽면은 FACE점까지 서고, 나머지 벽 윗면은 그 높이다.
+        카메라 쪽 벽은 FRONT점으로 낮게 자르고(방 사이 칸막이는 그대로), 바깥 문지방은 바닥, 위층 계단은 벽면을 뚫고 오르는 비탈이다.
+        """
+        floor = self.dots | self.sills
+        heights = relief.walls(floor, relief.faces_above(self.dots, FACE), FACE, front=FRONT)
+        yy = self.c.yy
+        for x0, x1, top, bottom in self.climbs:
+            band = np.zeros_like(floor)
+            band[top:bottom, x0:x1] = True
+            heights.slope(band, (bottom - yy) / 2)
+        return heights
 
 
 def face_decal(m, name, image, x, row):

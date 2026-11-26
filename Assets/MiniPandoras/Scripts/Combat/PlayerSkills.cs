@@ -84,7 +84,7 @@ namespace MiniPandoras.Combat
             p.Hp += hp;
             p.Dp += mana;
             state.SetItemCount(item, state.ItemCount(item) - 1);
-            combat.Effects.AddNumber(FieldCombat.Up(p.Body.Position, 28f), hp > 0 ? hp : mana, hp > 0 ? HealColor : ManaColor, 8f);
+            combat.Effects.AddNumber(FieldCombat.Raise(p.Body.Position, 28f), hp > 0 ? hp : mana, hp > 0 ? HealColor : ManaColor, 8f);
         }
 
         /// <summary>지금 그 칸의 동료를 누르면 곧바로 나온다. 튜토리얼이 시간을 멈출 때를 고른다.</summary>
@@ -256,7 +256,7 @@ namespace MiniPandoras.Combat
         {
             SkillShape shape = skill.Shape;
             Vector2 center = source.Feet + new Vector2(d.x * Pixels(shape.Reach), Pixels(PlayerFighter.ChestPixels) + d.y * Pixels(shape.Reach) * 0.8f);
-            combat.Effects.AddArc(center, d, Pixels(15f), skill.MainColor);
+            combat.Effects.AddArc(new Raised(source.Feet + new Vector2(d.x * Pixels(shape.Reach), d.y * Pixels(shape.Reach) * 0.8f), Pixels(PlayerFighter.ChestPixels)), d, Pixels(15f), skill.MainColor);
             BurstFx(center, skill.Palette, 14);
             HitAround(center, Pixels(shape.Size), source.Attack, skill, power, shape.Knock, d, lethal);
         }
@@ -306,7 +306,7 @@ namespace MiniPandoras.Combat
         {
             SkillShape shape = skill.Shape;
             Shot shot = combat.Effects.NewShot();
-            shot.Position = source.Feet + new Vector2(d.x * Pixels(8f), Pixels(10f) + d.y * Pixels(6f));
+            shot.Position = source.Feet + new Vector2(d.x * Pixels(8f), Pixels(Shot.FlightHeightPixels) + d.y * Pixels(6f));
             shot.Velocity = d * Pixels(shape.Speed);
             shot.Travelled = 0f;
             shot.Range = Pixels(shape.Range);
@@ -420,7 +420,7 @@ namespace MiniPandoras.Combat
             PlayerFighter p = combat.Player;
             int amount = JsMath.Round(p.MaxHp * skill.Shape.Ratio);
             p.Hp = Mathf.Min(p.MaxHp, p.Hp + amount);
-            combat.Effects.AddPopup(FieldCombat.Up(p.Body.Position, 26f), "+" + amount, HealColor, 8f);
+            combat.Effects.AddPopup(FieldCombat.Raise(p.Body.Position, 26f), "+" + amount, HealColor, 8f);
             combat.Particles.Burst(FieldCombat.Up(p.Body.Position, 12f), 22, skill.Palette, new Vector2(0.3f, 1.2f), new Vector2(20f, 36f), new Vector2(-Mathf.PI, 0f));
         }
 
@@ -685,7 +685,7 @@ namespace MiniPandoras.Combat
                     else
                     {
                         Execute(new FieldCombat.CastSource(body.Position, FacingRules.Step(body.Facing), s.Attack, null), s.Skill, power, target, false);
-                        combat.Effects.AddPopup(FieldCombat.Up(body.Position, body.Sheet.Size.y + 4f), s.Skill.DisplayName, s.Skill.AccentColor, 7f);
+                        combat.Effects.AddPopup(FieldCombat.Raise(body.Position, body.Sheet.Size.y + 4f), s.Skill.DisplayName, s.Skill.AccentColor, 7f);
                     }
                 }
 
@@ -761,7 +761,7 @@ namespace MiniPandoras.Combat
             HitAround(FieldCombat.Up(feet, 8f), Pixels(s.Skill.Shape.Radius), s.Attack, s.Skill, power, s.Skill.Shape.Knock, null, false);
             if (index == 0)
             {
-                combat.Effects.AddPopup(FieldCombat.Up(feet, body.Sheet.Size.y + 4f), look.Call?.Invoke() ?? s.Skill.DisplayName, s.Skill.AccentColor, 7f);
+                combat.Effects.AddPopup(FieldCombat.Raise(feet, body.Sheet.Size.y + 4f), look.Call?.Invoke() ?? s.Skill.DisplayName, s.Skill.AccentColor, 7f);
             }
         }
 

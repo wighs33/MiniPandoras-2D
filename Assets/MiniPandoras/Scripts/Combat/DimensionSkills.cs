@@ -60,7 +60,7 @@ namespace MiniPandoras.Combat
 
             if (!gateReach.Contains(CellOf(feet)) || FootMover.IsBlocked(feet))
             {
-                combat.Effects.AddPopup(FieldCombat.Up(feet, 8f), T("fieldCombat.dimension.leaveGateAt.1"), HintColor, 6.5f);
+                combat.Effects.AddPopup(FieldCombat.Raise(feet, 8f), T("fieldCombat.dimension.leaveGateAt.1"), HintColor, 6.5f);
                 return false;
             }
 
@@ -115,7 +115,7 @@ namespace MiniPandoras.Combat
             }
 
             ghostCount += 1;
-            combat.Effects.AddGhost(heroLook.Shown, heroLook.transform.position, heroLook.IsFlipped, GhostColors[ghostCount % GhostColors.Length]);
+            combat.Effects.AddGhost(heroLook.Shown, combat.Hero.Position, heroLook.IsFlipped, GhostColors[ghostCount % GhostColors.Length]);
         }
 
         // ── 공간도약 ─────────────────────────────────────────────
@@ -123,7 +123,7 @@ namespace MiniPandoras.Combat
         internal void BeginSlice(PlayerFighter p)
         {
             sliced.Clear();
-            combat.Effects.AddSpriteFx(FxSheet.Shard, FieldCombat.Up(p.Body.Position, PlayerFighter.ChestPixels), ShardFxFrames, 1.6f);
+            combat.Effects.AddSpriteFx(FxSheet.Shard, FieldCombat.Raise(p.Body.Position, PlayerFighter.ChestPixels), ShardFxFrames, 1.6f);
         }
 
         /// <summary>지나가는 자리의 적을 벤다. 한 번 뛰는 동안 같은 적은 한 번만 벤다.</summary>
@@ -131,7 +131,7 @@ namespace MiniPandoras.Combat
         {
             if (dash.FramesLeft % 2 == 0)
             {
-                combat.Effects.AddSpriteFx(FxSheet.Shard, FieldCombat.Up(p.Body.Position, PlayerFighter.ChestPixels), ShardFxFrames, 1f);
+                combat.Effects.AddSpriteFx(FxSheet.Shard, FieldCombat.Raise(p.Body.Position, PlayerFighter.ChestPixels), ShardFxFrames, 1f);
             }
 
             SkillShape shape = dash.Skill.Shape;
@@ -157,11 +157,11 @@ namespace MiniPandoras.Combat
 
             Vector2 from = p.Body.Position;
             Vector2 across = FieldCombat.Direction(target.Position - from);
-            combat.Effects.AddSpriteFx(FxSheet.Shard, FieldCombat.Up(from, PlayerFighter.ChestPixels), ShardFxFrames, 1.6f);
+            combat.Effects.AddSpriteFx(FxSheet.Shard, FieldCombat.Raise(from, PlayerFighter.ChestPixels), ShardFxFrames, 1.6f);
             p.Body.PlaceAt(SpotBehind(target, across, from));
             p.Body.Face(FacingRules.From(target.Position - p.Body.Position));
             p.Invulnerable = Mathf.Max(p.Invulnerable, WarpSafeFrames);
-            combat.Effects.AddSpriteFx(FxSheet.SpaceCut, target.Chest, SpaceCutFxFrames, 1f);
+            combat.Effects.AddSpriteFx(FxSheet.SpaceCut, target.ChestPoint, SpaceCutFxFrames, 1f);
             combat.RaiseScreenFlashed(skill.MainColor, 0.12f);
             combat.FollowCamera.Shake(2f, 8f);
             combat.PlayerSkills.DamageEnemy(target, source.Attack, power, skill.Shape.Knock, -across, skill.Status, lethal);

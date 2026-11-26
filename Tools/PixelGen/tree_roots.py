@@ -17,6 +17,7 @@ import numpy as np
 
 import fairy_props as fp
 import pixelgen as pg
+import relief
 import terrain
 from houses import Canvas
 from layout import LOGICAL, MapLayout
@@ -44,6 +45,8 @@ ROWS = [
 ]
 HEIGHT, WIDTH = len(ROWS), len(ROWS[0])
 FACE = 26                    # 바닥 북쪽 가장자리에 드러난 뿌리 벽면 높이(점)
+RISE = 30                    # HD-2D 필드에서 뿌리 벽을 그린 벽면보다 이만큼(점) 더 높이 세운다(사람 키를 넘는 굴)
+FRONT = 12                   # 카메라 쪽(남쪽) 뿌리 벽을 낮게 자른 높이(점)
 ROOT = pg.hexes("#0e0a08", "#1a120e", "#281c14", "#38281c", "#4a3726", "#5e4832")
 SOIL = pg.hexes("#221a15", "#2e241d", "#3b2f26", "#4a3b30", "#5a493b")
 CURSED_WATER = pg.hexes("#07040c", "#120a1e", "#1e1032", "#2e1a48", "#4a2a6e")
@@ -159,7 +162,7 @@ def water_layer(pool, rng, clean):
 
 
 def build():
-    m = MapLayout("treeRoots", "고목의 뿌리", WIDTH, HEIGHT, theme="cave", music="sorrow",
+    m = MapLayout("treeRoots", "고목의 뿌리", WIDTH, HEIGHT, theme="cave", indoors=True, music="sorrow",
                   ambient={"color": "#06080c", "alpha": 0.42}, seed=311)
     rng = np.random.default_rng(312)
     floor, face = build_floor(rng)
@@ -169,6 +172,7 @@ def build():
     pool = terrain.region(water_cells, wobble, 0.9) & floor
     ground = paint(np.random.default_rng(314), floor, face, pool, None, clean=False)
     m.paint_ground = lambda: ground
+    m.paint_relief = lambda: relief.walls(floor, relief.faces_above(floor, FACE + RISE), FACE + RISE, front=FRONT)
 
     for name, clean in (("cursed", False), ("clean", True)):
         with m.look(name):

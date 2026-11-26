@@ -17,6 +17,7 @@ from pathlib import Path
 import numpy as np
 
 import pixelgen as pg
+import relief
 import terrain
 import trees
 from layout import LOGICAL, MapLayout
@@ -113,7 +114,7 @@ def paint(rng):
     image[lit, :3] = (image[lit, :3] * (1 - mix) + np.array([255, 246, 220]) * mix).astype(np.uint8)
     edge = top & pg.neighbours(~top)
     image[edge, :3] = MEADOW[1]
-    return image
+    return image, top
 
 
 def blossom_tree(rng):
@@ -124,8 +125,9 @@ def blossom_tree(rng):
 
 def build():
     m = MapLayout("dream", "꿈", WIDTH, HEIGHT, theme="dream", music="void", weather="motes", background="void", seed=401)
-    image = paint(np.random.default_rng(402))
+    image, top = paint(np.random.default_rng(402))
     m.paint_ground = lambda: image
+    m.paint_relief = lambda: relief.island(top, image[..., 3] > 0)
     m.block_where(~cells_of(',."PH'))
     m.stand("blossom_tree", blossom_tree(np.random.default_rng(403)), 6.5, 5, block=(0.8, 0.4))
     m.light(10.5 * LOGICAL, 6.5 * LOGICAL, 60, "#fff0d0")
