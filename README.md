@@ -7,11 +7,7 @@
 직접 만든 웹게임을 Unity로 옮기고, 도트 그림을 입체 무대에 세운 **HD-2D 액션 RPG**입니다.<br>
 휴대폰 가로 화면에 맞췄고, 프롤로그부터 11장 엔딩까지 끝까지 할 수 있습니다.
 
-![Unity](https://img.shields.io/badge/Unity-6000.3-222c37?style=flat-square&logo=unity&logoColor=white)
-![C#](https://img.shields.io/badge/C%23-512bd4?style=flat-square)
-![URP](https://img.shields.io/badge/URP-HLSL-3b5b8c?style=flat-square)
-![Android](https://img.shields.io/badge/Android-IL2CPP-3a7d44?style=flat-square&logo=android&logoColor=white)
-![Python](https://img.shields.io/badge/Python-그림_생성기-8a6d2f?style=flat-square&logo=python&logoColor=white)
+<img src="Docs/Readme/badges.svg" height="24" alt="Unity 6000.3 · C# · URP · HLSL · Android IL2CPP · Python 그림 생성기">
 
 [**플레이 영상과 상세 설명**](https://hyeonsik-game-portfolio.vercel.app/projects/minipandoras/) · [코드 구조](Docs/ARCHITECTURE.md) · [로드맵](Docs/ROADMAP.md) · [외부 자료](Docs/THIRD_PARTY.md)
 
