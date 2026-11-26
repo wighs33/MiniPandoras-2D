@@ -4,7 +4,7 @@
   tower_top.png·_glow.png 돌뱀 탑의 위쪽(원래 크기), bridge.png 나무다리 판자,
   parchment.png 떨어진 지도, planks.png 널벽, beam.png 들보, cloud_day/dusk_0~3.png 구름, city.png·_glow.png 아이로스의 스카이라인,
   mountain_0~1.png 산줄기, seat.png 객실 의자, panel.png 객실 벽널, curtain.png 커튼, lamp.png 등, cart_0~3.png 수레와 호빗, dirt.png 흙길,
-  demon_wings.png·_glow.png 디엘의 날개, diel_seated·diel_back·kyle.png 한 사람이 주인공인 장면의 인물
+  demon_wings.png·_glow.png 디엘의 날개(정면), demon_wings_back.png·demon_wings_glow_back.png 뒤에서 본 디엘의 날개, diel_seated·diel_back·kyle.png 한 사람이 주인공인 장면의 인물, kyle_wings.png 카일의 천사 날개
 
 사용: python Tools/PixelGen/stage_props.py <프로젝트 루트>
 """
@@ -13,11 +13,12 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 import castle
 import pixelgen as pg
 import cutin_castle
+import cutin_descent
 from title_dawn import clouds_of
 from title_stage import chiselled, ramp, save, tone
 
@@ -387,6 +388,46 @@ def demon_wings(folder):
     put(folder, "demon_wings_glow.png", np.concatenate([glow[:, ::-1], glow], axis=1))
 
 
+# 뒤에서 본 디엘의 날개(3장 컷인). 정면용 날개는 두 날개가 한 점에서 만나서, 등 뒤 카메라 쪽에 두면 몸을 덮고 몸 너머에 두면 가슴에 달린 것처럼 보인다
+# (2026-11-26 사용자 지적). 그래서 반쪽씩 나눠 양 어깨뼈에서 돋게 하고 바깥으로 기울인다.
+BACK_GAP = 0.02            # 뿌리 사이 반폭(정면용 날개 폭의 몫). 무대가 날개 폭을 14칸으로 그리므로 0.28칸, 디엘의 어깨뼈 자리다
+BACK_TILT = 12             # 바깥(위)으로 기울인 각(도)
+FRONT_JOINT = 0.6          # 정면용 날개에서 이음매의 높이(그림 위에서)
+BACK_ROOT_ABOVE_BOTTOM = 0.4   # 뒤에서 본 날개 그림에서 뿌리의 높이(그림 아래에서). 무대가 이 자리를 등 위쪽에 맞춘다
+
+
+def wings_from_behind(folder):
+    """demon_wings.png·_glow.png를 반쪽씩 기울여 벌린 demon_wings_back.png·demon_wings_glow_back.png. 정면용과 점 크기가 같고, 두 그림의 자리도 같다."""
+
+    def tilted_right_half(wings, fill):
+        """오른쪽 날개를 뿌리(왼쪽 가장자리의 이음매 높이)가 판 가운데 (반폭, 높이)에 오게 놓고 바깥으로 기울인다."""
+        w, h = wings.size
+        half = wings.crop((w // 2, 0, w, h))
+        board = Image.new("RGBA", (half.width * 2, h * 2), fill)
+        board.paste(half, (half.width, h - round(h * FRONT_JOINT)))
+        return board.rotate(BACK_TILT, resample=Image.NEAREST, center=(half.width, h), fillcolor=fill)
+
+    colour = Image.open(folder / "demon_wings.png").convert("RGBA")
+    w, h = colour.size
+    board_root = (w // 2, h)
+    # 자리는 색 그림의 보이는 범위로 한 번 정한다(빛 그림은 온통 불투명해서 범위를 알 수 없다).
+    left_edge, top, right_edge, bottom = tilted_right_half(colour, (0, 0, 0, 0)).getbbox()
+    height = math.ceil(max((h - top) / (1 - BACK_ROOT_ABOVE_BOTTOM), (bottom - h) / BACK_ROOT_ABOVE_BOTTOM))
+    gap = round(w * BACK_GAP)
+    width = 2 * (gap + max(right_edge - board_root[0], board_root[0] - left_edge))
+    root_y = round(height * (1 - BACK_ROOT_ABOVE_BOTTOM))
+    for name, fill in (("demon_wings", (0, 0, 0, 0)), ("demon_wings_glow", (0, 0, 0, 255))):
+        right = tilted_right_half(Image.open(folder / f"{name}.png").convert("RGBA"), fill)
+        left = right.transpose(Image.FLIP_LEFT_RIGHT)
+        out = Image.new("RGBA", (width, height), fill)
+        for side, root_x, side_root_x in ((right, width // 2 + gap, board_root[0]), (left, width // 2 - gap, left.width - board_root[0])):
+            layer = Image.new("RGBA", (width, height), fill)
+            layer.paste(side, (root_x - side_root_x, root_y - board_root[1]))
+            # 색은 겹쳐 그리고, 빛은 둘 중 밝은 쪽을 남긴다(빛 그림은 바탕까지 불투명한 검정이다).
+            out = Image.alpha_composite(out, layer) if fill[3] == 0 else ImageChops.lighter(out, layer)
+        save(np.asarray(out).astype(float), folder, f"{name}_back.png")
+
+
 def carriage(folder):
     """수레와 호빗: 컷인에서 쓰던 장면 그림에서 그 부분만 오린다."""
     source = folder.parent / "CutIns/carriage"
@@ -398,14 +439,19 @@ def carriage(folder):
 
 
 def heroes(project, folder):
-    """한 사람이 주인공인 장면의 그림: 난간의 디엘과 등 돌린 디엘(컷인에서 쓰던 도트), 카일(웹게임 원화)."""
+    """한 사람이 주인공인 장면의 그림: 난간의 디엘, 등 돌린 디엘, 옆모습 카일(모두 컷인에서 쓰던 도트)과 카일의 천사 날개.
+
+    카일은 웹게임 원화 대신 도트를 쓴다(2026-11-26 사용자 판정: 도트 캐릭터가 더 낫다).
+    날개는 옛 컷인과 같은 pixelfx 천사 날개의 다 펼친 장이다. 무대의 펼침(_Reveal)은 그림 가로 가운데에서 바깥으로 번지므로,
+    날개 뿌리(effect.json의 pivot)가 가로 가운데에 오도록 왼쪽을 비운다. 뿌리는 그림 아래에서 (높이 - pivot y)만큼 위다.
+    """
     source = folder.parent / "CutIns"
-    for file, name in (("railing/diel.png", "diel_seated.png"), ("wings/diel.png", "diel_back.png")):
+    for file, name in (("railing/diel.png", "diel_seated.png"), ("wings/diel.png", "diel_back.png"), ("descent/kyle.png", "kyle.png")):
         save(np.asarray(Image.open(source / file).convert("RGBA")).astype(float), folder, name)
-    art = project.parent.parent.parent / "PANDORA_AI/public/games/pandoras/art"
-    kyle = Image.open(art / "kyle-eve.webp").convert("RGBA")
-    kyle.thumbnail((820, 1240), Image.LANCZOS)
-    save(np.asarray(kyle).astype(float), folder, "kyle.png")
+    wings, (root_x, _) = cutin_descent.last_wing_frame(project)
+    padded = Image.new("RGBA", (wings.width + wings.width - 2 * root_x, wings.height))
+    padded.alpha_composite(wings, (wings.width - 2 * root_x, 0))
+    save(np.asarray(padded).astype(float), folder, "kyle_wings.png")
 
 
 def compartment(folder):
@@ -468,6 +514,7 @@ def main(project):
     carriage(folder)
     dirt(folder)
     demon_wings(folder)
+    wings_from_behind(folder)
     compartment(folder)
     heroes(project, folder)
     for name, palette, seed in (("day", DAY, 81), ("dusk", DUSK, 82), ("night", NIGHT, 83), ("pale", PALE, 84)):

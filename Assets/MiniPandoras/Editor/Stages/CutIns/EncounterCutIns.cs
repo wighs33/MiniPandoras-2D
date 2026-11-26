@@ -168,13 +168,23 @@ namespace MiniPandoras.Editor.Stages.CutIns
             // 날개: 뒤에서 터지는 보랏빛을 등지고 펼쳐진다.
             kit.Disc("Burst", kit.Material("burst", "MiniPandoras/Stage/Glow", ("_Color", new Color(0.34f, 0.08f, 0.6f)), ("_Softness", 1.7f), ("_GlowShare", 1f)), At(0f, 4f, 4.6f), 28f);
             kit.Disc("Burst Rays", kit.Material("burst_rays", "MiniPandoras/Stage/Glow", ("_Color", new Color(0.26f, 0.07f, 0.5f)), ("_Rays", 1f), ("_RayCount", 14f), ("_RaySpeed", 0.3f), ("_GlowShare", 1f)), At(0f, 4.4f, 4.6f), 40f);
-            Texture2D span = CutInPicture("demon_wings.png");
-            const float wingSpan = 20f;
-            Material skin = Card(kit, "wings", span, new Color(0.95f, 0.88f, 1.05f), At(0f, 1f, 1f), new Color(0.9f, 0.35f, 1.5f), 0f, default,
-                ("_GlowTex", CutInPicture("demon_wings_glow.png")), ("_Glow", new Color(1.5f, 0.5f, 2.4f)), ("_GlowPulse", 0.25f), ("_GlowShare", 0.8f), ("_RevealFrom", 0f), ("_Unfold", 1f));
-            GameObject wings = kit.Card("Wings", skin, At(0f, 0.6f, -1.9f), wingSpan, wingSpan * span.height / span.width);
+            // 날개는 디엘의 등에 달린다(2026-11-26 사용자 지적: 날개가 몸 앞에, 곧 가슴 쪽에 달린 것처럼 보였다).
+            // 카메라가 등을 보므로 날개는 몸보다 카메라 쪽에 둔다. 그림은 양 어깨뼈에서 하나씩 돋는 뒤에서 본 날개이고(stage_props.wings_from_behind),
+            // 그 뿌리(그림 아래에서 40%)를 등 위쪽(발에서 키의 64%)에 맞춘다. 펼침은 등 가운데에서 바깥으로 번진다.
             Texture2D back = CutInPicture("diel_back.png");
-            kit.Card("Diel", Card(kit, "diel", back, new Color(0.62f, 0.56f, 0.72f), At(0f, 1f, 1f), new Color(1f, 0.45f, 1.7f)), At(0f, -1f, -0.5f), 5f * back.width / back.height, 5f);
+            const float dielHeight = 5f;
+            const float dielFeet = -0.5f;
+            kit.Card("Diel", Card(kit, "diel", back, new Color(0.62f, 0.56f, 0.72f), At(0f, 1f, 1f), new Color(1f, 0.45f, 1.7f)), At(0f, -1f, dielFeet), dielHeight * back.width / back.height, dielHeight);
+            Texture2D span = CutInPicture("demon_wings_back.png");
+            const float wingDot = 14f / 1000f;       // 정면용 날개 그림(폭 1000점)을 14칸으로 그리던 크기. 뒤에서 본 그림도 점 크기가 같다
+            const float rootAboveBottom = 0.4f;      // stage_props.BACK_ROOT_ABOVE_BOTTOM
+            const float backAboveFeet = 0.64f;
+            float wingWidth = span.width * wingDot;
+            float wingHeight = span.height * wingDot;
+            float wingBottom = dielFeet + dielHeight * backAboveFeet - wingHeight * rootAboveBottom;
+            Material skin = Card(kit, "wings", span, new Color(0.95f, 0.88f, 1.05f), At(0f, 1f, 1f), new Color(0.9f, 0.35f, 1.5f), 0f, default,
+                ("_GlowTex", CutInPicture("demon_wings_glow_back.png")), ("_Glow", new Color(1.5f, 0.5f, 2.4f)), ("_GlowPulse", 0.25f), ("_GlowShare", 0.8f), ("_RevealFrom", 0f), ("_Unfold", 1f));
+            GameObject wings = kit.Card("Wings", skin, At(0f, -1.3f, wingBottom), wingWidth, wingHeight);
             Motes(kit, 420, new Vector3(-10f, -1f, 0f), new Vector3(10f, 8f, 3f), Violet, new Color(0.5f, 0.1f, 0.9f), 0.12f, 12f, 1.2f, 0.95f);
             // 비: 앞은 또렷하게, 뒤는 흐리게
             for (int i = 0; i < 5; i++)
@@ -244,16 +254,27 @@ namespace MiniPandoras.Editor.Stages.CutIns
 
             kit.Crowd(new[] { "soldier", "soldier", "neo", "soldier" }, feet, people, Facing.Up);
 
-            Texture2D kyle = CutInPicture("kyle.png", FilterMode.Bilinear);
-            const float height = 17f;
-            Material angel = Card(kit, "kyle", kyle, new Color(0.8f, 0.77f, 0.72f), At(0f, 1f, 1f), new Color(1f, 0.82f, 0.46f), 0f, default, ("_RevealFrom", 0.44f), ("_Cutoff", 0.4f));
-            GameObject figure = kit.Card("Kyle", angel, At(0f, 30f, 10.5f), height * kyle.width / kyle.height, height);
+            // 카일은 옛 컷인의 도트 옆모습(왼쪽을 본다)과 천사 날개다(2026-11-26 사용자 판정: 원화보다 도트가 낫다).
+            // 옛 컷인과 같은 구도: 날개 뿌리를 발밑 뒤에 두고, 날개 그림 1점 = 카일 키의 1/192(옛 컷인에서 키 192점, 날개 1점 = 1px).
+            // 카일과 날개를 한 묶음(figure)으로 두어 함께 내려오게 하고, 무리 전체가 가운데에 오도록 카일을 왼쪽에 둔다.
+            Texture2D kyle = CutInPicture("kyle.png");
+            Texture2D feathers = CutInPicture("kyle_wings.png");
+            const float height = 11f;
+            const float wingDot = height / 192f;
+            const float wingRootAboveBottom = 40f;   // pixelfx angel/wings-unfurl의 pivot y(440)가 그림(480) 아래에서 40점 위
+            var group = new GameObject("Kyle").transform;
+            group.SetParent(kit.Root, false);
+            group.localPosition = At(-9.3f, 30f, 8f);
+            Material armour = Card(kit, "kyle", kyle, new Color(0.8f, 0.77f, 0.72f), At(0f, 1f, 1f), new Color(1f, 0.82f, 0.46f));
+            kit.Card("Body", armour, Vector3.zero, height * kyle.width / kyle.height, height, group);
+            Material plumes = Card(kit, "kyle_wings", feathers, new Color(0.95f, 0.92f, 0.86f), At(0f, 1f, 1f), new Color(1f, 0.82f, 0.46f), 0f, default, ("_RevealFrom", 0f), ("_Unfold", 1f));
+            GameObject wings = kit.Card("Wings", plumes, At(0f, 0.4f, -wingRootAboveBottom * wingDot), feathers.width * wingDot, feathers.height * wingDot, group);
             kit.Disc("Kyle Glow", kit.Material("kyle_glow", "MiniPandoras/Stage/Glow", ("_Color", new Color(0.4f, 0.32f, 0.18f)), ("_Softness", 1.8f), ("_GlowShare", 0.7f)), At(0f, 33f, 20f), 34f);
             kit.Disc("Kyle Rays", kit.Material("kyle_rays", "MiniPandoras/Stage/Glow", ("_Color", new Color(0.46f, 0.37f, 0.2f)), ("_Rays", 1f), ("_RayCount", 14f), ("_RaySpeed", 0.08f), ("_GlowShare", 1f)), At(0f, 32.6f, 20f), 46f);
             Motes(kit, 420, new Vector3(-20f, 6f, 0f), new Vector3(20f, 50f, 30f), new Color(1.1f, 0.95f, 0.6f), Color.white, 0.16f, -14f, 1.1f, 0.4f);
             kit.Look(0.6f, 0.95f, 0.7f, new Color(1f, 0.95f, 0.82f), 0.36f, 20f, -30f, Color.gray, Color.gray);
             CutInStage stage = kit.CutIn(kit.Pose("Start View", At(0f, -18f, 3f), At(0f, 34f, 17f)), kit.Pose("End View", At(0f, -6f, 5f), At(0f, 32f, 19f)), 42f, 38f, new Color(0.5f, 0.48f, 0.44f), new Color(0.6f, 0.56f, 0.5f), 0.005f);
-            SerializedFields.Set(stage, ("figure", figure.transform), ("descendFrom", 34f), ("revealed", figure.GetComponent<Renderer>()), ("revealSeconds", 0.9f));
+            SerializedFields.Set(stage, ("figure", group), ("descendFrom", 34f), ("revealed", wings.GetComponent<Renderer>()), ("revealSeconds", 0.9f));
             kit.Save("CutIns/CutIn_descent");
         }
     }
