@@ -6,7 +6,7 @@
 !/README.md
 !/.editorconfig
 
-# 문서. 작업 중 쌓인 백업 zip과 캡처 묶음은 뺀다.
+# 문서. 작업 중 쌓인 백업 zip과 캡처 묶음은 뺀다. README에 보이는 화면(Docs/Readme)은 올린다.
 !/Docs/
 /Docs/ArtUpgrade/
 
